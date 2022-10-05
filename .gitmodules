@@ -1,0 +1,6 @@
+[submodule "Tensors"]
+	path = Tensors
+	url = git@github.com:HenrikSchumacher/Tensors.git
+[submodule "GJK"]
+	path = GJK
+	url = git@github.com:HenrikSchumacher/GJK.git
