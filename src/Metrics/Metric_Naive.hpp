@@ -2,7 +2,7 @@
 
 #define CLASS Metric_Naive
 
-namespace Repulsion
+namespace Repulsor
 {
     template<int DOM_DIM, int AMB_DIM, typename Real, typename Int, typename SReal, typename ExtReal>
     class CLASS
@@ -207,6 +207,6 @@ namespace Repulsion
         
     };
     
-}// namespace Repulsion
+}// namespace Repulsor
 
 #undef CLASS

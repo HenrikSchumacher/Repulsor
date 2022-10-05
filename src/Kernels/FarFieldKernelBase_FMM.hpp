@@ -3,7 +3,7 @@
 #define CLASS FarFieldKernelBase_FMM
 
 // This sets up the basic I/O routines for all FMM-like far field kernels, both for energies and metrics.
-namespace Repulsion
+namespace Repulsor
 {
     template<int AMB_DIM, int DEGREE, typename Real, typename Int>
     class alignas( OBJECT_ALIGNMENT ) CLASS
@@ -35,7 +35,7 @@ namespace Repulsion
 
         virtual ~CLASS() = default;
         
-        REPULSION__ADD_CLONE_CODE_FOR_BASE_CLASS(CLASS)
+        __ADD_CLONE_CODE_FOR_BASE_CLASS__(CLASS)
         
     public:
         
@@ -244,7 +244,7 @@ namespace Repulsion
   
     };
     
-} // namespace Repulsion
+} // namespace Repulsor
 
 #undef CLASS
 

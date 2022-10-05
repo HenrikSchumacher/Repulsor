@@ -2,7 +2,7 @@
 
 #define CLASS SimplicialRemesherBase
 
-namespace Repulsion
+namespace Repulsor
 {
     template<typename Real, typename Int, typename SReal, typename ExtReal>
     class CLASS
@@ -61,6 +61,7 @@ namespace Repulsion
             return TO_STD_STRING(CLASS)+"<"+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+">";
         }
     };
-}
+    
+} // namespace Repulsor
 
 #undef CLASS

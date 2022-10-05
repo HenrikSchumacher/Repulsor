@@ -3,7 +3,7 @@
 #define CLASS TP_Energy_FMM_Adaptive
 #define BASE  Energy_FMM_Adaptive<DOM_DIM,AMB_DIM,DEGREE,Real,Int,SReal,ExtReal>
 
-namespace Repulsion
+namespace Repulsor
 {
     template<int DOM_DIM, int AMB_DIM, int DEGREE, typename Real, typename Int, typename SReal, typename ExtReal>
     class CLASS : public BASE
@@ -54,7 +54,7 @@ namespace Repulsion
         
     };
     
-}// namespace Repulsion
+}// namespace Repulsor
 
 #undef BASE
 #undef CLASS

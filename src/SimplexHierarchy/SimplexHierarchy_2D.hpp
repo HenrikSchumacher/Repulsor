@@ -1,0 +1,120 @@
+#pragma once
+
+namespace Repulsor
+{
+    
+#define DOM_DIM 2
+    
+    template<int AMB_DIM, typename Real, typename Int, typename SReal>
+    class alignas( OBJECT_ALIGNMENT ) SimplexHierarchy<DOM_DIM,AMB_DIM,Real,Int,SReal>
+    {
+        
+#include "SimplexHierarchy_Details.hpp"
+        
+        constexpr Int ChildCount() const
+        {
+            return 4;
+        }
+        
+        void ToChild( const Int k )
+        {
+            current_simplex_computed = false;
+            
+            former_child_id = child_id;
+            child_id = k;
+            column = ChildCount() * column + k;
+            ++level;
+            
+            scale  *= static_cast<SReal>(0.5);
+            weight *= static_cast<SReal>(0.25);
+            
+            if( (0<=k) && (k<=2) )
+            {
+                for( Int i = 0; i < VertexCount(); ++i )
+                {
+                    if( i != k )
+                    {
+                        for( Int j = 0; j < VertexCount(); ++j )
+                        {
+                            corners[i][j] = corners[k][j] + half * (corners[i][j] - corners[k][j]);
+                        }
+                    }
+                    else
+                    {
+                        for( Int j = 0; j < VertexCount(); ++j )
+                        {
+                            center[j]     = corners[k][j] + half * (center[j]     - corners[k][j]);
+                        }
+                    }
+                }
+            }
+            else if( child_id == 3 )
+            {
+                for( Int i = 0; i < VertexCount(); ++ i )
+                {
+                    for( Int j = 0; j < VertexCount(); ++j )
+                    {
+                        corners[i][j] = center[j] - half * (corners[i][j] - center[j]);
+                    }
+                }
+            }
+        }
+        
+        void ToParent()
+        {
+            if( level > 0)
+            {
+                current_simplex_computed = false;
+                
+                Int k = child_id;
+                
+                column = (column-child_id) / ChildCount();
+                former_child_id = child_id;
+                child_id = column % ChildCount();
+                --level;
+                
+                scale  *= static_cast<SReal>(2);
+                weight *= static_cast<SReal>(4);
+                
+                if( (0<=k) && (k<=2) )
+                {
+                    for( Int i = 0; i < VertexCount(); ++i )
+                    {
+                        if( i != k )
+                        {
+                            for( Int j = 0; j < VertexCount(); ++j )
+                            {
+                                corners[i][j] = corners[k][j] + two * (corners[i][j] - corners[k][j]);
+                            }
+                        }
+                        else
+                        {
+                            for( Int j = 0; j < VertexCount(); ++j )
+                            {
+                                center[j]     = corners[k][j] + two * (center[j]     - corners[k][j]);
+                            }
+                        }
+                    }
+                }
+                else if( k == 3 )
+                {
+                    for( Int i = 0; i < VertexCount(); ++ i )
+                    {
+                        for( Int j = 0; j < VertexCount(); ++j )
+                        {
+                            corners[i][j] = center[j] - two * (corners[i][j] - center[j]);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                wprint("Level is equal to 0 already.");
+            }
+        }
+        
+    }; // SimplexHierarchy
+    
+#undef DOM_DIM
+    
+} // namespace Repulsor

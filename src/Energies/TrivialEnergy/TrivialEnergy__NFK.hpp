@@ -3,7 +3,7 @@
 #define CLASS TrivialEnergy__NFK
 #define BASE Energy__NFK<DOM_DIM1,DOM_DIM2,AMB_DIM,Real,Int,SReal>
 
-namespace Repulsion
+namespace Repulsor
 {
     template<int DOM_DIM1, int DOM_DIM2, int AMB_DIM, typename Real, typename Int, typename SReal>
     class CLASS : public BASE
@@ -39,7 +39,7 @@ namespace Repulsion
         
         virtual ~CLASS() override = default;
         
-        REPULSION__ADD_CLONE_CODE(CLASS)
+        __ADD_CLONE_CODE__(CLASS)
         
     protected :
                 
@@ -64,7 +64,7 @@ namespace Repulsion
   
     };
     
-} // namespace Repulsion
+} // namespace Repulsor
 
 #undef CLASS
 #undef BASE

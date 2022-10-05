@@ -3,7 +3,7 @@
 #define CLASS Energy__FFK_FMM
 #define BASE  FarFieldKernelBase_FMM<AMB_DIM,DEGREE,Real,Int>
 
-namespace Repulsion
+namespace Repulsor
 {
     template<int AMB_DIM, int DEGREE, typename Real, typename Int>
     class CLASS : public BASE
@@ -17,7 +17,7 @@ namespace Repulsion
 
         virtual ~CLASS() override = default;
         
-        REPULSION__ADD_CLONE_CODE_FOR_ABSTRACT_CLASS(CLASS)
+        __ADD_CLONE_CODE_FOR_ABSTRACT_CLASS__(CLASS)
         
     public:
         
@@ -62,7 +62,7 @@ namespace Repulsion
   
     };
     
-} // namespace Repulsion
+} // namespace Repulsor
 
 #undef BASE
 #undef CLASS

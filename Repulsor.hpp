@@ -19,9 +19,11 @@
     }
 
 
-    #include "src/Types.hpp"
+    #include "src/Enums.hpp"
     #include "src/Settings.hpp"
     //#include "src/MultipoleMoments.hpp"
+    #include "src/SimplexHierarchy.hpp"
+    #include "src/Cluster.hpp"
     #include "src/ClusterTreeBase.hpp"
     #include "src/ClusterTree.hpp"
     #include "src/BlockClusterTreeBase.hpp"

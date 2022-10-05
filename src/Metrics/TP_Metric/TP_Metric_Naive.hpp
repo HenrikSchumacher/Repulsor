@@ -3,7 +3,7 @@
 #define CLASS TP_Metric_Naive
 #define BASE  Metric_Naive<DOM_DIM,AMB_DIM,Real,Int,SReal,ExtReal>
 
-namespace Repulsion
+namespace Repulsor
 {
     template<int DOM_DIM, int AMB_DIM, typename Real, typename Int, typename SReal, typename ExtReal>
     class CLASS : public BASE
@@ -45,7 +45,7 @@ namespace Repulsion
         
     };
     
-}// namespace Repulsion
+}// namespace Repulsor
 
 #undef BASE
 #undef CLASS

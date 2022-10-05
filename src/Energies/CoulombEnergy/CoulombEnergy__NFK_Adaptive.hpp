@@ -4,7 +4,7 @@
 #define BASE  Energy__NFK_Adaptive<DOM_DIM1,DOM_DIM2,AMB_DIM,Real,Int,SReal>
 
 
-namespace Repulsion
+namespace Repulsor
 {
     template<int DOM_DIM1, int DOM_DIM2, int AMB_DIM, typename T2, typename Real, typename Int, typename SReal>
     class CLASS : public BASE
@@ -67,7 +67,7 @@ namespace Repulsion
         
         virtual ~CLASS() override = default;
         
-        REPULSION__ADD_CLONE_CODE(CLASS)
+        __ADD_CLONE_CODE__(CLASS)
         
     protected:
         
@@ -247,7 +247,7 @@ namespace Repulsion
         return std::unique_ptr<BASE>(r);
     }
 
-} // namespace Repulsion
+} // namespace Repulsr
 
 #undef CLASS
 #undef BASE

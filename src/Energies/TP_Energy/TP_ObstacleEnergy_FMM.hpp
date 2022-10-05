@@ -3,7 +3,7 @@
 #define CLASS TP_ObstacleEnergy_FMM
 #define BASE  ObstacleEnergy_FMM<DOM_DIM1,DOM_DIM2,AMB_DIM,DEGREE,Real,Int,SReal,ExtReal>
 
-namespace Repulsion
+namespace Repulsor
 {
     template<int DOM_DIM1, int DOM_DIM2, int AMB_DIM, int DEGREE, typename Real, typename Int, typename SReal, typename ExtReal>
     class CLASS : public BASE
@@ -53,7 +53,7 @@ namespace Repulsion
         
     };
     
-}// namespace Repulsion
+}// namespace Repulsor
 
 #undef BASE
 #undef CLASS

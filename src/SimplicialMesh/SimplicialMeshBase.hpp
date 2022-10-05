@@ -2,7 +2,7 @@
 
 #define CLASS SimplicialMeshBase
 
-namespace Repulsion
+namespace Repulsor
 {
     template<typename Real, typename Int, typename SReal, typename ExtReal>
     class EnergyBase;
@@ -348,6 +348,6 @@ namespace Repulsion
         }
     };
     
-} // namespace Repulsion
+} // namespace Repulsor
 
 #undef CLASS

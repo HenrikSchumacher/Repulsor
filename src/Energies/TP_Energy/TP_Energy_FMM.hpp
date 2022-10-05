@@ -3,7 +3,7 @@
 #define CLASS TP_Energy_FMM
 #define BASE  Energy_FMM<DOM_DIM,AMB_DIM,DEGREE,Real,Int,SReal,ExtReal>
 
-namespace Repulsion
+namespace Repulsor
 {
     template<int DOM_DIM, int AMB_DIM, int DEGREE, typename Real, typename Int, typename SReal, typename ExtReal>
     class CLASS : public BASE
@@ -187,7 +187,7 @@ namespace Repulsion
         return std::unique_ptr<EnergyBase<Real,Int,SReal,ExtReal>>(r);
     }
 
-}// namespace Repulsion
+}// namespace Repulsor
 
 #undef BASE
 #undef CLASS

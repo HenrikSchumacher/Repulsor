@@ -3,7 +3,7 @@
 #define CLASS Energy__NFK
 #define BASE  NearFieldKernelBase<DOM_DIM1,DOM_DIM2,AMB_DIM,Real,Int,SReal>
 
-namespace Repulsion
+namespace Repulsor
 {
     template<int DOM_DIM1, int DOM_DIM2, int AMB_DIM, typename Real, typename Int, typename SReal>
     class CLASS : public BASE
@@ -17,7 +17,7 @@ namespace Repulsion
         
         virtual ~CLASS() override = default;
         
-        REPULSION__ADD_CLONE_CODE_FOR_ABSTRACT_CLASS(CLASS)
+        __ADD_CLONE_CODE_FOR_ABSTRACT_CLASS__(CLASS)
         
     protected:
         
@@ -80,7 +80,7 @@ namespace Repulsion
   
     };
     
-} // namespace Repulsion
+} // namespace Repulsor
 
 #undef BASE
 #undef CLASS

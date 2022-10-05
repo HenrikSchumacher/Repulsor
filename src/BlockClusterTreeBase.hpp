@@ -2,8 +2,6 @@
 
 #define CLASS BlockClusterTreeBase
 
-#define REPULSION_BLOCKCLUSTERTREE
-
 namespace Repulsor
 {
     

@@ -3,8 +3,6 @@
 #define CLASS BlockClusterTree
 #define BASE  BlockClusterTreeBase<Real,Int,SReal,ExtReal>
 
-#define REPULSION_BLOCKCLUSTERTREE
-
 namespace Repulsor
 {
     template<int AMB_DIM, typename Real, typename Int, typename SReal, typename ExtReal>

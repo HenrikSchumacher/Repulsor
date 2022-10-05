@@ -3,7 +3,7 @@
 #define CLASS Energy_FMM_Adaptive
 #define BASE  Energy_FMM<DOM_DIM,AMB_DIM,DEGREE,Real,Int,SReal,ExtReal>
 
-namespace Repulsion
+namespace Repulsor
 {
     template<int DOM_DIM, int AMB_DIM, int DEGREE, typename Real, typename Int, typename SReal, typename ExtReal>
     class CLASS : public BASE
@@ -387,7 +387,7 @@ namespace Repulsion
                 
                 std::unique_ptr<A_Kernel_T> A = A_ker->Clone();
                 
-#ifdef REPULSION__PRINT_REPORTS_FOR_ADAPTIVE_KERNELS
+#ifdef REPULSOR__PRINT_REPORTS_FOR_ADAPTIVE_KERNELS
                 A->CreateLogFile();
 #endif
                 
@@ -627,7 +627,7 @@ namespace Repulsion
         
     };
     
-}// namespace Repulsion
+}// namespace Repulsor
 
 #undef BASE
 #undef CLASS

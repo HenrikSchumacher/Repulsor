@@ -2,6 +2,28 @@
 
 namespace Repulsor
 {
+    enum class BoundingVolumeType
+    {
+        AABB,
+        AABB_LongestAxisSplit,
+        AABB_MedianSplit,
+        AABB_PreorderedSplit
+    };
+    
+    enum class SplitMethod
+    {
+        Parallel,
+        Sequential,
+        Recursive
+    };
+    
+    enum class BlockSplitMethod
+    {
+        Parallel,
+        Sequential,
+        Recursive
+    };
+    
     enum class TreePercolationAlgorithm
     {
         Tasks,

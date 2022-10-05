@@ -3,7 +3,7 @@
 #define BASE  SimplicialMeshBase<Real,Int,SReal,ExtReal>
 #define CLASS SimplicialMesh
 
-namespace Repulsion
+namespace Repulsor
 {
     template<int DOM_DIM, int AMB_DIM, int DEGREE, typename Real, typename Int, typename SReal, typename ExtReal>
     class TP_Energy_FMM_Adaptive;
@@ -1194,7 +1194,7 @@ namespace Repulsion
         return M;
     }
     
-} // namespace Repulsion
+} // namespace Repulsor
 
 #undef BASE
 #undef CLASS

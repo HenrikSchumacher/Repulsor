@@ -2,7 +2,7 @@
 
 #define CLASS EnergyBase
 
-namespace Repulsion
+namespace Repulsor
 {
     template<typename Real, typename Int, typename SReal, typename ExtReal>
     class CLASS
@@ -67,6 +67,6 @@ namespace Repulsion
         
     };
 
-}// namespace Repulsion
+}// namespace Repulsor
 
 #undef CLASS

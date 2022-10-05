@@ -3,7 +3,7 @@
 #define CLASS TP_Energy__FFK_FMM
 #define BASE  Energy__FFK_FMM<AMB_DIM,DEGREE,Real,Int>
 
-namespace Repulsion
+namespace Repulsor
 {
     template<int AMB_DIM, int DEGREE, typename T1, typename T2, typename Real, typename Int>
     class CLASS : public BASE
@@ -66,7 +66,7 @@ namespace Repulsion
         
         virtual ~CLASS() override = default;
         
-        REPULSION__ADD_CLONE_CODE(CLASS)
+        __ADD_CLONE_CODE__(CLASS)
         
     protected:
         
@@ -264,7 +264,7 @@ namespace Repulsion
         return std::unique_ptr<BASE>(r);
     }
     
-} // namespace Repulsion
+} // namespace Repulsor
 
 #undef BASE
 #undef CLASS

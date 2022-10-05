@@ -4,7 +4,7 @@
 
 // This sets up the basic I/O routines for all near field kernels, both for energies and metrics.
 
-namespace Repulsion
+namespace Repulsor
 {
     template<int DOM_DIM1, int DOM_DIM2, int AMB_DIM, typename Real, typename Int, typename SReal>
     class alignas( OBJECT_ALIGNMENT ) CLASS
@@ -47,7 +47,7 @@ namespace Repulsion
         
         virtual ~CLASS() = default;
         
-        REPULSION__ADD_CLONE_CODE_FOR_BASE_CLASS(CLASS)
+        __ADD_CLONE_CODE_FOR_BASE_CLASS__(CLASS)
         
     public:
         
@@ -338,7 +338,7 @@ namespace Repulsion
   
     };
     
-} // namespace Repulsion
+} // namespace Repulsor
 
 #undef CLASS
 

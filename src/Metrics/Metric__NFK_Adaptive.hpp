@@ -4,7 +4,7 @@
 #define BASE  Metric__NFK<DOM_DIM1,DOM_DIM2,AMB_DIM,Real,Int,SReal>
 
 
-namespace Repulsion
+namespace Repulsor
 {
     template<int DOM_DIM1, int DOM_DIM2, int AMB_DIM, typename Real, typename Int, typename SReal>
     class CLASS : public BASE
@@ -75,12 +75,12 @@ namespace Repulsion
         virtual ~CLASS() override = default;
         
 //        {
-//#ifdef REPULSION__PRINT_REPORTS_FOR_ADAPTIVE_KERNELS
+//#ifdef REPULSOR__PRINT_REPORTS_FOR_ADAPTIVE_KERNELS
 //            if( block_count > 0 )
 //            {
 //                const Int thread = omp_get_thread_num();
 //
-//                std::string filename = "./Repulsion__"+this->ClassName()+"_Report_"+ToString( thread )+".txt";
+//                std::string filename = "./Repulsor__"+this->ClassName()+"_Report_"+ToString( thread )+".txt";
 //                std::ofstream s (filename);
 //                s
 //                    << "Report for class                  = " << this->ClassName() << "\n"
@@ -93,14 +93,14 @@ namespace Repulsion
 //                ;
 //                if( bottom_count > 0 )
 //                {
-//                    s << "WARNING: Maximal subdivision level = "+ToString(settings.max_level)+" reached "+ToString(bottom_count)+" times. Expect non-sufficent repulsion behavior. Consider refining the mesh.";
+//                    s << "WARNING: Maximal subdivision level = "+ToString(settings.max_level)+" reached "+ToString(bottom_count)+" times. Expect non-sufficent repulsive behavior. Consider refining the mesh.";
 //                }
 //                s << std::endl;
 //            }
 //#endif
 //        }
         
-        REPULSION__ADD_CLONE_CODE_FOR_ABSTRACT_CLASS(CLASS)
+        __ADD_CLONE_CODE_FOR_ABSTRACT_CLASS__(CLASS)
         
     protected:
         
@@ -294,7 +294,7 @@ namespace Repulsion
   
     };
     
-} // namespace Repulsion
+} // namespace Repulsor
 
 #undef CLASS
 #undef BASE

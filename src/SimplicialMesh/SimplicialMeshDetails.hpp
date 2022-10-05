@@ -2,7 +2,7 @@
 
 #pragma once
 
-namespace Repulsion
+namespace Repulsor
 {
 	template<int DOM_DIM, int AMB_DIM, typename Real, typename Int>
     struct SimplicialMeshDetails
@@ -8095,4 +8095,4 @@ namespace Repulsion
 
 	}; // SimplicialMeshDetails<2,4,Real,Int>
 
-} // namespace Repulsion
+} // namespace Repulsor

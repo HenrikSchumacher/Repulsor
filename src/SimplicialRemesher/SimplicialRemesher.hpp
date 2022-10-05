@@ -12,7 +12,7 @@
 #define I(x) static_cast<Int>(x)
 #define R(x) static_cast<Real>(x)
 
-namespace Repulsion
+namespace Repulsor
 {
     
 //    template <class T>
@@ -1028,7 +1028,7 @@ namespace Repulsion
     };
     
         
-} // namespace Repulsion
+} // namespace Repulsor
 
 #undef I
 #undef R

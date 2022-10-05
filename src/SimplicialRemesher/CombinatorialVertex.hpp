@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Repulsion
+namespace Repulsor
 {
 
     template<int DOM_DIM, typename Int> class CombinatorialVertex;
@@ -212,4 +212,4 @@ namespace Repulsion
         
     }; // CombinatorialVertex
     
-} // namespace Repulsion
+} // namespace Repulsor

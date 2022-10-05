@@ -3,7 +3,7 @@
 #define CLASS SquaredDistanceMatrix__FFK_FMM
 #define BASE  Metric__FFK_FMM<AMB_DIM,DEGREE,Real,Int>
 
-namespace Repulsion
+namespace Repulsor
 {
     template<int AMB_DIM, int DEGREE, typename Real, typename  Int>
     class CLASS : public BASE
@@ -56,7 +56,7 @@ namespace Repulsion
         
         virtual ~CLASS() override = default;
         
-        REPULSION__ADD_CLONE_CODE(CLASS)
+        __ADD_CLONE_CODE__(CLASS)
         
     protected:
         
@@ -103,7 +103,7 @@ namespace Repulsion
   
     };
     
-} // namespace Repulsion
+} // namespace Repulsor
 
 #undef CLASS
 #undef BASE

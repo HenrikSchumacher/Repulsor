@@ -2,7 +2,7 @@
 
 #define CLASS MetricBase
 
-namespace Repulsion
+namespace Repulsor
 {
     template<typename Real, typename Int, typename SReal, typename ExtReal>
     class CLASS
@@ -82,6 +82,6 @@ namespace Repulsion
         
     };
     
-}// namespace Repulsion
+}// namespace Repulor
 
 #undef CLASS

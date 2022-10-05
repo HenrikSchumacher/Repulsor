@@ -5,7 +5,7 @@
 
 #define ADMISSABILITY_CONDITION const bool admissable = gjk.MultipoleAcceptanceCriterion(P, Q, theta2);
 
-namespace Repulsion
+namespace Repulsor
 {
     template<int DOM_DIM1, int DOM_DIM2, int AMB_DIM, typename Real, typename Int, typename SReal>
     class CLASS : public BASE
@@ -76,7 +76,7 @@ namespace Repulsion
         
         virtual ~CLASS() override
         {
-#ifdef REPULSION__PRINT_REPORTS_FOR_ADAPTIVE_KERNELS
+#ifdef REPULSOR__PRINT_REPORTS_FOR_ADAPTIVE_KERNELS
             logfile
                 << "\n"
                 << "Report for class                    = " << this->ClassName() << "\n"
@@ -88,13 +88,13 @@ namespace Repulsion
             ;
             if( bottom_count > 0 )
             {
-                logfile << "WARNING: Maximal subdivision level = "+ToString(settings.max_level)+" reached "+ToString(bottom_count)+" times. Expect non-sufficent repulsion behavior. Consider refining the mesh.";
+                logfile << "WARNING: Maximal subdivision level = "+ToString(settings.max_level)+" reached "+ToString(bottom_count)+" times. Expect non-sufficent repulsive behavior. Consider refining the mesh.";
             }
             logfile << std::endl;
 #endif
         }
         
-        REPULSION__ADD_CLONE_CODE_FOR_ABSTRACT_CLASS(CLASS)
+        __ADD_CLONE_CODE_FOR_ABSTRACT_CLASS__(CLASS)
         
     public:
         
@@ -102,10 +102,10 @@ namespace Repulsion
         {
             DUMP(ClassName());
             logprint("CreateLogFile");
-#ifdef REPULSION__PRINT_REPORTS_FOR_ADAPTIVE_KERNELS
+#ifdef REPULSOR__PRINT_REPORTS_FOR_ADAPTIVE_KERNELS
 
             logprint("Really creating log file");
-            std:: string s = "./Repulsion__"+ClassName()+"_Report_"+ToString(omp_get_thread_num())+".txt";
+            std:: string s = "./Repulsor__"+ClassName()+"_Report_"+ToString(omp_get_thread_num())+".txt";
             
             DUMP(s);
             
@@ -113,16 +113,16 @@ namespace Repulsion
             
             logfile << "Log file for " << ClassName() << std::endl;
             
-            s = "./Repulsion__"+ClassName()+"_Simplices_"+ToString(omp_get_thread_num())+".txt";
+            s = "./Repulsor__"+ClassName()+"_Simplices_"+ToString(omp_get_thread_num())+".txt";
             simplex_file.open(s, std::ios_base::app);
             
-            s = "./Repulsion__"+ClassName()+"_Centers_"+ToString(omp_get_thread_num())+".txt";
+            s = "./Repulsor__"+ClassName()+"_Centers_"+ToString(omp_get_thread_num())+".txt";
             center_file.open(s, std::ios_base::app);
             
-            s = "./Repulsion__"+ClassName()+"_EmbSimplices_"+ToString(omp_get_thread_num())+".txt";
+            s = "./Repulsor__"+ClassName()+"_EmbSimplices_"+ToString(omp_get_thread_num())+".txt";
             emb_simplex_file.open(s, std::ios_base::app);
             
-            s = "./Repulsion__"+ClassName()+"_EmbCenters_"+ToString(omp_get_thread_num())+".txt";
+            s = "./Repulsor__"+ClassName()+"_EmbCenters_"+ToString(omp_get_thread_num())+".txt";
             emb_center_file.open(s, std::ios_base::app);
             
 //            logprint("Writing to log file "+s+".");
@@ -418,7 +418,7 @@ namespace Repulsion
   
     };
     
-} // namespace Repulsion
+} // namespace Repulsor
 
 #undef CLASS
 #undef BASE
