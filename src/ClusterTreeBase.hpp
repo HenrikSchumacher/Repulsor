@@ -1137,7 +1137,7 @@ namespace Repulsor
 //##        Moments
 //##################################################################################################
         
-        virtual void RequireClusterMoments( const Int moment_degree_ ) const = 0;
+//        virtual void RequireClusterMoments( const Int moment_degree_ ) const = 0;
         
 //##################################################################################################
 //##        General reports

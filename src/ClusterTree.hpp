@@ -31,7 +31,7 @@ namespace Repulsor
         using BASE::PrimitiveCount;
         using BASE::ClusterCount;
         using BASE::LeafClusterCount;
-        using BASE::RequireClusterMoments;
+//        using BASE::RequireClusterMoments;
         
     protected:
         

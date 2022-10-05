@@ -1099,7 +1099,7 @@ namespace Repulsor
     )
     {
         // For backward-compatibility.
-        // Assuming that vertex_count_ and simplex_count_ are both in row-major format.
+        // Assuming that V_coords_ and simplices_ are both in row-major format.
         return MakeSimplicialMesh<Real,Int,SReal,ExtReal, ExtInt>(
             V_coords_,  vertex_count_,  amb_dim,      false,
             simplices_, simplex_count_, simplex_size, false,
@@ -1109,7 +1109,7 @@ namespace Repulsor
     
     
     template<typename Real, typename Int, typename SReal, typename ExtReal, typename ExtInt>
-    std::unique_ptr<SimplicialMeshBase<Real, Int, SReal, ExtReal>> MakeSimplicialMeshFromFile( const std::string & file_name, const Int thread_count )
+    std::unique_ptr<BASE> MakeSimplicialMeshFromFile( const std::string & file_name, const Int thread_count )
     {
         ptic("MakeSimplicialMeshFromFile");
         
@@ -1183,7 +1183,7 @@ namespace Repulsor
         }
         
 
-        auto M = MakeSimplicialMesh<Real, Int, SReal, ExtReal, ExtInt>(
+        auto M = MakeSimplicialMesh<Real,Int,SReal,ExtReal,ExtInt>(
             V, vertex_count,  amb_dim,      false,
             S, simplex_count, simplex_size, false,
             thread_count
