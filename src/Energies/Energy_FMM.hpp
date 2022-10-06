@@ -11,7 +11,7 @@ namespace Repulsor
     public:
 
         using Mesh_T     = typename BASE::Mesh_T;
-        using N_Kernel_T = Energy__NFK    <DOM_DIM,DOM_DIM,AMB_DIM,Real,Int,SReal>;
+        using N_Kernel_T = Energy__NFK     <DOM_DIM,DOM_DIM,AMB_DIM,Real,Int,SReal>;
         using F_Kernel_T = Energy__FFK_FMM <AMB_DIM,DEGREE,Real,Int>;
         
         CLASS(

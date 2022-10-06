@@ -129,7 +129,7 @@ namespace Repulsor
 #endif
         }
         
-    protected :
+    protected:
         
         const AdaptivitySettings settings;
         const Real theta  = 10;

@@ -8,8 +8,8 @@ namespace Repulsor
     template<int AMB_DIM, int DEGREE, typename Real, typename Int>
     class alignas( OBJECT_ALIGNMENT ) CLASS
     {
-        ASSERT_FLOAT(Real   );
-        ASSERT_INT  (Int    );
+        ASSERT_FLOAT(Real);
+        ASSERT_INT  (Int );
         
     public:
         

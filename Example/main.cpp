@@ -1,10 +1,14 @@
 #include <iostream>
 
-// We have to toggle which domain dimensions and ambient dimensions shall be supported by runtime polymorphism before we load Repulsion.h
+#include <sys/types.h>
+#include <pwd.h>
+
+// We have to toggle which domain dimensions and ambient dimensions shall be supported by runtime polymorphism before we load Repulsor.hpp
 // You can activate everything you want, but compile times might increase substatially.
 #define INT long long
 #define REAL double
 
+#define TOOLS_ENABLE_PROFILER // enable profiler
 
 #define ENABLE_POINTCLOUDS  0
 #define ENABLE_CURVES       0
@@ -23,7 +27,15 @@ using namespace Tools;
 
 int main(int argc, const char * argv[]) {
     
-    Profiler::Clear("/Users/Henrik");
+    const char * homedir = getenv("HOME");
+
+    if( homedir == NULL)
+    {
+        homedir = getpwuid(getuid())->pw_dir;
+    }
+    std::string path ( homedir );
+    
+    Profiler::Clear( path );
 
     
     int thread_count = 8;
