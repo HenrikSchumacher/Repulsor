@@ -53,9 +53,10 @@ namespace Repulsor
             
             DUMP(Stats());
             
-//            const Real near = (!use_blocking) ? NearField(M) : NearField_Blocked(M);
             const Real near = NearField(M);
+//            const Real near = 0;
             const Real  far =  FarField(M);
+//            const Real  far = 0;
             
             DUMP(near);
             DUMP(far);
@@ -76,14 +77,15 @@ namespace Repulsor
             
             M.GetClusterTree().CleanseDerivativeBuffers();
             
-//            const Real near = (!use_blocking) ? DNearField(M) : DNearField_Blocked(M);
             const Real near = DNearField(M);
+//            const Real near = 0;
             const Real  far =  DFarField(M);
-            
+//            const Real far = 0;
             DUMP(near);
             DUMP(far);
             
             M.Assemble_ClusterTree_Derivatives(output, weight, addTo);
+
             
             ptoc(ClassName()+"::Differential");
             return weight * (near+far);

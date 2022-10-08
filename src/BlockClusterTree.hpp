@@ -1275,268 +1275,268 @@ namespace Repulsor
         }
 
         void RequireAdaptiveSubdivisionData() const override
-                {
-                    if( adaptive_subdivision_data_initialized )
-                    {
-                        return;
-                    }
-                    
-                    ptic(className()+"::RequireAdaptiveSubdivisionData");
-                    
-                    if( near.NonzeroCount() <= 0 )
-                    {
-                        ptoc(className()+"::RequireAdaptiveSubdivisionData");
-                        return;
-                    }
-                    
-                    // cppcheck-suppress [knownConditionTrueFalse]
-                    const bool uppertriangular = NearUpperTriangular();
-                    
-                    // cppcheck-suppress [knownConditionTrueFalse]
-                    const auto & job_ptr = uppertriangular
-                        ? near.UpperTriangularJobPtr()
-                        : near.JobPtr();
-                    
-                    // cppcheck-suppress [knownConditionTrueFalse]
-                    Int const * restrict const row_begin = uppertriangular
-                        ? near.Diag ().data()
-                        : near.Outer().data();
+        {
+            if( adaptive_subdivision_data_initialized )
+            {
+                return;
+            }
+            
+            ptic(className()+"::RequireAdaptiveSubdivisionData");
+            
+            if( near.NonzeroCount() <= 0 )
+            {
+                ptoc(className()+"::RequireAdaptiveSubdivisionData");
+                return;
+            }
+            
+            // cppcheck-suppress [knownConditionTrueFalse]
+            const bool uppertriangular = NearUpperTriangular();
+            
+            // cppcheck-suppress [knownConditionTrueFalse]
+            const auto & job_ptr = uppertriangular
+                ? near.UpperTriangularJobPtr()
+                : near.JobPtr();
+            
+            // cppcheck-suppress [knownConditionTrueFalse]
+            Int const * restrict const row_begin = uppertriangular
+                ? near.Diag ().data()
+                : near.Outer().data();
 
-                    Int const * restrict const row_end = near.Outer().data()+1;
-                    Int const * restrict const inner   = near.Inner().data();
-                    
+            Int const * restrict const row_end = near.Outer().data()+1;
+            Int const * restrict const inner   = near.Inner().data();
+            
 //                    const Int pair_count = near.Inner().Size();
 
-                    const Int thread_count_ = job_ptr.Size()-1;
-                    
-                     intersec_i = std::vector<std::vector<Int>>(thread_count_);
-                     intersec_j = std::vector<std::vector<Int>>(thread_count_);
-                     intersec_a = std::vector<std::vector<Int>>(thread_count_);
-                    
-                     sep_a = std::vector<std::vector<Int>>(thread_count_);
-                    nsep_a = std::vector<std::vector<Int>>(thread_count_);
-                    
-                    if( IsSymmetric() )
-                    {
-                        //Ensure that the adjacency matrix is constructed before the parallel region.
-                        logprint("Tree is symmetric.");
-                        (void)S.PrimitiveAdjacencyMatrix();
-                    }
-                    else
-                    {
-                        logprint("Tree is not symmetric.");
-                    }
-                    
-                    DUMP(AdaptivityParameter());
-                    
-                    const Real intersection_theta2 = pow( settings.near_field_intersection_parameter, 2 );
-                        
-                    #pragma omp parallel for num_threads( thread_count_ )
-                    for( Int thread = 0; thread < thread_count_; ++thread )
-                    {
-                        SReal * restrict const S_serialized = GetS().PrimitiveSerializedData().data();
-                        SReal * restrict const T_serialized = GetT().PrimitiveSerializedData().data();
-                        
-                        //I hope this guarantees that the vectors are allocated on the local RAM of each thread.
-                        
-                        intersec_i[thread] = std::vector<Int>();
-                        intersec_j[thread] = std::vector<Int>();
-                        intersec_a[thread] = std::vector<Int>();
-                        
-                        sep_i[thread]      = std::vector<Int>();
-                        sep_j[thread]      = std::vector<Int>();
-                        sep_a[thread]      = std::vector<Int>();
-                        
-                        nsep_i[thread]     = std::vector<Int>();
-                        nsep_j[thread]     = std::vector<Int>();
-                        nsep_a[thread]     = std::vector<Int>();
-                        
-                        std::vector<Int> & intersec_idx = intersec_i[thread];
-                        std::vector<Int> & intersec_jdx = intersec_j[thread];
-                        std::vector<Int> & intersec_val = intersec_a[thread];
-                        
-                        std::vector<Int> & sep_idx      = sep_i[thread];
-                        std::vector<Int> & sep_jdx      = sep_j[thread];
-                        std::vector<Int> & sep_val      = sep_a[thread];
-                        
+            const Int thread_count_ = job_ptr.Size()-1;
+            
+             intersec_i = std::vector<std::vector<Int>>(thread_count_);
+             intersec_j = std::vector<std::vector<Int>>(thread_count_);
+             intersec_a = std::vector<std::vector<Int>>(thread_count_);
+            
+             sep_a = std::vector<std::vector<Int>>(thread_count_);
+            nsep_a = std::vector<std::vector<Int>>(thread_count_);
+            
+            if( IsSymmetric() )
+            {
+                //Ensure that the adjacency matrix is constructed before the parallel region.
+                logprint("Tree is symmetric.");
+                (void)S.PrimitiveAdjacencyMatrix();
+            }
+            else
+            {
+                logprint("Tree is not symmetric.");
+            }
+            
+            DUMP(AdaptivityParameter());
+            
+            const Real intersection_theta2 = pow( settings.near_field_intersection_parameter, 2 );
+                
+            #pragma omp parallel for num_threads( thread_count_ )
+            for( Int thread = 0; thread < thread_count_; ++thread )
+            {
+                SReal * restrict const S_serialized = GetS().PrimitiveSerializedData().data();
+                SReal * restrict const T_serialized = GetT().PrimitiveSerializedData().data();
+                
+                //I hope this guarantees that the vectors are allocated on the local RAM of each thread.
+                
+                intersec_i[thread] = std::vector<Int>();
+                intersec_j[thread] = std::vector<Int>();
+                intersec_a[thread] = std::vector<Int>();
+                
+                sep_i[thread]      = std::vector<Int>();
+                sep_j[thread]      = std::vector<Int>();
+                sep_a[thread]      = std::vector<Int>();
+                
+                nsep_i[thread]     = std::vector<Int>();
+                nsep_j[thread]     = std::vector<Int>();
+                nsep_a[thread]     = std::vector<Int>();
+                
+                std::vector<Int> & intersec_idx = intersec_i[thread];
+                std::vector<Int> & intersec_jdx = intersec_j[thread];
+                std::vector<Int> & intersec_val = intersec_a[thread];
+                
+                std::vector<Int> & sep_idx      = sep_i[thread];
+                std::vector<Int> & sep_jdx      = sep_j[thread];
+                std::vector<Int> & sep_val      = sep_a[thread];
+                
 //                        sep_idx.reserve(pair_count);
 //                        sep_jdx.reserve(pair_count);
 //                        sep_val.reserve(pair_count);
-                        
-                        std::vector<Int> & nsep_idx     = nsep_i[thread];
-                        std::vector<Int> & nsep_jdx     = nsep_j[thread];
-                        std::vector<Int> & nsep_val     = nsep_a[thread];
+                
+                std::vector<Int> & nsep_idx     = nsep_i[thread];
+                std::vector<Int> & nsep_jdx     = nsep_j[thread];
+                std::vector<Int> & nsep_val     = nsep_a[thread];
 
-                        const Int i_begin = job_ptr[thread  ];
-                        const Int i_end   = job_ptr[thread+1];
+                const Int i_begin = job_ptr[thread  ];
+                const Int i_end   = job_ptr[thread+1];
+                
+                std::unique_ptr<Primitive_T> P_ptr = S.PrimitivePrototype().Clone();
+                std::unique_ptr<Primitive_T> Q_ptr = T.PrimitivePrototype().Clone();
+                
+                Primitive_T & P = *P_ptr;
+                Primitive_T & Q = *Q_ptr;
+                GJK_T       & G = *gjk[thread];
+                
+                // cppcheck-suppress [knownConditionTrueFalse]
+                if( IsSymmetric() )
+                {
+                    const SparseBinaryMatrixCSR<Int> & A = S.PrimitiveAdjacencyMatrix();
+                          
+                    for( Int i = i_begin; i < i_end; ++i )
+                    {
+                        P.SetPointer(S_serialized,i);
+
+                        const Int k_begin = row_begin[i];
+                        const Int k_end   = row_end  [i];
                         
-                        std::unique_ptr<Primitive_T> P_ptr = S.PrimitivePrototype().Clone();
-                        std::unique_ptr<Primitive_T> Q_ptr = T.PrimitivePrototype().Clone();
-                        
-                        Primitive_T & P = *P_ptr;
-                        Primitive_T & Q = *Q_ptr;
-                        GJK_T       & G = *gjk[thread];
-                        
-                        // cppcheck-suppress [knownConditionTrueFalse]
-                        if( IsSymmetric() )
+                        for (Int k = k_begin; k < k_end; ++k )
                         {
-                            const SparseBinaryMatrixCSR<Int> & A = S.PrimitiveAdjacencyMatrix();
-                                  
-                            for( Int i = i_begin; i < i_end; ++i )
+                            const Int j = inner[k];
+                            
+                            Q.SetPointer(T_serialized,j);
+                            
+                            const bool neighbor_found = A.FindNonzeroPosition(i,j) >= 0;
+                            
+                            if( neighbor_found )
                             {
-                                P.SetPointer(S_serialized,i);
-
-                                const Int k_begin = row_begin[i];
-                                const Int k_end   = row_end  [i];
+//                                logprint("neighbors");
+                                sep_idx.push_back(i);
+                                sep_jdx.push_back(j);
+                                sep_val.push_back(k);
+                            }
+                            else
+                            {
+                                const bool admissable = G.MultipoleAcceptanceCriterion( P, Q, near_theta2);
                                 
-                                for (Int k = k_begin; k < k_end; ++k )
+                                if( admissable )
                                 {
-                                    const Int j = inner[k];
+//                                    logprint("admissable");
+                                    sep_idx.push_back(i);
+                                    sep_jdx.push_back(j);
+                                    sep_val.push_back(k);
+                                }
+                                else
+                                {
+//                                    logprint("inadmissable");
+                                    const bool intersecting = (!G.SeparatedQ()) && G.IntersectingQ( P, Q, intersection_theta2 );
                                     
-                                    Q.SetPointer(T_serialized,j);
-                                    
-                                    const bool neighbor_found = A.FindNonzeroPosition(i,j) >= 0;
-                                    
-                                    if( neighbor_found )
+                                    if( intersecting )
                                     {
-        //                                logprint("neighbors");
-                                        sep_idx.push_back(i);
-                                        sep_jdx.push_back(j);
-                                        sep_val.push_back(k);
+                                        intersec_idx.push_back(i);
+                                        intersec_jdx.push_back(j);
+                                        intersec_val.push_back(k);
                                     }
                                     else
                                     {
-                                        const bool admissable = G.MultipoleAcceptanceCriterion( P, Q, near_theta2);
-                                        
-                                        if( admissable )
-                                        {
-        //                                    logprint("admissable");
-                                            sep_idx.push_back(i);
-                                            sep_jdx.push_back(j);
-                                            sep_val.push_back(k);
-                                        }
-                                        else
-                                        {
-        //                                    logprint("inadmissable");
-                                            const bool intersecting = (!G.SeparatedQ()) && G.IntersectingQ( P, Q, intersection_theta2 );
-                                            
-                                            if( intersecting )
-                                            {
-                                                intersec_idx.push_back(i);
-                                                intersec_jdx.push_back(j);
-                                                intersec_val.push_back(k);
-                                            }
-                                            else
-                                            {
-                                                nsep_idx.push_back(i);
-                                                nsep_jdx.push_back(j);
-                                                nsep_val.push_back(k);
-                                            }
-                                        }
+                                        nsep_idx.push_back(i);
+                                        nsep_jdx.push_back(j);
+                                        nsep_val.push_back(k);
                                     }
-                                    
-                                } // for (Int k = k_begin; k < k_end; ++k)
-                                
-                            } // for( Int i = i_begin; i < i_end; ++i )
-                        }
-                        else
-                        {
-                            for( Int i = i_begin; i < i_end; ++i )
-                            {
-                                P.SetPointer(S_serialized,i);
-
-                                const Int k_begin = row_begin[i];
-                                const Int k_end   = row_end  [i];
-                                
-                                for (Int k = k_begin; k < k_end; ++k )
-                                {
-                                    const Int j = inner[k];
-                                    
-                                    Q.SetPointer(T_serialized,j);
-                                    
-                                    const bool admissable = G.MultipoleAcceptanceCriterion( P, Q, near_theta2);
-                                    
-                                    if( admissable )
-                                    {
-        //                                    logprint("admissable");
-                                        sep_idx.push_back(i);
-                                        sep_jdx.push_back(j);
-                                        sep_val.push_back(k);
-                                    }
-                                    else
-                                    {
-        //                                    logprint("inadmissable");
-                                        const bool intersecting = (!G.SeparatedQ()) && G.IntersectingQ( P, Q, intersection_theta2 );
-                                        
-                                        
-                                        if( intersecting )
-                                        {
-                                            intersec_idx.push_back(i);
-                                            intersec_jdx.push_back(j);
-                                            intersec_val.push_back(k);
-                                        }
-                                        else
-                                        {
-                                            nsep_idx.push_back(i);
-                                            nsep_jdx.push_back(j);
-                                            nsep_val.push_back(k);
-                                        }
-                                    }
-                                    
-                                } // for (Int k = k_begin; k < k_end; ++k)
-                                
-                            } // for( Int i = i_begin; i < i_end; ++i )
-                        }
+                                }
+                            }
+                            
+                        } // for (Int k = k_begin; k < k_end; ++k)
                         
-                    } // #pragma omp parallel
-
-                    ptic("assembling matrix no_subdivide");
-                    no_subdivide     = SparseMatrixCSR <Int,Int>(
-                         sep_i,  sep_j,  sep_a, near.RowCount(), near.ColCount(), near.ThreadCount(), false, 0 );
-                    ptoc("assembling matrix no_subdivide");
-                    
-                    DUMP(no_subdivide.NonzeroCount());
-                    
-                    ptic("assembling matrix to_subdivide");
-                    to_subdivide     = SparseMatrixCSR <Int,Int>(
-                        nsep_i, nsep_j, nsep_a, near.RowCount(), near.ColCount(), near.ThreadCount(), false, 0 );
-                    ptoc("assembling matrix to_subdivide");
-                    
-                    DUMP(to_subdivide.NonzeroCount());
-                    
-                    ptic("assembling primitive_intersection_matrix");
-                    primitive_intersection_matrix = SparseMatrixCSR<Int,Int>(
-                         intersec_i,  intersec_j,  intersec_a, near.RowCount(), near.ColCount(), near.ThreadCount(), false, 0 );
-                    ptoc("assembling primitive_intersection_matrix");
-                    
-                    DUMP(primitive_intersection_matrix.NonzeroCount());
-                    
-                    if( primitive_intersection_matrix.Inner().Size() > 0 )
-                    {
-                        wprint(className()+"::RequireAdaptiveSubdivisionData: "+ToString(primitive_intersection_matrix.Inner().Size())+" intersections detected.");
-                    }
-                    
-                    #pragma omp parallel for num_threads(thread_count_)
-                    for( Int thread = 0; thread < thread_count_; ++thread )
-                    {
-                        intersec_i[thread] = std::vector<Int>();
-                        intersec_j[thread] = std::vector<Int>();
-                        intersec_a[thread] = std::vector<Int>();
-                        
-                        sep_i[thread] = std::vector<Int>();
-                        sep_j[thread] = std::vector<Int>();
-                        sep_a[thread] = std::vector<Int>();
-                        
-                       nsep_i[thread] = std::vector<Int>();
-                       nsep_j[thread] = std::vector<Int>();
-                       nsep_a[thread] = std::vector<Int>();
-                    }
-
-                    
-                    adaptive_subdivision_data_initialized = true;
-                    
-                    ptoc(className()+"::RequireAdaptiveSubdivisionData");
+                    } // for( Int i = i_begin; i < i_end; ++i )
                 }
+                else
+                {
+                    for( Int i = i_begin; i < i_end; ++i )
+                    {
+                        P.SetPointer(S_serialized,i);
+
+                        const Int k_begin = row_begin[i];
+                        const Int k_end   = row_end  [i];
+                        
+                        for (Int k = k_begin; k < k_end; ++k )
+                        {
+                            const Int j = inner[k];
+                            
+                            Q.SetPointer(T_serialized,j);
+                            
+                            const bool admissable = G.MultipoleAcceptanceCriterion( P, Q, near_theta2);
+                            
+                            if( admissable )
+                            {
+//                                    logprint("admissable");
+                                sep_idx.push_back(i);
+                                sep_jdx.push_back(j);
+                                sep_val.push_back(k);
+                            }
+                            else
+                            {
+//                                    logprint("inadmissable");
+                                const bool intersecting = (!G.SeparatedQ()) && G.IntersectingQ( P, Q, intersection_theta2 );
+                                
+                                
+                                if( intersecting )
+                                {
+                                    intersec_idx.push_back(i);
+                                    intersec_jdx.push_back(j);
+                                    intersec_val.push_back(k);
+                                }
+                                else
+                                {
+                                    nsep_idx.push_back(i);
+                                    nsep_jdx.push_back(j);
+                                    nsep_val.push_back(k);
+                                }
+                            }
+                            
+                        } // for (Int k = k_begin; k < k_end; ++k)
+                        
+                    } // for( Int i = i_begin; i < i_end; ++i )
+                }
+                
+            } // #pragma omp parallel
+
+            ptic("assembling matrix no_subdivide");
+            no_subdivide     = SparseMatrixCSR <Int,Int>(
+                 sep_i,  sep_j,  sep_a, near.RowCount(), near.ColCount(), near.ThreadCount(), false, 0 );
+            ptoc("assembling matrix no_subdivide");
+            
+            DUMP(no_subdivide.NonzeroCount());
+            
+            ptic("assembling matrix to_subdivide");
+            to_subdivide     = SparseMatrixCSR <Int,Int>(
+                nsep_i, nsep_j, nsep_a, near.RowCount(), near.ColCount(), near.ThreadCount(), false, 0 );
+            ptoc("assembling matrix to_subdivide");
+            
+            DUMP(to_subdivide.NonzeroCount());
+            
+            ptic("assembling primitive_intersection_matrix");
+            primitive_intersection_matrix = SparseMatrixCSR<Int,Int>(
+                 intersec_i,  intersec_j,  intersec_a, near.RowCount(), near.ColCount(), near.ThreadCount(), false, 0 );
+            ptoc("assembling primitive_intersection_matrix");
+            
+            DUMP(primitive_intersection_matrix.NonzeroCount());
+            
+            if( primitive_intersection_matrix.Inner().Size() > 0 )
+            {
+                wprint(className()+"::RequireAdaptiveSubdivisionData: "+ToString(primitive_intersection_matrix.Inner().Size())+" intersections detected.");
+            }
+            
+            #pragma omp parallel for num_threads(thread_count_)
+            for( Int thread = 0; thread < thread_count_; ++thread )
+            {
+                intersec_i[thread] = std::vector<Int>();
+                intersec_j[thread] = std::vector<Int>();
+                intersec_a[thread] = std::vector<Int>();
+                
+                sep_i[thread] = std::vector<Int>();
+                sep_j[thread] = std::vector<Int>();
+                sep_a[thread] = std::vector<Int>();
+                
+               nsep_i[thread] = std::vector<Int>();
+               nsep_j[thread] = std::vector<Int>();
+               nsep_a[thread] = std::vector<Int>();
+            }
+
+            
+            adaptive_subdivision_data_initialized = true;
+            
+            ptoc(className()+"::RequireAdaptiveSubdivisionData");
+        }
 
         Int PrimitiveIntersectionCount() const override
         {

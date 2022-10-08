@@ -70,7 +70,7 @@ public:
     ) const override
     {
         RequireTangentPointSingularMetric();
-        
+
         if( farQ )
         {
             tpsm->ApplyFarFieldKernel ( static_cast<Real>(1), KernelType::MixedOrder );

@@ -1215,9 +1215,18 @@ namespace Repulsor
                 {
                     const Int j = inv_ord[i];
                     
-                    copy_buffer( &from[near_dim * j], &to[near_dim * i], near_dim );
+                    #pragma omp simd
+                    for( Int k = 0; k < near_dim; ++k )
+                    {
+                        to[ near_dim * i + k ] += from[ near_dim * j + k ];
+                    }
+
+                    // THIS WAS WRONG!!!
+//                    copy_buffer( &from[near_dim * j], &to[near_dim * i], near_dim );
                 }
             }
+            
+
             
             ptoc(className()+"::CollectNearFieldDerivatives");
             
@@ -1247,7 +1256,7 @@ namespace Repulsor
                       Real * restrict const to   = C_out.data();
                 const Int last = cluster_count * far_dim;
                 
-                #pragma omp parallel for simd num_threads( thread_count ) aligned( from, to : ALIGNMENT ) schedule( static )
+                #pragma omp parallel for simd num_threads( thread_count )
                 for( Int i = 0; i < last; ++i )
                 {
                     to[i] += from[i];
@@ -1259,18 +1268,18 @@ namespace Repulsor
             this->ClustersToPrimitives(false);
 
             // Finally, permute data for the outside world.
-            
             if(addto)
             {
-                Real const * restrict const from = P_out.data();
-                Real       * restrict const to   = P_D_far.data();
-                Int  const * restrict const inv_ord = P_inverse_ordering.data();
+                const Real * restrict const from = P_out.data();
+                      Real * restrict const to   = P_D_far.data();
+                const Int  * restrict const inv_ord = P_inverse_ordering.data();
                 
                 #pragma omp parallel for num_threads( thread_count ) schedule( static )
                 for( Int i = 0; i < primitive_count; ++i )
                 {
                     const Int j = inv_ord[i];
                     
+                    #pragma omp simd
                     for( Int k = 0; k < far_dim; ++k )
                     {
                         to[ far_dim * i + k ] += from[ far_dim * j + k ];
@@ -1279,9 +1288,9 @@ namespace Repulsor
             }
             else
             {
-                Real const * restrict const from = P_out.data();
-                Real       * restrict const to   = P_D_far.data();
-                Int  const * restrict const inv_ord = P_inverse_ordering.data();
+                const Real * restrict const from = P_out.data();
+                      Real * restrict const to   = P_D_far.data();
+                const Int  * restrict const inv_ord = P_inverse_ordering.data();
                 
                 #pragma omp parallel for num_threads( thread_count ) schedule( static )
                 for( Int i = 0; i < primitive_count; ++i )

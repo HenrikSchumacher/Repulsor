@@ -82,7 +82,7 @@ public:
             static_cast<Real>(alpha), U, beta, V, cols, KernelType::HighOrder );
         
         tpm->Multiply_DenseMatrix(
-            static_cast<Real>(alpha), U, beta, V, cols, KernelType::LowOrder );
+            static_cast<Real>(alpha), U, static_cast<Real>(1), V, cols, KernelType::LowOrder );
     }
         
     virtual void TangentPointMetric_Multiply(

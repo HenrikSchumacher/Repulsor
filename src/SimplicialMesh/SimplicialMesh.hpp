@@ -118,23 +118,23 @@ namespace Repulsor
         
 #endif
 
-        template<typename SomeInt>
+        template<typename ExtInt>
         CLASS(
             const ExtReal * V_coords_, // vertex coordinates; assumed to be of size vertex_count_ x AMB_DIM
             const long long vertex_count_,
-            const SomeInt * simplices_, // simplices; assumed to be of size simplex_count_ x (DOM_DIM+1)
+            const ExtInt * simplices_, // simplices; assumed to be of size simplex_count_ x (DOM_DIM+1)
             const long long simplex_count_,
             const long long thread_count_ = 1
         )
         :   CLASS( V_coords_, vertex_count_, false, simplices_, simplex_count_, false, thread_count_)
         {}
         
-        template<typename SomeInt>
+        template<typename ExtInt>
         CLASS(
             const ExtReal * vertex_coords_, // vertex coordinates; assumed to be of size vertex_count_ x AMB_DIM
             const long long vertex_count_,
             const bool vertex_coords_transpose,
-            const SomeInt * simplices_, // simplices; assumed to be of size simplex_count_ x (DOM_DIM+1)
+            const ExtInt * simplices_, // simplices; assumed to be of size simplex_count_ x (DOM_DIM+1)
             const long long simplex_count_,
             const bool simplices_transpose,
             const long long thread_count_ = 1
@@ -412,9 +412,6 @@ namespace Repulsor
                     #pragma omp parallel for num_threads(thread_count)
                     for( Int thread = 0; thread < thread_count; ++thread )
                     {
-
-//                        std::unique_ptr<Primitive_T> P = P_proto.Clone();
-
                         Primitive_T P;
                         
                         Int i_begin = job_ptr[thread];
@@ -505,10 +502,7 @@ namespace Repulsor
                     
                     block_cluster_tree_initialized = true;
                 }
-//                else
-//                {
-//                    block_cluster_tree = std::make_unique<BlockClusterTree_T>();
-//                }
+                
                 ptoc(className()+"::GetBlockClusterTree");
             }
             return *block_cluster_tree;
@@ -529,10 +523,6 @@ namespace Repulsor
 
                     collision_tree_initialized = true;
                 }
-//                else
-//                {
-//                    collision_tree = std::make_unique<CollisionTree_T>();
-//                }
 
                 ptoc(className()+"::GetCollisionTree");
             }
@@ -570,9 +560,10 @@ namespace Repulsor
         {
             ptic(className()+"::Assemble_ClusterTree_Derivatives");
             
-            Tensor3<Real,Int> buffer ( SimplexCount(), DOM_DIM+1, AMB_DIM );
+            Tensor3<Real,Int> buffer ( SimplexCount(), DOM_DIM+1, AMB_DIM, static_cast<Real>(0) );
             
             GetClusterTree().CollectDerivatives();
+            
             
             details.DNearToHulls( V_coords, simplices, GetClusterTree().PrimitiveDNearFieldData(), buffer, false );
             

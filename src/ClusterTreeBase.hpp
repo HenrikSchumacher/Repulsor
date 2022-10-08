@@ -975,7 +975,7 @@ namespace Repulsor
                 const Real * restrict const from = thread_C_D_far.data(thread);
                       Real * restrict const to   = C_out.data();
                 
-                #pragma omp parallel for simd aligned( from, to : ALIGNMENT ) schedule( static )
+                #pragma omp parallel for num_threads( thread_count ) schedule( static )
                 for( Int i = 0; i < cluster_count; ++i )
                 {
                     to[i] += from[far_dim * i];
@@ -987,7 +987,7 @@ namespace Repulsor
                 const Real * restrict const a = C_far.data();
                       Real * restrict const e = C_out.data();
                 
-                #pragma omp parallel for simd aligned( a, e : ALIGNMENT ) schedule( static )
+                #pragma omp parallel for num_threads( thread_count ) schedule( static )
                 for( Int i = 0; i < cluster_count; ++i )
                 {
                     e[i] /= a[far_dim * i];
@@ -1004,7 +1004,7 @@ namespace Repulsor
                 const Real * restrict const a = P_near.data();
                       Real * restrict const e = P_out.data();
                 
-                #pragma omp parallel for simd num_threads( thread_count ) aligned( a, e : ALIGNMENT ) schedule( static )
+                #pragma omp parallel for num_threads( thread_count ) schedule( static )
                 for( Int i = 0; i < primitive_count; ++i )
                 {
                     e[i] *= a[near_dim * i];
@@ -1018,7 +1018,7 @@ namespace Repulsor
                 const Real * restrict const from = thread_P_D_near.data(thread);
                       Real * restrict const to   = P_out.data();
                 
-                #pragma omp parallel for simd aligned( from, to : ALIGNMENT ) schedule( static )
+                #pragma omp parallel for num_threads( thread_count ) schedule( static )
                 for( Int i = 0; i < primitive_count; ++i )
                 {
                     to[i] += from[near_dim * i];
@@ -1044,7 +1044,7 @@ namespace Repulsor
                 const Real * restrict const from = P_out.data();
                       Real * restrict const to   = output;
             
-                #pragma omp parallel for simd aligned( o, from, to : ALIGNMENT ) schedule( static )
+                #pragma omp parallel for num_threads( ThreadCount() ) schedule( static )
                 for( Int i = 0; i < primitive_count; ++i )
                 {
                     const Int j = o[i];
@@ -1068,11 +1068,7 @@ namespace Repulsor
             this->RequireBuffers( static_cast<Int>(1) );
             
             // Compute dual volume vectors.
-            #pragma omp parallel for simd num_threads(ThreadCount())
-            for( Int j = 0; j < primitive_count; ++j )
-            {
-                P_in[j] = static_cast<Real>(1);
-            }
+            fill_buffer( &P_in[0], primitive_count, static_cast<Real>(1) );
 
             const Int vertex_count = lo_post.RowCount();
 
@@ -1093,7 +1089,7 @@ namespace Repulsor
                 const Real * restrict const a = P_near.data();
                       Real * restrict const e = P_out.data();
                 
-                #pragma omp parallel for simd num_threads(ThreadCount()) aligned( a, e : ALIGNMENT ) schedule( static )
+                #pragma omp parallel for num_threads(ThreadCount()) schedule( static )
                 for( Int j = 0; j < primitive_count; ++j )
                 {
                     e[j] /= a[near_dim * j];
