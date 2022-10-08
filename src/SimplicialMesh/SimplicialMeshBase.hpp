@@ -287,34 +287,34 @@ namespace Repulsor
             const KernelType kernel
         ) const = 0;
         
-//##############################################################################################
-//      TangentPointSingularMetric
-//##############################################################################################
-
-        
-        virtual void TangentPointSingularMetric_Multiply(
-            const ExtReal alpha, const ExtReal * U,
-            const ExtReal  beta,       ExtReal * V,
-            Int cols
-        ) const  = 0;
-        
-        virtual void TangentPointSingularMetric_Multiply(
-            const ExtReal alpha, const Tensor1<ExtReal,Int> & U,
-            const ExtReal  beta,       Tensor1<ExtReal,Int> & V
-        ) const = 0;
-        
-        virtual void TangentPointSingularMetric_Multiply(
-            const ExtReal alpha, const Tensor2<ExtReal,Int> & U,
-            const ExtReal  beta,       Tensor2<ExtReal,Int> & V
-        ) const = 0;
-        
-        virtual const Tensor1<Real,Int> & TangentPointSingularMetric_Values(
-            const bool farQ
-        ) const = 0;
-        
-        virtual void TangentPointSingularMetric_ApplyKernel(
-            const bool farQ
-        ) const = 0;
+////##############################################################################################
+////      TangentPointSingularMetric
+////##############################################################################################
+//
+//        
+//        virtual void TangentPointSingularMetric_Multiply(
+//            const ExtReal alpha, const ExtReal * U,
+//            const ExtReal  beta,       ExtReal * V,
+//            Int cols
+//        ) const  = 0;
+//        
+//        virtual void TangentPointSingularMetric_Multiply(
+//            const ExtReal alpha, const Tensor1<ExtReal,Int> & U,
+//            const ExtReal  beta,       Tensor1<ExtReal,Int> & V
+//        ) const = 0;
+//        
+//        virtual void TangentPointSingularMetric_Multiply(
+//            const ExtReal alpha, const Tensor2<ExtReal,Int> & U,
+//            const ExtReal  beta,       Tensor2<ExtReal,Int> & V
+//        ) const = 0;
+//        
+//        virtual const Tensor1<Real,Int> & TangentPointSingularMetric_Values(
+//            const bool farQ
+//        ) const = 0;
+//        
+//        virtual void TangentPointSingularMetric_ApplyKernel(
+//            const bool farQ
+//        ) const = 0;
         
 //##############################################################################################
 //      IO

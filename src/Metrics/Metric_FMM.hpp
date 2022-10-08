@@ -379,7 +379,7 @@ namespace Repulsor
                 ptoc(ClassName()+"::Multiply_DenseMatrix");
                 return;
             }
-            
+                        
             auto & S = bct->GetS();
             auto & T = bct->GetT();
             

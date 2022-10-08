@@ -20,10 +20,3 @@
 #include "Metrics/TP_Metric/TP_Metric_FMM.hpp"
 #include "Metrics/TP_Metric/TP_Metric_FMM_Adaptive.hpp"
 
-#include "Metrics/TP_SingularMetric/TP_SingularMetric__NFK.hpp"
-#include "Metrics/TP_SingularMetric/TP_SingularMetric__NFK_Adaptive.hpp"
-#include "Metrics/TP_SingularMetric/TP_SingularMetric__FFK_FMM.hpp"
-//#include "Metrics/TP_SingularMetric/TP_SingularMetric_Naive.hpp"
-#include "Metrics/TP_SingularMetric/TP_SingularMetric_FMM.hpp"
-#include "Metrics/TP_SingularMetric/TP_SingularMetric_FMM_Adaptive.hpp"
-

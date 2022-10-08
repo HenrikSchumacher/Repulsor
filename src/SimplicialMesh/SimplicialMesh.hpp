@@ -14,8 +14,8 @@ namespace Repulsor
     template<int DOM_DIM, int AMB_DIM, int DEGREE, typename Real, typename Int, typename SReal, typename ExtReal>
     class TP_Metric_FMM_Adaptive;
     
-    template<int DOM_DIM, int AMB_DIM, int DEGREE, typename Real, typename Int, typename SReal, typename ExtReal>
-    class TP_SingularMetric_FMM_Adaptive;
+//    template<int DOM_DIM, int AMB_DIM, int DEGREE, typename Real, typename Int, typename SReal, typename ExtReal>
+//    class TP_SingularMetric_FMM_Adaptive;
     
     template<int DOM_DIM, int AMB_DIM, int DEGREE, typename Real, typename Int, typename SReal, typename ExtReal>
     class TrivialEnergy_FMM_Adaptive;
@@ -723,8 +723,8 @@ namespace Repulsor
         mutable bool tpm_initialized = false;
         mutable std::unique_ptr<TP_Metric_FMM_Adaptive<DOM_DIM,AMB_DIM,0,Real,Int,SReal,ExtReal>> tpm;
 
-        mutable bool tpsm_initialized = false;
-        mutable std::unique_ptr<TP_SingularMetric_FMM_Adaptive<DOM_DIM,AMB_DIM,0,Real,Int,SReal,ExtReal>> tpsm;
+//        mutable bool tpsm_initialized = false;
+//        mutable std::unique_ptr<TP_SingularMetric_FMM_Adaptive<DOM_DIM,AMB_DIM,0,Real,Int,SReal,ExtReal>> tpsm;
         
     public:
         
@@ -748,10 +748,10 @@ namespace Repulsor
             {
                 tpm->SetWeight(tp_weight);
             }
-            if( tpsm_initialized )
-            {
-                tpsm->SetWeight(tp_weight);
-            }
+//            if( tpsm_initialized )
+//            {
+//                tpsm->SetWeight(tp_weight);
+//            }
         }
                                                
         std::pair<Real,Real> GetTangentPointExponents() const override
@@ -769,7 +769,7 @@ namespace Repulsor
                tpe_initialized  = false;
                tpo_initialized  = false;
                tpm_initialized  = false;
-               tpsm_initialized = false;
+//               tpsm_initialized = false;
            }
         }
         
@@ -780,7 +780,7 @@ namespace Repulsor
         
 #include "TangentPointMetric.hpp"
         
-#include "TangentPointSingularMetric.hpp"
+//#include "TangentPointSingularMetric.hpp"
         
         
 //##############################################################################################

@@ -692,19 +692,19 @@ int main(int argc, const char * argv[]) {
     M->TangentPointMetric_Multiply( a, U, b, V );
     toc("Matrix multiplication");
 
-    print("");
-    print("");
-
-    tic("Singular matrix multiplication");
-    M->TangentPointSingularMetric_Multiply( a, U.data(), b, V.data(), cols );
-    toc("Matrix multiplication");
-
-    tic("Singular matrix multiplication");
-    M->TangentPointSingularMetric_Multiply( a, U.data(), b, V.data(), cols );
-    toc("Matrix multiplication");
-
-    print("");
-    print("");
+//    print("");
+//    print("");
+//
+//    tic("Singular matrix multiplication");
+//    M->TangentPointSingularMetric_Multiply( a, U.data(), b, V.data(), cols );
+//    toc("Matrix multiplication");
+//
+//    tic("Singular matrix multiplication");
+//    M->TangentPointSingularMetric_Multiply( a, U.data(), b, V.data(), cols );
+//    toc("Matrix multiplication");
+//
+//    print("");
+//    print("");
 
 //    // You can also get the energy densities as follows:
 //    Tensor1<double,int> density ( M->SimplexCount(), 0. );
