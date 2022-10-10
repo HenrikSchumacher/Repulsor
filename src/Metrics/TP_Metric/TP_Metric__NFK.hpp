@@ -40,6 +40,9 @@ namespace Repulsor
         
     public:
         
+        static constexpr Int BLOCK_SIZE = AMB_DIM * (DOM_DIM+1);
+        static constexpr Int VALUE_SIZE = 2;
+        
         CLASS( const Real alpha_, const Real beta_ )
         :
             BASE(),
@@ -74,6 +77,11 @@ namespace Repulsor
         Real * restrict fr_values = nullptr;
         Real * restrict hi_values = nullptr;
         Real * restrict lo_values = nullptr;
+        
+        Real * restrict X = nullptr;
+        Real * restrict Y = nullptr;
+        
+        Real z [BLOCK_SIZE] = {};
                 
     public:
 
@@ -97,7 +105,7 @@ namespace Repulsor
             lo_values = near_values[KernelType::LowOrder].data();
         }
         
-        virtual void Metric( const Int pos ) override
+        virtual void ComputeBlock( const Int pos ) override
         {
             Real v [AMB_DIM] = {};
             
@@ -154,6 +162,22 @@ namespace Repulsor
             fr_values[to] = fr_values[from];
             lo_values[to] = lo_values[from];
         }
+        
+        virtual void ApplyBlock( const Real alpha, const Int pos, const Int j ) override
+        {
+            
+        }
+                
+        virtual void ClearVector() override
+        {
+            
+        }
+        
+        virtual void WriteVector( const Int i ) = 0;
+        
+        virtual void LoadOutputBuffer( const Real * restrict const Y ) = 0;
+        
+        virtual void LoadInputBuffer ( const Real * restrict const X ) = 0;
         
     public:
         

@@ -16,9 +16,11 @@ namespace Repulsor
     public:
         
         using Setting_T         = BlockClusterTreeSettings;
-        
-        using Near_T            = SparseBinaryMatrixVBSR<Int>;
-        using  Far_T            = SparseBinaryMatrixCSR <Int>;
+
+        using Inter_T           = SparseBinaryMatrixCSR<Int>;
+        using VeryNear_T        = SparseBinaryMatrixCSR<Int>;
+        using Near_T            = SparseBinaryMatrixCSR<Int>;
+        using Far_T             = SparseBinaryMatrixCSR<Int>;
     
         using ClusterTreeBase_T = ClusterTreeBase<Real,Int,SReal,ExtReal>;
 
@@ -38,35 +40,25 @@ namespace Repulsor
         
         virtual bool IsSymmetric() const = 0;
         
-        virtual bool ExploitSymmetry() const = 0;
+        virtual Int PrimitiveIntersectionCount() const = 0;
         
-        virtual bool NearUpperTriangular() const = 0;
-
-        virtual bool FarUpperTriangular() const = 0;
-
-        virtual Int SeparatedBlockCount() const = 0;
-        
-        virtual Int NonseparatedBlockCount() const = 0;
+        virtual Int VeryNearFieldInteractionCount() const = 0;
         
         virtual Int NearFieldInteractionCount() const = 0;
 
-        virtual const Far_T & Far() const = 0;
+        virtual Int FarFieldInteractionCount() const = 0;
+        
+        virtual const Inter_T & PrimitiveIntersectionMatrix() const = 0;
+
+        virtual const VeryNear_T & VeryNear() const = 0;
         
         virtual const Near_T & Near() const = 0;
+        
+        virtual const Far_T & Far() const = 0;
         
         virtual const ClusterTreeBase_T & GetS() const = 0;
         
         virtual const ClusterTreeBase_T & GetT() const = 0;
-        
-        virtual void RequireAdaptiveSubdivisionData() const = 0;
-        
-        virtual Int PrimitiveIntersectionCount() const = 0;
-        
-        virtual const SparseMatrixCSR<Int,Int> & PrimitiveIntersectionMatrix() const = 0;
-        
-        virtual const SparseMatrixCSR <Int,Int> & AdaptiveNoSubdivisionData() const = 0;
-        
-        virtual const SparseMatrixCSR <Int,Int> & AdaptiveSubdivisionData()   const = 0;
 
         virtual const Setting_T & Settings() const = 0;
         

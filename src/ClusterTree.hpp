@@ -967,7 +967,7 @@ namespace Repulsor
                     
                     const Real a = near[ near_dim * i ];
     
-                    // Copy the single of AvOp that belong to primitive i.
+                    // Copy the single rowof AvOp that belongs to primitive i.
                     {
                         const Int read_begin    = av_row_size * j;
                         const Int write_begin   = mi_block_size * i;

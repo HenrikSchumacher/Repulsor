@@ -58,8 +58,6 @@ namespace Repulsor
 
             N_ker->AllocateValueBuffers(near_values, bct->Near().NonzeroCount());
             
-            bct->RequireAdaptiveSubdivisionData();
-            
             NearField_Nonadaptive();
             
             NearField_Adaptive();
@@ -71,7 +69,7 @@ namespace Repulsor
         {
             ptic(ClassName()+"::NearField_Nonadaptive");
     
-            auto & near = bct->AdaptiveNoSubdivisionData();
+            auto & near = bct->Near();
             
             if( near.NonzeroCount() <= 0 )
             {
@@ -84,7 +82,6 @@ namespace Repulsor
                         
             Int const * restrict const outer = near.Outer().data();
             Int const * restrict const inner = near.Inner().data();
-            Int const * restrict const pos   = near.Value().data();
             
             const Int thread_count = job_ptr.Size()-1;
             
@@ -121,7 +118,7 @@ namespace Repulsor
 
                         N->LoadT(j);
                         
-                        N->Metric(pos[k]);
+                        N->ComputeBlock(k);
 
                     } // for (Int k = k_begin; k < k_end; ++k)
                     
@@ -136,7 +133,7 @@ namespace Repulsor
         {
             ptic(ClassName()+"::NearField_Adaptive");
             
-            auto & near = bct->AdaptiveSubdivisionData();
+            auto & near = bct->VeryNear();
             
             if( near.NonzeroCount() <= 0 )
             {
@@ -149,7 +146,6 @@ namespace Repulsor
             
             Int const * restrict const outer = near.Outer().data();
             Int const * restrict const inner = near.Inner().data();
-            Int const * restrict const pos   = near.Value().data();
             
             const Int thread_count = job_ptr.Size()-1;
             
@@ -186,7 +182,7 @@ namespace Repulsor
                         
                         A->LoadT(j);
                     
-                        A->Metric(pos[k]);
+                        A->ComputeBlock(k);
 
                     } // for (Int k = k_begin; k < k_end; ++k)
                     

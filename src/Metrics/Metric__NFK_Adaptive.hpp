@@ -22,15 +22,15 @@ namespace Repulsor
         using BASE::S;
         using BASE::S_serialized;
         using BASE::S_near;
-        using BASE::S_D_near;
+//        using BASE::S_D_near;
         
         using BASE::T;
         using BASE::T_serialized;
         using BASE::T_near;
-        using BASE::T_D_near;
+//        using BASE::T_D_near;
         
-        using BASE::DX;
-        using BASE::DY;
+//        using BASE::DX;
+//        using BASE::DY;
         
         using BASE::a;
         using BASE::x;
@@ -122,7 +122,7 @@ namespace Repulsor
         virtual void LoadS( const Int i ) override
         {
             S_ID = i;
-            const Real * const X  = &S_near[NEAR_DIMS * S_ID];
+            const Real * const X = &S_near[NEAR_DIMS * S_ID];
     
             S.RequireSimplex(S_serialized, S_ID);
             
@@ -165,13 +165,13 @@ namespace Repulsor
 //            }
         }
         
-        virtual void metric() = 0;
+        virtual void computeBlock() = 0;
 
         virtual void StartEntry() = 0;
 
         virtual void FinishEntry( const Int pos ) = 0;
         
-        virtual void Metric( const Int pos ) override
+        virtual void ComputeBlock( const Int pos ) override
         {
             StartEntry();
             
@@ -195,7 +195,7 @@ namespace Repulsor
                         max_reached_level = settings.max_level;
                         block_count++;
                         bottom_count++;
-                        metric();
+                        computeBlock();
                         S.ToParent();
                         T.ToParent();
                         from_above = false;
@@ -215,7 +215,7 @@ namespace Repulsor
                             // We compute, go to parent, and prepare the next child of the parent.
                             max_reached_level = std::max( max_reached_level, S.Level() );
                             block_count++;
-                            metric();
+                            computeBlock();
                             S.ToParent();
                             T.ToParent();
                             from_above = false;
@@ -276,9 +276,25 @@ namespace Repulsor
             
             FinishEntry(pos);
             
-        }
+        } // ComputeBlock
+        
         
         virtual void TransposeBlock( const Int from, const Int to ) override = 0;
+        
+        virtual void LoadOutputBuffer( const Real * restrict const Y ) override = 0;
+        
+        virtual void LoadInputBuffer ( const Real * restrict const X ) override = 0;
+
+        virtual void ClearVector() override = 0;
+        
+        virtual void ApplyBlock( const Real alpha, const Int pos, const Int j ) override = 0;
+        
+        virtual void WriteVector( const Int i ) const override = 0;
+        
+        virtual Int BlockSize() const override = 0;
+        
+        virtual Int ValueSize() const override = 0;
+        
         
     public:
         

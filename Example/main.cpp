@@ -25,7 +25,8 @@ using namespace Repulsor;
 using namespace Tensors;
 using namespace Tools;
 
-int main(int argc, const char * argv[]) {
+int main(int argc, const char * argv[])
+{
     
     const char * homedir = getenv("HOME");
 

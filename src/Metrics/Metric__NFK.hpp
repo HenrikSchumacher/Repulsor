@@ -13,15 +13,15 @@ namespace Repulsor
         using BASE::S;
         using BASE::S_serialized;
         using BASE::S_near;
-        using BASE::S_D_near;
+//        using BASE::S_D_near;
         
         using BASE::T;
         using BASE::T_serialized;
         using BASE::T_near;
-        using BASE::T_D_near;
+//        using BASE::T_D_near;
         
-        using BASE::DX;
-        using BASE::DY;
+//        using BASE::DX;
+//        using BASE::DY;
         
         using BASE::a;
         using BASE::x;
@@ -68,9 +68,23 @@ namespace Repulsor
         virtual void LoadValueBuffers(
             std::map<KernelType, Tensor1<Real,Int>> & near_values ) = 0;
         
-        virtual void Metric ( const Int pos ) = 0;
+        virtual void ComputeBlock( const Int pos ) = 0;
         
         virtual void TransposeBlock( const Int from, const Int to ) = 0;
+        
+        virtual void LoadOutputBuffer( const Real * restrict const Y ) = 0;
+        
+        virtual void LoadInputBuffer ( const Real * restrict const X ) = 0;
+
+        virtual void ClearVector() = 0;
+        
+        virtual void ApplyBlock( const Real alpha, const Int pos, const Int j ) = 0;
+        
+        virtual void WriteVector( const Int i ) const = 0;
+        
+        virtual Int BlockSize() const = 0;
+        
+        virtual Int ValueSize() const = 0;
         
     public:
         

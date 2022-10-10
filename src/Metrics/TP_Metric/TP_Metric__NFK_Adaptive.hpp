@@ -125,7 +125,7 @@ namespace Repulsor
             lo_values[pos] = lo_value;
         }
 
-        virtual void metric() override
+        virtual void computeBlock() override
         {
             Real x [AMB_DIM] = {};
             Real y [AMB_DIM] = {};

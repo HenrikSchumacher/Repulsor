@@ -99,7 +99,7 @@ namespace Repulsor
             ptic(ClassName()+"::NearField_Nonadaptive");
             
             auto & bct  = M.GetBlockClusterTree();
-            auto & near = bct.AdaptiveNoSubdivisionData();
+            auto & near = bct.Near();
             
             if( near.NonzeroCount() <= 0 )
             {
@@ -184,7 +184,7 @@ namespace Repulsor
             ptic(ClassName()+"::DNearField_Nonadaptive");
 
             auto & bct  = M.GetBlockClusterTree();
-            auto & near = bct.AdaptiveNoSubdivisionData();
+            auto & near = bct.Near();
             
             if( near.NonzeroCount() <= 0 )
             {
@@ -269,7 +269,7 @@ namespace Repulsor
             ptic(ClassName()+"::NearField_SimplexEnergies_Nonadaptive");
 
             auto & bct  = M.GetBlockClusterTree();
-            auto & near = bct.AdaptiveNoSubdivisionData();
+            auto & near = bct.Near();
             
             if( near.NonzeroCount() <= 0 )
             {
@@ -349,7 +349,7 @@ namespace Repulsor
             ptic(ClassName()+"::NearField_Adaptive");
 
             auto & bct  = M.GetBlockClusterTree();
-            auto & near = bct.AdaptiveSubdivisionData();
+            auto & near = bct.VeryNear();
 
             
             if( near.NonzeroCount() <= 0 )
@@ -443,7 +443,7 @@ namespace Repulsor
             ptic(ClassName()+"::DNearField_Adaptive");
 
             auto & bct  = M.GetBlockClusterTree();
-            auto & near = bct.AdaptiveSubdivisionData();
+            auto & near = bct.VeryNear();
             
             if( near.NonzeroCount() <= 0 )
             {
@@ -537,7 +537,7 @@ namespace Repulsor
             ptic(ClassName()+"::NearField_SimplexEnergies_Adaptive");
 
             auto & bct  = M.GetBlockClusterTree();
-            auto & near = bct.AdaptiveSubdivisionData();
+            auto & near = bct.VeryNear();
 
             if( near.NonzeroCount() <= 0 )
             {

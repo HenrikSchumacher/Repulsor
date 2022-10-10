@@ -110,7 +110,7 @@ namespace Repulsor
         }
         
         
-        virtual void Metric( const Int pos ) override
+        virtual void ComputeBlock( const Int pos ) override
         {
             Real v [AMB_DIM] = {};
             
@@ -159,6 +159,11 @@ namespace Repulsor
             hi_values[to] = hi_values[from];
             fr_values[to] = fr_values[from];
             lo_values[to] = lo_values[from];
+        }
+        
+        virtual void ApplyBlock( const Int pos ) override
+        {
+            
         }
         
     public:
