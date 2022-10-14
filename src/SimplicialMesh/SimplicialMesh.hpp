@@ -264,11 +264,21 @@ namespace Repulsor
             return V_coords.data();
         }
         
-        virtual void SemiStaticUpdate( const ExtReal * restrict const new_V_coords_ ) override
+        virtual void SemiStaticUpdate(
+            const ExtReal * restrict const new_V_coords_,
+            const bool transp_ = false
+        ) override
         {
             ptic(className()+"::SemiStaticUpdate");
             
-            V_coords.Read(new_V_coords_);
+            if( transp_ )
+            {
+                V_coords.ReadTransposed(new_V_coords_);
+            }
+            else
+            {
+                V_coords.Read(new_V_coords_);
+            }
             
             Tensor2<Real,Int> P_near( SimplexCount(), NearDim() );
             Tensor2<Real,Int> P_far ( SimplexCount(), FarDim()  );
@@ -281,7 +291,11 @@ namespace Repulsor
         }
        
         
-        virtual void LoadUpdateVectors( const ExtReal * const vecs, const ExtReal max_time ) override
+        virtual void LoadUpdateVectors(
+            const ExtReal * const vecs,
+            const ExtReal max_time,
+            const bool transp_
+        ) override
         {
             ptic(className()+"::LoadUpdateVectors");
             
@@ -295,7 +309,14 @@ namespace Repulsor
             }
             else
             {
-                V_updates.Read(vecs);
+                if( transp_ )
+                {
+                    V_updates.ReadTransposed(vecs);
+                }
+                else
+                {
+                    V_updates.Read(vecs);
+                }
             }
             // ATTENTION: We reorder already here outside of the cluster tree to save a copy operation of a big Tensor2!
             
@@ -334,11 +355,15 @@ namespace Repulsor
             ptoc(className()+"::LoadUpdateVectors");
         }
         
-        virtual ExtReal MaximumSafeStepSize( const ExtReal * restrict const vecs, const ExtReal max_time ) override
+        virtual ExtReal MaximumSafeStepSize(
+            const ExtReal * restrict const vecs,
+            const ExtReal max_time,
+            const bool transp_ = false
+        ) override
         {
             ptic(className()+"::MaximumSafeStepSize");
             
-            LoadUpdateVectors( vecs, max_time );
+            LoadUpdateVectors( vecs, max_time, transp_ );
             
             ExtReal t = max_time;
             

@@ -69,7 +69,10 @@ namespace Repulsor
             return thread_count;
         }
         
-        virtual void SemiStaticUpdate( const ExtReal * restrict const V_coords_ ) = 0;
+        virtual void SemiStaticUpdate(
+            const ExtReal * restrict const V_coords_,
+            const bool transp_ = false
+        ) = 0;
         
         virtual const ClusterTreeBase_T & GetClusterTree() const = 0;
         
@@ -97,9 +100,17 @@ namespace Repulsor
             bool addTo = false
         ) const = 0;
         
-        virtual void LoadUpdateVectors( const ExtReal * restrict const vecs, const ExtReal max_time ) = 0;
+        virtual void LoadUpdateVectors(
+            const ExtReal * restrict const vecs,
+            const ExtReal max_time,
+            const bool transp_ = false
+        ) = 0;
 
-        virtual ExtReal MaximumSafeStepSize( const ExtReal * restrict const vecs, const ExtReal max_time ) = 0;
+        virtual ExtReal MaximumSafeStepSize(
+            const ExtReal * restrict const vecs,
+            const ExtReal max_time,
+            const bool transp_ = false
+        ) = 0;
         
 //#######################################################################################
 //      Obstacle
