@@ -28,12 +28,14 @@ namespace Repulsor
         using Far_T             = typename BASE::Far_T;
         
         using ClusterTree_T     = ClusterTree<AMB_DIM,Real,Int,SReal,ExtReal>;
+        using BlockSplitter_T   = BlockSplitter<ClusterTree_T>;
         
         using Primitive_T       = typename ClusterTree_T::Primitive_T;
         using BoundingVolume_T  = typename ClusterTree_T::BoundingVolume_T;
     
         using GJK_T             = GJK_Algorithm<AMB_DIM,GJK_Real,Int>;
         
+
         using BASE::AmbDim;
         using BASE::ThreadCount;
         using BASE::FarFieldSeparationParameter;
@@ -76,7 +78,7 @@ namespace Repulsor
         
     protected:
 
-        static constexpr Int zero = static_cast<Int>(0);
+        static constexpr Int null = static_cast<Int>(0);
         
         // Not very elegant to use raw pointers here, but maybe acceptable due to constness.
         const ClusterTree_T & S; // "left"  BVH (output side of matrix-vector multiplication)
@@ -111,7 +113,6 @@ namespace Repulsor
         mutable std::vector<std::vector<Int>> far_j;
         
         static constexpr Int max_depth = 128;
-        static constexpr Int null = static_cast<Int>(0);
         
     public:
 
@@ -227,12 +228,6 @@ namespace Repulsor
 //#################################################################################################
 //      Initialization
 //#################################################################################################
-
-#include "BlockClusterTree/Split_Parallel.hpp"
-
-#include "BlockClusterTree/Split_Sequential_DFS.hpp"
-        
-#include "BlockClusterTree/Split_Sequential_DFS_1.hpp"
         
     protected:
         
@@ -242,128 +237,95 @@ namespace Repulsor
             {
                 return;
             }
-            
+
             ptic(className()+"::ComputeBlocks");
 
-            inter_i    = std::vector<std::vector<Int>>(thread_count);
-            inter_j    = std::vector<std::vector<Int>>(thread_count);
-            verynear_i = std::vector<std::vector<Int>>(thread_count);
-            verynear_j = std::vector<std::vector<Int>>(thread_count);
-            near_i     = std::vector<std::vector<Int>>(thread_count);
-            near_j     = std::vector<std::vector<Int>>(thread_count);
-            far_i      = std::vector<std::vector<Int>>(thread_count);
-            far_j      = std::vector<std::vector<Int>>(thread_count);
-            
-            #pragma omp parallel for num_threads(thread_count)
+            std::vector<BlockSplitter_T> kernels;
+
             for( Int thread = 0; thread < thread_count; ++thread )
             {
-                // TODO: Find a better initial guess for the number of admissable and inadmissable blocks.
-                const Int expected = static_cast<Int>(10) * ( S.PrimitiveCount() + T.PrimitiveCount() );
-
-                   inter_i[thread] = std::vector<Int>();
-                   inter_j[thread] = std::vector<Int>();
-                verynear_i[thread] = std::vector<Int>();
-                verynear_j[thread] = std::vector<Int>();
-                    near_i[thread] = std::vector<Int>();
-                    near_j[thread] = std::vector<Int>();
-                     far_i[thread] = std::vector<Int>();
-                     far_j[thread] = std::vector<Int>();
-                
-                near_i[thread].reserve(expected);
-                near_j[thread].reserve(expected);
-                 far_i[thread].reserve(expected);
-                 far_j[thread].reserve(expected);
+                kernels.emplace_back( S, T, far_theta2, near_theta2 );
             }
 
-            switch( settings.block_split_method )
+            if( (S.SplitThreshold()==1) && (T.SplitThreshold()==1) )
             {
-                case BlockSplitMethod::Parallel:
-                {
-                    Split_Parallel( static_cast<Int>(4) * thread_count * thread_count );
-                    break;
-                }
-                case BlockSplitMethod::Sequential:
-                {
-                    if( S.SplitThreshold() == 1 && T.SplitThreshold() == 1 )
-                    {
-                        Split_Sequential_DFS_1( zero, zero );
-                    }
-                    else
-                    {
-                        Split_Sequential_DFS( zero, zero );
-                    }
-                    break;
-                }
-                default:
-                {
-                    Split_Parallel( static_cast<Int>(4) * thread_count * thread_count );
-                    break;
-                }
+                Traversor<BlockSplitter_T,is_symmetric,true> traversor ( S, T, kernels );
+
+                traversor.Traverse();
             }
-        
-            ptic(className()+"  Far field interaction data");
-            
-            far = Far_T( far_i, far_j, S.ClusterCount(), T.ClusterCount(),
-                    thread_count, false, is_symmetric );
-            
-            pdump(far.Stats());
-            
-            ptoc(className()+"  Far field interaction data");
+            else
+            {
+                Traversor<BlockSplitter_T,is_symmetric,false> traversor ( S, T, kernels );
 
-            ptic(className()+"  Near field interaction data");
-            
-            near = Near_T( near_i, near_j, S.PrimitiveCount(), T.PrimitiveCount(),
-                thread_count, false, is_symmetric );
-            
-            pdump(near.Stats());
-            
-            ptoc(className()+"  Near field interaction data");
-            
-            ptic(className()+"  Very near field interaction data");
+                traversor.Traverse();
+            }
 
-            verynear = VeryNear_T( verynear_i, verynear_j, S.PrimitiveCount(), T.PrimitiveCount(),
-                thread_count, false, is_symmetric );
-            
-            pdump(verynear.Stats());
-            
-            ptoc(className()+"  Very near field interaction data");
-            
-            ptic(className()+"  Primitive intersection data");
-
-            inter = Inter_T( inter_i, inter_j, S.PrimitiveCount(), T.PrimitiveCount(),
-                thread_count, false, is_symmetric );
-            
-            pdump(inter.Stats());
-            
-            ptoc(className()+"  Primitive intersection data");
-            
-            blocks_initialized = true;
+            std::vector<std::vector<Int>> inter_idx    (thread_count);
+            std::vector<std::vector<Int>> inter_jdx    (thread_count);
+            std::vector<std::vector<Int>> verynear_idx (thread_count);
+            std::vector<std::vector<Int>> verynear_jdx (thread_count);
+            std::vector<std::vector<Int>> near_idx     (thread_count);
+            std::vector<std::vector<Int>> near_jdx     (thread_count);
+            std::vector<std::vector<Int>> far_idx      (thread_count);
+            std::vector<std::vector<Int>> far_jdx      (thread_count);
 
             // Free memory that is no longer used.
             #pragma omp parallel for num_threads(thread_count)
             for( Int thread = 0; thread < thread_count; ++thread )
             {
-                   inter_i[thread] = std::vector<Int>();
-                   inter_j[thread] = std::vector<Int>();
-                verynear_i[thread] = std::vector<Int>();
-                verynear_j[thread] = std::vector<Int>();
-                    near_i[thread] = std::vector<Int>();
-                    near_j[thread] = std::vector<Int>();
-                     far_i[thread] = std::vector<Int>();
-                     far_j[thread] = std::vector<Int>();
+                   inter_idx[thread] = std::move( kernels[thread].inter_idx    );
+                   inter_jdx[thread] = std::move( kernels[thread].inter_jdx    );
+                verynear_idx[thread] = std::move( kernels[thread].verynear_idx );
+                verynear_jdx[thread] = std::move( kernels[thread].verynear_jdx );
+                    near_idx[thread] = std::move( kernels[thread].near_idx     );
+                    near_jdx[thread] = std::move( kernels[thread].near_jdx     );
+                     far_idx[thread] = std::move( kernels[thread].far_idx      );
+                     far_jdx[thread] = std::move( kernels[thread].far_jdx      );
             }
-            
+
             ptoc(className()+"::ComputeBlocks");
 
+
+            ptic(className()+"  Far field interaction data");
+
+            far = Far_T( far_idx, far_jdx, S.ClusterCount(), T.ClusterCount(),
+                    thread_count, false, is_symmetric );
+
+            pdump(far.Stats());
+
+            ptoc(className()+"  Far field interaction data");
+
+
+            ptic(className()+"  Near field interaction data");
+
+            near = Near_T( near_idx, near_jdx, S.PrimitiveCount(), T.PrimitiveCount(),
+                thread_count, false, is_symmetric );
+
+            pdump(near.Stats());
+
+            ptoc(className()+"  Near field interaction data");
+
+            ptic(className()+"  Very near field interaction data");
+
+            verynear = VeryNear_T( verynear_idx, verynear_jdx, S.PrimitiveCount(), T.PrimitiveCount(),
+                thread_count, false, is_symmetric );
+
+            pdump(verynear.Stats());
+
+            ptoc(className()+"  Very near field interaction data");
+
+            ptic(className()+"  Primitive intersection data");
+
+            inter = Inter_T( inter_idx, inter_jdx, S.PrimitiveCount(), T.PrimitiveCount(),
+                thread_count, false, is_symmetric );
+
+            pdump(inter.Stats());
+
+            ptoc(className()+"  Primitive intersection data");
+
+            blocks_initialized = true;
+
         }; // ComputeBlocks
-
-        
-
-        
-        std::string ClassName() const override
-        {
-            return className();
-        }
         
     private:
         
@@ -372,7 +334,13 @@ namespace Repulsor
             return TO_STD_STRING(CLASS) + "<"+ToString(AMB_DIM)+","+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+","+ToString(is_symmetric)+">";
         }
       
+    public:
         
+        std::string ClassName() const override
+        {
+            return className();
+        }
+    
     };
     
 } //namespace Repulsor

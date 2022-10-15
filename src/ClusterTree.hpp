@@ -9,7 +9,7 @@
 
 namespace Repulsor
 {
-    template<int AMB_DIM, typename Real_, typename Int_, typename SReal_, typename ExtReal_>
+    template<int AMB_DIM_, typename Real_, typename Int_, typename SReal_, typename ExtReal_>
     class CLASS : public BASE
     {
     public:
@@ -18,6 +18,8 @@ namespace Repulsor
         using Int     = Int_;
         using SReal   = SReal_;
         using ExtReal = ExtReal_;
+        
+        static constexpr Int AMB_DIM = AMB_DIM_;
         
         using       Primitive_T =       PolytopeBase<AMB_DIM,GJK_Real,Int,SReal>;
         using MovingPrimitive_T = MovingPolytopeBase<AMB_DIM,GJK_Real,Int,SReal>;

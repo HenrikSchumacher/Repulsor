@@ -18,27 +18,59 @@ namespace Repulsor
         
     public:
         
+        CLASS() = default;
+        
         virtual ~CLASS() = default;
         
         CLASS(
             const ClusterTree_T & S_,
             const ClusterTree_T & T_
         )
-        :   S(S_)
-        ,   T(T_)
-        ,   tree_string( S_.ClassName() )
+        :   tree_string( S_.ClassName() )
+        {}
+        
+        CLASS(
+            const CLASS & other
+        )
+        :   tree_string( other.tree_string )
+        {}
+        
+        friend void swap(CLASS &A, CLASS &B)
         {
-            ptic(className());
-            
-            ptoc(className());
-        } // Constructor
+            // see https://stackoverflow.com/questions/5695548/public-friend-swap-member-function for details
+            using std::swap;
+
+            swap( A.tree_string, B.tree_string );
+        }
+        
+//        // Copy assignment
+//        CLASS & operator=(CLASS other) // Intentionally no pass-by-reference here!
+//        {
+//            swap(*this, other);
+//
+//            return *this;
+//        }
+        
+        // Move constructor
+        CLASS( CLASS && other ) noexcept
+        :   CLASS()
+        {
+            swap(*this, other);
+        }
+
+        /* Move assignment operator */
+        CLASS & operator=( CLASS && other ) noexcept
+        {
+            if( this != &other )
+            {
+                swap( *this, other );
+            }
+            return *this;
+        }
         
     protected:
         
-        const ClusterTree_T & S;
-        const ClusterTree_T & T;
-
-        const std::string tree_string;
+        std::string tree_string;
         
     public:
 
@@ -50,8 +82,8 @@ namespace Repulsor
         
         virtual bool IsAdmissable() = 0;
         
-        virtual bool ClusterScoreS() = 0;
-        virtual bool ClusterScoreT() = 0;
+        virtual SReal ClusterScoreS() = 0;
+        virtual SReal ClusterScoreT() = 0;
         
         virtual void ComputeLeafDiagonal() = 0;
         virtual void ComputeLeaf() = 0;
@@ -70,7 +102,7 @@ namespace Repulsor
         
     private:
         
-        std::string className()
+        std::string className() const
         {
             return TO_STD_STRING(CLASS) + "<"+tree_string+">";
         }

@@ -6,7 +6,7 @@
 
 namespace Repulsor
 {
-    template<typename Kernel_T, bool is_symmetric, bool leafs_are_singletons >
+    template<typename Kernel_T, bool is_symmetric, bool leaves_are_singletons >
     class CLASS
     {
         
@@ -33,12 +33,12 @@ namespace Repulsor
         ,   thread_count( static_cast<Int>(kernels.size()) )
         ,   S_C_left  ( S_.ClusterLeft().data() )
         ,   S_C_right ( S_.ClusterRight().data() )
-        ,   S_C_begin ( S_.Begin().data() )
-        ,   S_C_end   ( S_.End().data() )
+        ,   S_C_begin ( S_.ClusterBegin().data() )
+        ,   S_C_end   ( S_.ClusterEnd().data() )
         ,   T_C_left  ( T_.ClusterLeft().data() )
         ,   T_C_right ( T_.ClusterRight().data() )
-        ,   T_C_begin ( T_.Begin().data() )
-        ,   T_C_end   ( T_.End().data() )
+        ,   T_C_begin ( T_.ClusterBegin().data() )
+        ,   T_C_end   ( T_.ClusterEnd().data() )
         {
             ptic(className());
             
@@ -52,11 +52,11 @@ namespace Repulsor
         
     protected:
 
-        static constexpr Int zero = static_cast<Int>(0);
-        static constexpr Int max_depth = 128;
-        static constexpr Int null = static_cast<Int>(0);
+        static constexpr Int   null      = static_cast<Int>(0);
+        static constexpr Int   max_depth = 128;
+        static constexpr SReal zero      = static_cast<SReal>(0);
     
-        std::vector<Kernel_T> kernels;
+        std::vector<Kernel_T> & kernels;
         
         const Int thread_count = static_cast<Int>(1);
         
@@ -87,26 +87,31 @@ namespace Repulsor
             return is_symmetric;
         }
         
-        void Traverse() const
+    public:
+        
+        void Traverse()
         {
             ptic(className()+"::Traverse");
             
             if( thread_count > 1 )
             {
+                print("Traverse_Parallel");
                 Traverse_Parallel();
             }
             else
             {
+                print("Traverse_Sequential");
                 Traverse_Sequential();
             }
             
             ptoc(className()+"::Traverse");
         }
         
-
+    protected:
+        
 #include "Traversor/Traverse_DepthFirst.hpp"
         
-        void Traverse_Sequential() const
+        void Traverse_Sequential()
         {
             ptic(className()+"::Traverse_Sequential");
             
@@ -115,9 +120,11 @@ namespace Repulsor
             ptoc(className()+"::Traverse_Sequential");
         }
         
+    protected:
+        
 #include "Traversor/Traverse_BreadthFirst.hpp"
         
-        void Traverse_Parallel() const
+        void Traverse_Parallel()
         {
             ptic(className()+"::Traverse_Parallel");
 
@@ -132,7 +139,7 @@ namespace Repulsor
             ptoc(className()+"::Traverse_Parallel");
         }
 
-    protected:
+    private:
         
         std::string ClassName() const
         {
@@ -141,7 +148,7 @@ namespace Repulsor
         
     private:
         
-        std::string className()
+        std::string className() const
         {
             return TO_STD_STRING(CLASS) + "<"+kernels[0].ClassName()+">";
         }

@@ -4,20 +4,19 @@ public:
     {
         const Int thread = omp_get_thread_num();
         
-        Kernel_T K = kernels[thread];
+        Kernel_T & K = kernels[thread];
         
         Int i_stack[max_depth] = {};
         Int j_stack[max_depth] = {};
 
-        Int stack_ptr = 0;
+        Int stack_ptr = null;
         i_stack[0] = i0;
         j_stack[0] = j0;
         
-        while( (zero <= stack_ptr) && (stack_ptr < max_depth) )
+        while( (null <= stack_ptr) && (stack_ptr < max_depth) )
         {
             const Int i = i_stack[stack_ptr];
             const Int j = j_stack[stack_ptr];
-            
             stack_ptr--;
             
             K.LoadClusterS(i);
@@ -31,18 +30,16 @@ public:
                 const Int left_j = T_C_left[j];
 
                 // Warning: This assumes that either both children are defined or empty.
-                if( left_i >= zero || left_j >= zero )
+                if( left_i >= null || left_j >= null )
                 {
                     const Int right_i = S_C_right[i];
                     const Int right_j = T_C_right[j];
                     
-                    const SReal score_i = (left_i>=zero) * K.ClusterScoreS();
-                    const SReal score_j = (left_j>=zero) * K.ClusterScoreT();
-
-                    if( score_i == score_j )
+                    const SReal score_i = (left_i>=null) * K.ClusterScoreS();
+                    const SReal score_j = (left_j>=null) * K.ClusterScoreT();
+                    
+                    if( score_i == score_j && score_i > zero )
                     {
-                        // tie breaker: split both clusters
-
                         if constexpr ( is_symmetric )
                         {
                             if( i == j )
@@ -131,7 +128,7 @@ public:
                         }
                     }
                 }
-                else // left_i < zero && left_j < zero
+                else // left_i < null && left_j < null
                 {
                     // We know that i and j are leaf clusters and that they belong either to the near field, the very near field or contain intersecting primitives.
                     
@@ -141,7 +138,7 @@ public:
                     {
                         if( i == j )
                         {
-                            if constexpr ( leafs_are_singletons )
+                            if constexpr ( leaves_are_singletons )
                             {
                                 K.LoadPrimitiveS( S_C_begin[i] );
                                 K.ComputeLeafDiagonal();
@@ -151,7 +148,7 @@ public:
                                 // This is a diagonal block.
                                 // Only traverse uppper triangle part.
                                 const Int ii_begin = S_C_begin[i];
-                                const Int ii_end   = S_C_end[i];
+                                const Int ii_end   = S_C_end  [i];
                                 
                                 for( Int ii = ii_begin; ii < ii_end; ++ii )
                                 {
@@ -170,14 +167,15 @@ public:
                         }
                         else // i != j
                         {
-                            // Traverse whole block, but sort primitive indices.
-                            if constexpr ( leafs_are_singletons )
+                            if constexpr ( leaves_are_singletons )
                             {
                                 const Int ii = S_C_begin[i];
                                 const Int jj = T_C_begin[j];
                                 
                                 K.LoadPrimitiveS( ii );
-                                K.LoadPrimitiveS( jj );
+                                K.LoadPrimitiveT( jj );
+                                
+//                                assert( ii != jj );
                                 
                                 if( ii < jj )
                                 {
@@ -190,10 +188,12 @@ public:
                             }
                             else
                             {
+                                // Traverse whole block, but sort primitive indices.
+                                
                                 const Int ii_begin = S_C_begin[i];
-                                const Int ii_end   = S_C_end[i];
+                                const Int ii_end   = S_C_end  [i];
                                 const Int jj_begin = T_C_begin[j];
-                                const Int jj_end   = T_C_end[j];
+                                const Int jj_end   = T_C_end  [j];
                                 
                                 for( Int ii = ii_begin; ii < ii_end; ++ii )
                                 {
@@ -218,19 +218,19 @@ public:
                     }
                     else // !is_symmetric
                     {
-                        if constexpr ( leafs_are_singletons )
+                        if constexpr ( leaves_are_singletons )
                         {
                             K.LoadPrimitiveS( S_C_begin[i] );
-                            K.LoadPrimitiveS( T_C_begin[j] );
+                            K.LoadPrimitiveT( T_C_begin[j] );
                             K.ComputeLeaf();
                         }
                         else
                         {
                             // Just traverse the whole block.
                             const Int ii_begin = S_C_begin[i];
-                            const Int ii_end   = S_C_end[i];
+                            const Int ii_end   = S_C_end  [i];
                             const Int jj_begin = T_C_begin[j];
-                            const Int jj_end   = T_C_end[j];
+                            const Int jj_end   = T_C_end  [j];
                             
                             for( Int ii = ii_begin; ii < ii_end; ++ii )
                             {
@@ -251,19 +251,21 @@ public:
             {
                 if constexpr ( is_symmetric )
                 {
+//                    assert( i != j );
+                    
                     if( i <= j )
                     {
-                        K->ComputeAdmissable();
+                        K.ComputeAdmissable();
                     }
                     else
                     {
-                        K->ComputeAdmissableSwapped();
+                        K.ComputeAdmissableSwapped();
                     }
                 }
                 else
                 {
                     // No symmetry exploited.
-                    K->ComputeAdmissable();
+                    K.ComputeAdmissable();
                 }
             }
         }

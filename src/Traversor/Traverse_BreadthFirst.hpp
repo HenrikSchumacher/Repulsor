@@ -2,19 +2,20 @@ public:
 
     void Traverse_BreadthFirst( const Int i0, const Int j0, const Int max_leaves )
     {
+        const Int thread = omp_get_thread_num();
+        
+        Kernel_T & K = kernels[thread];
+        
         i_queue = std::deque<Int>();
         j_queue = std::deque<Int>();
         i_queue.push_back(static_cast<Int>(i0));
         j_queue.push_back(static_cast<Int>(j0));
         
-        const Int thread = omp_get_thread_num();
-        
-        Kernel_T K = kernels[thread];
-        
         while( !i_queue.empty() && ( static_cast<Int>(i_queue.size()) < max_leaves ) )
         {
             const Int i = i_queue.front();
             const Int j = j_queue.front();
+            
             i_queue.pop_front();
             j_queue.pop_front();
             
@@ -29,15 +30,15 @@ public:
                 const Int left_j = T_C_left[j];
 
                 // Warning: This assumes that either both children are defined or empty.
-                if( left_i >= zero || left_j >= zero )
+                if( left_i >= null || left_j >= null )
                 {
                     const Int right_i = S_C_right[i];
                     const Int right_j = T_C_right[j];
                     
-                    const SReal score_i = (left_i>=zero) * K.ScoreS();
-                    const SReal score_j = (left_j>=zero) * K.ScoreT();
+                    const SReal score_i = (left_i>=null) * K.ClusterScoreS();
+                    const SReal score_j = (left_j>=null) * K.ClusterScoreT();
 
-                    if( score_i == score_j )
+                    if( score_i == score_j && score_i > zero )
                     {
                         // tie breaker: split both clusters
 
@@ -114,7 +115,7 @@ public:
                         }
                     }
                 }
-                else // left_i < zero && left_j < zero
+                else // left_i < null && left_j < null
                 {
                     // We know that i and j are leaf clusters and that they belong either to the near field, the very near field or contain intersecting primitives.
                     
@@ -124,52 +125,80 @@ public:
                     {
                         if( i == j )
                         {
-                            // This is a diagonal block.
-                            // Only traverse uppper triangle part.
-                            const Int ii_begin = S_C_begin[i];
-                            const Int ii_end   = S_C_end[i];
-                            
-                            for( Int ii = ii_begin; ii < ii_end; ++ii )
+                            if constexpr ( leaves_are_singletons )
                             {
-                                K.LoadPrimitiveS(ii);
-                                
+                                K.LoadPrimitiveS( S_C_begin[i] );
                                 K.ComputeLeafDiagonal();
+                            }
+                            else
+                            {
+                                // This is a diagonal block.
+                                // Only traverse uppper triangle part.
+                                const Int ii_begin = S_C_begin[i];
+                                const Int ii_end   = S_C_end[i];
                                 
-                                for( Int jj = ii+1; jj < ii_end; ++jj )
+                                for( Int ii = ii_begin; ii < ii_end; ++ii )
                                 {
-                                    K.LoadPrimitiveT(jj);
+                                    K.LoadPrimitiveS(ii);
+                                    K.ComputeLeafDiagonal();
                                     
-                                    K.ComputeLeaf();
+                                    for( Int jj = ii+1; jj < ii_end; ++jj )
+                                    {
+                                        K.LoadPrimitiveT(jj);
+                                        
+                                        K.ComputeLeaf();
+                                    }
                                 }
                             }
                         }
                         else // i != j
                         {
                             // Traverse whole block, but sort primitive indices.
-                            const Int ii_begin = S_C_begin[i];
-                            const Int ii_end   = S_C_end[i];
-                            const Int jj_begin = T_C_begin[j];
-                            const Int jj_end   = T_C_end[j];
-                            
-                            for( Int ii = ii_begin; ii < ii_end; ++ii )
+                            // Traverse whole block, but sort primitive indices.
+                            if constexpr ( leaves_are_singletons )
                             {
-                                K.LoadPrimitiveS(ii);
+                                const Int ii = S_C_begin[i];
+                                const Int jj = T_C_begin[j];
                                 
-                                for( Int jj = jj_begin; jj < jj_end; ++jj )
+                                K.LoadPrimitiveS( ii );
+                                K.LoadPrimitiveT( jj );
+                                
+                                if( ii < jj )
                                 {
+                                    K.ComputeLeaf();
+                                }
+                                else
+                                {
+                                    K.ComputeLeafSwapped();
+                                }
+                            }
+                            else
+                            {
+                                const Int ii_begin = S_C_begin[i];
+                                const Int ii_end   = S_C_end  [i];
+                                const Int jj_begin = T_C_begin[j];
+                                const Int jj_end   = T_C_end  [j];
+                                
+                                for( Int ii = ii_begin; ii < ii_end; ++ii )
+                                {
+                                    K.LoadPrimitiveS(ii);
                                     
-                                    K.LoadPrimitiveT(jj);
-                                    
-                                    // No primitive can be member in more than one leaf cluster.
-                                    assert( ii != jj );
-
-                                    if( ii < jj )
+                                    for( Int jj = jj_begin; jj < jj_end; ++jj )
                                     {
-                                        K.ComputeLeaf();
-                                    }
-                                    else
-                                    {
-                                        K.ComputeLeafSwapped();
+                                        
+                                        K.LoadPrimitiveT(jj);
+                                        
+                                        // No primitive can be member in more than one leaf cluster.
+                                        assert( ii != jj );
+                                        
+                                        if( ii < jj )
+                                        {
+                                            K.ComputeLeaf();
+                                        }
+                                        else
+                                        {
+                                            K.ComputeLeafSwapped();
+                                        }
                                     }
                                 }
                             }
@@ -177,21 +206,30 @@ public:
                     }
                     else // !is_symmetric
                     {
-                        // Just traverse the whole block.
-                        const Int ii_begin = S_C_begin[i];
-                        const Int ii_end   = S_C_end[i];
-                        const Int jj_begin = T_C_begin[j];
-                        const Int jj_end   = T_C_end[j];
-                        
-                        for( Int ii = ii_begin; ii < ii_end; ++ii )
+                        if constexpr ( leaves_are_singletons )
                         {
-                            K.LoadPrimitiveS(ii);
+                            K.LoadPrimitiveS( S_C_begin[i] );
+                            K.LoadPrimitiveT( T_C_begin[j] );
+                            K.ComputeLeaf();
+                        }
+                        else
+                        {
+                            // Just traverse the whole block.
+                            const Int ii_begin = S_C_begin[i];
+                            const Int ii_end   = S_C_end  [i];
+                            const Int jj_begin = T_C_begin[j];
+                            const Int jj_end   = T_C_end  [j];
                             
-                            for( Int jj = jj_begin; jj < jj_end; ++jj )
+                            for( Int ii = ii_begin; ii < ii_end; ++ii )
                             {
-                                K.LoadPrimitiveT(jj);
+                                K.LoadPrimitiveS(ii);
                                 
-                                K.ComputeLeaf();
+                                for( Int jj = jj_begin; jj < jj_end; ++jj )
+                                {
+                                    K.LoadPrimitiveT(jj);
+                                    
+                                    K.ComputeLeaf();
+                                }
                             }
                         }
                     }
@@ -203,17 +241,17 @@ public:
                 {
                     if( i <= j )
                     {
-                        K->ComputeAdmissable();
+                        K.ComputeAdmissable();
                     }
                     else
                     {
-                        K->ComputeAdmissableSwapped();
+                        K.ComputeAdmissableSwapped();
                     }
                 }
                 else
                 {
                     // No symmetry exploited.
-                    K->ComputeAdmissable();
+                    K.ComputeAdmissable();
                 }
             }
         }
