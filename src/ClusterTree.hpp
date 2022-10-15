@@ -1,15 +1,23 @@
 #pragma once
 
-#define CLASS ClusterTree
-#define BASE  ClusterTreeBase<Real,Int,SReal,ExtReal>
+#include "ClusterTree/Cluster.hpp"
+#include "ClusterTree/ClusterTreeBase.hpp"
 
+
+#define CLASS ClusterTree
+#define BASE  ClusterTreeBase<Real_,Int_,SReal_,ExtReal_>
 
 namespace Repulsor
 {
-    template<int AMB_DIM, typename Real, typename Int, typename SReal, typename ExtReal>
+    template<int AMB_DIM, typename Real_, typename Int_, typename SReal_, typename ExtReal_>
     class CLASS : public BASE
     {
     public:
+        
+        using Real    = Real_;
+        using Int     = Int_;
+        using SReal   = SReal_;
+        using ExtReal = ExtReal_;
         
         using       Primitive_T =       PolytopeBase<AMB_DIM,GJK_Real,Int,SReal>;
         using MovingPrimitive_T = MovingPolytopeBase<AMB_DIM,GJK_Real,Int,SReal>;

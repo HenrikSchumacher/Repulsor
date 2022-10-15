@@ -5,7 +5,7 @@
 namespace Repulsor
 {
     
-    template<typename Real, typename Int, typename SReal, typename ExtReal>
+    template<typename Real, typename Int, typename SReal, typename ExtReal, bool is_symmetric>
     class CLASS
     {
         ASSERT_FLOAT(Real   );
@@ -34,11 +34,14 @@ namespace Repulsor
 
         virtual Int ThreadCount() const = 0;
         
-        virtual Real SeparationParameter() const = 0;
+        virtual Real FarFieldSeparationParameter() const = 0;
         
-        virtual Real AdaptivityParameter() const = 0;
+        virtual Real NearFieldSeparationParameter() const = 0;
         
-        virtual bool IsSymmetric() const = 0;
+        static constexpr bool IsSymmetric()
+        {
+            return is_symmetric;
+        }
         
         virtual Int PrimitiveIntersectionCount() const = 0;
         
@@ -68,7 +71,7 @@ namespace Repulsor
         
         virtual std::string ClassName() const
         {
-            return TO_STD_STRING(CLASS) + "<"+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+">";
+            return TO_STD_STRING(CLASS) + "<"+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+","+ToString(is_symmetric)+">";
         }
         
     };

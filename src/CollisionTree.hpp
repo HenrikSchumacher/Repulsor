@@ -1,7 +1,9 @@
 #pragma once
 
+#include "CollisionTree/CollisionTreeBase.hpp"
+
 #define CLASS CollisionTree
-#define BASE CollisionTreeBase<Real,Int,SReal,ExtReal>
+#define BASE CollisionTreeBase<Real,Int,SReal,ExtReal,is_symmetric>
 
 namespace Repulsor
 {
@@ -118,7 +120,7 @@ namespace Repulsor
         }
     
     
-    template<int AMB_DIM, typename Real, typename Int, typename SReal, typename ExtReal>
+    template<int AMB_DIM, typename Real, typename Int, typename SReal, typename ExtReal, bool is_symmetric>
     class CLASS : public BASE
     {
         ASSERT_FLOAT(Real   );
@@ -128,10 +130,8 @@ namespace Repulsor
         
     public:
         
-        using ClusterTreeBase_T = BASE;
-        
         using ClusterTree_T     = ClusterTree<AMB_DIM,Real,Int,SReal,ExtReal>;
-        using CollisionMatrix_T = typename ClusterTreeBase_T::CollisionMatrix_T;
+        using CollisionMatrix_T = typename BASE::CollisionMatrix_T;
         
         using Primitive_T       = typename ClusterTree_T::Primitive_T;
         using MovingPrimitive_T = typename ClusterTree_T::MovingPrimitive_T;
@@ -145,12 +145,18 @@ namespace Repulsor
         ,   T( T_ )
         ,   t_init(t_init_)
         ,   thread_count( std::min(S_.ThreadCount(), T_.ThreadCount()) )
-        ,   is_symmetric( std::addressof(S_) == std::addressof(T_) )
+//        ,   is_symmetric( std::addressof(S_) == std::addressof(T_) )
         ,   collision_i( thread_count )
         ,   collision_j( thread_count )
         ,   collision_t( thread_count )
         {
             ptic(className()+"()");
+            
+            if constexpr ( is_symmetric)
+            {
+                assert( std::addressof(S_) == std::addressof(T_) );
+            }
+            
             #pragma omp parallel for num_threads( thread_count )
             for( Int thread = 0; thread < thread_count; ++thread )
             {
@@ -190,7 +196,7 @@ namespace Repulsor
         
         const Int thread_count = 1;
         
-        const bool is_symmetric = false;
+//        const bool is_symmetric = false;
         
         mutable std::deque<Int> i_queue;
         mutable std::deque<Int> j_queue;
@@ -442,179 +448,26 @@ namespace Repulsor
             ptoc(className()+"::FindCollidingClusters");
         }
         
-//####################################################################################################
+//################################################################################################
 //      FindCollidingClusters_Sequential
-//####################################################################################################
-                
+//################################################################################################
+
+#include "CollisionTree/FindCollidingClusters_DFS.hpp"
+        
         void FindCollidingClusters_Sequential() const
         {
             ptic(className()+"::FindCollidingClusters_Sequential");
             
-            FindCollidingClusters_Sequential_DFS(0,0);
+            FindCollidingClusters_DFS(0,0);
             
             ptoc(className()+"::FindCollidingClusters_Sequential");
         }
-                
-        void FindCollidingClusters_Sequential_DFS( const Int i_0, const Int j_0 ) const
-        {
-            const Int thread = omp_get_thread_num();
-            
-            Int i_stack[max_depth] = {};
-            Int j_stack[max_depth] = {};
-            
-            Int stack_ptr = null;
-            i_stack[0] = i_0;
-            j_stack[0] = j_0;
-            
-            std::vector<Int>   & collision_idx  = collision_i[thread];
-            std::vector<Int>   & collision_jdx  = collision_j[thread];
-            std::vector<SReal> & collision_time = collision_t[thread];
-            
-            const Int * restrict const S_left   = S.ClusterLeft().data();
-            const Int * restrict const S_right  = S.ClusterRight().data();
-            
-            const Int * restrict const T_left   = T.ClusterLeft().data();
-            const Int * restrict const T_right  = T.ClusterRight().data();
-            
-            const Tensor2<SReal,Int> & S_C_ser    = S.ClusterSerializedData();
-            const Tensor2<SReal,Int> & S_C_up_ser = S.ClusterUpdatedSerializedData();
-            const Tensor2<SReal,Int> & T_C_ser    = T.ClusterSerializedData();
-            const Tensor2<SReal,Int> & T_C_up_ser = T.ClusterUpdatedSerializedData();
-            //
-            SReal a = static_cast<SReal>(0);
-            SReal b = static_cast<SReal>(1);
-            
-            while( (null <= stack_ptr) && (stack_ptr < max_depth - 4) )
-            {
-                const Int i = i_stack[stack_ptr];
-                const Int j = j_stack[stack_ptr];
-                stack_ptr--;
-                
-                AABB_CollisionTimeInterval<AMB_DIM, SReal, Int> (
-                    S_C_ser.data(i), S_C_up_ser.data(i),
-                    T_C_ser.data(j), T_C_up_ser.data(j),
-                    a, b
-                );
-                
-                if( a < static_cast<SReal>(1) )
-                {
-                    const Int left_i = S_left[i];
-                    const Int left_j = T_left[j];
-                    
-                    // Warning: This assumes that both children in a cluster tree are either defined or empty.
-                    if( left_i >= null || left_j >= null )
-                    {
-                        
-                        const Int right_i = S_right[i];
-                        const Int right_j = T_right[j];
-                        
-                        // TODO: Improve score.
-                        
-                        const SReal score_i = static_cast<SReal>(left_i >= null) * S_C_ser(i,0);
-                        const SReal score_j = static_cast<SReal>(left_j >= null) * T_C_ser(j,0);
-                        
-                        if( (score_i == score_j) /*&& (score_i > static_cast<SReal>(0)) && score_j > static_cast<SReal>(0)*/ )
-                        {
-                            if( (is_symmetric) && ( i == j ) )
-                            {
-                                //  Creating 3 blockcluster children, since there is one block is just the mirror of another one.
-                                
-                                ++stack_ptr;
-                                i_stack[stack_ptr] = left_i;
-                                j_stack[stack_ptr] = right_j;
-                                
-                                ++stack_ptr;
-                                i_stack[stack_ptr] = right_i;
-                                j_stack[stack_ptr] = right_j;
-                                
-                                ++stack_ptr;
-                                i_stack[stack_ptr] = left_i;
-                                j_stack[stack_ptr] = left_j;
-                            }
-                            else
-                            {
-                                // tie breaker: split both clusters
-                                
-                                // This is a very seldom case; still required to preserve symmetry.
-                                // This happens only if i and j represent_diffent clusters with same radii.
-                                
-                                ++stack_ptr;
-                                i_stack[stack_ptr] = right_i;
-                                j_stack[stack_ptr] = right_j;
-                                
-                                ++stack_ptr;
-                                i_stack[stack_ptr] = left_i;
-                                j_stack[stack_ptr] = right_j;
-                                
-                                ++stack_ptr;
-                                i_stack[stack_ptr] = right_i;
-                                j_stack[stack_ptr] = left_j;
-                                
-                                ++stack_ptr;
-                                i_stack[stack_ptr] = left_i;
-                                j_stack[stack_ptr] = left_j;
-                                
-                            }
-                        }
-                        else
-                        {
-                            // split only larger cluster
-                            if (score_i > score_j)
-                            {
-                                ++stack_ptr;
-                                i_stack[stack_ptr] = right_i;
-                                j_stack[stack_ptr] = j;
-                                
-                                //split cluster i
-                                ++stack_ptr;
-                                i_stack[stack_ptr] = left_i;
-                                j_stack[stack_ptr] = j;
-                            }
-                            else //score_i < score_j
-                            {
-                                //split cluster j
-                                ++stack_ptr;
-                                i_stack[stack_ptr] = i;
-                                j_stack[stack_ptr] = right_j;
-                                
-                                ++stack_ptr;
-                                i_stack[stack_ptr] = i;
-                                j_stack[stack_ptr] = left_j;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        collision_time.push_back(a * t_init);
-                        
-                        if( is_symmetric )
-                        {
-                            // For creating an upper triangle matrix we store the pair  { min(i,j), max(i,j) }.
-                            if (i <= j)
-                            {
-                                collision_idx.push_back(i);
-                                collision_jdx.push_back(j);
-                            }
-                            else
-                            {
-                                collision_idx.push_back(j);
-                                collision_jdx.push_back(i);
-                            }
-                        }
-                        else
-                        {
-                            // No symmetry exploited.
-                            collision_idx.push_back(i);
-                            collision_jdx.push_back(j);
-                        }
-                    }
-                }
-            }
-        } // FindCollidingClusters_Sequential_DFS
         
-//####################################################################################################
+//################################################################################################
 //      FindCollidingClusters_Parallel
-//####################################################################################################
+//################################################################################################
+        
+#include "CollisionTree/FindCollidingClusters_BFS.hpp"
         
         void FindCollidingClusters_Parallel() const
         {
@@ -629,7 +482,7 @@ namespace Repulsor
             #pragma omp parallel for num_threads( thread_count ) schedule( dynamic )
             for( Int k = 0; k < static_cast<Int>(i_queue.size()); ++k )
             {
-                FindCollidingClusters_Sequential_DFS(i_queue[k], j_queue[k]);
+                FindCollidingClusters_DFS(i_queue[k], j_queue[k]);
             }
 
             i_queue = std::deque<Int>();
@@ -638,146 +491,7 @@ namespace Repulsor
             ptoc(className()+"::FindCollidingClusters_Parallel");
         }
         
-        void FindCollidingClusters_BFS( const Int max_leaves ) const
-        {
-            i_queue.push_back(null);
-            j_queue.push_back(null);
-            
-            std::vector<Int>   & collision_idx  = collision_i[0];
-            std::vector<Int>   & collision_jdx  = collision_j[0];
-            std::vector<SReal> & collision_time = collision_t[0];
 
-            const Int * restrict const S_left   = S.ClusterLeft().data();
-            const Int * restrict const S_right  = S.ClusterRight().data();
-            const Int * restrict const T_left   = T.ClusterLeft().data();
-            const Int * restrict const T_right  = T.ClusterRight().data();
-            
-            const Tensor2<SReal,Int> & S_C_ser    = S.ClusterSerializedData();
-            const Tensor2<SReal,Int> & S_C_up_ser = S.ClusterUpdatedSerializedData();
-            const Tensor2<SReal,Int> & T_C_ser    = T.ClusterSerializedData();
-            const Tensor2<SReal,Int> & T_C_up_ser = T.ClusterUpdatedSerializedData();
-//
-            SReal a = static_cast<SReal>(0);
-            SReal b = static_cast<SReal>(1);
-
-            while( !i_queue.empty() && ( static_cast<Int>(i_queue.size()) < max_leaves ) )
-            {
-                const Int i = i_queue.front();
-                const Int j = j_queue.front();
-                i_queue.pop_front();
-                j_queue.pop_front();
-                
-                AABB_CollisionTimeInterval<AMB_DIM, SReal, Int> (
-                    S_C_ser.data(i), S_C_up_ser.data(i),
-                    T_C_ser.data(j), T_C_up_ser.data(j),
-                    a, b
-                );
-                
-                    
-                
-                if( a < static_cast<SReal>(1) )
-                {
-                    const Int left_i = S_left[i];
-                    const Int left_j = T_left[j];
-
-                    // Warning: This assumes that both children in a cluster tree are either defined or empty.
-                    if( left_i >= null || left_j >= null )
-                    {
-
-                        const Int right_i = S_right[i];
-                        const Int right_j = T_right[j];
-                        
-// TODO: Improve score.
-                                                
-                        const SReal score_i = (left_i>=null) * S_C_ser(i,0);
-                        const SReal score_j = (left_j>=null) * T_C_ser(j,0);
-                        
-                        if( score_i == score_j )
-                        {
-                            // tie breaker: split both clusters
-
-                            if( (is_symmetric) && (i == j) )
-                            {
-                                //  Creating 3 blockcluster children, since there is one block is just the mirror of another one.
-
-                                i_queue.push_back(left_i);
-                                j_queue.push_back(right_j);
-                                
-                                i_queue.push_back(right_i);
-                                j_queue.push_back(right_j);
-                                
-                                i_queue.push_back(left_i);
-                                j_queue.push_back(left_j);
-                            }
-                            else
-                            {
-                                // In case of exploit_symmetry !=0, this is a very seldom case; still requird to preserve symmetry.
-                                // This happens only if i and j represent_diffent clusters with same radii.
-                                
-                                i_queue.push_back(right_i);
-                                j_queue.push_back(right_j);
-                                
-                                i_queue.push_back(left_i);
-                                j_queue.push_back(right_j);
-                                
-                                i_queue.push_back(right_i);
-                                j_queue.push_back(left_j);
-                                
-                                i_queue.push_back(left_i);
-                                j_queue.push_back(left_j);
-                            }
-                        }
-                        else
-                        {
-                            // split only the larger cluster
-                            if (score_i > score_j)
-                            {
-                                i_queue.push_back(right_i);
-                                j_queue.push_back(j);
-                                
-                                //split cluster i
-                                i_queue.push_back(left_i);
-                                j_queue.push_back(j);
-                            }
-                            else //score_i < score_j
-                            {
-                                //split cluster j
-                                i_queue.push_back(i);
-                                j_queue.push_back(right_j);
-                                
-                                i_queue.push_back(i);
-                                j_queue.push_back(left_j);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        collision_time.push_back(a * t_init);
-                        
-                        if( is_symmetric )
-                        {
-                            // For creating an upper triangle matrix we store the pair  { min(i,j), max(i,j) }.
-                            if (i <= j)
-                            {
-                                collision_idx.push_back(i);
-                                collision_jdx.push_back(j);
-                            }
-                            else
-                            {
-                                collision_idx.push_back(j);
-                                collision_jdx.push_back(i);
-                            }
-                        }
-                        else
-                        {
-                            // No symmetry exploited.
-                            collision_idx.push_back(i);
-                            collision_jdx.push_back(j);
-                        }
-                    }
-                }
-            }
-        } // FindCollidingClusters_BFS
         
         
 //####################################################################################################
@@ -803,6 +517,9 @@ namespace Repulsor
 //      MaximumSafeStepSize_Sequential
 //####################################################################################################
                
+#include "CollisionTree/MaximumSafeStepSize_DFS.hpp"
+#include "CollisionTree/MaximumSafeStepSize_BFS.hpp"
+        
     protected:
         
         SReal MaximumSafeStepSize_Sequential() const
@@ -811,343 +528,12 @@ namespace Repulsor
             
             SReal t;
             
-            if( is_symmetric )
-            {
-                t = MaximumSafeStepSize_DFS_Symmetric(0,0,t_init);
-            }
-            else
-            {
-                t = MaximumSafeStepSize_DFS_Asymmetric(0,0,t_init);
-            }
+            t = MaximumSafeStepSize_DFS(0,0,t_init);
             
             ptoc(className()+"::MaximumSafeStepSize_Sequential");
             
             return t;
-        }
-                
-        SReal MaximumSafeStepSize_DFS_Symmetric(
-                const Int i_0, const Int j_0, const SReal t_init_ ) const
-        {
-            Int i_stack[max_depth] = {};
-            Int j_stack[max_depth] = {};
-            
-            Int stack_ptr = null;
-            i_stack[0] = i_0;
-            j_stack[0] = j_0;
-            
-            const Int * restrict const S_left     = S.ClusterLeft().data();
-            const Int * restrict const S_right    = S.ClusterRight().data();
-            const Int * restrict const T_left     = T.ClusterLeft().data();
-            const Int * restrict const T_right    = T.ClusterRight().data();
-            
-            const Int * restrict const S_begin    = S.ClusterBegin().data();
-            const Int * restrict const S_end      = S.ClusterEnd().data();
-            const Int * restrict const T_begin    = T.ClusterBegin().data();
-            const Int * restrict const T_end      = T.ClusterEnd().data();
-            
-            const Tensor2<SReal,Int> & S_C_ser    = S.ClusterSerializedData();
-            const Tensor2<SReal,Int> & S_C_up_ser = S.ClusterUpdatedSerializedData();
-            const Tensor2<SReal,Int> & T_C_ser    = T.ClusterSerializedData();
-            const Tensor2<SReal,Int> & T_C_up_ser = T.ClusterUpdatedSerializedData();
-            
-            const Tensor2<SReal,Int> & S_P_ser    = S.PrimitiveSerializedData();
-            const Tensor2<SReal,Int> & S_P_v_ser  = S.PrimitiveVelocitiesSerializedData();
-            const Tensor2<SReal,Int> & T_P_ser    = T.PrimitiveSerializedData();
-            const Tensor2<SReal,Int> & T_P_v_ser  = T.PrimitiveVelocitiesSerializedData();
-
-            const SparseBinaryMatrixCSR<Int> & A = S.PrimitiveAdjacencyMatrix();
-            
-            PrimitiveCollisionFinder_T C ( S.MovingPrimitivePrototype(), T.MovingPrimitivePrototype() );
-            
-            SReal a = static_cast<SReal>(0);
-            SReal b = static_cast<SReal>(1);
-            
-            SReal t_max = t_init_;
-            
-            while( (null <= stack_ptr) && (stack_ptr < max_depth - 4) )
-            {
-                const Int i = i_stack[stack_ptr];
-                const Int j = j_stack[stack_ptr];
-                stack_ptr--;
-                
-                AABB_CollisionTimeInterval<AMB_DIM, SReal, Int> (
-                    S_C_ser.data(i), S_C_up_ser.data(i),
-                    T_C_ser.data(j), T_C_up_ser.data(j),
-                    a, b
-                );
-                
-                if( a * t_init_ < t_max )
-                {
-                    const Int left_i = S_left[i];
-                    const Int left_j = T_left[j];
-                    
-                    // Warning: This assumes that both children in a cluster tree are either defined or empty.
-                    if( left_i >= null || left_j >= null )
-                    {
-                        
-                        const Int right_i = S_right[i];
-                        const Int right_j = T_right[j];
-                        
-                        // TODO: Improve score.
-                        
-                        const SReal score_i = static_cast<SReal>(left_i >= null) * S_C_ser(i,0);
-                        const SReal score_j = static_cast<SReal>(left_j >= null) * T_C_ser(j,0);
-                        
-                        if( (score_i == score_j) && (score_i > static_cast<SReal>(0)) /*&& score_j > static_cast<SReal>(0)*/ )
-                        {
-                            // tie breaker: split both clusters
-                            
-                            if( i == j )
-                            {
-                                //  Creating 3 blockcluster children, since there is one block is just the mirror of another one.
-                                
-                                ++stack_ptr;
-                                i_stack[stack_ptr] = left_i;
-                                j_stack[stack_ptr] = right_j;
-                                
-                                ++stack_ptr;
-                                i_stack[stack_ptr] = right_i;
-                                j_stack[stack_ptr] = right_j;
-                                
-                                ++stack_ptr;
-                                i_stack[stack_ptr] = left_i;
-                                j_stack[stack_ptr] = left_j;
-                            }
-                            else
-                            {
-                                // In case of is_symmetric !=0, this is a very seldom case; still requird to preserve symmetry.
-                                // This happens only if i and j represent_diffent clusters with same radii.
-                                
-                                ++stack_ptr;
-                                i_stack[stack_ptr] = right_i;
-                                j_stack[stack_ptr] = right_j;
-                                
-                                ++stack_ptr;
-                                i_stack[stack_ptr] = left_i;
-                                j_stack[stack_ptr] = right_j;
-                                
-                                ++stack_ptr;
-                                i_stack[stack_ptr] = right_i;
-                                j_stack[stack_ptr] = left_j;
-                                
-                                ++stack_ptr;
-                                i_stack[stack_ptr] = left_i;
-                                j_stack[stack_ptr] = left_j;
-                            }
-                        }
-                        else
-                        {
-                            // split only larger cluster
-                            if (score_i > score_j)
-                            {
-                                ++stack_ptr;
-                                i_stack[stack_ptr] = right_i;
-                                j_stack[stack_ptr] = j;
-                                
-                                //split cluster i
-                                ++stack_ptr;
-                                i_stack[stack_ptr] = left_i;
-                                j_stack[stack_ptr] = j;
-                            }
-                            else //score_i < score_j
-                            {
-                                //split cluster j
-                                ++stack_ptr;
-                                i_stack[stack_ptr] = i;
-                                j_stack[stack_ptr] = right_j;
-                                
-                                ++stack_ptr;
-                                i_stack[stack_ptr] = i;
-                                j_stack[stack_ptr] = left_j;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        const Int ii_begin = S_begin[i];
-                        const Int ii_end   = S_end  [i];
-                        
-                        const Int jj_end   = T_end[j];
-                        
-                        for( Int ii = ii_begin; ii < ii_end; ++ii )
-                        {
-                            const Int jj_begin = ( i == j ) ? ii_begin+1 : T_begin[j];
-                            
-                            for( Int jj = jj_begin; jj < jj_end; ++jj )
-                            {
-                                if( A.FindNonzeroPosition(ii,jj) < null )
-                                {
-                                    const SReal t = C.FindMaximumSafeStepSize(
-                                        S_P_ser.data(ii), S_P_v_ser.data(ii),
-                                        T_P_ser.data(jj), T_P_v_ser.data(jj),
-                                        t_max, false
-                                    );
-                                    
-                                    t_max = std::min(t, t_max);
-                                }
-                                
-                            } // for( Int jj = jj_begin; jj < jj_end; ++jj )
-                            
-                        } // for( Int ii = ii_begin; ii < ii_end; ++ii )
-                    
-                    } // if( left_i >= null || left_j >= null )
-                }
-            
-            } // while
-            
-            
-            return t_max;
-            
-        } // MaximumSafeStepSize_DFS_Symmetric
-        
-        
-        SReal MaximumSafeStepSize_DFS_Asymmetric(
-                const Int i_0, const Int j_0, const SReal t_init_ ) const
-        {
-            Int i_stack[max_depth] = {};
-            Int j_stack[max_depth] = {};
-            
-            Int stack_ptr = null;
-            i_stack[0] = i_0;
-            j_stack[0] = j_0;
-            
-            const Int * restrict const S_left     = S.ClusterLeft().data();
-            const Int * restrict const S_right    = S.ClusterRight().data();
-            const Int * restrict const T_left     = T.ClusterLeft().data();
-            const Int * restrict const T_right    = T.ClusterRight().data();
-            
-            const Int * restrict const S_begin    = S.ClusterBegin().data();
-            const Int * restrict const S_end      = S.ClusterEnd().data();
-            const Int * restrict const T_begin    = T.ClusterBegin().data();
-            const Int * restrict const T_end      = T.ClusterEnd().data();
-            
-            const Tensor2<SReal,Int> & S_C_ser    = S.ClusterSerializedData();
-            const Tensor2<SReal,Int> & S_C_up_ser = S.ClusterUpdatedSerializedData();
-            const Tensor2<SReal,Int> & T_C_ser    = T.ClusterSerializedData();
-            const Tensor2<SReal,Int> & T_C_up_ser = T.ClusterUpdatedSerializedData();
-            
-            const Tensor2<SReal,Int> & S_P_ser    = S.PrimitiveSerializedData();
-            const Tensor2<SReal,Int> & S_P_v_ser  = S.PrimitiveVelocitiesSerializedData();
-            const Tensor2<SReal,Int> & T_P_ser    = T.PrimitiveSerializedData();
-            const Tensor2<SReal,Int> & T_P_v_ser  = T.PrimitiveVelocitiesSerializedData();
-
-            PrimitiveCollisionFinder_T C ( S.MovingPrimitivePrototype(), T.MovingPrimitivePrototype() );
-            
-            SReal a = static_cast<SReal>(0);
-            SReal b = static_cast<SReal>(1);
-            
-            SReal t_max = t_init_;
-            
-            while( (null <= stack_ptr) && (stack_ptr < max_depth - 4) )
-            {
-                const Int i = i_stack[stack_ptr];
-                const Int j = j_stack[stack_ptr];
-                stack_ptr--;
-                
-                AABB_CollisionTimeInterval<AMB_DIM, SReal, Int> (
-                    S_C_ser.data(i), S_C_up_ser.data(i),
-                    T_C_ser.data(j), T_C_up_ser.data(j),
-                    a, b
-                );
-                
-                if( a * t_init_ < t_max )
-                {
-                    const Int left_i = S_left[i];
-                    const Int left_j = T_left[j];
-                    
-                    // Warning: This assumes that both children in a cluster tree are either defined or empty.
-                    if( left_i >= null || left_j >= null )
-                    {
-                        
-                        const Int right_i = S_right[i];
-                        const Int right_j = T_right[j];
-                        
-                        // TODO: Improve score.
-                        
-                        const SReal score_i = static_cast<SReal>(left_i >= null) * S_C_ser(i,0);
-                        const SReal score_j = static_cast<SReal>(left_j >= null) * T_C_ser(j,0);
-                        
-                        if( (score_i == score_j) /* && (score_i > static_cast<SReal>(0)) && score_j > static_cast<SReal>(0)*/ )
-                        {
-                            // tie breaker: split both clusters
-                            
-                            ++stack_ptr;
-                            i_stack[stack_ptr] = right_i;
-                            j_stack[stack_ptr] = right_j;
-                            
-                            ++stack_ptr;
-                            i_stack[stack_ptr] = left_i;
-                            j_stack[stack_ptr] = right_j;
-                            
-                            ++stack_ptr;
-                            i_stack[stack_ptr] = right_i;
-                            j_stack[stack_ptr] = left_j;
-                            
-                            ++stack_ptr;
-                            i_stack[stack_ptr] = left_i;
-                            j_stack[stack_ptr] = left_j;
-                        }
-                        else
-                        {
-                            // split only larger cluster
-                            if (score_i > score_j)
-                            {
-                                ++stack_ptr;
-                                i_stack[stack_ptr] = right_i;
-                                j_stack[stack_ptr] = j;
-                                
-                                //split cluster i
-                                ++stack_ptr;
-                                i_stack[stack_ptr] = left_i;
-                                j_stack[stack_ptr] = j;
-                            }
-                            else //score_i < score_j
-                            {
-                                //split cluster j
-                                ++stack_ptr;
-                                i_stack[stack_ptr] = i;
-                                j_stack[stack_ptr] = right_j;
-                                
-                                ++stack_ptr;
-                                i_stack[stack_ptr] = i;
-                                j_stack[stack_ptr] = left_j;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        const Int ii_begin = S_begin[i];
-                        const Int ii_end   = S_end  [i];
-                        
-                        const Int jj_begin = T_begin[j];
-                        const Int jj_end   = T_end[j];
-                        
-                        for( Int ii = ii_begin; ii < ii_end; ++ii )
-                        {
-                            for( Int jj = jj_begin; jj < jj_end; ++jj )
-                            {
-                                const SReal t = C.FindMaximumSafeStepSize(
-                                    S_P_ser.data(ii), S_P_v_ser.data(ii),
-                                    T_P_ser.data(jj), T_P_v_ser.data(jj),
-                                    t_max, false
-                                );
-                                
-                                t_max = std::min(t, t_max);
-                                
-                            } // for( Int jj = jj_begin; jj < jj_end; ++jj )
-                            
-                        } // for( Int ii = ii_begin; ii < ii_end; ++ii )
-                    
-                    } // if( left_i >= null || left_j >= null )
-                }
-            
-            } // while
-            
-            
-            return t_max;
-            
-        } // MaximumSafeStepSize_DFS_Asymmetric
-        
+        }        
         
         
 //####################################################################################################
@@ -1167,46 +553,21 @@ namespace Repulsor
             i_queue = std::deque<Int>();
             j_queue = std::deque<Int>();
             
-            if( is_symmetric )
-            {
-                logprint("Peeling the top of symmetric tree by BFS search.");
-                t_max = MaximumSafeStepSize_BFS_Symmetric ( max_leaves, t_max );
-    
-                DUMP(t_max);
+            logprint("Peeling the top of tree by BFS search.");
+            t_max = MaximumSafeStepSize_BFS( max_leaves, t_max );
+
+            DUMP(t_max);
 //                DUMP(ThreadCount());
-                
-                #pragma omp parallel for num_threads( thread_count ) schedule(dynamic)
-                for( Int k = 0; k < static_cast<Int>(i_queue.size()); ++k )
-                {
-                    const SReal t = MaximumSafeStepSize_DFS_Symmetric( i_queue[k], j_queue[k], t_max );
-                    
-                    
-                    logprint("Chunk "+ToString(k)+" got t_max = "+ToString(t)+".");
-                    #pragma omp critical(t_max)
-                    {
-                        t_max = std::min( t, t_max );
-                    }
-                }
-            }
-            else
+            
+            #pragma omp parallel for num_threads( thread_count ) schedule(dynamic)
+            for( Int k = 0; k < static_cast<Int>(i_queue.size()); ++k )
             {
-                logprint("Peeling the top of asymmetric tree by BFS search.");
+                const SReal t = MaximumSafeStepSize_DFS( i_queue[k], j_queue[k], t_max );
                 
-                t_max = MaximumSafeStepSize_BFS_Asymmetric( max_leaves, t_max );
-                DUMP(t_max);
-//                DUMP(ThreadCount());
-                
-                #pragma omp parallel for num_threads( thread_count ) schedule(dynamic)
-                for( Int k = 0; k < static_cast<Int>(i_queue.size()); ++k )
+                logprint("Chunk "+ToString(k)+" got t_max = "+ToString(t)+".");
+                #pragma omp critical(t_max)
                 {
-                    const SReal t = MaximumSafeStepSize_DFS_Asymmetric( i_queue[k], j_queue[k], t_max );
-                    
-                    logprint("Chunk "+ToString(k)+" got t_max = "+ToString(t)+".");
-                    
-                    #pragma omp critical(t_max)
-                    {
-                        t_max = std::min( t, t_max );
-                    }
+                    t_max = std::min( t, t_max );
                 }
             }
 
@@ -1220,294 +581,6 @@ namespace Repulsor
             return t_max;
         }
         
-        
-        SReal MaximumSafeStepSize_BFS_Symmetric( const Int max_leaves, const SReal t_init_ ) const
-        {
-            ptic(className()+"MaximumSafeStepSize_BFS_Symmetric");
-            
-            i_queue.push_back(null);
-            j_queue.push_back(null);
-
-            const Int * restrict const S_left     = S.ClusterLeft().data();
-            const Int * restrict const S_right    = S.ClusterRight().data();
-            const Int * restrict const T_left     = T.ClusterLeft().data();
-            const Int * restrict const T_right    = T.ClusterRight().data();
-            
-            const Int * restrict const S_begin    = S.ClusterBegin().data();
-            const Int * restrict const S_end      = S.ClusterEnd().data();
-            const Int * restrict const T_begin    = T.ClusterBegin().data();
-            const Int * restrict const T_end      = T.ClusterEnd().data();
-            
-            const Tensor2<SReal,Int> & S_C_ser    = S.ClusterSerializedData();
-            const Tensor2<SReal,Int> & S_C_up_ser = S.ClusterUpdatedSerializedData();
-            const Tensor2<SReal,Int> & T_C_ser    = T.ClusterSerializedData();
-            const Tensor2<SReal,Int> & T_C_up_ser = T.ClusterUpdatedSerializedData();
-            
-            const Tensor2<SReal,Int> & S_P_ser    = S.PrimitiveSerializedData();
-            const Tensor2<SReal,Int> & S_P_v_ser  = S.PrimitiveVelocitiesSerializedData();
-            const Tensor2<SReal,Int> & T_P_ser    = T.PrimitiveSerializedData();
-            const Tensor2<SReal,Int> & T_P_v_ser  = T.PrimitiveVelocitiesSerializedData();
-
-            const SparseBinaryMatrixCSR<Int> & A = S.PrimitiveAdjacencyMatrix();
-            
-            PrimitiveCollisionFinder_T C ( S.MovingPrimitivePrototype(), T.MovingPrimitivePrototype() );
-            
-            SReal a = static_cast<SReal>(0);
-            SReal b = static_cast<SReal>(1);
-            
-            SReal t_max = t_init_;
-            
-            while( !i_queue.empty() && ( static_cast<Int>(i_queue.size()) < max_leaves ) )
-            {
-                const Int i = i_queue.front();
-                const Int j = j_queue.front();
-                
-                i_queue.pop_front();
-                j_queue.pop_front();
-
-                AABB_CollisionTimeInterval<AMB_DIM, SReal, Int> (
-                    S_C_ser.data(i), S_C_up_ser.data(i),
-                    T_C_ser.data(j), T_C_up_ser.data(j),
-                    a, b
-                );
-                
-                if( a * t_init_ < t_max )
-                {
-                    const Int left_i = S_left[i];
-                    const Int left_j = T_left[j];
-
-                    // Warning: This assumes that both children in a cluster tree are either defined or empty.
-                    if( left_i >= null || left_j >= null )
-                    {
-
-                        const Int right_i = S_right[i];
-                        const Int right_j = T_right[j];
-                                                
-                        const SReal score_i = (left_i>=null) * S_C_ser(i,0);
-                        const SReal score_j = (left_j>=null) * T_C_ser(j,0);
-                        
-                        // split only the larger cluster
-                        if (score_i > score_j)
-                        {
-                            i_queue.push_back(right_i);
-                            j_queue.push_back(j);
-                            
-                            //split cluster i
-                            i_queue.push_back(left_i);
-                            j_queue.push_back(j);
-                        }
-                        else //score_i < score_j
-                        {
-                            if (score_i < score_j)
-                            {
-                                i_queue.push_back(i);
-                                j_queue.push_back(right_j);
-                                
-                                i_queue.push_back(i);
-                                j_queue.push_back(left_j);
-                            }
-                            else
-                            {
-                                // This is a very seldom case; still requird to preserve symmetry.
-                                // This happens only if i and j represent_diffent clusters with same radii.
-                                
-                                i_queue.push_back(right_i);
-                                j_queue.push_back(right_j);
-                                
-                                i_queue.push_back(left_i);
-                                j_queue.push_back(right_j);
-                                
-                                i_queue.push_back(right_i);
-                                j_queue.push_back(left_j);
-                                
-                                i_queue.push_back(left_i);
-                                j_queue.push_back(left_j);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        const Int ii_begin = S_begin[i];
-                        const Int ii_end   = S_end  [i];
-                        
-                        const Int jj_end   = T_end  [j];
-                        
-                        for( Int ii = ii_begin; ii < ii_end; ++ii )
-                        {
-                            const Int jj_begin = ( i == j ) ? ii_begin+1 : T_begin[j];
-                            
-                            for( Int jj = jj_begin; jj < jj_end; ++jj )
-                            {
-                                if( A.FindNonzeroPosition(ii,jj) < null )
-                                {
-                                    const SReal t = C.FindMaximumSafeStepSize(
-                                        S_P_ser.data(ii), S_P_v_ser.data(ii),
-                                        T_P_ser.data(jj), T_P_v_ser.data(jj),
-                                        t_max, false
-                                    );
-                                    
-                                    t_max = std::min( t, t_max );
-                                }
-                                
-                            } // for( Int jj = jj_begin; jj < jj_end; ++jj )
-                            
-                        } // for( Int ii = ii_begin; ii < ii_end; ++ii )
-                    
-                    } // if( score_i == score_j )
-                    
-                }
-                
-            }
-            
-            ptoc(className()+"MaximumSafeStepSize_BFS_Symmetric");
-            
-            return t_max;
-            
-        } // MaximumSafeStepSize_BFS_Symmetric
-        
-        
-        
-        SReal MaximumSafeStepSize_BFS_Asymmetric( const Int max_leaves, const SReal t_init_ ) const
-        {
-            ptic(className()+"MaximumSafeStepSize_BFS_Asymmetric");
-            
-            i_queue.push_back(null);
-            j_queue.push_back(null);
-
-            const Int * restrict const S_left     = S.ClusterLeft().data();
-            const Int * restrict const S_right    = S.ClusterRight().data();
-            const Int * restrict const T_left     = T.ClusterLeft().data();
-            const Int * restrict const T_right    = T.ClusterRight().data();
-
-            const Int * restrict const S_begin    = S.ClusterBegin().data();
-            const Int * restrict const S_end      = S.ClusterEnd().data();
-            const Int * restrict const T_begin    = T.ClusterBegin().data();
-            const Int * restrict const T_end      = T.ClusterEnd().data();
-
-            const Tensor2<SReal,Int> & S_C_ser    = S.ClusterSerializedData();
-            const Tensor2<SReal,Int> & S_C_up_ser = S.ClusterUpdatedSerializedData();
-            const Tensor2<SReal,Int> & T_C_ser    = T.ClusterSerializedData();
-            const Tensor2<SReal,Int> & T_C_up_ser = T.ClusterUpdatedSerializedData();
-
-            const Tensor2<SReal,Int> & S_P_ser    = S.PrimitiveSerializedData();
-            const Tensor2<SReal,Int> & S_P_v_ser  = S.PrimitiveVelocitiesSerializedData();
-            const Tensor2<SReal,Int> & T_P_ser    = T.PrimitiveSerializedData();
-            const Tensor2<SReal,Int> & T_P_v_ser  = T.PrimitiveVelocitiesSerializedData();
-            
-            auto & AA = S.MovingPrimitivePrototype();
-            
-            auto & BB = T.MovingPrimitivePrototype();
-            
-            PrimitiveCollisionFinder_T C ( AA, BB );
-            
-            SReal a = static_cast<SReal>(0);
-            SReal b = static_cast<SReal>(1);
-            
-            SReal t_max = t_init_;
-
-            while( !i_queue.empty() && ( static_cast<Int>(i_queue.size()) < max_leaves ) )
-            {
-                const Int i = i_queue.front();
-                const Int j = j_queue.front();
-                i_queue.pop_front();
-                j_queue.pop_front();
-
-                AABB_CollisionTimeInterval<AMB_DIM, SReal, Int> (
-                    S_C_ser.data(i), S_C_up_ser.data(i),
-                    T_C_ser.data(j), T_C_up_ser.data(j),
-                    a, b
-                );
-                
-                if( a * t_init_ < t_max )
-                {
-                    const Int left_i = S_left[i];
-                    const Int left_j = T_left[j];
-
-                    // Warning: This assumes that both children in a cluster tree are either defined or empty.
-                    if( left_i >= null || left_j >= null )
-                    {
-
-                        const Int right_i = S_right[i];
-                        const Int right_j = T_right[j];
-                                                
-                        const SReal score_i = (left_i>=null) * S_C_ser(i,0);
-                        const SReal score_j = (left_j>=null) * T_C_ser(j,0);
-                        
-                        if( score_i == score_j )
-                        {
-                            // tie breaker: split both clusters
-                            
-                            i_queue.push_back(right_i);
-                            j_queue.push_back(right_j);
-                            
-                            i_queue.push_back(left_i);
-                            j_queue.push_back(right_j);
-                            
-                            i_queue.push_back(right_i);
-                            j_queue.push_back(left_j);
-                            
-                            i_queue.push_back(left_i);
-                            j_queue.push_back(left_j);
-                        }
-                        else
-                        {
-                            // split only the larger cluster
-                            if (score_i > score_j)
-                            {
-                                i_queue.push_back(right_i);
-                                j_queue.push_back(j);
-                                
-                                //split cluster i
-                                i_queue.push_back(left_i);
-                                j_queue.push_back(j);
-                            }
-                            else //score_i < score_j
-                            {
-                                //split cluster j
-                                i_queue.push_back(i);
-                                j_queue.push_back(right_j);
-                                
-                                i_queue.push_back(i);
-                                j_queue.push_back(left_j);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        const Int ii_begin = S_begin[i];
-                        const Int ii_end   = S_end  [i];
-                        
-                        const Int jj_begin = T_begin[j];
-                        const Int jj_end   = T_end  [j];
-                        
-                        for( Int ii = ii_begin; ii < ii_end; ++ii )
-                        {
-                            for( Int jj = jj_begin; jj < jj_end; ++jj )
-                            {
-                                const SReal t = C.FindMaximumSafeStepSize(
-                                    S_P_ser.data(ii), S_P_v_ser.data(ii),
-                                    T_P_ser.data(jj), T_P_v_ser.data(jj),
-                                    t_max, false
-                                );
-                                
-                                t_max = std::min( t, t_max );
-                                
-                            } // for( Int jj = jj_begin; jj < jj_end; ++jj )
-                            
-                        } // for( Int ii = ii_begin; ii < ii_end; ++ii )
-                    
-                    } // if( score_i == score_j )
-                    
-                }
-                
-            }
-            
-            ptoc(className()+"MaximumSafeStepSize_BFS_Asymmetric");
-            
-            return t_max;
-            
-        } // MaximumSafeStepSize_BFS_Asymmetric
-        
     public:
         
         virtual Int ThreadCount() const override
@@ -1518,11 +591,6 @@ namespace Repulsor
         Int AmbDim() const override
         {
             return AMB_DIM;
-        }
-        
-        bool IsSymmetric() const override
-        {
-            return is_symmetric;
         }
         
         const CollisionMatrix_T & ClusterCollisionMatrix() const override
@@ -1568,7 +636,7 @@ namespace Repulsor
         
         static std::string className()
         {
-            return TO_STD_STRING(CLASS) + "<"+ToString(AMB_DIM)+","+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+">";
+            return TO_STD_STRING(CLASS) + "<"+ToString(AMB_DIM)+","+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+","+ToString(is_symmetric)+">";
         }
 
     }; // CLASS

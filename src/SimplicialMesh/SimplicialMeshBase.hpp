@@ -2,10 +2,18 @@
 
 #define CLASS SimplicialMeshBase
 
+
+//#define ENABLE_ENERGIES
+//#define ENABLE_METRICS
+
 namespace Repulsor
 {
+#ifdef ENABLE_ENERGIES
+    
     template<typename Real, typename Int, typename SReal, typename ExtReal>
     class EnergyBase;
+    
+#endif
     
     template<typename Real, typename Int, typename SReal, typename ExtReal>
     class SimplicialRemesherBase;
@@ -21,10 +29,12 @@ namespace Repulsor
         
     public:
         
-        using ClusterTreeBase_T      =        ClusterTreeBase<Real,Int,SReal,ExtReal>;
-        using BlockClusterTreeBase_T =   BlockClusterTreeBase<Real,Int,SReal,ExtReal>;
-        using CollisionTreeBase_T    =      CollisionTreeBase<Real,Int,SReal,ExtReal>;
-        using RemesherBase_T         = SimplicialRemesherBase<Real,Int,SReal,ExtReal>;
+        using ClusterTree_T              =        ClusterTreeBase<Real,Int,SReal,ExtReal>;
+        using BlockClusterTree_T         =   BlockClusterTreeBase<Real,Int,SReal,ExtReal,true>;
+        using CollisionTree_T            =      CollisionTreeBase<Real,Int,SReal,ExtReal,true>;
+        using ObstacleBlockClusterTree_T =   BlockClusterTreeBase<Real,Int,SReal,ExtReal,false>;
+        using ObstacleCollisionTree_T    =      CollisionTreeBase<Real,Int,SReal,ExtReal,false>;
+        using Remesher_T                 = SimplicialRemesherBase<Real,Int,SReal,ExtReal>;
         
         CLASS () {}
         
@@ -71,11 +81,11 @@ namespace Repulsor
         
         virtual void SemiStaticUpdate( const ExtReal * restrict const V_coords_ ) = 0;
         
-        virtual const ClusterTreeBase_T & GetClusterTree() const = 0;
+        virtual const ClusterTree_T & GetClusterTree() const = 0;
         
-        virtual const BlockClusterTreeBase_T & GetBlockClusterTree() const = 0;
+        virtual const BlockClusterTree_T & GetBlockClusterTree() const = 0;
         
-        virtual const CollisionTreeBase_T & GetCollisionTree() const = 0;
+        virtual const CollisionTree_T & GetCollisionTree() const = 0;
                 
         virtual const SparseBinaryMatrixCSR<Int> & DerivativeAssembler() const = 0;
         
@@ -113,11 +123,11 @@ namespace Repulsor
         
         virtual bool ObstacleInitialized() const = 0;
         
-        virtual const ClusterTreeBase_T & GetObstacleClusterTree() const = 0;
+        virtual const ClusterTree_T & GetObstacleClusterTree() const = 0;
         
-        virtual const BlockClusterTreeBase_T & GetObstacleBlockClusterTree() const = 0;
+        virtual const ObstacleBlockClusterTree_T & GetObstacleBlockClusterTree() const = 0;
         
-        virtual const CollisionTreeBase_T & GetObstacleCollisionTree() const = 0;
+        virtual const ObstacleCollisionTree_T & GetObstacleCollisionTree() const = 0;
         
 //##############################################################################################
 //      Tangent-point
@@ -137,6 +147,7 @@ namespace Repulsor
 //      TangentPointEnergy
 //##############################################################################################
 
+#ifdef ENABLE_ENERGIES
         
         virtual ExtReal TangentPointEnergy() const = 0;
 
@@ -154,12 +165,14 @@ namespace Repulsor
         
         virtual void TangentPointEnergy_SimplexEnergies( Tensor1<ExtReal,Int> & output, bool addTo = false ) const  = 0;
         
+#endif
         
 //##############################################################################################
 //      TangentPointObstacleEnergy
 //##############################################################################################
 
-
+#ifdef ENABLE_ENERGIES
+        
         virtual ExtReal TangentPointObstacleEnergy() const = 0;
 
         virtual ExtReal TangentPointObstacleEnergy_Differential( ExtReal * output, bool addTo = false ) const  = 0;
@@ -176,9 +189,13 @@ namespace Repulsor
         
         virtual void TangentPointObstacleEnergy_SimplexEnergies( Tensor1<ExtReal,Int> & output, bool addTo = false ) const  = 0;
         
+#endif
+        
 //##############################################################################################
 //      Custom energy (allows for loading arbitrary EnergyBase object )
 //##############################################################################################
+        
+#ifdef ENABLE_ENERGIES
         
     public:
         
@@ -205,9 +222,13 @@ namespace Repulsor
         
         virtual void CustomEnergy_SimplexEnergies( Tensor1<ExtReal,Int> & output, bool addTo = false ) const  = 0;
         
+#endif
+        
 //##############################################################################################
 //      Trivial energy (for debugging purposes)
 //##############################################################################################
+        
+#ifdef ENABLE_ENERGIES
         
         virtual ExtReal GetTrivialEnergyWeight() const = 0;
 
@@ -221,10 +242,13 @@ namespace Repulsor
         
         virtual ExtReal TrivialEnergy_Differential( Tensor2<ExtReal,Int> & output, bool addTo = false ) const = 0;
         
+#endif
+        
 //##############################################################################################
 //      TrivialObstacleEnergy (for debugging purposes)
 //##############################################################################################
          
+#ifdef ENABLE_ENERGIES
         
         virtual ExtReal TrivialObstacleEnergy() const = 0;
 
@@ -234,12 +258,13 @@ namespace Repulsor
         
         virtual ExtReal TrivialObstacleEnergy_Differential( Tensor2<ExtReal,Int> & output, bool addTo = false ) const = 0;
 
-        
+#endif
         
 //##############################################################################################
 //      TangentPointMetric
 //##############################################################################################
 
+#ifdef ENABLE_METRICS
         
         virtual void TangentPointMetric_Multiply(
             const ExtReal alpha, const ExtReal * U,
@@ -287,6 +312,8 @@ namespace Repulsor
             const KernelType kernel
         ) const = 0;
         
+#endif
+        
 ////##############################################################################################
 ////      TangentPointSingularMetric
 ////##############################################################################################
@@ -330,7 +357,7 @@ namespace Repulsor
         
     public:
         
-        virtual std::unique_ptr<RemesherBase_T> CreateRemesher() = 0;
+        virtual std::unique_ptr<Remesher_T> CreateRemesher() = 0;
         
 //##############################################################################################
 //      Standard interface

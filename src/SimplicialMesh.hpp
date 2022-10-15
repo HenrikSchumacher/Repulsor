@@ -1,30 +1,40 @@
 #pragma once
 
+#include "SimplicialMesh/SimplicialMeshBase.hpp"
+
 #define BASE  SimplicialMeshBase<Real,Int,SReal,ExtReal>
 #define CLASS SimplicialMesh
 
 namespace Repulsor
 {
+#ifdef ENABLE_ENERGIES
+    
+    template<int DOM_DIM, int AMB_DIM, typename Real, typename Int, typename SReal, typename ExtReal>
+    class Energy_Restricted;
+    
     template<int DOM_DIM, int AMB_DIM, int DEGREE, typename Real, typename Int, typename SReal, typename ExtReal>
     class TP_Energy_FMM_Adaptive;
     
     template<int DOM_DIM1, int DOM_DIM2, int AMB_DIM, int DEGREE, typename Real, typename Int, typename SReal, typename ExtReal>
     class TP_ObstacleEnergy_FMM_Adaptive;
-    
-    template<int DOM_DIM, int AMB_DIM, int DEGREE, typename Real, typename Int, typename SReal, typename ExtReal>
-    class TP_Metric_FMM_Adaptive;
-    
-//    template<int DOM_DIM, int AMB_DIM, int DEGREE, typename Real, typename Int, typename SReal, typename ExtReal>
-//    class TP_SingularMetric_FMM_Adaptive;
-    
+
     template<int DOM_DIM, int AMB_DIM, int DEGREE, typename Real, typename Int, typename SReal, typename ExtReal>
     class TrivialEnergy_FMM_Adaptive;
     
     template<int DOM_DIM1, int DOM_DIM2, int AMB_DIM, int DEGREE, typename Real, typename Int, typename SReal, typename ExtReal>
     class TrivialObstacleEnergy_FMM_Adaptive;
     
-    template<int DOM_DIM, int AMB_DIM, typename Real, typename Int, typename SReal, typename ExtReal>
-    class Energy_Restricted;
+#endif
+
+#ifdef ENABLE_METRICS
+    
+    template<int DOM_DIM, int AMB_DIM, int DEGREE, typename Real, typename Int, typename SReal, typename ExtReal>
+    class TP_Metric_FMM_Adaptive;
+    
+    //    template<int DOM_DIM, int AMB_DIM, int DEGREE, typename Real, typename Int, typename SReal, typename ExtReal>
+    //    class TP_SingularMetric_FMM_Adaptive;
+        
+#endif
     
     template<typename Real, typename Int, typename SReal, typename ExtReal>
     class SimplicialRemesherBase;
@@ -42,15 +52,21 @@ namespace Repulsor
         using BoundingVolume_T   =           AABB<           AMB_DIM,GJK_Real,Int,SReal>;
         
         
-        using ClusterTree_T      =            ClusterTree<        AMB_DIM,Real,Int,SReal,ExtReal>;
-        using BlockClusterTree_T =       BlockClusterTree<        AMB_DIM,Real,Int,SReal,ExtReal>;
-        using CollisionTree_T    =          CollisionTree<        AMB_DIM,Real,Int,SReal,ExtReal>;
-        using Energy_T           =      Energy_Restricted<DOM_DIM,AMB_DIM,Real,Int,SReal,ExtReal>;
+        using ClusterTree_T              =            ClusterTree<AMB_DIM,Real,Int,SReal,ExtReal>;
+        using BlockClusterTree_T         =       BlockClusterTree<AMB_DIM,Real,Int,SReal,ExtReal,true>;
+        using ObstacleBlockClusterTree_T =       BlockClusterTree<AMB_DIM,Real,Int,SReal,ExtReal,false>;
+        using CollisionTree_T            =          CollisionTree<AMB_DIM,Real,Int,SReal,ExtReal,true>;
+        using ObstacleCollisionTree_T    =          CollisionTree<AMB_DIM,Real,Int,SReal,ExtReal,false>;
+
         using Remesher_T         =     SimplicialRemesher<DOM_DIM,AMB_DIM,Real,Int,SReal,ExtReal>;
         using RemesherBase_T     = SimplicialRemesherBase<                Real,Int,SReal,ExtReal>;
         using Obstacle_T         = BASE;
         
-        CLASS() {}
+#ifdef ENABLE_ENERGIES
+        using Energy_T           =      Energy_Restricted<DOM_DIM,AMB_DIM,Real,Int,SReal,ExtReal>;
+#endif
+        
+        CLASS() = default;
 
         CLASS(
             const Tensor2<ExtReal,Int> & V_coords_,
@@ -169,11 +185,6 @@ namespace Repulsor
         using BASE::cluster_tree_settings;
         using BASE::adaptivity_settings;
         using BASE::ThreadCount;
-//        using BASE::GetClusterTree;
-//        using BASE::GetBlockClusterTree;
-//        using BASE::GetCollisionTree;
-//        using BASE::GetObstacleClusterTree;
-//        using BASE::GetObstacleBlockClusterTree;
         
     protected:
         
@@ -188,11 +199,6 @@ namespace Repulsor
         
         mutable bool collision_tree_initialized = false;
         mutable std::unique_ptr<CollisionTree_T> collision_tree
-              = std::unique_ptr<CollisionTree_T>(
-                    new CollisionTree_T(*cluster_tree, *cluster_tree, static_cast<SReal>(1) ) );
-        
-        mutable bool obstacle_collision_tree_initialized = false;
-        mutable std::unique_ptr<CollisionTree_T> obstacle_collision_tree
               = std::unique_ptr<CollisionTree_T>(
                     new CollisionTree_T(*cluster_tree, *cluster_tree, static_cast<SReal>(1) ) );
         
@@ -605,8 +611,14 @@ namespace Repulsor
         mutable std::unique_ptr<Obstacle_T> obstacle = nullptr;
         
         mutable bool obstacle_block_cluster_tree_initialized = false;
-        mutable std::unique_ptr<BlockClusterTree_T> obstacle_block_cluster_tree = nullptr;
+        mutable std::unique_ptr<ObstacleBlockClusterTree_T> obstacle_block_cluster_tree = nullptr;
 //              = std::unique_ptr<BlockClusterTree_T>();
+        
+        
+        mutable bool obstacle_collision_tree_initialized = false;
+        mutable std::unique_ptr<ObstacleCollisionTree_T> obstacle_collision_tree = nullptr;
+//              = std::unique_ptr<ObstacleCollisionTree_T>(
+//                    new ObstacleCollisionTree_T(*cluster_tree, *cluster_tree, static_cast<SReal>(1) ) );
         
         bool ObstacleInitialized() const override
         {
@@ -633,8 +645,10 @@ namespace Repulsor
             
             obstacle_initialized = true;
             
+#ifdef ENABLE_ENERGIES
             tpo_initialized = false;
             trivial_oe_initialized = false;
+#endif
         }
         
         const Obstacle_T & GetObstacle() const override
@@ -652,7 +666,7 @@ namespace Repulsor
             return *dynamic_cast<const ClusterTree_T *>( & (GetObstacle().GetClusterTree()) );
         }
         
-        virtual const BlockClusterTree_T & GetObstacleBlockClusterTree() const override
+        virtual const ObstacleBlockClusterTree_T & GetObstacleBlockClusterTree() const override
         {
             if( !obstacle_block_cluster_tree_initialized )
             {
@@ -660,7 +674,7 @@ namespace Repulsor
                 if( obstacle_initialized )
                 {
                     (void)GetClusterTree();
-                    obstacle_block_cluster_tree = std::make_unique<BlockClusterTree_T>(
+                    obstacle_block_cluster_tree = std::make_unique<ObstacleBlockClusterTree_T>(
                         *cluster_tree,
                         GetObstacleClusterTree(),
                         block_cluster_tree_settings
@@ -679,7 +693,7 @@ namespace Repulsor
             return *obstacle_block_cluster_tree;
         }
         
-        virtual const CollisionTree_T & GetObstacleCollisionTree() const override
+        virtual const ObstacleCollisionTree_T & GetObstacleCollisionTree() const override
         {
             if( !obstacle_collision_tree_initialized )
             {
@@ -690,7 +704,7 @@ namespace Repulsor
                     (void)GetClusterTree();
                     if( cluster_tree_initialized )
                     {
-                        obstacle_collision_tree = std::make_unique<CollisionTree_T>(
+                        obstacle_collision_tree = std::make_unique<ObstacleCollisionTree_T>(
                             *cluster_tree, GetObstacleClusterTree(), max_update_step_size );
 
                         obstacle_collision_tree_initialized = true;
@@ -712,19 +726,25 @@ namespace Repulsor
         mutable Real    tp_beta   = 4 * (DOM_DIM+1);
         mutable ExtReal tp_weight = 1;
 
-        
+#ifdef ENABLE_ENERGIES
         
         mutable bool tpe_initialized = false;
         mutable std::unique_ptr<TP_Energy_FMM_Adaptive<DOM_DIM,AMB_DIM,0,Real,Int,SReal,ExtReal>> tpe;
 
         mutable bool tpo_initialized = false;
         mutable std::unique_ptr<Energy_T> tpo;
+        
+#endif
+        
+#ifdef ENABLE_METRICS
   
         mutable bool tpm_initialized = false;
         mutable std::unique_ptr<TP_Metric_FMM_Adaptive<DOM_DIM,AMB_DIM,0,Real,Int,SReal,ExtReal>> tpm;
 
 //        mutable bool tpsm_initialized = false;
 //        mutable std::unique_ptr<TP_SingularMetric_FMM_Adaptive<DOM_DIM,AMB_DIM,0,Real,Int,SReal,ExtReal>> tpsm;
+        
+#endif
         
     public:
         
@@ -736,6 +756,7 @@ namespace Repulsor
         void SetTangentPointWeight( const ExtReal weight ) const override
         {
             tp_weight = weight;
+#ifdef ENABLE_ENERGIES
             if( tpe_initialized )
             {
                 tpe->SetWeight(tp_weight);
@@ -744,6 +765,9 @@ namespace Repulsor
             {
                 tpo->SetWeight(tp_weight);
             }
+#endif
+            
+#ifdef ENABLE_METRICS
             if( tpm_initialized )
             {
                 tpm->SetWeight(tp_weight);
@@ -752,6 +776,7 @@ namespace Repulsor
 //            {
 //                tpsm->SetWeight(tp_weight);
 //            }
+#endif
         }
                                                
         std::pair<Real,Real> GetTangentPointExponents() const override
@@ -765,32 +790,41 @@ namespace Repulsor
            {
                tp_alpha = alpha_;
                tp_beta  = beta_;
+
+#ifdef ENABLE_ENERGIES
                
                tpe_initialized  = false;
                tpo_initialized  = false;
+               
+#endif
+         
+#ifdef ENABLE_METRICS
                tpm_initialized  = false;
 //               tpsm_initialized = false;
+#endif
            }
         }
         
 
-#include "TangentPointEnergy.hpp"
-        
-#include "TangentPointObstacleEnergy.hpp"
-        
-#include "TangentPointMetric.hpp"
-        
-//#include "TangentPointSingularMetric.hpp"
-        
-        
-//##############################################################################################
-//      Other energies
-//##############################################################################################
-            
-#include "CustomEnergy.hpp"
+#ifdef ENABLE_ENERGIES
 
-#include "TrivialEnergy.hpp"
+    #include "TangentPointEnergy.hpp"
+        
+    #include "TangentPointObstacleEnergy.hpp"
+  
+    #include "CustomEnergy.hpp"
 
+    #include "TrivialEnergy.hpp"
+        
+#endif
+        
+#ifdef ENABLE_METRICS
+        
+//    #include "TangentPointMetric.hpp"
+//
+//    #include "TangentPointSingularMetric.hpp"
+        
+#endif
 
         
 //##############################################################################################

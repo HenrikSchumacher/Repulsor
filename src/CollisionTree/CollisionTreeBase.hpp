@@ -4,7 +4,7 @@
 
 namespace Repulsor
 {
-    template<typename Real, typename Int, typename SReal, typename ExtReal>
+    template<typename Real, typename Int, typename SReal, typename ExtReal, bool is_symmetric>
     class CLASS
     {
         ASSERT_FLOAT(Real   );
@@ -31,7 +31,10 @@ namespace Repulsor
 
         virtual Int ThreadCount() const = 0;
         
-        virtual bool IsSymmetric() const = 0;
+        static constexpr bool IsSymmetric()
+        {
+            return is_symmetric;
+        }
 
         virtual const CollisionMatrix_T & ClusterCollisionMatrix() const = 0;
         
