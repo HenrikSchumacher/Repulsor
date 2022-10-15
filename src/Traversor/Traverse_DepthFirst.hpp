@@ -4,7 +4,7 @@ public:
     {
         const Int thread = omp_get_thread_num();
         
-        Kernel_T ker = kernels[thread];
+        Kernel_T K = kernels[thread];
         
         Int i_stack[max_depth] = {};
         Int j_stack[max_depth] = {};
@@ -20,10 +20,10 @@ public:
             
             stack_ptr--;
             
-            ker.LoadClusterS(i);
-            ker.LoadClusterT(j);
+            K.LoadClusterS(i);
+            K.LoadClusterT(j);
             
-            const bool admissable = (!( is_symmetric && (i == j) )) && ker.IsAdmissable();
+            const bool admissable = (!( is_symmetric && (i == j) )) && K.IsAdmissable();
             
             if( !admissable )
             {
@@ -36,8 +36,8 @@ public:
                     const Int right_i = S_C_right[i];
                     const Int right_j = T_C_right[j];
                     
-                    const SReal score_i = (left_i>=zero) * ker.ClusterScoreS();
-                    const SReal score_j = (left_j>=zero) * ker.ClusterScoreT();
+                    const SReal score_i = (left_i>=zero) * K.ClusterScoreS();
+                    const SReal score_j = (left_j>=zero) * K.ClusterScoreT();
 
                     if( score_i == score_j )
                     {
@@ -143,8 +143,8 @@ public:
                         {
                             if constexpr ( leafs_are_singletons )
                             {
-                                ker.LoadPrimitiveS( S_C_begin[i] );
-                                ker.ComputeLeafDiagonal();
+                                K.LoadPrimitiveS( S_C_begin[i] );
+                                K.ComputeLeafDiagonal();
                             }
                             else
                             {
@@ -155,15 +155,15 @@ public:
                                 
                                 for( Int ii = ii_begin; ii < ii_end; ++ii )
                                 {
-                                    ker.LoadPrimitiveS(ii);
+                                    K.LoadPrimitiveS(ii);
                                     
-                                    ker.ComputeLeafDiagonal();
+                                    K.ComputeLeafDiagonal();
                                     
                                     for( Int jj = ii+1; jj < ii_end; ++jj )
                                     {
-                                        ker.LoadPrimitiveT(jj);
+                                        K.LoadPrimitiveT(jj);
                                         
-                                        ker.ComputeLeaf();
+                                        K.ComputeLeaf();
                                     }
                                 }
                             }
@@ -173,16 +173,19 @@ public:
                             // Traverse whole block, but sort primitive indices.
                             if constexpr ( leafs_are_singletons )
                             {
-                                ker.LoadPrimitiveS( S_C_begin[i] );
-                                ker.LoadPrimitiveS( T_C_begin[j] );
+                                const Int ii = S_C_begin[i];
+                                const Int jj = T_C_begin[j];
+                                
+                                K.LoadPrimitiveS( ii );
+                                K.LoadPrimitiveS( jj );
                                 
                                 if( ii < jj )
                                 {
-                                    ker.ComputeLeaf();
+                                    K.ComputeLeaf();
                                 }
                                 else
                                 {
-                                    ker.ComputeLeafSwapped();
+                                    K.ComputeLeafSwapped();
                                 }
                             }
                             else
@@ -194,19 +197,19 @@ public:
                                 
                                 for( Int ii = ii_begin; ii < ii_end; ++ii )
                                 {
-                                    ker.LoadPrimitiveS(ii);
+                                    K.LoadPrimitiveS(ii);
                                     
                                     for( Int jj = jj_begin; jj < jj_end; ++jj )
                                     {
-                                        ker.LoadPrimitiveT(jj);
+                                        K.LoadPrimitiveT(jj);
                                         
                                         if( ii < jj )
                                         {
-                                            ker.ComputeLeaf();
+                                            K.ComputeLeaf();
                                         }
                                         else
                                         {
-                                            ker.ComputeLeafSwapped();
+                                            K.ComputeLeafSwapped();
                                         }
                                     }
                                 }
@@ -217,9 +220,9 @@ public:
                     {
                         if constexpr ( leafs_are_singletons )
                         {
-                            ker.LoadPrimitiveS( S_C_begin[i] );
-                            ker.LoadPrimitiveS( T_C_begin[j] );
-                            ker.ComputeLeaf();
+                            K.LoadPrimitiveS( S_C_begin[i] );
+                            K.LoadPrimitiveS( T_C_begin[j] );
+                            K.ComputeLeaf();
                         }
                         else
                         {
@@ -231,13 +234,13 @@ public:
                             
                             for( Int ii = ii_begin; ii < ii_end; ++ii )
                             {
-                                ker.LoadPrimitiveS(ii);
+                                K.LoadPrimitiveS(ii);
                                 
                                 for( Int jj = jj_begin; jj < jj_end; ++jj )
                                 {
-                                    ker.LoadPrimitiveT(jj);
+                                    K.LoadPrimitiveT(jj);
                                     
-                                    ker.ComputeLeaf();
+                                    K.ComputeLeaf();
                                 }
                             }
                         }
@@ -250,17 +253,17 @@ public:
                 {
                     if( i <= j )
                     {
-                        ker->ComputeAdmissable();
+                        K->ComputeAdmissable();
                     }
                     else
                     {
-                        ker->ComputeAdmissableSwapped();
+                        K->ComputeAdmissableSwapped();
                     }
                 }
                 else
                 {
                     // No symmetry exploited.
-                    ker->ComputeAdmissable();
+                    K->ComputeAdmissable();
                 }
             }
         }

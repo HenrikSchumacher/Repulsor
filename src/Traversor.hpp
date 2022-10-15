@@ -87,6 +87,51 @@ namespace Repulsor
             return is_symmetric;
         }
         
+        void Traverse() const
+        {
+            ptic(className()+"::Traverse");
+            
+            if( thread_count > 1 )
+            {
+                Traverse_Parallel();
+            }
+            else
+            {
+                Traverse_Sequential();
+            }
+            
+            ptoc(className()+"::Traverse");
+        }
+        
+
+#include "Traversor/Traverse_DepthFirst.hpp"
+        
+        void Traverse_Sequential() const
+        {
+            ptic(className()+"::Traverse_Sequential");
+            
+            Traverse_DepthFirst(0,0);
+            
+            ptoc(className()+"::Traverse_Sequential");
+        }
+        
+#include "Traversor/Traverse_BreadthFirst.hpp"
+        
+        void Traverse_Parallel() const
+        {
+            ptic(className()+"::Traverse_Parallel");
+
+            Traverse_BreadthFirst( 0, 0, static_cast<Int>(4) * ThreadCount() * ThreadCount() );
+
+            #pragma omp parallel for num_threads( thread_count ) schedule( dynamic )
+            for( Int k = 0; k < static_cast<Int>(i_queue.size()); ++k )
+            {
+                Traverse_DepthFirst(i_queue[k], j_queue[k]);
+            }
+            
+            ptoc(className()+"::Traverse_Parallel");
+        }
+
     protected:
         
         std::string ClassName() const

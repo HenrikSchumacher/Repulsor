@@ -9,6 +9,8 @@ public:
         
         const Int thread = omp_get_thread_num();
         
+        Kernel_T K = kernels[thread];
+        
         while( !i_queue.empty() && ( static_cast<Int>(i_queue.size()) < max_leaves ) )
         {
             const Int i = i_queue.front();
@@ -16,9 +18,10 @@ public:
             i_queue.pop_front();
             j_queue.pop_front();
             
-            ker.LoadCluster(i,j);
+            K.LoadClusterS(i);
+            K.LoadClusterT(j);
             
-            const bool separatedQ = (!( is_symmetric && (i == j) )) && ker.IsAdmissable()
+            const bool admissable = (!( is_symmetric && (i == j) )) && K.IsAdmissable();
 
             if( !admissable )
             {
@@ -31,8 +34,8 @@ public:
                     const Int right_i = S_C_right[i];
                     const Int right_j = T_C_right[j];
                     
-                    const SReal score_i = (left_i>=zero) * ker.ScoreS();
-                    const SReal score_j = (left_j>=zero) * ker.ScoreT();
+                    const SReal score_i = (left_i>=zero) * K.ScoreS();
+                    const SReal score_j = (left_j>=zero) * K.ScoreT();
 
                     if( score_i == score_j )
                     {
@@ -128,15 +131,15 @@ public:
                             
                             for( Int ii = ii_begin; ii < ii_end; ++ii )
                             {
-                                ker.LoadPrimitiveS(ii);
+                                K.LoadPrimitiveS(ii);
                                 
-                                ker.ComputeLeafDiagonal();
+                                K.ComputeLeafDiagonal();
                                 
                                 for( Int jj = ii+1; jj < ii_end; ++jj )
                                 {
-                                    ker.LoadPrimitiveT(jj);
+                                    K.LoadPrimitiveT(jj);
                                     
-                                    ker.ComputeLeaf();
+                                    K.ComputeLeaf();
                                 }
                             }
                         }
@@ -150,23 +153,23 @@ public:
                             
                             for( Int ii = ii_begin; ii < ii_end; ++ii )
                             {
-                                ker.LoadPrimitiveS(ii);
+                                K.LoadPrimitiveS(ii);
                                 
                                 for( Int jj = jj_begin; jj < jj_end; ++jj )
                                 {
                                     
-                                    ker.LoadPrimitiveT(jj);
+                                    K.LoadPrimitiveT(jj);
                                     
                                     // No primitive can be member in more than one leaf cluster.
                                     assert( ii != jj );
 
                                     if( ii < jj )
                                     {
-                                        ker.ComputeLeaf();
+                                        K.ComputeLeaf();
                                     }
                                     else
                                     {
-                                        ker.ComputeLeafSwapped();
+                                        K.ComputeLeafSwapped();
                                     }
                                 }
                             }
@@ -182,13 +185,13 @@ public:
                         
                         for( Int ii = ii_begin; ii < ii_end; ++ii )
                         {
-                            ker.LoadPrimitiveS(ii);
+                            K.LoadPrimitiveS(ii);
                             
                             for( Int jj = jj_begin; jj < jj_end; ++jj )
                             {
-                                ker.LoadPrimitiveT(jj);
+                                K.LoadPrimitiveT(jj);
                                 
-                                ker.ComputeLeaf();
+                                K.ComputeLeaf();
                             }
                         }
                     }
@@ -200,17 +203,17 @@ public:
                 {
                     if( i <= j )
                     {
-                        ker->ComputeAdmissable();
+                        K->ComputeAdmissable();
                     }
                     else
                     {
-                        ker->ComputeAdmissableSwapped();
+                        K->ComputeAdmissableSwapped();
                     }
                 }
                 else
                 {
                     // No symmetry exploited.
-                    ker->ComputeAdmissable();
+                    K->ComputeAdmissable();
                 }
             }
         }
