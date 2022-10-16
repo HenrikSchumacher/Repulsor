@@ -150,9 +150,9 @@ namespace Repulsor
                     S->PrimitiveNearFieldData(),
                     T->PrimitiveNearFieldData()
                 );
-                (void)N->LoadPrimitiveSerializedData(
-                    S->PrimitiveSerializedData(),
-                    T->PrimitiveSerializedData()
+                (void)N->LoadPrimitiveSerialized(
+                    S->PrimitiveSerialized(),
+                    T->PrimitiveSerialized()
                 );
                 
                 const Real * restrict const b =  T->PrimitiveNearFieldData().data();

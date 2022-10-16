@@ -1,3 +1,7 @@
+public:
+
+    static constexpr Int SIZE = 1 + (DOM_DIM+2) * AMB_DIM;
+
 protected:
 
     static constexpr SReal zero = static_cast<SReal>(0);
@@ -6,8 +10,8 @@ protected:
     static constexpr SReal two  = static_cast<SReal>(2);
     static constexpr SReal nth  = one / static_cast<SReal>(DOM_DIM+1);
 
-    SReal root_serialized    [1 + (DOM_DIM+2) * AMB_DIM] = {};
-    SReal simplex_serialized [1 + (DOM_DIM+2) * AMB_DIM] = {};
+    SReal root_serialized    [SIZE] = {};
+    SReal simplex_serialized [SIZE] = {};
     
     SReal corners [DOM_DIM+1][DOM_DIM+1] = {};
     SReal center  [DOM_DIM+1] = {};

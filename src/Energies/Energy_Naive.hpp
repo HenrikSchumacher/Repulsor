@@ -102,9 +102,9 @@ namespace Repulsor
 //                    S.ThreadPrimitiveDNearFieldData()[thread],
 //                    S.ThreadPrimitiveDNearFieldData()[thread]
 //                );
-                (void)N->LoadPrimitiveSerializedData(
-                    S.PrimitiveSerializedData(),
-                    S.PrimitiveSerializedData()
+                (void)N->LoadPrimitiveSerialized(
+                    S.PrimitiveSerialized(),
+                    S.PrimitiveSerialized()
                 );
                 (void)N->LoadNeighborData(
                     S.PrimitiveNeighborRowPointers(),
@@ -174,9 +174,9 @@ namespace Repulsor
                     S.ThreadPrimitiveDNearFieldData()[thread],
                     S.ThreadPrimitiveDNearFieldData()[thread]
                 );
-                (void)N->LoadPrimitiveSerializedData(
-                    S.PrimitiveSerializedData(),
-                    S.PrimitiveSerializedData()
+                (void)N->LoadPrimitiveSerialized(
+                    S.PrimitiveSerialized(),
+                    S.PrimitiveSerialized()
                 );
                 (void)N->LoadNeighborData(
                     S.PrimitiveNeighborRowPointers(),

@@ -1,7 +1,7 @@
 #pragma once
 
-#define CLASS TP_Kernel_NearField
-#define  BASE  FMM_Kernel_NearField<S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,is_symmetric_,energy_flag,diff_flag,hess_flag,metric_flag>
+#define CLASS TP_Kernel_Adaptive
+#define  BASE  FMM_Kernel_Adaptive<S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,is_symmetric_,energy_flag,diff_flag,hess_flag,metric_flag>
 
 namespace Repulsor
 {
@@ -46,8 +46,11 @@ namespace Repulsor
         
         CLASS() = delete;
         
-        CLASS( const ClusterTree_T & S_, const ClusterTree_T & T_, const T1 q_half_, const T2 p_half_ )
-        :   BASE( S_, T_ )
+        CLASS( const ClusterTree_T & S_, const ClusterTree_T & T_,
+               const Real theta_, const Int max_level_,
+               const T1 q_half_, const T2 p_half_
+        )
+        :   BASE( S_, T_, theta_, max_level_ )
         ,   q                    (two*q_half_)
         ,   q_half               (q_half_    )
         ,   q_half_minus_1       (q_half-1   )
@@ -83,10 +86,12 @@ namespace Repulsor
         
         using BASE::a;
         using BASE::x;
+        using BASE::x_buffer;
         using BASE::P;
         
         using BASE::b;
         using BASE::y;
+        using BASE::y_buffer;
         using BASE::Q;
         
         using BASE::S_ID;
@@ -96,8 +101,13 @@ namespace Repulsor
         using BASE::tri_j;
         using BASE::lin_k;
         
+        using BASE::S_Tree;
+        using BASE::T_Tree;
         using BASE::S_scale;
         using BASE::T_scale;
+        
+        using BASE::lambda;
+        using BASE::mu;
         
         const Real q;
         const T1   q_half;
@@ -111,19 +121,36 @@ namespace Repulsor
     public:
         
         virtual force_inline Real compute() override
-        {            
-            Real v    [AMB_DIM ] = {};
-            Real Pv   [AMB_DIM ] = {};
-            Real Qv   [AMB_DIM ] = {};
-            Real dEdv [AMB_DIM ] = {};
+        {
+            Real x    [AMB_DIM] = {};
+            Real y    [AMB_DIM] = {};
+            Real v    [AMB_DIM] = {};
+            Real Pv   [AMB_DIM] = {};
+            Real Qv   [AMB_DIM] = {};
+            Real dEdv [AMB_DIM] = {};
             Real V    [PROJ_DIM] = {};
             
             Real r2        = zero;
             Real rCosPhi_2 = zero;
             Real rCosPsi_2 = zero;
             
+            const Real w = S_Tree.Weight() * T_Tree.Weight();
+            
             for( Int i = 0; i < AMB_DIM; ++i )
             {
+                x[i] = lambda[0] * x_buffer[AMB_DIM*0 +i];
+                y[i] = mu    [0] * y_buffer[AMB_DIM*0 +i];
+
+                for( Int ii = 1; ii < S_DOM_DIM+1; ++ii )
+                {
+                    x[i] += lambda[ii] * x_buffer[AMB_DIM*ii +i];
+                }
+                
+                for( Int ii = 1; ii < T_DOM_DIM+1; ++ii )
+                {
+                    y[i] += mu    [ii] * y_buffer[AMB_DIM*ii +i];
+                }
+                
                 v[i] = y[i] - x[i];
                 r2  += v[i] * v[i];
             }
@@ -137,7 +164,7 @@ namespace Repulsor
                     Qv[i] += Q[k] * v[j];
                     if( j >= i )
                     {
-                        V[k] = ( one + static_cast<Real>(i!=j) )*v[i]*v[j];
+                        V[k] = ( static_cast<Real>(1) + static_cast<Real>(i!=j) )*v[i]*v[j];
                     }
                 }
                 rCosPhi_2 += v[i] * Pv[i];
@@ -146,9 +173,9 @@ namespace Repulsor
             
             const Real rCosPhi_q_minus_2 = MyMath::pow<Real,T1>( fabs(rCosPhi_2), q_half_minus_1);
             const Real rCosPsi_q_minus_2 = MyMath::pow<Real,T1>( fabs(rCosPsi_2), q_half_minus_1);
-            const Real r_minus_p_minus_2  = MyMath::pow<Real,T2>( r2, minus_p_half_minus_1 );
+            const Real r_minus_p_minus_2 = MyMath::pow<Real,T2>( r2, minus_p_half_minus_1 );
 
-            const Real r_minus_p   = r_minus_p_minus_2 * r2;
+            const Real r_minus_p = r_minus_p_minus_2 * r2;
             const Real rCosPhi_q = rCosPhi_q_minus_2 * rCosPhi_2;
             const Real rCosPsi_q = rCosPsi_q_minus_2 * rCosPsi_2;
             const Real Num = ( rCosPhi_q + rCosPsi_q );
@@ -165,35 +192,39 @@ namespace Repulsor
                 Real dEdvx = zero;
                 Real dEdvy = zero;
                 
+                const Real wa = w * a;
+                const Real wb = w * b;
+                
                 for( Int i = 0; i < AMB_DIM; ++i )
                 {
                     dEdv[i] = two * ( F * Pv[i] + G * Qv[i] ) + H * v[i];
-                    dEdvx += dEdv[i] * x[i];
-                    dEdvy += dEdv[i] * y[i];
+                    dEdvx  += dEdv[i] * x[i];
+                    dEdvy  += dEdv[i] * y[i];
                     
                     for( Int ii = 0; ii < S_DOM_DIM+1; ++ii )
                     {
-                        DX[1+AMB_DIM*ii+i] -=    S_scale *  b * dEdv[i];
+                        DX[1+AMB_DIM*ii+i] -= lambda[ii] * wb * dEdv[i];
                     }
                     
                     for( Int ii = 0; ii < T_DOM_DIM+1; ++ii )
                     {
-                        DY[1+AMB_DIM*ii+i] +=    T_scale *  a * dEdv[i];
+                        DY[1+AMB_DIM*ii+i] +=     mu[ii] * wa * dEdv[i];
                     }
                 }
                 
-                DX[0] +=  b * ( E - factor * rCosPhi_q + dEdvx );
-                DY[0] +=  a * ( E - factor * rCosPsi_q - dEdvy );
+                DX[0] += wb * ( E - factor * rCosPhi_q + dEdvx );
+                DY[0] += wa * ( E - factor * rCosPsi_q - dEdvy );
                 
-                const Real  bF =  b * F;
-                const Real  aG =  a * G;
+                const Real wbF = wb * F;
+                const Real waG = wa * G;
                 
                 for( Int k = 0; k < PROJ_DIM; ++k )
                 {
-                    DX[1+S_COORD_DIM+k] +=  bF * V[k];
-                    DY[1+T_COORD_DIM+k] +=  aG * V[k];
+                    DX[1+S_COORD_DIM+k] += wbF * V[k];
+                    DY[1+T_COORD_DIM+k] += waG * V[k];
                 }
             }
+            
             
             if constexpr ( energy_flag )
             {
@@ -235,4 +266,5 @@ namespace Repulsor
 
 #undef BASE
 #undef CLASS
+
 

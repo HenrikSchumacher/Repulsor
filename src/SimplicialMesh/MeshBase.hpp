@@ -65,7 +65,7 @@ namespace Repulsor
             bool addTo = false
         ) const = 0;
         
-        protected :
+    public:
         
     public:
         

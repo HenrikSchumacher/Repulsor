@@ -84,7 +84,7 @@ namespace Repulsor
         const Real * restrict T_far   = nullptr;
               Real * restrict T_D_far = nullptr;
         
-#ifdef FarField_FMM_S_Copy
+#ifdef FarField_S_Copy
         mutable Real a = 0.;
         mutable Real x [AMB_DIM]  = {};
         mutable Real p [PROJ_DIM] = {};
@@ -94,7 +94,7 @@ namespace Repulsor
         mutable Real const * restrict p = nullptr;
 #endif
         
-#ifdef FarField_FMM_T_Copy
+#ifdef FarField_T_Copy
         mutable Real b = 0.;
         mutable Real y [AMB_DIM]  = {};
         mutable Real q [PROJ_DIM] = {};
@@ -175,7 +175,7 @@ namespace Repulsor
             const Real * const restrict X = &S_far[FAR_DIM * S_ID];
 
             a = X[0];
-#ifdef FarField_FMM_S_Copy
+#ifdef FarField_S_Copy
             copy_buffer( &X[1],         &x[0], AMB_DIM  );
             copy_buffer( &X[1+AMB_DIM], &p[0], PROJ_DIM );
 #else
@@ -206,7 +206,7 @@ namespace Repulsor
             const Real * const restrict Y = &T_far[FAR_DIM * T_ID];
             
             b = Y[0];
-#ifdef FarField_FMM_T_Copy
+#ifdef FarField_T_Copy
             copy_buffer( &Y[1],         &y[0], AMB_DIM  );
             copy_buffer( &Y[1+AMB_DIM], &q[0], PROJ_DIM );
 #else

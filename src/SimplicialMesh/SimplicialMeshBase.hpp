@@ -359,6 +359,10 @@ namespace Repulsor
         
         virtual std::unique_ptr<Remesher_T> CreateRemesher() = 0;
         
+        virtual Real TangentPointEnergy_New() const = 0;
+        
+        virtual Real TangentPointEnergy_New_Differential( ExtReal * output, bool addTo = false ) const = 0;
+        
 //##############################################################################################
 //      Standard interface
 //##############################################################################################

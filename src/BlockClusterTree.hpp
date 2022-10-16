@@ -4,19 +4,18 @@
 #include "BlockClusterTree/BlockSplit_Kernel.hpp"
 
 #define CLASS BlockClusterTree
-#define BASE  BlockClusterTreeBase<Real,Int,SReal,ExtReal,is_symmetric>
+#define BASE  BlockClusterTreeBase<Real_,Int_,SReal_,ExtReal_,is_symmetric>
 
 namespace Repulsor
 {
-    template<int AMB_DIM, typename Real, typename Int, typename SReal, typename ExtReal, bool is_symmetric>
+    template<int AMB_DIM, typename Real_, typename Int_, typename SReal_, typename ExtReal_, bool is_symmetric>
     class CLASS : public BASE
     {
-        ASSERT_FLOAT(Real   );
-        ASSERT_INT  (Int    );
-        ASSERT_FLOAT(SReal  );
-        ASSERT_FLOAT(ExtReal);
-        
     public:
+        using Real    = Real_;
+        using Int     = Int_;
+        using SReal   = SReal_;
+        using ExtReal = ExtReal_;
         
         using BlockClusterTreeBase_T = BASE;
         
@@ -269,8 +268,8 @@ namespace Repulsor
             std::vector<std::vector<Int>> far_idx      (thread_count);
             std::vector<std::vector<Int>> far_jdx      (thread_count);
 
-            // Free memory that is no longer used.
-            #pragma omp parallel for num_threads(thread_count)
+
+//            #pragma omp parallel for num_threads(thread_count)
             for( Int thread = 0; thread < thread_count; ++thread )
             {
                    inter_idx[thread] = std::move( kernels[thread].inter_idx    );
@@ -286,15 +285,25 @@ namespace Repulsor
             ptoc(className()+"::ComputeBlocks");
 
 
-            ptic(className()+"  Far field interaction data");
+            ptic(className()+"  Primitive intersection data");
+            
+            inter = Inter_T( inter_idx, inter_jdx, S.PrimitiveCount(), T.PrimitiveCount(),
+                thread_count, false, is_symmetric );
 
-            far = Far_T( far_idx, far_jdx, S.ClusterCount(), T.ClusterCount(),
-                    thread_count, false, is_symmetric );
+            pdump(inter.Stats());
 
-            pdump(far.Stats());
+            ptoc(className()+"  Primitive intersection data");
+            
 
-            ptoc(className()+"  Far field interaction data");
+            ptic(className()+"  Very near field interaction data");
 
+            verynear = VeryNear_T( verynear_idx, verynear_jdx, S.PrimitiveCount(), T.PrimitiveCount(),
+                thread_count, false, is_symmetric );
+
+            pdump(verynear.Stats());
+
+            ptoc(className()+"  Very near field interaction data");
+            
 
             ptic(className()+"  Near field interaction data");
 
@@ -305,24 +314,17 @@ namespace Repulsor
 
             ptoc(className()+"  Near field interaction data");
 
-            ptic(className()+"  Very near field interaction data");
-
-            verynear = VeryNear_T( verynear_idx, verynear_jdx, S.PrimitiveCount(), T.PrimitiveCount(),
-                thread_count, false, is_symmetric );
-
-            pdump(verynear.Stats());
-
-            ptoc(className()+"  Very near field interaction data");
-
-            ptic(className()+"  Primitive intersection data");
             
-            inter = Inter_T( inter_idx, inter_jdx, S.PrimitiveCount(), T.PrimitiveCount(),
-                thread_count, false, is_symmetric );
+            ptic(className()+"  Far field interaction data");
 
-            pdump(inter.Stats());
+            far = Far_T( far_idx, far_jdx, S.ClusterCount(), T.ClusterCount(),
+                    thread_count, false, is_symmetric );
 
-            ptoc(className()+"  Primitive intersection data");
+            pdump(far.Stats());
 
+            ptoc(className()+"  Far field interaction data");
+
+            
             blocks_initialized = true;
 
         }; // ComputeBlocks

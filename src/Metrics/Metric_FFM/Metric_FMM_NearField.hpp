@@ -48,9 +48,9 @@ protected:
                 bct->GetS().PrimitiveNearFieldData(),
                 bct->GetT().PrimitiveNearFieldData()
             );
-            (void)N->LoadPrimitiveSerializedData(
-                bct->GetS().PrimitiveSerializedData(),
-                bct->GetT().PrimitiveSerializedData()
+            (void)N->LoadPrimitiveSerialized(
+                bct->GetS().PrimitiveSerialized(),
+                bct->GetT().PrimitiveSerialized()
             );
             
             const Int i_begin = job_ptr[thread  ];

@@ -27,6 +27,16 @@ namespace Repulsor
         :   settings(settings_)
         {}
         
+//        CLASS( const CLASS & other )
+//        :   settings ( other.settings)
+//        ,   P_near   ( other.P_near)
+//        ,   P_D_near   ( other.P_D_near)
+//        ,   P_far   ( other.P_far)
+//        ,   P_D_far   ( other.P_D_far)
+//        ,   P_moments   ( other.P_moments)
+//        ,   P_in   ( other.P_in)
+//        {}
+        
         virtual ~CLASS() = default;
         
     protected:
@@ -248,27 +258,27 @@ namespace Repulsor
             return C_depth;
         }
                 
-        Tensor2<SReal,Int> & ClusterSerializedData() const
+        Tensor2<SReal,Int> & ClusterSerialized() const
         {
             return C_serialized;
         }
         
-        Tensor2<SReal,Int> & ClusterUpdatedSerializedData() const
+        Tensor2<SReal,Int> & ClusterUpdatedSerialized() const
         {
             return C_updated_serialized;
         }
 
-        Tensor2<SReal,Int> & PrimitiveSerializedData() const
+        Tensor2<SReal,Int> & PrimitiveSerialized() const
         {
             return P_serialized;
         }
         
-        Tensor2<SReal,Int> & PrimitiveUpdatedSerializedData() const
+        Tensor2<SReal,Int> & PrimitiveUpdatedSerialized() const
         {
             return P_updated_serialized;
         }
         
-        Tensor2<SReal,Int> & PrimitiveVelocitiesSerializedData() const
+        Tensor2<SReal,Int> & PrimitiveVelocitiesSerialized() const
         {
             return P_velocities_serialized;
         }

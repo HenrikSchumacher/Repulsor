@@ -879,7 +879,31 @@ namespace Repulsor
 //      Standard interface
 //##############################################################################################
  
+    public:
+        
+        virtual Real TangentPointEnergy_New() const override
+        {
+            TP_Traversor<DOM_DIM,DOM_DIM,BlockClusterTree_T,true,false,false,false> T ( GetBlockClusterTree(),
+                GetTangentPointExponents ().first,
+                GetTangentPointExponents ().second
+            );
+            
+            return T.Compute();
+        }
+        
 
+        virtual Real TangentPointEnergy_New_Differential( ExtReal * output, bool addTo = false ) const  override
+        {
+            TP_Traversor<DOM_DIM,DOM_DIM,BlockClusterTree_T,true,true,false,false> T ( GetBlockClusterTree(),
+                GetTangentPointExponents ().first,
+                GetTangentPointExponents ().second
+            );
+            
+            wprint(ClassName()+"::TangentPointEnergy_New_Differential is not fully implemented.");
+            
+            return T.Compute();
+        }
+        
     public:
         
         virtual CLASS & DownCast() override

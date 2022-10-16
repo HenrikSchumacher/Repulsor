@@ -206,9 +206,9 @@ namespace Repulsor
 //                    bct.GetS().ThreadPrimitiveDNearFieldData()[thread],
 //                    bct.GetT().ThreadPrimitiveDNearFieldData()[thread]
 //                );
-                (void)N->LoadPrimitiveSerializedData(
-                    bct.GetS().PrimitiveSerializedData(),
-                    bct.GetT().PrimitiveSerializedData()
+                (void)N->LoadPrimitiveSerialized(
+                    bct.GetS().PrimitiveSerialized(),
+                    bct.GetT().PrimitiveSerialized()
                 );
                 
                 Real local_sum = static_cast<Real>(0);
@@ -281,9 +281,9 @@ namespace Repulsor
                     bct.GetS().ThreadPrimitiveDNearFieldData()[thread],
                     bct.GetT().ThreadPrimitiveDNearFieldData()[thread]
                 );
-                (void)N->LoadPrimitiveSerializedData(
-                    bct.GetS().PrimitiveSerializedData(),
-                    bct.GetT().PrimitiveSerializedData()
+                (void)N->LoadPrimitiveSerialized(
+                    bct.GetS().PrimitiveSerialized(),
+                    bct.GetT().PrimitiveSerialized()
                 );
 
                 Real local_sum = static_cast<Real>(0);
@@ -360,9 +360,9 @@ namespace Repulsor
 //                    bct.GetS().ThreadPrimitiveDNearFieldData()[thread],
 //                    bct.GetT().ThreadPrimitiveDNearFieldData()[thread]
 //                );
-                (void)N->LoadPrimitiveSerializedData(
-                    bct.GetS().PrimitiveSerializedData(),
-                    bct.GetT().PrimitiveSerializedData()
+                (void)N->LoadPrimitiveSerialized(
+                    bct.GetS().PrimitiveSerialized(),
+                    bct.GetT().PrimitiveSerialized()
                 );
                 
                 auto & X = bct.GetS().ThreadPrimitiveDNearFieldData()[thread];
@@ -443,9 +443,9 @@ namespace Repulsor
 ////                    bct.GetS().ThreadPrimitiveDNearFieldData()[thread],
 ////                    bct.GetT().ThreadPrimitiveDNearFieldData()[thread]
 ////                );
-//                (void)N->LoadPrimitiveSerializedData(
-//                    bct.GetS().PrimitiveSerializedData(),
-//                    bct.GetT().PrimitiveSerializedData()
+//                (void)N->LoadPrimitiveSerialized(
+//                    bct.GetS().PrimitiveSerialized(),
+//                    bct.GetT().PrimitiveSerialized()
 //                );
 //
 //                Real local_sum = static_cast<Real>(0);
@@ -537,9 +537,9 @@ namespace Repulsor
 //                    bct.GetS().ThreadPrimitiveDNearFieldData()[thread],
 //                    bct.GetT().ThreadPrimitiveDNearFieldData()[thread]
 //                );
-//                (void)N->LoadPrimitiveSerializedData(
-//                    bct.GetS().PrimitiveSerializedData(),
-//                    bct.GetT().PrimitiveSerializedData()
+//                (void)N->LoadPrimitiveSerialized(
+//                    bct.GetS().PrimitiveSerialized(),
+//                    bct.GetT().PrimitiveSerialized()
 //                );
 //
 //                Real local_sum = static_cast<Real>(0);

@@ -5,15 +5,19 @@
 namespace Repulsor
 {
     
-    template<typename Real, typename Int, typename SReal, typename ExtReal, bool is_symmetric>
+    template<typename Real_, typename Int_, typename SReal_, typename ExtReal_, bool is_symmetric>
     class CLASS
     {
-        ASSERT_FLOAT(Real   );
-        ASSERT_INT  (Int    );
-        ASSERT_FLOAT(SReal  );
-        ASSERT_FLOAT(ExtReal);
+        ASSERT_FLOAT(Real_   );
+        ASSERT_INT  (Int_    );
+        ASSERT_FLOAT(SReal_  );
+        ASSERT_FLOAT(ExtReal_);
         
     public:
+        using Real    = Real_;
+        using Int     = Int_;
+        using SReal   = SReal_;
+        using ExtReal = ExtReal_;
         
         using Setting_T         = BlockClusterTreeSettings;
 

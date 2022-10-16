@@ -1,12 +1,11 @@
 #pragma once
 
-#define CLASS TP_Kernel_NearField
-#define  BASE  FMM_Kernel_NearField<S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,is_symmetric_,energy_flag,diff_flag,hess_flag,metric_flag>
+#define CLASS TP_Kernel_FarField
+#define BASE  FMM_Kernel_FarField<ClusterTree_T_,is_symmetric_,energy_flag,diff_flag,hess_flag,metric_flag>
 
 namespace Repulsor
 {
     template<
-        int S_DOM_DIM_, int T_DOM_DIM_,
         typename ClusterTree_T_, typename T1, typename T2,
         bool is_symmetric_,
         bool energy_flag, bool diff_flag, bool hess_flag, bool metric_flag
@@ -24,23 +23,16 @@ namespace Repulsor
         
         using BASE::AMB_DIM;
         using BASE::PROJ_DIM;
-        using BASE::S_DOM_DIM;
-        using BASE::T_DOM_DIM;
-        using BASE::S_COORD_DIM;
-        using BASE::T_COORD_DIM;
         using BASE::T_DATA_DIM;
         using BASE::S_DATA_DIM;
 
         using BASE::S;
         using BASE::T;
-//        using BASE::S_Tree;
-//        using BASE::T_Tree;
         
         using BASE::zero;
         using BASE::one;
         using BASE::two;
-        
-        static constexpr bool is_symmetric = is_symmetric_;
+        using BASE::is_symmetric;
         
     public:
         
@@ -96,9 +88,6 @@ namespace Repulsor
         using BASE::tri_j;
         using BASE::lin_k;
         
-        using BASE::S_scale;
-        using BASE::T_scale;
-        
         const Real q;
         const T1   q_half;
         const T1   q_half_minus_1;
@@ -111,7 +100,12 @@ namespace Repulsor
     public:
         
         virtual force_inline Real compute() override
-        {            
+        {
+            if( S_ID == T_ID )
+            {
+                eprint("!!!!");
+            }
+            
             Real v    [AMB_DIM ] = {};
             Real Pv   [AMB_DIM ] = {};
             Real Qv   [AMB_DIM ] = {};
@@ -146,9 +140,9 @@ namespace Repulsor
             
             const Real rCosPhi_q_minus_2 = MyMath::pow<Real,T1>( fabs(rCosPhi_2), q_half_minus_1);
             const Real rCosPsi_q_minus_2 = MyMath::pow<Real,T1>( fabs(rCosPsi_2), q_half_minus_1);
-            const Real r_minus_p_minus_2  = MyMath::pow<Real,T2>( r2, minus_p_half_minus_1 );
+            const Real r_minus_p_minus_2 = MyMath::pow<Real,T2>( r2, minus_p_half_minus_1 );
 
-            const Real r_minus_p   = r_minus_p_minus_2 * r2;
+            const Real r_minus_p = r_minus_p_minus_2 * r2;
             const Real rCosPhi_q = rCosPhi_q_minus_2 * rCosPhi_2;
             const Real rCosPsi_q = rCosPsi_q_minus_2 * rCosPsi_2;
             const Real Num = ( rCosPhi_q + rCosPsi_q );
@@ -167,19 +161,12 @@ namespace Repulsor
                 
                 for( Int i = 0; i < AMB_DIM; ++i )
                 {
-                    dEdv[i] = two * ( F * Pv[i] + G * Qv[i] ) + H * v[i];
+                    dEdv[i] = static_cast<Real>(2) * ( F * Pv[i] + G * Qv[i] ) + H * v[i];
                     dEdvx += dEdv[i] * x[i];
                     dEdvy += dEdv[i] * y[i];
                     
-                    for( Int ii = 0; ii < S_DOM_DIM+1; ++ii )
-                    {
-                        DX[1+AMB_DIM*ii+i] -=    S_scale *  b * dEdv[i];
-                    }
-                    
-                    for( Int ii = 0; ii < T_DOM_DIM+1; ++ii )
-                    {
-                        DY[1+AMB_DIM*ii+i] +=    T_scale *  a * dEdv[i];
-                    }
+                    DX[1+i] -= b * dEdv[i];
+                    DY[1+i] += a * dEdv[i];
                 }
                 
                 DX[0] +=  b * ( E - factor * rCosPhi_q + dEdvx );
@@ -190,8 +177,8 @@ namespace Repulsor
                 
                 for( Int k = 0; k < PROJ_DIM; ++k )
                 {
-                    DX[1+S_COORD_DIM+k] +=  bF * V[k];
-                    DY[1+T_COORD_DIM+k] +=  aG * V[k];
+                    DX[1+AMB_DIM+k] +=  bF * V[k];
+                    DY[1+AMB_DIM+k] +=  aG * V[k];
                 }
             }
             
@@ -217,8 +204,6 @@ namespace Repulsor
         std::string className() const
         {
             return TO_STD_STRING(CLASS)+"<"
-            + ToString(S_DOM_DIM) + ","
-            + ToString(T_DOM_DIM) + ","
             + S.ClassName() + ","
             + TypeName<T1>::Get() + ","
             + TypeName<T2>::Get() + ","

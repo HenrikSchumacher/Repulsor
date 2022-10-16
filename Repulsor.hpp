@@ -29,10 +29,12 @@
     #include "src/BlockClusterTree.hpp"
     #include "src/CollisionTree.hpp"
 
+
+    #include "src/FMM.hpp"
+
     #include "src/SimplicialMesh/SimplicialMeshDetails.hpp"
     #include "src/SimplicialMesh.hpp"
 
-    #include "src/FMM.hpp"
 
     // TODO: Finalize this!
     #include "src/SimplicialRemesher/SimplicialRemesherBase.hpp"
@@ -40,13 +42,13 @@
 
 
 //    // toggle whether primitive data should be copied by kernels.
-//    #define NearField_S_Copy
-//    #define NearField_T_Copy
+#define NearField_S_Copy
+#define NearField_T_Copy
 //    #include "src/Kernels/NearFieldKernelBase.hpp"
 //
 //    // toggle whether cluster data should be copied by kernels.
-//    #define FarField_S_Copy
-//    #define FarField_T_Copy
+#define FarField_S_Copy
+#define FarField_T_Copy
 //    #include "src/Kernels/FarFieldKernelBase_FMM.hpp"
 //
 //    #include "src/Energies.hpp"

@@ -4,7 +4,7 @@
 
 // TODO: Handle symmetric/asymmetric cases correctly!
 
-namespace Tensors
+namespace Repulsor
 {
     template<typename Kernel_T>
     class CLASS
@@ -13,7 +13,7 @@ namespace Tensors
         
         using Real    = typename Kernel_T::Real;
         using Int     = typename Kernel_T::Int;
-        using SReal   = typename Kernel_T::sReal;
+        using SReal   = typename Kernel_T::SReal;
         using ExtReal = typename Kernel_T::ExtReal;
         
         using SparsityPattern_T = SparsityPatternCSR<Int>;
@@ -58,7 +58,7 @@ namespace Tensors
             if( pattern.NonzeroCount() <= 0 )
             {
                 ptoc(ClassName()+"::Compute");
-                return;
+                return static_cast<Real> (0);
             }
             
             const auto & job_ptr = COND(
@@ -67,19 +67,27 @@ namespace Tensors
                 pattern.JobPtr()
             );
             
+            // Make sure that pattern.Diag() is created before the parallel region.
+            if constexpr ( is_symmetric )
+            {
+                (void)pattern.Diag();
+            }
+            
             const Int thread_count = job_ptr.Size()-1;
             
             Real global_sum = static_cast<Real>(0);
 
-            #pragma omp parallel for num_threads( thread_count )
+            
+            #pragma omp parallel for num_threads( thread_count ) reduction( + : global_sum )
             for( Int thread = 0; thread < thread_count; ++thread )
             {
                 // Initialize local kernel and feed it all the information that is going to be constant along its life time.
-                Kernel_T ker ( kernel );
 
+                Kernel_T ker ( kernel );
+                
                 Real local_sum = static_cast<Real>(0);
                 
-                Int const * restrict const diag = COND(is_symmetric,
+                const Int * restrict const diag = COND(is_symmetric,
                     pattern.Diag().data(),
                     nullptr
                 );
@@ -94,7 +102,7 @@ namespace Tensors
                 for( Int i = i_begin; i < i_end; ++i )
                 {
                     // These are the corresponding nonzero blocks in i-th row.
-                    const Int k_begin = COND( is_symmetric, diag [i]+1, rp[i] );
+                    const Int k_begin = COND( is_symmetric, diag[i]+1, rp[i] );
                     const Int k_end   = rp[i+1];
                     
                     if( k_end > k_begin )
@@ -103,7 +111,7 @@ namespace Tensors
                         ker.LoadS(i);
                         
                         // Perform all but the last calculation in row with prefetch.
-                        for( int k = k_begin; k < k_end-1; ++k )
+                        for( Int k = k_begin; k < k_end-1; ++k )
                         {
                             const Int j = ci[k];
 
@@ -138,14 +146,11 @@ namespace Tensors
                     
                 }
                 
-                #pragma omp critical
-                {
-                    global_sum += local_sum;
-                }
+                global_sum += local_sum;
             }
         
             ptoc(ClassName()+"::Compute");
-            
+
             return global_sum;
         }
         
@@ -158,7 +163,7 @@ namespace Tensors
         
     };
     
-}// namespace Tensors
+}// namespace Repulsor
 
 #undef CLASS
 

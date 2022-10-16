@@ -84,16 +84,16 @@ namespace Repulsor
 //        };
         
         CLASS( const ClusterTree_T & S_, const ClusterTree_T & T_ )
-        :   S_Tree( S_ )
-        ,   T_Tree( T_ )
+        :   S( S_ )
+        ,   T( T_ )
         {
             Init();
         }
         
         // Copy constructor
         CLASS( const CLASS & other )
-        :   S_Tree ( other.S_Tree )
-        ,   T_Tree ( other.T_Tree )
+        :   S ( other.S )
+        ,   T ( other.T )
         {
             Init();
         }
@@ -113,10 +113,7 @@ namespace Repulsor
         
         virtual Real compute() = 0;
                                                        
-        Real Compute() override
-        {
-           return symmetry_factor * compute();
-        }
+        virtual Real Compute() = 0;
         
         virtual void WriteS() = 0;
         
@@ -124,8 +121,8 @@ namespace Repulsor
         
     protected:
         
-        ClusterTree_T S_Tree;
-        ClusterTree_T T_Tree;
+        const ClusterTree_T & S;
+        const ClusterTree_T & T;
         
         Int S_ID = -1;
         Int T_ID = -1;
@@ -139,9 +136,9 @@ namespace Repulsor
         
     private:
         
-        std::string className()
+        std::string className() const
         {
-            return TO_STD_STRING(CLASS)+"<"+S_Tree.ClassName()+">";
+            return TO_STD_STRING(CLASS)+"<"+S.ClassName()+">";
         }
 
     };

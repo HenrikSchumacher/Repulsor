@@ -186,7 +186,7 @@ namespace Repulsor
             return check;
         }
         
-        bool LoadPrimitiveSerializedData(
+        bool LoadPrimitiveSerialized(
             const Tensor2<SReal,Int> & S_serialized_,
             const Tensor2<SReal,Int> & T_serialized_
         )
@@ -196,7 +196,7 @@ namespace Repulsor
             if( (S_serialized_.Dimension(1) != S.SimplexPrototype().Size()) || (T_serialized_.Dimension(1) != T.SimplexPrototype().Size()) )
             {
                 check = false;
-                eprint(ClassName()+"::LoadPrimitiveSerializedData.");
+                eprint(ClassName()+"::LoadPrimitiveSerialized.");
             }
             else
             {
