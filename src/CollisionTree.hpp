@@ -61,10 +61,6 @@ namespace Repulsor
         static constexpr Int max_depth = 128;
         static constexpr Int null = static_cast<Int>(0);
         
-        // Not very elegant to use raw pointers here, but maybe acceptable due to constness.
-//        const ClusterTree_T * S = nullptr; // "left"  BVH (output side of matrix-vector multiplication)
-//        const ClusterTree_T * T = nullptr; // "right" BVH (input  side of matrix-vector multiplication)
-
         const ClusterTree_T & S; // "left"  BVH (output side of matrix-vector multiplication)
         const ClusterTree_T & T; // "right" BVH (input  side of matrix-vector multiplication)
         
@@ -75,7 +71,6 @@ namespace Repulsor
         mutable CollisionMatrix_T P_collision_matrix;
         
 
-        
 //####################################################################################################
 //      PrimitiveCollisionMatrix
 //####################################################################################################
