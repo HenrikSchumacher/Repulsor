@@ -32,6 +32,8 @@
     #include "src/SimplicialMesh/SimplicialMeshDetails.hpp"
     #include "src/SimplicialMesh.hpp"
 
+    #include "src/FMM.hpp"
+
     // TODO: Finalize this!
     #include "src/SimplicialRemesher/SimplicialRemesherBase.hpp"
     #include "src/SimplicialRemesher/SimplicialRemesher.hpp"
