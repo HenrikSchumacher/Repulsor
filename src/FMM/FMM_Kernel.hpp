@@ -32,7 +32,7 @@ namespace Repulsor
         static constexpr Real one  = static_cast<Real>(1);
         static constexpr Real two  = static_cast<Real>(2);
         
-        static constexpr Real symmetry_factor = one / (one + static_cast<Real>(is_symmetric);
+        static constexpr Real symmetry_factor = one / (one + static_cast<Real>(is_symmetric) );
                                                         
         Int tri_i [PROJ_DIM] = {};
         Int tri_j [PROJ_DIM] = {};

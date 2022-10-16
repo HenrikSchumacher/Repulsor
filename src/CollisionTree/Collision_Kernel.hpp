@@ -44,7 +44,7 @@ namespace Repulsor
         
 
         CLASS( const CLASS & other )
-        : BASE( other )
+        :   BASE( other )
         ,   S_C_ser     ( other.S_C_ser     )
         ,   S_C_up_ser  ( other.S_C_up_ser  )
         ,   T_C_ser     ( other.T_C_ser     )
