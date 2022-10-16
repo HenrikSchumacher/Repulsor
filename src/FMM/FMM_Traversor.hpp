@@ -2,6 +2,8 @@
 
 #define CLASS FMM_Traversor
 
+// TODO: Handle symmetric/asymmetric cases correctly!
+
 namespace Tensors
 {
     template<typename Kernel_T>
@@ -15,6 +17,8 @@ namespace Tensors
         using ExtReal = typename Kernel_T::ExtReal;
         
         using SparsityPattern_T = SparsityPatternCSR<Int>;
+        
+        static constexpr bool is_symmetric = Kernel_T::is_symmetric;
         
         CLASS() = default;
         
@@ -57,7 +61,11 @@ namespace Tensors
                 return;
             }
             
-            const auto & job_ptr = pattern.JobPtr();
+            const auto & job_ptr = COND(
+                is_symmetric,
+                pattern.UpperTriangularJobPtr(),
+                pattern.JobPtr()
+            );
             
             const Int thread_count = job_ptr.Size()-1;
             
@@ -71,6 +79,11 @@ namespace Tensors
 
                 Real local_sum = static_cast<Real>(0);
                 
+                Int const * restrict const diag = COND(is_symmetric,
+                    pattern.Diag().data(),
+                    nullptr
+                );
+                
                 const Int * restrict const rp = pattern.Outer().data();
                 const Int * restrict const ci = pattern.Inner().data();
                 
@@ -81,7 +94,7 @@ namespace Tensors
                 for( Int i = i_begin; i < i_end; ++i )
                 {
                     // These are the corresponding nonzero blocks in i-th row.
-                    const Int k_begin = rp[i  ];
+                    const Int k_begin = COND( is_symmetric, diag [i]+1, rp[i] );
                     const Int k_end   = rp[i+1];
                     
                     if( k_end > k_begin )

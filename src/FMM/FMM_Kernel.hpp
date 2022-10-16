@@ -6,6 +6,7 @@ namespace Repulsor
 {
     template<
         typename ClusterTree_T_,
+        bool is_symmetric_,
         bool energy_flag, bool diff_flag, bool hess_flag, bool metric_flag
     >
     class alignas( OBJECT_ALIGNMENT ) CLASS
@@ -20,6 +21,8 @@ namespace Repulsor
         using SReal   = typename ClusterTree_T::SReal;
         using ExtReal = typename ClusterTree_T::ExtReal;
         
+        static constexpr bool is_symmetric = is_symmetric_;
+        
         static constexpr Int AMB_DIM   = ClusterTree_T::AMB_DIM;
         static constexpr Int PROJ_DIM  = (AMB_DIM*(AMB_DIM+1))/2;
         
@@ -29,6 +32,8 @@ namespace Repulsor
         static constexpr Real one  = static_cast<Real>(1);
         static constexpr Real two  = static_cast<Real>(2);
         
+        static constexpr Real symmetry_factor = one / (one + static_cast<Real>(is_symmetric);
+                                                        
         Int tri_i [PROJ_DIM] = {};
         Int tri_j [PROJ_DIM] = {};
         Int lin_k [AMB_DIM][AMB_DIM] = {};
@@ -106,7 +111,12 @@ namespace Repulsor
         
         virtual void PrefetchT( const Int j ) const = 0;
         
-        virtual Real Compute() = 0;
+        virtual Real compute() = 0;
+                                                       
+        Real Compute() override
+        {
+           return symmetry_factor * compute();
+        }
         
         virtual void WriteS() = 0;
         

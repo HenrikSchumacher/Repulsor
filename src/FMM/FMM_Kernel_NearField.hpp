@@ -1,13 +1,14 @@
 #pragma once
 
 #define CLASS FMM_Kernel_NearField
-#define BASE  FMM_Kernel<ClusterTree_T_,energy_flag,diff_flag,hess_flag,metric_flag>
+#define BASE  FMM_Kernel<ClusterTree_T_,is_symmetric_,energy_flag,diff_flag,hess_flag,metric_flag>
 
 namespace Repulsor
 {
     template<
         int S_DOM_DIM_, int T_DOM_DIM_,
         typename ClusterTree_T_,
+        bool is_symmetric_,
         bool energy_flag, bool diff_flag, bool hess_flag, bool metric_flag
     >
     class CLASS : public BASE
@@ -25,6 +26,8 @@ namespace Repulsor
         using BASE::PROJ_DIM;
         using BASE::S_Tree;
         using BASE::T_Tree;
+        using BASE::symmetry_factor;
+        
 
         static constexpr Int S_DOM_DIM = S_DOM_DIM_;
         static constexpr Int T_DOM_DIM = T_DOM_DIM_;
@@ -214,10 +217,17 @@ namespace Repulsor
 //        {}
         
         virtual void PrefetchT( const Int j ) const override
-        {}
+        {
+            prefetch_range<T_DATA_DIM,0,0>( &T_data[T_DATA_DIM * j] );
+            
+            if( diff_flag )
+            {
+                prefetch_range<T_DATA_DIM,1,0>( &T_D_data[T_DATA_DIM * j] );
+            }
+        }
         
-        virtual Real Compute() override = 0;
-        
+        virtual Real compute() override = 0;
+            
         virtual void WriteS() override
         {
             if constexpr (diff_flag )
@@ -226,7 +236,7 @@ namespace Repulsor
                 
                 for( Int k = 0; k < S_DATA_DIM; ++k )
                 {
-                    to[k] += DX[k];
+                    to[k] += symmetry_factor * DX[k];
                 }
             }
         }
@@ -239,7 +249,7 @@ namespace Repulsor
                 
                 for( Int k = 0; k < T_DATA_DIM; ++k )
                 {
-                    to[k] += DY[k];
+                    to[k] += symmetry_factor * DY[k];
                 }
             }
         }

@@ -1,13 +1,14 @@
 #pragma once
 
 #define CLASS TP_Kernel_NearField
-#define  BASE  FMM_Kernel_NearField<S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,energy_flag,diff_flag,hess_flag,metric_flag>
+#define  BASE  FMM_Kernel_NearField<S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,is_symmetric_,energy_flag,diff_flag,hess_flag,metric_flag>
 
 namespace Repulsor
 {
     template<
         int S_DOM_DIM_, int T_DOM_DIM_,
         typename ClusterTree_T_, typename T1, typename T2,
+        bool is_symmetric_,
         bool energy_flag, bool diff_flag, bool hess_flag, bool metric_flag
     >
     class CLASS : public BASE
@@ -104,7 +105,7 @@ namespace Repulsor
         
     public:
         
-        virtual Real Compute() override
+        virtual Real compute() override
         {
             Real v    [AMB_DIM ] = {};
             Real Pv   [AMB_DIM ] = {};
