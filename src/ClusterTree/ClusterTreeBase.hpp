@@ -109,6 +109,8 @@ namespace Repulsor
         mutable Tensor2<SReal,Int> C_serialized;
         mutable Tensor2<SReal,Int> C_updated_serialized;
         
+        mutable SReal update_time = static_cast<SReal>(0);
+        
         mutable bool P_adjacency_matrix_initialized = false;
         mutable SparseBinaryMatrixCSR<Int> P_adjacency_matrix;
         
@@ -173,6 +175,11 @@ namespace Repulsor
         Int LeafClusterCount() const
         {
             return leaf_clusters.Dimension(0);
+        }
+        
+        SReal UpdateTime() const
+        {
+            return update_time;
         }
         
 //##################################################################################################

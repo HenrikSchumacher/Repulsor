@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BlockClusterTree/BlockClusterTreeBase.hpp"
-#include "BlockClusterTree/BlockSplitter.hpp"
+#include "BlockClusterTree/BlockSplit_Kernel.hpp"
 
 #define CLASS BlockClusterTree
 #define BASE  BlockClusterTreeBase<Real,Int,SReal,ExtReal,is_symmetric>
@@ -28,7 +28,7 @@ namespace Repulsor
         using Far_T             = typename BASE::Far_T;
         
         using ClusterTree_T     = ClusterTree<AMB_DIM,Real,Int,SReal,ExtReal>;
-        using BlockSplitter_T   = BlockSplitter<ClusterTree_T>;
+        using BlockSplitter_T   = BlockSplit_Kernel<ClusterTree_T>;
         
         using Primitive_T       = typename ClusterTree_T::Primitive_T;
         using BoundingVolume_T  = typename ClusterTree_T::BoundingVolume_T;
@@ -315,7 +315,7 @@ namespace Repulsor
             ptoc(className()+"  Very near field interaction data");
 
             ptic(className()+"  Primitive intersection data");
-
+            
             inter = Inter_T( inter_idx, inter_jdx, S.PrimitiveCount(), T.PrimitiveCount(),
                 thread_count, false, is_symmetric );
 

@@ -44,7 +44,7 @@ protected:
             const Int j = j_stack[stack_ptr];
             stack_ptr--;
             
-            AABB_CollisionTimeInterval<AMB_DIM, SReal, Int> (
+            Compute_AABB_CollisionTimeInterval<AMB_DIM, SReal, Int> (
                 S_C_ser.data(i), S_C_up_ser.data(i),
                 T_C_ser.data(j), T_C_up_ser.data(j),
                 a, b

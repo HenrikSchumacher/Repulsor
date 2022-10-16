@@ -9,7 +9,6 @@ namespace Repulsor
     template<typename Kernel_T, bool is_symmetric, bool leaves_are_singletons >
     class CLASS
     {
-        
     public:
         
         using ClusterTree_T = typename Kernel_T::ClusterTree_T;
@@ -95,12 +94,10 @@ namespace Repulsor
             
             if( thread_count > 1 )
             {
-                print("Traverse_Parallel");
                 Traverse_Parallel();
             }
             else
             {
-                print("Traverse_Sequential");
                 Traverse_Sequential();
             }
             

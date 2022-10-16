@@ -29,13 +29,15 @@ protected:
         SReal a = static_cast<SReal>(0);
         SReal b = static_cast<SReal>(1);
         
+        const SReal t_init = std::min( S.UpdateTime(), T.UpdateTime() );
+        
         while( (null <= stack_ptr) && (stack_ptr < max_depth - 4) )
         {
             const Int i = i_stack[stack_ptr];
             const Int j = j_stack[stack_ptr];
             stack_ptr--;
             
-            AABB_CollisionTimeInterval<AMB_DIM, SReal, Int> (
+            Compute_AABB_CollisionTimeInterval<AMB_DIM, SReal, Int> (
                 S_C_ser.data(i), S_C_up_ser.data(i),
                 T_C_ser.data(j), T_C_up_ser.data(j),
                 a, b

@@ -194,13 +194,11 @@ namespace Repulsor
         
         mutable bool block_cluster_tree_initialized = false;
         mutable std::unique_ptr<BlockClusterTree_T> block_cluster_tree
-              = std::unique_ptr<BlockClusterTree_T>(
-                    new BlockClusterTree_T(*cluster_tree, *cluster_tree) );
+              = std::unique_ptr<BlockClusterTree_T>( new BlockClusterTree_T(*cluster_tree, *cluster_tree) );
         
         mutable bool collision_tree_initialized = false;
         mutable std::unique_ptr<CollisionTree_T> collision_tree
-              = std::unique_ptr<CollisionTree_T>(
-                    new CollisionTree_T(*cluster_tree, *cluster_tree, static_cast<SReal>(1) ) );
+              = std::unique_ptr<CollisionTree_T>( new CollisionTree_T(*cluster_tree, *cluster_tree ) );
         
         mutable SReal max_update_step_size = 0;
         
@@ -347,24 +345,19 @@ namespace Repulsor
             LoadUpdateVectors( vecs, max_time );
             
             ExtReal t = max_time;
-            
+
             if( obstacle_initialized )
             {
                 obstacle->LoadUpdateVectors( static_cast<ExtReal *>(nullptr), max_time );
-                
-                ExtReal s = static_cast<ExtReal>( GetObstacleCollisionTree().MaximumSafeStepSize() );
-                
-                t = std::min( s, t );
-                
-                logprint("GetObstacleCollisionTree().MaximumSafeStepSize() = "+ToString(s));
+
+                t = GetObstacleCollisionTree().MaximumSafeStepSize(t);
+
+                logprint("GetObstacleCollisionTree().MaximumSafeStepSize(t) = "+ToString(t));
             }
             
-            {
-                ExtReal s = static_cast<ExtReal>( GetCollisionTree().MaximumSafeStepSize() );
-                logprint("GetCollisionTree().MaximumSafeStepSize()         = "+ToString(s));
-                
-                t = std::min( s, t );
-            }
+            t = GetCollisionTree().MaximumSafeStepSize(t);
+            
+            logprint("GetCollisionTree().MaximumSafeStepSize(t)         = "+ToString(t));
             
             ptoc(className()+"::MaximumSafeStepSize");
             
@@ -494,20 +487,15 @@ namespace Repulsor
             {
                 ptic(className()+"::GetBlockClusterTree");
                 
-                (void)GetClusterTree();
+                block_cluster_tree_settings.near_field_separation_parameter = adaptivity_settings.theta;
+                block_cluster_tree_settings.near_field_intersection_parameter  = adaptivity_settings.intersection_theta;
                 
-                if( cluster_tree_initialized )
-                {
-                    block_cluster_tree_settings.near_field_separation_parameter = adaptivity_settings.theta;
-                    block_cluster_tree_settings.near_field_intersection_parameter  = adaptivity_settings.intersection_theta;
-                    
-                    block_cluster_tree = std::make_unique<BlockClusterTree_T>(
-                        *cluster_tree, *cluster_tree,
-                        block_cluster_tree_settings
-                    );
-                    
-                    block_cluster_tree_initialized = true;
-                }
+                block_cluster_tree = std::make_unique<BlockClusterTree_T>(
+                    GetClusterTree(), GetClusterTree(),
+                    block_cluster_tree_settings
+                );
+                
+                block_cluster_tree_initialized = true;
                 
                 ptoc(className()+"::GetBlockClusterTree");
             }
@@ -520,15 +508,9 @@ namespace Repulsor
             {
                 ptic(className()+"::GetCollisionTree");
                 
-                (void)GetClusterTree();
-        
-                if( cluster_tree_initialized )
-                {
-                    collision_tree = std::make_unique<CollisionTree_T>(
-                        *cluster_tree, *cluster_tree, max_update_step_size );
+                collision_tree = std::make_unique<CollisionTree_T>( GetClusterTree(), GetClusterTree() );
 
-                    collision_tree_initialized = true;
-                }
+                collision_tree_initialized = true;
 
                 ptoc(className()+"::GetCollisionTree");
             }
@@ -611,14 +593,15 @@ namespace Repulsor
         mutable std::unique_ptr<Obstacle_T> obstacle = nullptr;
         
         mutable bool obstacle_block_cluster_tree_initialized = false;
-        mutable std::unique_ptr<ObstacleBlockClusterTree_T> obstacle_block_cluster_tree = nullptr;
-//              = std::unique_ptr<BlockClusterTree_T>();
+        mutable std::unique_ptr<ObstacleBlockClusterTree_T> obstacle_block_cluster_tree
+              = std::unique_ptr<ObstacleBlockClusterTree_T>(
+                    new ObstacleBlockClusterTree_T(*cluster_tree, *cluster_tree) );
         
         
         mutable bool obstacle_collision_tree_initialized = false;
-        mutable std::unique_ptr<ObstacleCollisionTree_T> obstacle_collision_tree = nullptr;
-//              = std::unique_ptr<ObstacleCollisionTree_T>(
-//                    new ObstacleCollisionTree_T(*cluster_tree, *cluster_tree, static_cast<SReal>(1) ) );
+        mutable std::unique_ptr<ObstacleCollisionTree_T> obstacle_collision_tree
+              = std::unique_ptr<ObstacleCollisionTree_T>(
+                    new ObstacleCollisionTree_T(*cluster_tree, *cluster_tree) );
         
         bool ObstacleInitialized() const override
         {
@@ -673,20 +656,15 @@ namespace Repulsor
                 ptic(className()+"::GetObstacleBlockClusterTree");
                 if( obstacle_initialized )
                 {
-                    (void)GetClusterTree();
                     obstacle_block_cluster_tree = std::make_unique<ObstacleBlockClusterTree_T>(
-                        *cluster_tree,
-                        GetObstacleClusterTree(),
-                        block_cluster_tree_settings
+                        GetClusterTree(), GetObstacleClusterTree(), block_cluster_tree_settings
                     );
                     obstacle_block_cluster_tree_initialized = true;
                 }
-//                else
-//                {
-//                    // Print warning message.
-//                    (void)GetObstacle();
-//                    obstacle_block_cluster_tree = std::make_unique<BlockClusterTree_T>();
-//                }
+                else
+                {
+                    wprint(className()+"::GetObstacleBlockClusterTree: Obstacle not initialized.");
+                }
                 ptoc(className()+"::GetObstacleBlockClusterTree");
                 
             }
@@ -701,14 +679,15 @@ namespace Repulsor
                 
                 if( obstacle_initialized )
                 {
-                    (void)GetClusterTree();
-                    if( cluster_tree_initialized )
-                    {
-                        obstacle_collision_tree = std::make_unique<ObstacleCollisionTree_T>(
-                            *cluster_tree, GetObstacleClusterTree(), max_update_step_size );
+                    obstacle_collision_tree = std::make_unique<ObstacleCollisionTree_T>(
+                            GetClusterTree(), GetObstacleClusterTree()
+                    );
 
-                        obstacle_collision_tree_initialized = true;
-                    }
+                    obstacle_collision_tree_initialized = true;
+                }
+                else
+                {
+                    print(ClassName()+"GetObstacleCollisionTree: Obstacle not initialized.");
                 }
 
                 ptoc(className()+"::GetObstacleCollisionTree");

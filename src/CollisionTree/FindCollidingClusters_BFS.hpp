@@ -21,6 +21,8 @@ protected:
 //
         SReal a = static_cast<SReal>(0);
         SReal b = static_cast<SReal>(1);
+        
+        const SReal t_init = std::min( S.UpdateTime(), T.UpdateTime() );
 
         while( !i_queue.empty() && ( static_cast<Int>(i_queue.size()) < max_leaves ) )
         {
@@ -29,7 +31,7 @@ protected:
             i_queue.pop_front();
             j_queue.pop_front();
             
-            AABB_CollisionTimeInterval<AMB_DIM, SReal, Int> (
+            Compute_AABB_CollisionTimeInterval<AMB_DIM, SReal, Int> (
                 S_C_ser.data(i), S_C_up_ser.data(i),
                 T_C_ser.data(j), T_C_up_ser.data(j),
                 a, b

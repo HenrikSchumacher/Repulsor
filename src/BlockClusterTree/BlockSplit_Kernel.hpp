@@ -1,6 +1,6 @@
 #pragma once
 
-#define CLASS BlockSplitter
+#define CLASS BlockSplit_Kernel
 #define BASE  Traversor_Kernel<ClusterTree_T_>
 
 namespace Repulsor
@@ -41,14 +41,7 @@ namespace Repulsor
         ,   far_theta2          ( far_theta2_                           )
         ,   near_theta2         ( near_theta2_                          )
         ,   intersection_theta2 ( near_theta2_                          )
-        {
-            const Int expected = static_cast<Int>(10) * ( S.PrimitiveCount() + T.PrimitiveCount() );
-            
-            near_idx.reserve(expected);
-            near_jdx.reserve(expected);
-            far_idx.reserve(expected);
-            far_jdx.reserve(expected);
-        }
+        {}
         
         CLASS( const CLASS & other )
         : BASE( other )

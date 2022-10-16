@@ -18,9 +18,13 @@ namespace Repulsor
         
         using CollisionMatrix_T = SparseMatrixCSR<SReal,Int>;
         
-        CLASS () {}
+        CLASS () = default;
         
         virtual ~CLASS() = default;
+        
+        CLASS ( const ClusterTreeBase_T & S, const ClusterTreeBase_T & T )
+        {}
+
         
     protected:
         
@@ -36,15 +40,13 @@ namespace Repulsor
             return is_symmetric;
         }
 
-        virtual const CollisionMatrix_T & ClusterCollisionMatrix() const = 0;
-        
         virtual const CollisionMatrix_T & PrimitiveCollisionMatrix() const = 0;
         
         virtual const ClusterTreeBase_T & GetS() const = 0;
         
         virtual const ClusterTreeBase_T & GetT() const = 0;
 
-        virtual SReal MaximumSafeStepSize() const = 0;
+        virtual SReal MaximumSafeStepSize( const SReal t_) const = 0;
         
 //        virtual Int CollisionCount() const = 0;
         

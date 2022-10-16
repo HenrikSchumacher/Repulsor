@@ -3,7 +3,6 @@
 #include "ClusterTree/Cluster.hpp"
 #include "ClusterTree/ClusterTreeBase.hpp"
 
-
 #define CLASS ClusterTree
 #define BASE  ClusterTreeBase<Real_,Int_,SReal_,ExtReal_>
 
@@ -1081,6 +1080,7 @@ namespace Repulsor
         {
             ptic(className()+"::TakeUpdateVectors");
             
+            this->update_time = max_time;
             // ATTENTION: We assume here that P_velocities_serialized are handed over already in correct order and won't be used anymore and just destroyed by the caller. This allows us to just swap the Tensor2s here, saving us a big copy operation.
             swap( P_velocities_serialized, P_velocities_serialized_ );
             
