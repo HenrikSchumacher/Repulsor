@@ -39,8 +39,8 @@ namespace Repulsor
         mutable Real b   = static_cast<Real>(0);
         
 #ifdef FarField_S_Copy
-        mutable Real x [AMB_DIM] = {};
-        mutable Real P [PROJ_DIM] = {};
+        mutable alignas( ALIGNMENT ) Real x [AMB_DIM] = {};
+        mutable alignas( ALIGNMENT ) Real P [PROJ_DIM] = {};
 #else
         mutable Real const * restrict x = nullptr;
         mutable Real const * restrict P = nullptr;
@@ -54,8 +54,8 @@ namespace Repulsor
         mutable Real const * restrict Q = nullptr;
 #endif
         
-        mutable Real DX [S_DATA_DIM] = {};
-        mutable Real DY [T_DATA_DIM] = {};
+        alignas( ALIGNMENT ) mutable Real DX [S_DATA_DIM] = {};
+        alignas( ALIGNMENT ) mutable Real DY [T_DATA_DIM] = {};
         
         const  Real * restrict const S_data     = nullptr;
                Real * restrict const S_D_data   = nullptr;
@@ -114,7 +114,7 @@ namespace Repulsor
 
     public:
         
-        virtual void LoadS( const Int i ) override
+        virtual force_inline void LoadS( const Int i ) override
         {
             S_ID = i;
             const Real * const restrict X = &S_data[S_DATA_DIM * S_ID];
@@ -134,7 +134,7 @@ namespace Repulsor
             }
         }
         
-        virtual void LoadT( const Int j ) override
+        virtual force_inline void LoadT( const Int j ) override
         {
             T_ID = j;
             const Real * const restrict Y = &T_data[T_DATA_DIM * T_ID];
@@ -155,24 +155,24 @@ namespace Repulsor
 //        void PrefetchS( const Int i ) const
 //        {}
         
-        virtual void PrefetchT( const Int j ) const override
+        virtual force_inline void PrefetchT( const Int j ) const override
         {
             prefetch_range<T_DATA_DIM,0,0>( &T_data[T_DATA_DIM * j] );
             
-            if( diff_flag )
+            if constexpr ( diff_flag )
             {
                 prefetch_range<T_DATA_DIM,1,0>( &T_D_data[T_DATA_DIM * j] );
             }
         }
         
-        virtual Real Compute() override
+        virtual force_inline Real Compute() override
         {
            return symmetry_factor * compute();
         }
         
         virtual Real compute() override = 0;
             
-        virtual void WriteS() override
+        virtual force_inline void WriteS() override
         {
             if constexpr (diff_flag )
             {
@@ -185,7 +185,7 @@ namespace Repulsor
             }
         }
         
-        virtual void WriteT() override
+        virtual force_inline void WriteT() override
         {
             if constexpr (diff_flag )
             {

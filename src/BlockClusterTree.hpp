@@ -8,6 +8,8 @@
 
 namespace Repulsor
 {
+    
+    
     template<int AMB_DIM, typename Real_, typename Int_, typename SReal_, typename ExtReal_, bool is_symmetric>
     class CLASS : public BASE
     {
@@ -97,19 +99,6 @@ namespace Repulsor
 //        const bool is_symmetric;
         
         mutable bool blocks_initialized = false;
-        
-        mutable std::deque<Int> i_queue;
-        mutable std::deque<Int> j_queue;
-        
-        // Containers for parallel aggregation of {i,j}-index pairs
-        mutable std::vector<std::vector<Int>> inter_i;
-        mutable std::vector<std::vector<Int>> inter_j;
-        mutable std::vector<std::vector<Int>> verynear_i;
-        mutable std::vector<std::vector<Int>> verynear_j;
-        mutable std::vector<std::vector<Int>> near_i;
-        mutable std::vector<std::vector<Int>> near_j;
-        mutable std::vector<std::vector<Int>> far_i;
-        mutable std::vector<std::vector<Int>> far_j;
         
         static constexpr Int max_depth = 128;
         
@@ -241,11 +230,14 @@ namespace Repulsor
 
             std::vector<BlockSplitter_T> kernels;
 
+            ptic(className()+"::ComputeBlocks: prepare kernels");
             for( Int thread = 0; thread < thread_count; ++thread )
             {
                 kernels.emplace_back( S, T, far_theta2, near_theta2 );
             }
-
+            ptoc(className()+"::ComputeBlocks: prepare kernels");
+            
+            ptic(className()+"::ComputeBlocks: traversal");
             if( (S.SplitThreshold()==1) && (T.SplitThreshold()==1) )
             {
                 Traversor<BlockSplitter_T,is_symmetric,true> traversor ( S, T, kernels );
@@ -258,36 +250,43 @@ namespace Repulsor
 
                 traversor.Traverse();
             }
+            ptoc(className()+"::ComputeBlocks: traversal");
+            
+            
+            ptic(className()+"::ComputeBlocks: reduce kernels");
+            
+            std::vector<PairAggregator<Int,Int,Int>> inter_idx    (thread_count);
+            std::vector<PairAggregator<Int,Int,Int>> verynear_idx (thread_count);
+            std::vector<PairAggregator<Int,Int,Int>> near_idx     (thread_count);
+            std::vector<PairAggregator<Int,Int,Int>> far_idx      (thread_count);
 
-            std::vector<std::vector<Int>> inter_idx    (thread_count);
-            std::vector<std::vector<Int>> inter_jdx    (thread_count);
-            std::vector<std::vector<Int>> verynear_idx (thread_count);
-            std::vector<std::vector<Int>> verynear_jdx (thread_count);
-            std::vector<std::vector<Int>> near_idx     (thread_count);
-            std::vector<std::vector<Int>> near_jdx     (thread_count);
-            std::vector<std::vector<Int>> far_idx      (thread_count);
-            std::vector<std::vector<Int>> far_jdx      (thread_count);
-
-
-//            #pragma omp parallel for num_threads(thread_count)
+            #pragma omp parallel for num_threads(thread_count)
+            for( Int thread = 0; thread < thread_count; ++thread )
+            {
+                kernels[thread].inter_idx.Finalize();
+                kernels[thread].verynear_idx.Finalize();
+                kernels[thread].near_idx.Finalize();
+                kernels[thread].far_idx.Finalize();
+            }
+            
             for( Int thread = 0; thread < thread_count; ++thread )
             {
                    inter_idx[thread] = std::move( kernels[thread].inter_idx    );
-                   inter_jdx[thread] = std::move( kernels[thread].inter_jdx    );
                 verynear_idx[thread] = std::move( kernels[thread].verynear_idx );
-                verynear_jdx[thread] = std::move( kernels[thread].verynear_jdx );
                     near_idx[thread] = std::move( kernels[thread].near_idx     );
-                    near_jdx[thread] = std::move( kernels[thread].near_jdx     );
                      far_idx[thread] = std::move( kernels[thread].far_idx      );
-                     far_jdx[thread] = std::move( kernels[thread].far_jdx      );
             }
-
+            ptoc(className()+"::ComputeBlocks: reduce kernels");
+            
             ptoc(className()+"::ComputeBlocks");
 
 
             ptic(className()+"  Primitive intersection data");
             
-            inter = Inter_T( inter_idx, inter_jdx, S.PrimitiveCount(), T.PrimitiveCount(),
+//            inter = Inter_T( inter_idx, inter_jdx, S.PrimitiveCount(), T.PrimitiveCount(),
+//                thread_count, false, is_symmetric );
+            
+            inter = Inter_T( inter_idx, S.PrimitiveCount(), T.PrimitiveCount(),
                 thread_count, false, is_symmetric );
 
             pdump(inter.Stats());
@@ -297,7 +296,7 @@ namespace Repulsor
 
             ptic(className()+"  Very near field interaction data");
 
-            verynear = VeryNear_T( verynear_idx, verynear_jdx, S.PrimitiveCount(), T.PrimitiveCount(),
+            verynear = VeryNear_T( verynear_idx, S.PrimitiveCount(), T.PrimitiveCount(),
                 thread_count, false, is_symmetric );
 
             pdump(verynear.Stats());
@@ -307,7 +306,7 @@ namespace Repulsor
 
             ptic(className()+"  Near field interaction data");
 
-            near = Near_T( near_idx, near_jdx, S.PrimitiveCount(), T.PrimitiveCount(),
+            near = Near_T( near_idx, S.PrimitiveCount(), T.PrimitiveCount(),
                 thread_count, false, is_symmetric );
 
             pdump(near.Stats());
@@ -317,7 +316,7 @@ namespace Repulsor
             
             ptic(className()+"  Far field interaction data");
 
-            far = Far_T( far_idx, far_jdx, S.ClusterCount(), T.ClusterCount(),
+            far = Far_T( far_idx, S.ClusterCount(), T.ClusterCount(),
                     thread_count, false, is_symmetric );
 
             pdump(far.Stats());

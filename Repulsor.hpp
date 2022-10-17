@@ -18,7 +18,6 @@
         using namespace GJK;
     }
 
-
     #include "src/Enums.hpp"
     #include "src/Settings.hpp"
     //#include "src/MultipoleMoments.hpp"
@@ -43,12 +42,12 @@
 
 //    // toggle whether primitive data should be copied by kernels.
 #define NearField_S_Copy
-#define NearField_T_Copy
+//#define NearField_T_Copy
 //    #include "src/Kernels/NearFieldKernelBase.hpp"
 //
 //    // toggle whether cluster data should be copied by kernels.
 #define FarField_S_Copy
-#define FarField_T_Copy
+//#define FarField_T_Copy
 //    #include "src/Kernels/FarFieldKernelBase_FMM.hpp"
 //
 //    #include "src/Energies.hpp"

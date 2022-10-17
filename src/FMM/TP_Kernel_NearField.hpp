@@ -112,11 +112,11 @@ namespace Repulsor
         
         virtual force_inline Real compute() override
         {            
-            Real v    [AMB_DIM ] = {};
-            Real Pv   [AMB_DIM ] = {};
-            Real Qv   [AMB_DIM ] = {};
-            Real dEdv [AMB_DIM ] = {};
-            Real V    [PROJ_DIM] = {};
+            alignas( ALIGNMENT ) Real v    [AMB_DIM ] = {};
+            alignas( ALIGNMENT ) Real Pv   [AMB_DIM ] = {};
+            alignas( ALIGNMENT ) Real Qv   [AMB_DIM ] = {};
+            alignas( ALIGNMENT ) Real dEdv [AMB_DIM ] = {};
+            alignas( ALIGNMENT ) Real V    [PROJ_DIM] = {};
             
             Real r2        = zero;
             Real rCosPhi_2 = zero;

@@ -57,9 +57,7 @@ namespace Repulsor
         ,   C           ( other.C           )
         ,   t_init      ( other.t_init      )
         ,   t_max       ( other.t_max       )
-        ,   collision_i ( other.collision_i )
-        ,   collision_j ( other.collision_j )
-        ,   collision_t ( other.collision_t )
+        ,   triples     ( other.triples     )
         {}
         
         friend void swap(CLASS &A, CLASS &B)
@@ -79,9 +77,7 @@ namespace Repulsor
             swap( A.C,              B.C             );
             swap( A.t_init,         B.t_init        );
             swap( A.t_max,          B.t_max         );
-            swap( A.collision_i,    B.collision_i   );
-            swap( A.collision_j,    B.collision_j   );
-            swap( A.collision_t,    B.collision_t   );
+            swap( A.triples,        B.triples       );
         }
 
         // Copy assignment
@@ -140,9 +136,7 @@ namespace Repulsor
         
     public:
         
-        std::vector<Int>   collision_i;
-        std::vector<Int>   collision_j;
-        std::vector<SReal> collision_t;
+        TripleAggregator<Int,Int,SReal,Int> triples;
         
     public:
 
@@ -201,9 +195,7 @@ namespace Repulsor
                 
                 if( t < t_init )
                 {
-                    collision_i.push_back(P_i);
-                    collision_j.push_back(P_j);
-                    collision_t.push_back(t);
+                    triples.Push( P_i, P_j, t );
                     
                     t_max = std::min( t_max, t );
                 }
@@ -222,9 +214,7 @@ namespace Repulsor
                 
                 if( t < t_init )
                 {
-                    collision_i.push_back(P_j);
-                    collision_j.push_back(P_i);
-                    collision_t.push_back(t);
+                    triples.Push( P_j, P_i, t );
                     
                     t_max = std::min( t_max, t );
                 }

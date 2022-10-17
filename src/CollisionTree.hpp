@@ -113,23 +113,25 @@ namespace Repulsor
                     traversor.Traverse();
                 }
                 
-                std::vector<std::vector<Int>  > collision_i (thread_count);
-                std::vector<std::vector<Int>  > collision_j (thread_count);
-                std::vector<std::vector<SReal>> collision_t (thread_count);
+                std::vector<TripleAggregator<Int,Int,SReal,Int>> triples (thread_count);
                 
                 ptic(ClassName()+"::PrimitiveCollisionMatrix: Reduce kernels");
-                // Free memory that is no longer used.
+
                 #pragma omp parallel for num_threads(thread_count)
                 for( Int thread = 0; thread < thread_count; ++thread )
                 {
-                    collision_i[thread] = std::move( kernels[thread].collision_i );
-                    collision_j[thread] = std::move( kernels[thread].collision_j );
-                    collision_t[thread] = std::move( kernels[thread].collision_t );
+                    kernels[thread].triples.Finalize();
+                }
+                
+                #pragma omp parallel for num_threads(thread_count)
+                for( Int thread = 0; thread < thread_count; ++thread )
+                {
+                    triples[thread] = std::move( kernels[thread].triples );
                 }
                 ptoc(ClassName()+"::PrimitiveCollisionMatrix: Reduce kernels");
                 
                 P_collision_matrix = CollisionMatrix_T(
-                    collision_i, collision_j, collision_t,
+                    triples,
                     S.PrimitiveCount(), T.PrimitiveCount(),
                     thread_count, false, is_symmetric
                 );

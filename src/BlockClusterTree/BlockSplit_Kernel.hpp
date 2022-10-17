@@ -29,42 +29,46 @@ namespace Repulsor
             const Real near_theta2_
         )
         :   BASE( S, T )
-        ,   S_C_proto           ( S.ClusterPrototype().Clone()          )
-        ,   T_C_proto           ( T.ClusterPrototype().Clone()          )
-        ,   S_P_proto           ( S.PrimitivePrototype().Clone()        )
-        ,   T_P_proto           ( T.PrimitivePrototype().Clone()        )
-        ,   S_C_serialized      ( S.ClusterSerialized().data()      )
-        ,   T_C_serialized      ( T.ClusterSerialized().data()      )
-        ,   S_P_serialized      ( S.PrimitiveSerialized().data()    )
-        ,   T_P_serialized      ( T.PrimitiveSerialized().data()    )
-        ,   A                   ( S.PrimitiveAdjacencyMatrix()          )
-        ,   far_theta2          ( far_theta2_                           )
-        ,   near_theta2         ( near_theta2_                          )
-        ,   intersection_theta2 ( near_theta2_                          )
+        ,   inter_idx           ( 1 )
+        ,   verynear_idx        ( 1 )
+        ,   near_idx            ( 2 * ( S.PrimitiveCount() + T.PrimitiveCount() ) )
+        ,   far_idx             ( 2 * ( S.PrimitiveCount() + T.PrimitiveCount() ) )
+        ,   S_C_proto           ( S.ClusterPrototype().Clone()              )
+        ,   T_C_proto           ( T.ClusterPrototype().Clone()              )
+        ,   S_P_proto           ( S.PrimitivePrototype().Clone()            )
+        ,   T_P_proto           ( T.PrimitivePrototype().Clone()            )
+        ,   S_C_serialized      ( S.ClusterSerialized().data()              )
+        ,   T_C_serialized      ( T.ClusterSerialized().data()              )
+        ,   S_P_serialized      ( S.PrimitiveSerialized().data()            )
+        ,   T_P_serialized      ( T.PrimitiveSerialized().data()            )
+        ,   A                   ( S.PrimitiveAdjacencyMatrix()              )
+        ,   far_theta2          ( far_theta2_                               )
+        ,   near_theta2         ( near_theta2_                              )
+        ,   intersection_theta2 ( near_theta2_                              )
         {}
         
         CLASS( const CLASS & other )
         : BASE( other )
-        ,   inter_idx           ( other.inter_idx                       )
-        ,   inter_jdx           ( other.inter_jdx                       )
-        ,   verynear_idx        ( other.verynear_idx                    )
-        ,   verynear_jdx        ( other.verynear_jdx                    )
-        ,   near_idx            ( other.near_idx                        )
-        ,   near_jdx            ( other.near_jdx                        )
-        ,   far_idx             ( other.far_idx                         )
-        ,   far_jdx             ( other.far_jdx                         )
-        ,   S_C_proto           ( other.S_C_proto->Clone()              )
-        ,   T_C_proto           ( other.T_C_proto->Clone()              )
-        ,   S_P_proto           ( other.S_P_proto->Clone()              )
-        ,   T_P_proto           ( other.T_P_proto->Clone()              )
-        ,   S_C_serialized      ( other.S_C_serialized                  )
-        ,   T_C_serialized      ( other.T_C_serialized                  )
-        ,   S_P_serialized      ( other.S_P_serialized                  )
-        ,   T_P_serialized      ( other.T_P_serialized                  )
-        ,   A                   ( other.A                               )
-        ,   far_theta2          ( other.far_theta2                      )
-        ,   near_theta2         ( other.near_theta2                     )
-        ,   intersection_theta2 ( other.near_theta2                     )
+        ,   inter_idx           ( other.inter_idx.Capacity()    )
+        ,   verynear_idx        ( other.verynear_idx.Capacity() )
+        ,   near_idx            ( other.near_idx.Capacity()     )
+        ,   far_idx             ( other.far_idx.Capacity()      )
+//        ,   inter_idx           ( other.inter_idx               )
+//        ,   verynear_idx        ( other.verynear_idx            )
+//        ,   near_idx            ( other.near_idx                )
+//        ,   far_idx             ( other.far_idx                 )
+        ,   S_C_proto           ( other.S_C_proto->Clone()      )
+        ,   T_C_proto           ( other.T_C_proto->Clone()      )
+        ,   S_P_proto           ( other.S_P_proto->Clone()      )
+        ,   T_P_proto           ( other.T_P_proto->Clone()      )
+        ,   S_C_serialized      ( other.S_C_serialized          )
+        ,   T_C_serialized      ( other.T_C_serialized          )
+        ,   S_P_serialized      ( other.S_P_serialized          )
+        ,   T_P_serialized      ( other.T_P_serialized          )
+        ,   A                   ( other.A                       )
+        ,   far_theta2          ( other.far_theta2              )
+        ,   near_theta2         ( other.near_theta2             )
+        ,   intersection_theta2 ( other.near_theta2             )
         {}
         
         friend void swap(CLASS &A, CLASS &B)
@@ -74,13 +78,9 @@ namespace Repulsor
 
             swap( A.tree_string,            B.tree_string           );
             swap( A.inter_idx,              B.inter_idx             );
-            swap( A.inter_jdx,              B.inter_jdx             );
             swap( A.verynear_idx,           B.verynear_idx          );
-            swap( A.verynear_jdx,           B.verynear_jdx          );
             swap( A.near_idx,               B.near_idx              );
-            swap( A.near_jdx,               B.near_jdx              );
             swap( A.far_idx,                B.far_idx               );
-            swap( A.far_jdx,                B.far_jdx               );
             swap( A.S_C_proto,              B.S_C_proto             );
             swap( A.T_C_proto,              B.T_C_proto             );
             swap( A.T_P_proto,              B.T_P_proto             );
@@ -119,15 +119,10 @@ namespace Repulsor
 //        }
         
     public:
-        
-        std::vector<Int>    inter_idx;
-        std::vector<Int>    inter_jdx;
-        std::vector<Int> verynear_idx;
-        std::vector<Int> verynear_jdx;
-        std::vector<Int>     near_idx;
-        std::vector<Int>     near_jdx;
-        std::vector<Int>      far_idx;
-        std::vector<Int>      far_jdx;
+        PairAggregator<Int, Int, Int> inter_idx;
+        PairAggregator<Int, Int, Int> verynear_idx;
+        PairAggregator<Int, Int, Int> near_idx;
+        PairAggregator<Int, Int, Int> far_idx;
 
     protected:
         
@@ -196,8 +191,9 @@ namespace Repulsor
         
         virtual force_inline void ComputeLeafDiagonal() override
         {
-            near_idx.push_back(P_i);
-            near_jdx.push_back(P_i);
+//            near_idx.push_back(P_i);
+//            near_jdx.push_back(P_i);
+            near_idx.Push( P_i, P_i );
         }
         
         virtual force_inline void ComputeLeaf() override
@@ -210,8 +206,10 @@ namespace Repulsor
             
             if( admissable )
             {
-                near_idx.push_back(P_i);
-                near_jdx.push_back(P_j);
+//                near_idx.push_back(P_i);
+//                near_jdx.push_back(P_j);
+                
+                near_idx.Push( P_i, P_j );
             }
             else
             {
@@ -221,13 +219,15 @@ namespace Repulsor
                 
                 if( intersecting )
                 {
-                    inter_idx.push_back(P_i);
-                    inter_jdx.push_back(P_j);
+//                    inter_idx.push_back(P_i);
+//                    inter_jdx.push_back(P_j);
+                    inter_idx.Push( P_i, P_j );
                 }
                 else
                 {
-                    verynear_idx.push_back(P_i);
-                    verynear_jdx.push_back(P_j);
+//                    verynear_idx.push_back(P_i);
+//                    verynear_jdx.push_back(P_j);
+                    verynear_idx.Push( P_i, P_j );
                 }
             }
         }
@@ -242,8 +242,9 @@ namespace Repulsor
             
             if( admissable )
             {
-                near_idx.push_back(P_j);
-                near_jdx.push_back(P_i);
+//                near_idx.push_back(P_j);
+//                near_jdx.push_back(P_i);
+                near_idx.Push( P_j, P_i );
             }
             else
             {
@@ -253,26 +254,30 @@ namespace Repulsor
                 
                 if( intersecting )
                 {
-                    inter_idx.push_back(P_j);
-                    inter_jdx.push_back(P_i);
+//                    inter_idx.push_back(P_j);
+//                    inter_jdx.push_back(P_i);
+                    inter_idx.Push( P_j, P_i );
                 }
                 else
                 {
-                    verynear_idx.push_back(P_j);
-                    verynear_jdx.push_back(P_i);
+//                    verynear_idx.push_back(P_j);
+//                    verynear_jdx.push_back(P_i);
+                    verynear_idx.Push( P_j, P_i );
                 }
             }
         }
         
         virtual force_inline void ComputeAdmissable() override
         {
-            far_idx.push_back(C_i);
-            far_jdx.push_back(C_j);
+//            far_idx.push_back(C_i);
+//            far_jdx.push_back(C_j);
+            far_idx.Push( C_i, C_j );
         }
         virtual force_inline void ComputeAdmissableSwapped() override
         {
-            far_idx.push_back(C_j);
-            far_jdx.push_back(C_i);
+//            far_idx.push_back(C_j);
+//            far_jdx.push_back(C_i);
+            far_idx.Push( C_j, C_i );
         }
 
         

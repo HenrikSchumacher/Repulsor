@@ -59,7 +59,7 @@ namespace Repulsor
         using BASE::P;
 
 #ifdef NearField_S_Copy
-        mutable Real x_buffer [S_DATA_DIM] = {};
+        alignas( ALIGNMENT ) mutable Real x_buffer [S_DATA_DIM] = {};
 #else
         mutable Real const * restrict x_buffer  = nullptr;
 #endif
@@ -69,7 +69,7 @@ namespace Repulsor
         using BASE::Q;
         
 #ifdef NearField_T_Copy
-        mutable Real y_buffer [T_DATA_DIM] = {};
+        alignas( ALIGNMENT ) mutable Real y_buffer [T_DATA_DIM] = {};
 #else
         mutable Real const * restrict y_buffer  = nullptr;
 #endif
@@ -168,7 +168,7 @@ namespace Repulsor
 
     public:
         
-        virtual void LoadS( const Int i ) override
+        virtual force_inline void LoadS( const Int i ) override
         {
             S_ID = i;
             const Real * const X  = &S_data[S_DATA_DIM * S_ID];
@@ -190,7 +190,7 @@ namespace Repulsor
             }
         }
         
-        virtual void LoadT( const Int j ) override
+        virtual force_inline void LoadT( const Int j ) override
         {
             T_ID = j;
             const Real * const Y  = &T_data[T_DATA_DIM * T_ID];
@@ -215,13 +215,13 @@ namespace Repulsor
 //        void PrefetchS( const Int i ) const
 //        {}
         
-        virtual void PrefetchT( const Int j ) const override
+        virtual force_inline void PrefetchT( const Int j ) const override
         {
             prefetch_range<T_DATA_DIM,0,0>( &T_data[T_DATA_DIM * j] );
             
             prefetch_range<T_Tree_T::SIZE,0,0>( &T_ser[T_Tree_T::SIZE * j] );
             
-            if( diff_flag )
+            if constexpr ( diff_flag )
             {
                 prefetch_range<T_DATA_DIM,1,0>( &T_D_data[T_DATA_DIM * j] );
             }
