@@ -1,7 +1,7 @@
 #pragma once
 
-#define CLASS FMM_Kernel_Adaptive
-#define BASE  FMM_Kernel_NearField<S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,is_symmetric_,energy_flag,diff_flag,hess_flag,metric_flag>
+#define CLASS FMM_Kernel_VF
+#define BASE  FMM_Kernel_NF<S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,hess_flag_,metric_flag_>
 
 namespace Repulsor
 {
@@ -9,7 +9,7 @@ namespace Repulsor
         int S_DOM_DIM_, int T_DOM_DIM_,
         typename ClusterTree_T_,
         bool is_symmetric_,
-        bool energy_flag, bool diff_flag, bool hess_flag, bool metric_flag
+        bool energy_flag_, bool diff_flag_, bool hess_flag_, bool metric_flag_
     >
     class CLASS : public BASE
     {
@@ -21,11 +21,16 @@ namespace Repulsor
         using Int     = typename ClusterTree_T::Int;
         using SReal   = typename ClusterTree_T::SReal;
         using ExtReal = typename ClusterTree_T::ExtReal;
+        using typename BASE::Configurator_T;
         
         using BASE::AMB_DIM;
         using BASE::PROJ_DIM;
         using BASE::symmetry_factor;
         using BASE::is_symmetric;
+        using BASE::energy_flag;
+        using BASE::diff_flag;
+        using BASE::hess_flag;
+        using BASE::metric_flag;
         
         using BASE::S_DOM_DIM;
         using BASE::T_DOM_DIM;
@@ -55,21 +60,19 @@ namespace Repulsor
         using BASE::DY;
         
         using BASE::a;
-        using BASE::x;
         using BASE::P;
 
 #ifdef NearField_S_Copy
-        alignas( ALIGNMENT ) mutable Real x_buffer [S_DATA_DIM] = {};
+        mutable Real x_buffer [S_DATA_DIM] = {};
 #else
         mutable Real const * restrict x_buffer  = nullptr;
 #endif
         
         using BASE::b;
-        using BASE::y;
         using BASE::Q;
         
 #ifdef NearField_T_Copy
-        alignas( ALIGNMENT ) mutable Real y_buffer [T_DATA_DIM] = {};
+        mutable Real y_buffer [T_DATA_DIM] = {};
 #else
         mutable Real const * restrict y_buffer  = nullptr;
 #endif
@@ -112,20 +115,14 @@ namespace Repulsor
         
         CLASS() = default;
         
-        CLASS(
-            const ClusterTree_T & S_,
-            const ClusterTree_T & T_,
-            const Real theta_,
-            const Int  max_level_ = 20
-        )
-        :   BASE        ( S_, T_                         )
+        CLASS( Configurator_T & conf, const Real theta_, const Int  max_level_ = 20 )
+        :   BASE        ( conf                           )
         ,   S_ser       ( S.PrimitiveSerialized().data() )
         ,   T_ser       ( T.PrimitiveSerialized().data() )
         ,   theta       ( theta_                         )
         ,   theta2      ( theta_ * theta_                )
         ,   max_level   ( max_level_                     )
         {
-            
             if( S.PrimitiveSerialized().Dimension(1) != S_Tree.SimplexPrototype().Size() )
             {
                 eprint(className()+" Constructor: S.PrimitiveSerialized().Dimension(1) != S_Tree.SimplexPrototype().Size()");
@@ -179,7 +176,7 @@ namespace Repulsor
         
 #ifdef NearField_S_Copy
             copy_buffer( &X[1],             &x_buffer[0], S_COORD_DIM );
-            copy_buffer( &X[1+S_COORD_DIM], &Q[0]       , PROJ_DIM   );
+            copy_buffer( &X[1+S_COORD_DIM], &P[0]       , PROJ_DIM   );
 #else
             x_buffer = &X[1];
             P        = &X[1+T_COORD_DIM];
@@ -227,9 +224,9 @@ namespace Repulsor
             }
         }
         
-        virtual Real compute() override = 0;
+        virtual Real compute(  const Int block_ID ) override = 0;
         
-        virtual Real Compute() override
+        virtual Real Compute(  const Int block_ID ) override
         {
             Real sum = static_cast<Real>(0);
             
@@ -251,7 +248,7 @@ namespace Repulsor
                         max_level_reached = max_level;
                         block_count++;
                         bottom_count++;
-                        sum += compute();
+                        sum += compute( block_ID );
                         S_Tree.ToParent();
                         T_Tree.ToParent();
                         from_above = false;
@@ -269,7 +266,7 @@ namespace Repulsor
                             // We compute energy, go to parent, and prepare the next child of the parent.
                             max_level_reached = std::max( max_level_reached, S_Tree.Level() );
                             block_count++;
-                            sum += compute();
+                            sum += compute( block_ID );
                             S_Tree.ToParent();
                             T_Tree.ToParent();
                             from_above = false;
@@ -366,6 +363,12 @@ namespace Repulsor
 //            logprint("Writing to log file "+s+".");
 #endif
         }
+        
+    public:
+        
+        virtual Int MetricNonzeroCount() const override = 0;
+
+        virtual Int PreconditionerNonzeroCount() const override = 0;
         
         virtual std::string ClassName() const override
         {

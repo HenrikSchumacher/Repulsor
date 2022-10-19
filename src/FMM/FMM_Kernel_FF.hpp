@@ -1,14 +1,14 @@
 #pragma once
 
-#define CLASS FMM_Kernel_FarField
-#define BASE  FMM_Kernel<ClusterTree_T_,is_symmetric_,energy_flag,diff_flag,hess_flag,metric_flag>
+#define CLASS FMM_Kernel_FF
+#define BASE  FMM_Kernel<ClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,hess_flag_,metric_flag_>
 
 namespace Repulsor
 {
     template<
         typename ClusterTree_T_,
         bool is_symmetric_,
-        bool energy_flag, bool diff_flag, bool hess_flag, bool metric_flag
+        bool energy_flag_, bool diff_flag_, bool hess_flag_, bool metric_flag_
     >
     class CLASS : public BASE
     {
@@ -20,6 +20,7 @@ namespace Repulsor
         using Int     = typename ClusterTree_T::Int;
         using SReal   = typename ClusterTree_T::SReal;
         using ExtReal = typename ClusterTree_T::ExtReal;
+        using typename BASE::Configurator_T;
         
         using BASE::AMB_DIM;
         using BASE::PROJ_DIM;
@@ -27,6 +28,10 @@ namespace Repulsor
         using BASE::T;
         using BASE::symmetry_factor;
         using BASE::is_symmetric;
+        using BASE::energy_flag;
+        using BASE::diff_flag;
+        using BASE::hess_flag;
+        using BASE::metric_flag;
         
         static constexpr Int S_DATA_DIM  = 1 + AMB_DIM + PROJ_DIM;
         static constexpr Int T_DATA_DIM  = 1 + AMB_DIM + PROJ_DIM;
@@ -39,8 +44,8 @@ namespace Repulsor
         mutable Real b   = static_cast<Real>(0);
         
 #ifdef FarField_S_Copy
-        mutable alignas( ALIGNMENT ) Real x [AMB_DIM] = {};
-        mutable alignas( ALIGNMENT ) Real P [PROJ_DIM] = {};
+        mutable Real x [AMB_DIM] = {};
+        mutable Real P [PROJ_DIM] = {};
 #else
         mutable Real const * restrict x = nullptr;
         mutable Real const * restrict P = nullptr;
@@ -54,8 +59,8 @@ namespace Repulsor
         mutable Real const * restrict Q = nullptr;
 #endif
         
-        alignas( ALIGNMENT ) mutable Real DX [S_DATA_DIM] = {};
-        alignas( ALIGNMENT ) mutable Real DY [T_DATA_DIM] = {};
+        mutable Real DX [S_DATA_DIM] = {};
+        mutable Real DY [T_DATA_DIM] = {};
         
         const  Real * restrict const S_data     = nullptr;
                Real * restrict const S_D_data   = nullptr;
@@ -74,8 +79,8 @@ namespace Repulsor
         
         CLASS() = default;
         
-        CLASS( const ClusterTree_T & S_, const ClusterTree_T & T_ )
-        :   BASE( S_, T_ )
+        CLASS( Configurator_T & conf )
+        :   BASE        ( conf                                                      )
         ,   S_data      ( S.ClusterFarFieldData().data()                            )
         ,   S_D_data    ( S.ThreadClusterDFarFieldData().data(omp_get_thread_num()) )
         ,   T_data      ( T.ClusterFarFieldData().data()                            )
@@ -86,9 +91,12 @@ namespace Repulsor
                 eprint(className()+" Constructor: S.ClusterFarFieldData().Dimension(1) != S_DATA_DIM");
             }
             
-            if( S.ThreadClusterDFarFieldData().Dimension(2) != S_DATA_DIM )
+            if constexpr ( diff_flag )
             {
-                eprint(className()+" Constructor: S.ThreadClusterDFarFieldData().Dimension(2) != S_DATA_DIM");
+                if( S.ThreadClusterDFarFieldData().Dimension(2) != S_DATA_DIM )
+                {
+                    eprint(className()+" Constructor: S.ThreadClusterDFarFieldData().Dimension(2) != S_DATA_DIM");
+                }
             }
                
             if( T.ClusterFarFieldData().Dimension(1) != T_DATA_DIM)
@@ -96,17 +104,20 @@ namespace Repulsor
                eprint(className()+" Constructor: T.ClusterFarFieldData().Dimension(1) != T_DATA_DIM ");
             }
             
-            if( T.ThreadClusterDFarFieldData().Dimension(2) != T_DATA_DIM )
+            if constexpr ( diff_flag )
             {
-                eprint(className()+" Constructor: T.ThreadClusterDFarFieldData().Dimension(2) != T_DATA_DIM ");
+                if( T.ThreadClusterDFarFieldData().Dimension(2) != T_DATA_DIM )
+                {
+                    eprint(className()+" Constructor: T.ThreadClusterDFarFieldData().Dimension(2) != T_DATA_DIM ");
+                }
             }
         }
         
         CLASS( const CLASS & other )
-        :   BASE( other )
-        ,   S_data      ( other.S_data                      )
+        :   BASE        ( other                                                           )
+        ,   S_data      ( other.S_data                                                    )
         ,   S_D_data    ( other.S.ThreadClusterDFarFieldData().data(omp_get_thread_num()) )
-        ,   T_data      ( other.T_data                      )
+        ,   T_data      ( other.T_data                                                    )
         ,   T_D_data    ( other.T.ThreadClusterDFarFieldData().data(omp_get_thread_num()) )
         {}
         
@@ -165,12 +176,12 @@ namespace Repulsor
             }
         }
         
-        virtual force_inline Real Compute() override
+        virtual force_inline Real Compute( const Int block_ID ) override
         {
-           return symmetry_factor * compute();
+            return symmetry_factor * compute( block_ID );
         }
         
-        virtual Real compute() override = 0;
+        virtual Real compute( const Int block_ID ) override = 0;
             
         virtual force_inline void WriteS() override
         {
@@ -197,6 +208,12 @@ namespace Repulsor
                 }
             }
         }
+        
+    public:
+        
+        virtual Int MetricNonzeroCount() const override = 0;
+
+        virtual Int PreconditionerNonzeroCount() const override= 0;
         
     public:
         

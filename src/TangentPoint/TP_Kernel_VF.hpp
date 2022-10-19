@@ -1,7 +1,7 @@
 #pragma once
 
-#define CLASS TP_Kernel_Adaptive
-#define  BASE  FMM_Kernel_Adaptive<S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,is_symmetric_,energy_flag,diff_flag,hess_flag,metric_flag>
+#define CLASS TP_Kernel_VF
+#define  BASE  FMM_Kernel_VF<S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,hess_flag_,metric_flag_>
 
 namespace Repulsor
 {
@@ -9,7 +9,7 @@ namespace Repulsor
         int S_DOM_DIM_, int T_DOM_DIM_,
         typename ClusterTree_T_, typename T1, typename T2,
         bool is_symmetric_,
-        bool energy_flag, bool diff_flag, bool hess_flag, bool metric_flag
+        bool energy_flag_, bool diff_flag_, bool hess_flag_, bool metric_flag_
     >
     class CLASS : public BASE
     {
@@ -21,6 +21,7 @@ namespace Repulsor
         using Int     = typename ClusterTree_T::Int;
         using SReal   = typename ClusterTree_T::SReal;
         using ExtReal = typename ClusterTree_T::ExtReal;
+        using typename BASE::Configurator_T;
         
         using BASE::AMB_DIM;
         using BASE::PROJ_DIM;
@@ -30,7 +31,14 @@ namespace Repulsor
         using BASE::T_COORD_DIM;
         using BASE::T_DATA_DIM;
         using BASE::S_DATA_DIM;
+        using BASE::energy_flag;
+        using BASE::diff_flag;
+        using BASE::hess_flag;
+        using BASE::metric_flag;
 
+        static constexpr Int METRIC_NNZ = 1 + 2 * AMB_DIM;
+        static constexpr Int PREC_NNZ   = 1;
+        
         using BASE::S;
         using BASE::T;
 //        using BASE::S_Tree;
@@ -46,11 +54,11 @@ namespace Repulsor
         
         CLASS() = delete;
         
-        CLASS( const ClusterTree_T & S_, const ClusterTree_T & T_,
-               const Real theta_, const Int max_level_,
-               const T1 q_half_, const T2 p_half_
+        CLASS(
+            Configurator_T & conf,
+            const Real theta_, const Int max_level_, const T1 q_half_, const T2 p_half_
         )
-        :   BASE( S_, T_, theta_, max_level_ )
+        :   BASE                 (conf, theta_, max_level_ )
         ,   q                    (two*q_half_)
         ,   q_half               (q_half_    )
         ,   q_half_minus_1       (q_half-1   )
@@ -61,7 +69,7 @@ namespace Repulsor
         {}
         
         CLASS( const CLASS & other )
-        :   BASE( other )
+        :   BASE                 (other                     )
         ,   q                    (other.q                   )
         ,   q_half               (other.q_half              )
         ,   q_half_minus_1       (other.q_half_minus_1      )
@@ -74,6 +82,9 @@ namespace Repulsor
         virtual ~CLASS() = default;
         
     protected:
+        
+        using BASE::metric_values;
+        using BASE::prec_values;
         
         using BASE::S_data;
         using BASE::S_D_data;
@@ -120,15 +131,15 @@ namespace Repulsor
         
     public:
         
-        virtual force_inline Real compute() override
+        virtual force_inline Real compute( const Int block_ID ) override
         {
-            alignas( ALIGNMENT ) Real x    [AMB_DIM] = {};
-            alignas( ALIGNMENT ) Real y    [AMB_DIM] = {};
-            alignas( ALIGNMENT ) Real v    [AMB_DIM] = {};
-            alignas( ALIGNMENT ) Real Pv   [AMB_DIM] = {};
-            alignas( ALIGNMENT ) Real Qv   [AMB_DIM] = {};
-            alignas( ALIGNMENT ) Real dEdv [AMB_DIM] = {};
-            alignas( ALIGNMENT ) Real V    [PROJ_DIM] = {};
+            Real x    [AMB_DIM] = {};
+            Real y    [AMB_DIM] = {};
+            Real v    [AMB_DIM] = {};
+            Real Pv   [AMB_DIM] = {};
+            Real Qv   [AMB_DIM] = {};
+            Real dEdv [AMB_DIM] = {};
+            Real V    [PROJ_DIM] = {};
             
             Real r2        = zero;
             Real rCosPhi_2 = zero;
@@ -171,57 +182,104 @@ namespace Repulsor
                 rCosPsi_2 += v[i] * Qv[i];
             }
             
+            // |P*(y-x)|^{q-2}
             const Real rCosPhi_q_minus_2 = MyMath::pow<Real,T1>( fabs(rCosPhi_2), q_half_minus_1);
+            // |Q*(y-x)|^{q-2}
             const Real rCosPsi_q_minus_2 = MyMath::pow<Real,T1>( fabs(rCosPsi_2), q_half_minus_1);
+            // r^{2-p}
             const Real r_minus_p_minus_2 = MyMath::pow<Real,T2>( r2, minus_p_half_minus_1 );
-
+            // |y-x|^-p
             const Real r_minus_p = r_minus_p_minus_2 * r2;
+            // |P*(y-x)|^q
             const Real rCosPhi_q = rCosPhi_q_minus_2 * rCosPhi_2;
+            // |Q*(y-x)|^q
             const Real rCosPsi_q = rCosPsi_q_minus_2 * rCosPsi_2;
+            
             const Real Num = ( rCosPhi_q + rCosPsi_q );
 
             const Real E = Num * r_minus_p;
 
-            if constexpr ( diff_flag )
+            if constexpr ( diff_flag || metric_flag )
             {
-                const Real factor = q_half * r_minus_p;
-                const Real F = factor * rCosPhi_q_minus_2;
-                const Real G = factor * rCosPsi_q_minus_2;
-                const Real H = - p * r_minus_p_minus_2 * Num;
+                // Needed for both the differential and the metric.
                 
-                Real dEdvx = zero;
-                Real dEdvy = zero;
+                const Real factor = q_half * r_minus_p;         // = q / |y-x|^p
                 
-                const Real wa = w * a;
-                const Real wb = w * b;
-                
-                for( Int i = 0; i < AMB_DIM; ++i )
+                const Real K_xy = factor * rCosPhi_q_minus_2;   // = |P*(y-x)|^(q-2) / |y-x|^p
+                const Real K_yx = factor * rCosPsi_q_minus_2;   // = |Q*(y-x)|^(q-2) / |y-x|^p
+
+                if constexpr ( diff_flag )
                 {
-                    dEdv[i] = two * ( F * Pv[i] + G * Qv[i] ) + H * v[i];
-                    dEdvx  += dEdv[i] * x[i];
-                    dEdvy  += dEdv[i] * y[i];
+                    const Real factor = q_half * r_minus_p;
+                    const Real H = - p * r_minus_p_minus_2 * Num;
                     
-                    for( Int ii = 0; ii < S_DOM_DIM+1; ++ii )
+                    Real dEdvx = zero;
+                    Real dEdvy = zero;
+                    
+                    const Real wa = w * a;
+                    const Real wb = w * b;
+                    
+                    for( Int i = 0; i < AMB_DIM; ++i )
                     {
-                        DX[1+AMB_DIM*ii+i] -= lambda[ii] * wb * dEdv[i];
+                        dEdv[i] = two * ( K_xy * Pv[i] + K_yx * Qv[i] ) + H * v[i];
+                        dEdvx  += dEdv[i] * x[i];
+                        dEdvy  += dEdv[i] * y[i];
+                        
+                        for( Int ii = 0; ii < S_DOM_DIM+1; ++ii )
+                        {
+                            DX[1+AMB_DIM*ii+i] -= lambda[ii] * wb * dEdv[i];
+                        }
+                        
+                        for( Int ii = 0; ii < T_DOM_DIM+1; ++ii )
+                        {
+                            DY[1+AMB_DIM*ii+i] +=     mu[ii] * wa * dEdv[i];
+                        }
                     }
                     
-                    for( Int ii = 0; ii < T_DOM_DIM+1; ++ii )
+                    DX[0] += wb * ( E - factor * rCosPhi_q + dEdvx );
+                    DY[0] += wa * ( E - factor * rCosPsi_q - dEdvy );
+                    
+                    const Real w_b_K_xy = wb * K_xy;
+                    const Real w_a_K_yx = wa * K_yx;
+                    
+                    for( Int k = 0; k < PROJ_DIM; ++k )
                     {
-                        DY[1+AMB_DIM*ii+i] +=     mu[ii] * wa * dEdv[i];
+                        DX[1+S_COORD_DIM+k] += w_b_K_xy * V[k];
+                        DY[1+T_COORD_DIM+k] += w_a_K_yx * V[k];
                     }
                 }
                 
-                DX[0] += wb * ( E - factor * rCosPhi_q + dEdvx );
-                DY[0] += wa * ( E - factor * rCosPsi_q - dEdvy );
-                
-                const Real wbF = wb * F;
-                const Real waG = wa * G;
-                
-                for( Int k = 0; k < PROJ_DIM; ++k )
+                if constexpr ( metric_flag )
                 {
-                    DX[1+S_COORD_DIM+k] += wbF * V[k];
-                    DY[1+T_COORD_DIM+k] += waG * V[k];
+                    Real * restrict const m_vals = &metric_values[ METRIC_NNZ * block_ID ];
+    //                Real * restrict const p_vals = &prec_values  [ PREC_NNZ   * block_ID ];
+                    
+//                     The metric block looks like this for AMB_DIM == 3:
+//
+//                          /                                                                 \
+//                          |   - K_xy - K_yx     Kyx * v[0]     Kyx * v[1]     Kyx * v[2]    |
+//                          |                                                                 |
+//                          |   - K_xy * v[0]         0              0              0         |
+//                          |                                                                 |
+//                          |   - K_xy * v[1]         0              0              0         |
+//                          |                                                                 |
+//                          |   - K_xy * v[2]         0              0              0         |
+//                          |                                                                 |
+//                          \                                                                 /
+//
+//                     This are 1 + 2 * AMB_DIM nonzero values.
+//                     It is tempting to compress also this to 2 + AMB_DIM values.
+//                     BUT we have to add the local matrices from several subtriangles!
+//                     Thus this structure cannot be exploited.
+                    
+                    // TODO: Make sure that the block is set too zero, so that we can added into like so:
+                    m_vals[0] -= K_xy + K_yx;
+                    
+                    for( Int l = 0; l < AMB_DIM; ++l )
+                    {
+                        m_vals[1+l]         += K_yx * v[l];
+                        m_vals[1+AMB_DIM+l] -= K_xy * v[l];
+                    }
                 }
             }
             
@@ -237,6 +295,16 @@ namespace Repulsor
         }
         
     public:
+        
+        virtual Int MetricNonzeroCount() const override
+        {
+            return METRIC_NNZ;
+        }
+
+        virtual Int PreconditionerNonzeroCount() const override
+        {
+            return PREC_NNZ;
+        }
         
         virtual std::string ClassName() const override
         {

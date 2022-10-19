@@ -1,7 +1,7 @@
 #pragma once
 
-#define CLASS FMM_Kernel_NearField
-#define BASE  FMM_Kernel<ClusterTree_T_,is_symmetric_,energy_flag,diff_flag,hess_flag,metric_flag>
+#define CLASS FMM_Kernel_NF
+#define BASE  FMM_Kernel<ClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,hess_flag_,metric_flag_>
 
 namespace Repulsor
 {
@@ -9,7 +9,7 @@ namespace Repulsor
         int S_DOM_DIM_, int T_DOM_DIM_,
         typename ClusterTree_T_,
         bool is_symmetric_,
-        bool energy_flag, bool diff_flag, bool hess_flag, bool metric_flag
+        bool energy_flag_, bool diff_flag_, bool hess_flag_, bool metric_flag_
     >
     class CLASS : public BASE
     {
@@ -21,6 +21,7 @@ namespace Repulsor
         using Int     = typename ClusterTree_T::Int;
         using SReal   = typename ClusterTree_T::SReal;
         using ExtReal = typename ClusterTree_T::ExtReal;
+        using typename BASE::Configurator_T;
         
         using BASE::AMB_DIM;
         using BASE::PROJ_DIM;
@@ -28,7 +29,10 @@ namespace Repulsor
         using BASE::T;
         using BASE::symmetry_factor;
         using BASE::is_symmetric;
-        
+        using BASE::energy_flag;
+        using BASE::diff_flag;
+        using BASE::hess_flag;
+        using BASE::metric_flag;
 
         static constexpr Int S_DOM_DIM = S_DOM_DIM_;
         static constexpr Int T_DOM_DIM = T_DOM_DIM_;
@@ -45,20 +49,18 @@ namespace Repulsor
         mutable Real a   = static_cast<Real>(0);
         mutable Real b   = static_cast<Real>(0);
         
-#ifdef NearField_S_Copy
-        alignas( ALIGNMENT ) mutable Real x [AMB_DIM] = {};
-        alignas( ALIGNMENT ) mutable Real P [PROJ_DIM] = {};
-#else
         mutable Real x [AMB_DIM] = {};
-        mutable Real const * restrict P         = nullptr;
+#ifdef NearField_S_Copy
+        mutable Real P [PROJ_DIM] = {};
+#else
+        mutable Real const * restrict P = nullptr;
 #endif
         
-#ifdef NearField_T_Copy
-        alignas( ALIGNMENT ) mutable Real y [AMB_DIM] = {};
-        alignas( ALIGNMENT ) mutable Real Q [PROJ_DIM] = {};
-#else
         mutable Real y [AMB_DIM] = {};
-        mutable Real const * restrict Q         = nullptr;
+#ifdef NearField_T_Copy
+        mutable Real Q [PROJ_DIM] = {};
+#else
+        mutable Real const * restrict Q = nullptr;
 #endif
         
         mutable Real DX [S_DATA_DIM] = {};
@@ -85,8 +87,9 @@ namespace Repulsor
         
         CLASS() = default;
         
-        CLASS( const ClusterTree_T & S_, const ClusterTree_T & T_ )
-        :   BASE( S_, T_ )
+        // To be used for configuration of kernel.
+        CLASS( Configurator_T & conf )
+        :   BASE        ( conf                                                         )
         ,   S_data      ( S.PrimitiveNearFieldData().data()                            )
         ,   S_D_data    ( S.ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
         ,   T_data      ( T.PrimitiveNearFieldData().data()                            )
@@ -97,27 +100,34 @@ namespace Repulsor
                 eprint(className()+" Constructor: S.PrimitiveNearFieldData().Dimension(1) != S_DATA_DIM");
             }
             
-            if( S.ThreadPrimitiveDNearFieldData().Dimension(2) != S_DATA_DIM )
+            if constexpr ( diff_flag )
             {
-                eprint(className()+" Constructor: S.ThreadPrimitiveDNearFieldData().Dimension(2) != S_DATA_DIM");
+                if( S.ThreadPrimitiveDNearFieldData().Dimension(2) != S_DATA_DIM )
+                {
+                    eprint(className()+" Constructor: S.ThreadPrimitiveDNearFieldData().Dimension(2) != S_DATA_DIM");
+                }
             }
-               
+            
             if( T.PrimitiveNearFieldData().Dimension(1) != T_DATA_DIM)
             {
                eprint(className()+" Constructor: T.PrimitiveNearFieldData().Dimension(1) != T_DATA_DIM ");
             }
             
-            if( T.ThreadPrimitiveDNearFieldData().Dimension(2) != T_DATA_DIM )
+            if constexpr ( diff_flag )
             {
-                eprint(className()+" Constructor: T.ThreadPrimitiveDNearFieldData().Dimension(2) != T_DATA_DIM ");
+                if( T.ThreadPrimitiveDNearFieldData().Dimension(2) != T_DATA_DIM )
+                {
+                    eprint(className()+" Constructor: T.ThreadPrimitiveDNearFieldData().Dimension(2) != T_DATA_DIM ");
+                }
             }
         }
         
+        // Use this constructor to make a copy of a configured kernel within the local thread.
         CLASS( const CLASS & other )
-        :   BASE( other )
-        ,   S_data      ( other.S_data                      )
+        :   BASE        ( other                                                              )
+        ,   S_data      ( other.S_data                                                       )
         ,   S_D_data    ( other.S.ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
-        ,   T_data      ( other.T_data                      )
+        ,   T_data      ( other.T_data                                                       )
         ,   T_D_data    ( other.T.ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
         {}
         
@@ -160,7 +170,7 @@ namespace Repulsor
             
             b = Y[0];
             
-#ifdef NearField_S_Copy
+#ifdef NearField_T_Copy
             copy_buffer( &Y[1+T_COORD_DIM], &Q[0], PROJ_DIM );
 #else
             Q = &Y[1+S_COORD_DIM];
@@ -194,12 +204,12 @@ namespace Repulsor
             }
         }
         
-        virtual force_inline Real Compute() override
+        virtual force_inline Real Compute( const Int block_ID ) override
         {
-           return symmetry_factor * compute();
+            return symmetry_factor * compute( block_ID );
         }
         
-        virtual Real compute() override = 0;
+        virtual Real compute(  const Int block_ID  ) override = 0;
             
         virtual force_inline void WriteS() override
         {
@@ -226,6 +236,12 @@ namespace Repulsor
                 }
             }
         }
+        
+    public:
+        
+        virtual Int MetricNonzeroCount() const override = 0;
+        
+        virtual Int PreconditionerNonzeroCount() const override = 0;
         
     public:
         

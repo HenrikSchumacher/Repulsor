@@ -7,24 +7,33 @@ namespace Repulsor
     template<
         typename ClusterTree_T_,
         bool is_symmetric_,
-        bool energy_flag, bool diff_flag, bool hess_flag, bool metric_flag
+        bool energy_flag_, bool diff_flag_, bool hess_flag_, bool metric_flag_
     >
     class alignas( OBJECT_ALIGNMENT ) CLASS
     {
-        
     public:
         
         using ClusterTree_T = ClusterTree_T_;
+        using Root_T        = CLASS;
         
         using Real    = typename ClusterTree_T::Real;
         using Int     = typename ClusterTree_T::Int;
         using SReal   = typename ClusterTree_T::SReal;
         using ExtReal = typename ClusterTree_T::ExtReal;
         
+        using ValueContainer_T = Tensor2<Real,Int>;
+        
+        using Configurator_T = FMM_Configurator<ClusterTree_T>;
+        
         static constexpr bool is_symmetric = is_symmetric_;
         
         static constexpr Int AMB_DIM   = ClusterTree_T::AMB_DIM;
         static constexpr Int PROJ_DIM  = (AMB_DIM*(AMB_DIM+1))/2;
+        
+        static constexpr bool energy_flag = energy_flag_;
+        static constexpr bool diff_flag   = diff_flag_;
+        static constexpr bool hess_flag   = hess_flag_;
+        static constexpr bool metric_flag = metric_flag_;
         
     protected:
         
@@ -45,13 +54,13 @@ namespace Repulsor
             for( Int i = 0; i < AMB_DIM; ++i )
             {
                 lin_k[i][i] = k;
-                tri_i[k] = i;
-                tri_j[k] = i;
+                tri_i[k]    = i;
+                tri_j[k]    = i;
                 ++k;
                 for( Int j = i+1; j < AMB_DIM; ++j )
                 {
-                    tri_i[k] = i;
-                    tri_j[k] = j;
+                    tri_i[k]    = i;
+                    tri_j[k]    = j;
                     lin_k[i][j] = lin_k[j][i] = k;
                     ++k;
                 }
@@ -77,23 +86,27 @@ namespace Repulsor
         
         
     public:
-//
-//        CLASS()
-//        {
-//            Init();
-//        };
+
+        CLASS() = delete;
         
-        CLASS( const ClusterTree_T & S_, const ClusterTree_T & T_ )
-        :   S( S_ )
-        ,   T( T_ )
+        // To be used for configuration of kernel. CANNOT BE USED FOR COMPUTE MODE!
+        CLASS( Configurator_T & conf )
+        :   S             ( conf.GetS()                 )
+        ,   T             ( conf.GetT()                 )
+        ,   metric_values ( conf.MetricValues()         )   // In configure mode, kernels needs access to refs.
+        ,   prec_values   ( conf.PreconditionerValues() )   // for allocation.
         {
             Init();
         }
         
-        // Copy constructor
+        // Copy constructor. Must be used for compute mode!
         CLASS( const CLASS & other )
-        :   S ( other.S )
-        ,   T ( other.T )
+        :   S                  ( other.S                  )
+        ,   T                  ( other.T                  )
+        ,   metric_values      ( other.metric_values      )
+        ,   metric_values_data ( other.metric_values_data ) // In compute the pointers are also needed!
+        ,   prec_values        ( other.prec_values        )
+        ,   prec_values_data   ( other.prec_values_data   ) // In compute the pointers are also needed!
         {
             Init();
         }
@@ -101,6 +114,53 @@ namespace Repulsor
         virtual ~CLASS() = default;
 
     public:
+        
+        void Allocate( const Int nnz )
+        {
+            if constexpr ( metric_flag )
+            {
+                if(
+                   metric_values.Dimensions(0) != nnz
+                   ||
+                   metric_values.Dimensions(1) != MetricNonzeroCount()
+                   )
+                {
+                    metric_values = Tensor2<Real,Int>( nnz, MetricNonzeroCount() );
+                }
+                
+                if(
+                   prec_values.Dimensions(0) != nnz
+                   ||
+                   prec_values.Dimensions(1) != PreconditionerNonzeroCount()
+                   )
+                {
+                    prec_values = Tensor2<Real,Int>( nnz, PreconditionerNonzeroCount() );
+                }
+            }
+        }
+        
+        bool PointersInititializedQ() const
+        {
+            if( metric_values_data == nullptr )
+            {
+                eprint(ClassName()+"::PointersInititializedQ: Pointers for metric_values not initialized. Make sure to initialize the kernel via the copy constructor.");
+                
+                return false;
+            }
+            
+            if( metric_values_data == nullptr )
+            {
+                eprint(ClassName()+"::PointersInititializedQ: Pointers for prec_values not initialized. Make sure to initialize the kernel via the copy constructor.");
+                
+                return false;
+            }
+            
+            return true;
+        }
+        
+        virtual Int MetricNonzeroCount() const = 0;
+
+        virtual Int PreconditionerNonzeroCount() const = 0;
         
         virtual void LoadS( const Int i ) = 0;
         
@@ -111,9 +171,9 @@ namespace Repulsor
         
         virtual void PrefetchT( const Int j ) const = 0;
         
-        virtual Real compute() = 0;
+        virtual Real compute( const Int block_ID ) = 0;
                                                        
-        virtual Real Compute() = 0;
+        virtual Real Compute( const Int block_ID ) = 0;
         
         virtual void WriteS() = 0;
         
@@ -123,6 +183,12 @@ namespace Repulsor
         
         const ClusterTree_T & S;
         const ClusterTree_T & T;
+        
+        ValueContainer_T & metric_values;
+        ValueContainer_T & prec_values;
+        
+        Real * restrict const metric_values_data = nullptr;
+        Real * restrict const   prec_values_data = nullptr;
         
         Int S_ID = -1;
         Int T_ID = -1;

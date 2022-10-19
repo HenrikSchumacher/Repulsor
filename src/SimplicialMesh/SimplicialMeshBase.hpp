@@ -51,6 +51,9 @@ namespace Repulsor
     protected:
         
         const Int thread_count = 1;
+        
+        mutable std::unordered_map<std::string,std::any> cache;
+        mutable std::unordered_map<std::string,std::any> persistent_cache;
             
     public:
         
@@ -358,16 +361,37 @@ namespace Repulsor
     public:
         
         virtual std::unique_ptr<Remesher_T> CreateRemesher() = 0;
-        
-        virtual Real TangentPointEnergy_New() const = 0;
-        
-        virtual Real TangentPointEnergy_New_Differential( ExtReal * output, bool addTo = false ) const = 0;
+//        
+//        virtual Real TangentPointEnergy_New() const = 0;
+//        
+//        virtual Real TangentPointEnergy_New_Differential( ExtReal * output, bool addTo = false ) const = 0;
         
 //##############################################################################################
 //      Standard interface
 //##############################################################################################
         
     public:
+        
+        bool IsCached( const std::string & s ) const
+        {
+            return static_cast<bool>( cache.count(s) );
+        }
+        
+        std::any & GetCache( const std::string & s ) const
+        {
+            return cache.at(s);
+        }
+        
+        void SetCache( const std::string & s, std::any & thing ) const
+        {
+            cache[s] = thing;
+        }
+        
+        void ClearCache() const
+        {
+            cache = std::unordered_map<std::string,std::any>();
+        }
+        
                                                           
         virtual CLASS & DownCast() = 0;
 

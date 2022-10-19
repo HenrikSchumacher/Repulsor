@@ -526,11 +526,11 @@ int main(int argc, const char * argv[])
     // ExtReal = ("external real") floating point type that is used by the outer world, e.g. for submitting the mesh's vertex coordinates and vectors to multiply against the metric.
     // ExtInt = ("external real") integer type that is used by the outer world, e.g. for submitting the mesh's vertex coordinates and vectors to multiply against the metric.
     
-    // Initialize mesh by the factory MakeSimplicialMesh to allow runtime polymorphism.
+
     tic("Initializing mesh");
-    std::unique_ptr<SimplicialMeshBase<REAL,INT,REAL,REAL>> M = MakeSimplicialMesh<REAL,INT,REAL,REAL>(
-        &vertex_coordinates[0][0],  vertex_count, ambient_dimension,
-        &simplices[0][0],          simplex_count, domain_dimension+1,
+    SimplicialMesh<domain_dimension,ambient_dimension,REAL,INT,REAL,REAL> M (
+        &vertex_coordinates[0][0],  vertex_count,
+        &simplices[0][0],          simplex_count,
         thread_count
     );
 
@@ -546,177 +546,184 @@ int main(int argc, const char * argv[])
     
     // Some quite decent settings for 2-dimensional surfaces.
     
-    M->cluster_tree_settings.split_threshold                        =  2;
-    M->cluster_tree_settings.thread_count                           =  0; // take as many threads as there are used by SimplicialMesh M
-    M->block_cluster_tree_settings.far_field_separation_parameter   =  0.5;
-    M->adaptivity_settings.theta                                    = 10.0;
+    M.cluster_tree_settings.split_threshold                        =  2;
+    M.cluster_tree_settings.thread_count                           =  0; // take as many threads as there are used by SimplicialMesh M
+    M.block_cluster_tree_settings.far_field_separation_parameter   =  0.5;
+    M.adaptivity_settings.theta                                    = 10.0;
 
     tic("Creating ClusterTree");
-    M->GetClusterTree();
+    M.GetClusterTree();
     toc("Creating ClusterTree");
     
     tic("Creating BlockClusterTree");
-    M->GetBlockClusterTree();
+    M.GetBlockClusterTree();
     toc("Creating BlockClusterTree");
 
-    valprint("M->GetClusterTree().ThreadCount()",M->GetClusterTree().ThreadCount());
+    valprint("M.GetClusterTree().ThreadCount()",M.GetClusterTree().ThreadCount());
 
-    valprint("M->GetClusterTree().NearDim()",M->GetClusterTree().NearDim());
-//    print(M->GetBlockClusterTree().Stats());
+    valprint("M.GetClusterTree().NearDim()",M.GetClusterTree().NearDim());
+//    print(M.GetBlockClusterTree().Stats());
 
-    valprint("number of detected intersections",M->GetBlockClusterTree().PrimitiveIntersectionCount());
+    valprint("number of detected intersections",M.GetBlockClusterTree().PrimitiveIntersectionCount());
 
     print("");
 
     // Tensor2 is a simple container class for heap-allocated matrices.
-    Tensor2<REAL,INT> diff ( M->VertexCount(), M->AmbDim() );
+    Tensor2<REAL,INT> diff ( M.VertexCount(), M.AmbDim() );
 
-    const double alpha  = 6;
-    const double beta   = 12;
+    const double q = 6;
+    const double p = 12;
     const double weight = 1;
-
-    M->SetTangentPointExponents(alpha, beta);
-    M->SetTangentPointWeight(weight);
-
+    
+    TangentPoint<domain_dimension,ambient_dimension,REAL,INT,REAL,REAL> TP (q,p);
+    
+    double en;
+    
+    tic("TP.Require(M)");
+    TP.Require(M);
+    toc("TP.Energy(M)");
+    
+    tic("TP.Energy(M)");
+    en = TP.Energy(M);
+    toc("TP.Energy(M)");
+    
+    dump(en);
+    
     tic("Compute tangent-point energy");
-    double tpe = M->TangentPointEnergy();
+    (void)TP.DEnergy(M);
     toc("Compute tangent-point energy");
-
-    print("");
-
-    valprint("tangent-point energy", tpe);
-    print("");
-    print("");
-
-    //Compute derivative of tangent-point energy.
-    bool add_to = false;
-
-    // Passing by pointer (diff.data() is just a double*, pointing to the first element in the array ).
-    tic("Compute differential of tangent-point energy");
-    M->TangentPointEnergy_Differential(diff.data(), add_to);         // Simply overwrite diff.
-    toc("Compute differential of tangent-point energy");
-    print("");
-
-    // You can also pass Tensor1 and Tensor2 objects directly.
-    M->TangentPointEnergy_Differential(diff, add_to);                // Simply overwrite diff.
-
-    // Initialize mesh by the factory MakeSimplicialMesh to allow runtime polymorphism.
-    tic("Initialize obstacle mesh");
-    std::unique_ptr<SimplicialMeshBase<REAL,INT,REAL,REAL>> Q = MakeSimplicialMesh<REAL,INT,REAL,REAL>(
-        &obstacle_vertex_coordinates[0][0],  obstacle_vertex_count, ambient_dimension,
-        &obstacle_simplices[0][0],          obstacle_simplex_count, domain_dimension+1,
-        thread_count
-      );
-    toc("Initialize obstacle mesh");
-    print("");
-
-    // Alternatively, you can do this, independent on which dimensions are enabled for MakeSimplicialMesh. However, domain_dimension, and ambient_dimension have to be known at compile time:
-//    Q = std::unique_ptr<SimplicialMeshBase<double,int,double,double>>(
-//        new SimplicialMesh<domain_dimension,ambient_dimension,double,int,double,double>(
-//            &obstacle_vertex_coordinates[0][0],  obstacle_vertex_count,
-//            &obstacle_simplices[0][0],          obstacle_simplex_count,
-//            thread_pool.ThreadCount()
-//        )
-//    );
+    
+    
+    M.ClearCache();
+    
+    tic("TP.Energy(M)");
+    en = TP.Energy(M);
+    toc("TP.Energy(M)");
+   
+    dump(en);
+   
+    
+    tic("Compute tangent-point energy");
+    (void)TP.DEnergy(M);
+    toc("Compute tangent-point energy");
+   
+//    M.SetTangentPointExponents(alpha, beta);
+//    M.SetTangentPointWeight(weight);
 //
-    // Load obstacle into mesh.
-    tic("Load obstacle");
-    M->LoadObstacle(std::move(Q));
-    toc("Load obstacle");
-    print("");
-
-    tic("Create obstacle trees");
-    M->GetObstacleBlockClusterTree();
-    toc("Create obstacle trees");
-    print("");
-
-//    print(M->GetObstacleBlockClusterTree().Stats() );
-
-    //Compute tangent-point energy between mesh and obstacle.
-
-    tic("Compute tangent-point energy between mesh and obstacle");
-    double tpo = M->TangentPointObstacleEnergy();
-    toc("Compute tangent-point energy between mesh and obstacle");
-    print("");
-
-    valprint("tangent-point obstacle energy", tpo);
-    print("");
-
-    //Compute derivative also of this energy.
-
-    add_to = true;
-
-    tic("Compute derivative of obstacle energy");
-    M->TangentPointObstacleEnergy_Differential(diff,add_to);        // Add into diff.
-    toc("Compute derivative of obstacle energy");
-    print("");
-    // Some vector-valued functions on vertices, represented by matrices.
-
-    const INT cols = M->AmbDim();
-
-    // Tensor2 is a simple container class for matrices.
-    Tensor2<REAL,INT> U ( M->VertexCount(), cols );
-    Tensor2<REAL,INT> V ( M->VertexCount(), cols );
-
-    // Load some random data into U.
-    U.Random();
-
-    const REAL a = 1.0;
-    const REAL b = 0.0;
-
-    print("");
-    print("");
-
-    valprint("M->ThreadCount()",M->ThreadCount());
-
-    //Performs generalized matrix-matrix product V = a * A * U + b * Y, where A is the tangent-point metric. Passing matrices by pointers (U.data() and V.data() are of type double*).
-    tic("Matrix multiplication");
-    M->TangentPointMetric_Multiply( a, U.data(), b, V.data(), cols, KernelType::LowOrder       );
-    M->TangentPointMetric_Multiply( a, U.data(), b, V.data(), cols, KernelType::HighOrder      );
-    M->TangentPointMetric_Multiply( a, U.data(), b, V.data(), cols, KernelType::FractionalOnly );
-        // This performs multiplication with high order _and low order term and returns the sum.
-    M->TangentPointMetric_Multiply( a, U.data(), b, V.data(), cols );
-    toc("Matrix multiplication");
-
-
-    print("");
-    print("Btw.: M->TangentPointMetric_Multiply has some overhead when you call it the first time. So next time it will be faster.");
-
-    print("");
-    tic("Matrix multiplication");
-    // You can also pass Tensor1 and Tensor2 objects directly.
-    M->TangentPointMetric_Multiply( a, U, b, V, KernelType::LowOrder       );
-    M->TangentPointMetric_Multiply( a, U, b, V, KernelType::HighOrder      );
-    M->TangentPointMetric_Multiply( a, U, b, V, KernelType::FractionalOnly );
-
-    // This performs multiplication with high order _and low order term and returns the sum.
-    M->TangentPointMetric_Multiply( a, U, b, V );
-    toc("Matrix multiplication");
-
+//    tic("Compute tangent-point energy");
+//    double tpe = M.TangentPointEnergy();
+//    toc("Compute tangent-point energy");
+//
+//    print("");
+//
+//    valprint("tangent-point energy", tpe);
 //    print("");
 //    print("");
 //
-//    tic("Singular matrix multiplication");
-//    M->TangentPointSingularMetric_Multiply( a, U.data(), b, V.data(), cols );
+//    //Compute derivative of tangent-point energy.
+//    bool add_to = false;
+//
+//    // Passing by pointer (diff.data() is just a double*, pointing to the first element in the array ).
+//    tic("Compute differential of tangent-point energy");
+//    M.TangentPointEnergy_Differential(diff.data(), add_to);         // Simply overwrite diff.
+//    toc("Compute differential of tangent-point energy");
+//    print("");
+//
+//    // You can also pass Tensor1 and Tensor2 objects directly.
+//    M.TangentPointEnergy_Differential(diff, add_to);                // Simply overwrite diff.
+//
+//    // Initialize mesh by the factory MakeSimplicialMesh to allow runtime polymorphism.
+//    tic("Initialize obstacle mesh");
+//    std::unique_ptr<SimplicialMeshBase<REAL,INT,REAL,REAL>> Q = MakeSimplicialMesh<REAL,INT,REAL,REAL>(
+//        &obstacle_vertex_coordinates[0][0],  obstacle_vertex_count, ambient_dimension,
+//        &obstacle_simplices[0][0],          obstacle_simplex_count, domain_dimension+1,
+//        thread_count
+//      );
+//    toc("Initialize obstacle mesh");
+//    print("");
+//
+//    // Alternatively, you can do this, independent on which dimensions are enabled for MakeSimplicialMesh. However, domain_dimension, and ambient_dimension have to be known at compile time:
+////    Q = std::unique_ptr<SimplicialMeshBase<double,int,double,double>>(
+////        new SimplicialMesh<domain_dimension,ambient_dimension,double,int,double,double>(
+////            &obstacle_vertex_coordinates[0][0],  obstacle_vertex_count,
+////            &obstacle_simplices[0][0],          obstacle_simplex_count,
+////            thread_pool.ThreadCount()
+////        )
+////    );
+////
+//    // Load obstacle into mesh.
+//    tic("Load obstacle");
+//    M.LoadObstacle(std::move(Q));
+//    toc("Load obstacle");
+//    print("");
+//
+//    tic("Create obstacle trees");
+//    M.GetObstacleBlockClusterTree();
+//    toc("Create obstacle trees");
+//    print("");
+//
+////    print(M.GetObstacleBlockClusterTree().Stats() );
+//
+//    //Compute tangent-point energy between mesh and obstacle.
+//
+//    tic("Compute tangent-point energy between mesh and obstacle");
+//    double tpo = M.TangentPointObstacleEnergy();
+//    toc("Compute tangent-point energy between mesh and obstacle");
+//    print("");
+//
+//    valprint("tangent-point obstacle energy", tpo);
+//    print("");
+//
+//    //Compute derivative also of this energy.
+//
+//    add_to = true;
+//
+//    tic("Compute derivative of obstacle energy");
+//    M.TangentPointObstacleEnergy_Differential(diff,add_to);        // Add into diff.
+//    toc("Compute derivative of obstacle energy");
+//    print("");
+//    // Some vector-valued functions on vertices, represented by matrices.
+//
+//    const INT cols = M.AmbDim();
+//
+//    // Tensor2 is a simple container class for matrices.
+//    Tensor2<REAL,INT> U ( M.VertexCount(), cols );
+//    Tensor2<REAL,INT> V ( M.VertexCount(), cols );
+//
+//    // Load some random data into U.
+//    U.Random();
+//
+//    const REAL a = 1.0;
+//    const REAL b = 0.0;
+//
+//    print("");
+//    print("");
+//
+//    valprint("M.ThreadCount()",M.ThreadCount());
+//
+//    //Performs generalized matrix-matrix product V = a * A * U + b * Y, where A is the tangent-point metric. Passing matrices by pointers (U.data() and V.data() are of type double*).
+//    tic("Matrix multiplication");
+//    M.TangentPointMetric_Multiply( a, U.data(), b, V.data(), cols, KernelType::LowOrder       );
+//    M.TangentPointMetric_Multiply( a, U.data(), b, V.data(), cols, KernelType::HighOrder      );
+//    M.TangentPointMetric_Multiply( a, U.data(), b, V.data(), cols, KernelType::FractionalOnly );
+//        // This performs multiplication with high order _and low order term and returns the sum.
+//    M.TangentPointMetric_Multiply( a, U.data(), b, V.data(), cols );
 //    toc("Matrix multiplication");
 //
-//    tic("Singular matrix multiplication");
-//    M->TangentPointSingularMetric_Multiply( a, U.data(), b, V.data(), cols );
+//
+//    print("");
+//    print("Btw.: M.TangentPointMetric_Multiply has some overhead when you call it the first time. So next time it will be faster.");
+//
+//    print("");
+//    tic("Matrix multiplication");
+//    // You can also pass Tensor1 and Tensor2 objects directly.
+//    M.TangentPointMetric_Multiply( a, U, b, V, KernelType::LowOrder       );
+//    M.TangentPointMetric_Multiply( a, U, b, V, KernelType::HighOrder      );
+//    M.TangentPointMetric_Multiply( a, U, b, V, KernelType::FractionalOnly );
+//
+//    // This performs multiplication with high order _and low order term and returns the sum.
+//    M.TangentPointMetric_Multiply( a, U, b, V );
 //    toc("Matrix multiplication");
-//
-//    print("");
-//    print("");
-
-//    // You can also get the energy densities as follows:
-//    Tensor1<double,int> density ( M->SimplexCount(), 0. );
-//
-//    tic("Compute energy density");
-//    M->TangentPointEnergy_Density(density,true);
-//    M->TangentPointObstacleEnergy_Density(density,true);
-//    toc("Compute energy density");
-//
-//    // Print the array to command line.
-//    valprint("density",density);
 
     print("");
     print("");

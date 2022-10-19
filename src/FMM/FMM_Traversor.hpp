@@ -5,7 +5,7 @@
 // TODO: Handle symmetric/asymmetric cases correctly!
 
 namespace Repulsor
-{
+{    
     template<typename Kernel_T>
     class CLASS
     {
@@ -16,6 +16,8 @@ namespace Repulsor
         using SReal   = typename Kernel_T::SReal;
         using ExtReal = typename Kernel_T::ExtReal;
         
+        using ValueContainer_T  = Tensor2<Real,Int>;
+        
         using SparsityPattern_T = SparsityPatternCSR<Int>;
         
         static constexpr bool is_symmetric = Kernel_T::is_symmetric;
@@ -23,7 +25,8 @@ namespace Repulsor
         CLASS() = default;
         
         explicit CLASS(
-            const SparsityPattern_T & pattern_, const Kernel_T & kernel_
+            const SparsityPattern_T & pattern_,
+            const Kernel_T & kernel_
         )
         :   pattern ( pattern_ )
         ,   kernel  ( kernel_  )
@@ -73,10 +76,19 @@ namespace Repulsor
                 (void)pattern.Diag();
             }
             
+            if constexpr ( Kernel_T::metric_flag )
+            {
+                kernel.GetS().CleanseDerivativeBuffers();
+                
+                if( !is_symmetric )
+                {
+                    kernel.GetT().CleanseDerivativeBuffers();
+                }
+            }
+            
             const Int thread_count = job_ptr.Size()-1;
             
             Real global_sum = static_cast<Real>(0);
-
             
             #pragma omp parallel for num_threads( thread_count ) reduction( + : global_sum )
             for( Int thread = 0; thread < thread_count; ++thread )
@@ -119,7 +131,7 @@ namespace Repulsor
                             
                             ker.PrefetchT(ci[k+1]);
 
-                            local_sum += ker.Compute();
+                            local_sum += ker.Compute(k);
                             
                             ker.WriteT();
                         }
@@ -132,7 +144,7 @@ namespace Repulsor
                             
                             ker.LoadT(j);
                             
-                            local_sum += ker.Compute();
+                            local_sum += ker.Compute(k);
                             
                             ker.WriteT();
                         }

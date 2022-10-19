@@ -1,13 +1,20 @@
 #pragma once
 
-#include "FMM/FMM_Traversor.hpp"
+namespace Repulsor
+{
+    enum FMM_Type : int
+    {
+        VF = 0,
+        NF = 1,
+        FF = 2
+    };
+
+} // namespace Repulsor
+
+
+#include "FMM/FMM_Configurator.hpp"
 #include "FMM/FMM_Kernel.hpp"
-#include "FMM/FMM_Kernel_FarField.hpp"
-#include "FMM/FMM_Kernel_NearField.hpp"
-#include "FMM/FMM_Kernel_Adaptive.hpp"
-
-#include "FMM/TP_Kernel_FarField.hpp"
-#include "FMM/TP_Kernel_NearField.hpp"
-#include "FMM/TP_Kernel_Adaptive.hpp"
-
-#include "FMM/TP_Traversor.hpp"
+#include "FMM/FMM_Kernel_FF.hpp"
+#include "FMM/FMM_Kernel_NF.hpp"
+#include "FMM/FMM_Kernel_VF.hpp"
+#include "FMM/FMM_Traversor.hpp"
