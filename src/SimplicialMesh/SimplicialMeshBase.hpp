@@ -374,17 +374,33 @@ namespace Repulsor
         
         bool IsCached( const std::string & s ) const
         {
-            return static_cast<bool>( cache.count(s) );
+            #pragma omp critical (cache)
+            {
+                return static_cast<bool>( cache.count(s) );
+            }
         }
         
         std::any & GetCache( const std::string & s ) const
         {
-            return cache.at(s);
+            #pragma omp critical (cache)
+            {
+                try{
+                  return cache.at(s);
+                }
+                catch( const std::out_of_range & e )
+                {
+                    eprint(ClassName()+"GetCache: Key \""+s+"\" not found!.");
+                    throw; //an internal catch block forwards the exception to its external level
+                }
+            }
         }
         
         void SetCache( const std::string & s, std::any & thing ) const
         {
-            cache[s] = thing;
+            #pragma omp critical (cache)
+            {
+                cache[s] = thing;
+            }
         }
         
         void ClearCache() const

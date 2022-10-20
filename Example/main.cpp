@@ -575,37 +575,39 @@ int main(int argc, const char * argv[])
     const double p = 12;
     const double weight = 1;
     
-    TangentPoint<domain_dimension,ambient_dimension,REAL,INT,REAL,REAL> TP (q,p);
+    TangentPoint<domain_dimension,ambient_dimension,REAL,INT,REAL,REAL> tpe (q,p);
     
     double en;
     
-    tic("TP.Require(M)");
-    TP.Require(M);
-    toc("TP.Energy(M)");
+    tic("tpe.Compute(M)");
+    tpe.Compute(M);
+    toc("tpe.Compute(M)");
     
-    tic("TP.Energy(M)");
-    en = TP.Energy(M);
-    toc("TP.Energy(M)");
+    tic("tpe.Energy(M)");
+    en = tpe.Value(M);
+    toc("tpe.Energy(M)");
     
     dump(en);
     
     tic("Compute tangent-point energy");
-    (void)TP.DEnergy(M);
+    (void)tpe.Value(M);
     toc("Compute tangent-point energy");
     
     
     M.ClearCache();
     
-    tic("TP.Energy(M)");
-    en = TP.Energy(M);
-    toc("TP.Energy(M)");
+    tic("Compute tangent-point energy");
+    (void)tpe.Value(M);
+    toc("Compute tangent-point energy");
+    
+    tic("tpe.Differential(M)");
+    (void)tpe.Differential(M);
+    toc("tpe.Differential(M)");
    
     dump(en);
    
     
-    tic("Compute tangent-point energy");
-    (void)TP.DEnergy(M);
-    toc("Compute tangent-point energy");
+
    
 //    M.SetTangentPointExponents(alpha, beta);
 //    M.SetTangentPointWeight(weight);

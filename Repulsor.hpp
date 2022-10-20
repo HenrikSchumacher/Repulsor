@@ -54,6 +54,8 @@
 //    #include "src/Metrics.hpp"
 
 #include "src/FMM.hpp"
-#include "src/TangentPoint.hpp"
+#include "src/Energies/EnergyBase.hpp"
+#include "src/Energies/EnergyDimRestricted.hpp"
+#include "src/TangentPointEnergy.hpp"
 
 #endif
