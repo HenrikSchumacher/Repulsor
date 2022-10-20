@@ -37,15 +37,15 @@ namespace Repulsor
             
             M.GetClusterTree().CleanseDerivativeBuffers();
             
-            std::any energy = compute(M);
+            std::any energy = weight * compute(M);
             
             M.SetCache(ClassName()+"::Value", energy );
             
-            std::any diff = std::make_any<Differential_T>( M.VertexCount(), M.AmbDim() );
+            std::any diff = std::make_any<Differential_T>( M.VertexCount(), M.AmbDim(), -1. );
             
             M.Assemble_ClusterTree_Derivatives(
                 std::any_cast<Differential_T>(diff).data(),
-                static_cast<ExtReal>(1),
+                weight,
                 false
             );
             
@@ -64,11 +64,9 @@ namespace Repulsor
             
             if( !M.IsCached(ClassName()+"::Value"))
             {
-                std::any energy = value(M);
+                std::any energy = weight * value(M);
                 
                 M.SetCache(ClassName()+"::Value", energy);
-                
-                return std::any_cast<ExtReal>(energy);
             }
             
             ptoc(ClassName()+"::Value");
@@ -82,25 +80,29 @@ namespace Repulsor
         // Return the differential of the energy; use caching.
         const Differential_T & Differential( const MeshBase_T & M ) const
         {
-            ptic((ClassName()+"::Differential"));
+            ptic(ClassName()+"::Differential");
+            
             if( !M.IsCached(ClassName()+"::Differential"))
             {
                 M.GetClusterTree().CleanseDerivativeBuffers();
                 
                 differential(M);
                 
-                std::any diff = std::make_any<Differential_T>( M.VertexCount(), M.AmbDim() );
-                
+                Differential_T diff ( M.VertexCount(), M.AmbDim(), -1 );
+
                 M.Assemble_ClusterTree_Derivatives(
-                    std::any_cast<Differential_T>(diff).data(),
-                    static_cast<ExtReal>(1),
+                    diff.data(),
+                    weight,
                     false
                 );
                 
-                M.SetCache(ClassName()+"::Differential", diff);
+                // TODO: Find out whether this incurs a copy operation.
+                std::any thing = diff;
+                
+                M.SetCache(ClassName()+"::Differential", thing);
             }
             
-            ptoc((ClassName()+"::Differential"));
+            ptoc(ClassName()+"::Differential");
             
             return std::any_cast<Differential_T &>(
                 M.GetCache(ClassName()+"::Differential")

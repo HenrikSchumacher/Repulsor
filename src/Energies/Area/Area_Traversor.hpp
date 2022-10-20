@@ -1,6 +1,6 @@
 #pragma once
 
-#define CLASS TP_Traversor
+#define CLASS Area_Traversor
 
 namespace Repulsor
 {
@@ -40,14 +40,6 @@ namespace Repulsor
               const Real p_
         )
         :   bct(bct_)
-        ,   q             ( q_ )
-        ,   p             ( p_ )
-        ,   q_half_real   ( q / static_cast<Real>(2) )
-        ,   p_half_real   ( p / static_cast<Real>(2) )
-        ,   q_half_int    ( q_half_real )
-        ,   p_half_int    ( p_half_real )
-        ,   q_half_is_int ( q_half_real == static_cast<Real>(q_half_int) )
-        ,   p_half_is_int ( p_half_real == static_cast<Real>(p_half_int) )
         ,   metric_values ( metric_values_ )
         ,   prec_values   ( prec_values_   )
         {}
@@ -58,17 +50,6 @@ namespace Repulsor
     protected:
 
         const BlockClusterTree_T & bct;
-        
-        const Real q;
-        const Real p;
-        const Real q_half_real;
-        const Real p_half_real;
-        
-        const Int q_half_int;
-        const Int p_half_int;
-        
-        const bool q_half_is_int;
-        const bool p_half_is_int;
         
         std::array<ValueContainer_T,3> & metric_values;
         std::array<ValueContainer_T,3> & prec_values;
@@ -85,45 +66,17 @@ namespace Repulsor
         Real Compute()
         {
             en = static_cast<Real>(0);
-            
-            if( q_half_is_int )
-            {
-                if( p_half_is_int)
-                {
-                    VeryNearField<Int,Int>( q_half_int, p_half_int );
-                    NearField    <Int,Int>( q_half_int, p_half_int );
-                    FarField     <Int,Int>( q_half_int, p_half_int );
-                }
-                else
-                {
-                    VeryNearField<Int,Real>( q_half_int, p_half_real );
-                    NearField    <Int,Real>( q_half_int, p_half_real );
-                    FarField     <Int,Real>( q_half_int, p_half_real );
-                }
-            }
-            else
-            {
-                if( p_half_is_int)
-                {
-                    VeryNearField<Real,Int>( q_half_real, p_half_int );
-                    NearField    <Real,Int>( q_half_real, p_half_int );
-                    FarField     <Real,Int>( q_half_real, p_half_int );
-                }
-                else
-                {
-                    VeryNearField<Real,Real>( q_half_real, p_half_real );
-                    NearField    <Real,Real>( q_half_real, p_half_real );
-                    FarField     <Real,Real>( q_half_real, p_half_real );
-                }
-            }
+
+            VeryNearField();
+            NearField    ();
+            FarField     ();
             
             return en;
         }
         
     protected:
         
-        template< typename T1, typename T2 >
-        void VeryNearField( const T1 q_half_, const T1 p_half_ )
+        void VeryNearField()
         {
             ptic(ClassName()+"::VeryNearField");
             
@@ -134,14 +87,14 @@ namespace Repulsor
                     metric_values[FMM_Type::VF], prec_values[FMM_Type::VF]
                 );
                 
-                using Kernel_T = TP_Kernel_VF<
+                using Kernel_T = Area_Kernel_VF<
                     S_DOM_DIM, T_DOM_DIM,
-                    ClusterTree_T, T1, T2,
+                    ClusterTree_T,
                     BlockClusterTree_T::IsSymmetric(),
                     energy_flag, diff_flag, hess_flag, metric_flag
                 >;
                 
-                Kernel_T ker ( conf, bct.NearFieldSeparationParameter(), 20, q_half_, p_half_ );
+                Kernel_T ker ( conf, bct.NearFieldSeparationParameter(), 20 );
                 
                 ptoc(ClassName()+"::VeryNearField prepare kernels");
                 
@@ -156,8 +109,7 @@ namespace Repulsor
             ptoc(ClassName()+"::VeryNearField");
         }
             
-        template< typename T1, typename T2 >
-        void NearField( const T1 q_half_, const T1 p_half_ )
+        void NearField()
         {
             ptic(ClassName()+"::NearField");
             
@@ -168,14 +120,14 @@ namespace Repulsor
                     metric_values[FMM_Type::NF], prec_values[FMM_Type::NF]
                 );
         
-                using Kernel_T = TP_Kernel_NF<
+                using Kernel_T = Area_Kernel_NF<
                     S_DOM_DIM, T_DOM_DIM,
-                    ClusterTree_T, T1, T2,
+                    ClusterTree_T,
                     BlockClusterTree_T::IsSymmetric(),
                     energy_flag, diff_flag, hess_flag, metric_flag
                 >;
                 
-                Kernel_T ker ( conf, q_half_, p_half_ );
+                Kernel_T ker ( conf );
                 
                 ptoc(ClassName()+"::NearField prepare kernels");
                 
@@ -186,12 +138,11 @@ namespace Repulsor
                 ptic(ClassName()+"::NearField traversal");
                 en += traversor.Compute();
                 ptoc(ClassName()+"::NearField traversal");
-
+            
             ptoc(ClassName()+"::NearField");
         }
             
-        template< typename T1, typename T2 >
-        void FarField( const T1 q_half_, const T1 p_half_ )
+        void FarField()
         {
             ptic(ClassName()+"::FarField");
 
@@ -202,13 +153,13 @@ namespace Repulsor
                     metric_values[FMM_Type::FF], prec_values[FMM_Type::FF]
                 );
                 
-                using Kernel_T = TP_Kernel_FF<
-                    ClusterTree_T, T1, T2,
+                using Kernel_T = Area_Kernel_FF<
+                    ClusterTree_T,
                     BlockClusterTree_T::IsSymmetric(),
                     energy_flag, diff_flag, hess_flag, metric_flag
                 >;
 
-                Kernel_T ker ( conf, q_half_, p_half_ );
+                Kernel_T ker ( conf );
                 
                 ptoc(ClassName()+"::FarField prepare kernels");
                 
@@ -219,7 +170,7 @@ namespace Repulsor
                 ptic(ClassName()+"::FarField traversal");
                 en += traversor.Compute();
                 ptoc(ClassName()+"::FarField traversal");
-
+            
             ptoc(ClassName()+"::FarField");
         }
         

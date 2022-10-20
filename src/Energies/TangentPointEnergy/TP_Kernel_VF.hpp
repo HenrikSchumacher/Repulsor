@@ -1,7 +1,7 @@
 #pragma once
 
 #define CLASS TP_Kernel_VF
-#define  BASE  FMM_Kernel_VF<S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,hess_flag_,metric_flag_>
+#define BASE  FMM_Kernel_VF<S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,hess_flag_,metric_flag_>
 
 namespace Repulsor
 {
@@ -282,7 +282,6 @@ namespace Repulsor
                     }
                 }
             }
-            
             
             if constexpr ( energy_flag )
             {

@@ -50,12 +50,8 @@
 //#define FarField_T_Copy
 //    #include "src/Kernels/FarFieldKernelBase_FMM.hpp"
 //
-//    #include "src/Energies.hpp"
-//    #include "src/Metrics.hpp"
-
 #include "src/FMM.hpp"
-#include "src/Energies/EnergyBase.hpp"
-#include "src/Energies/EnergyDimRestricted.hpp"
-#include "src/TangentPointEnergy.hpp"
+#include "src/Energies.hpp"
+//    #include "src/Metrics.hpp"
 
 #endif

@@ -44,15 +44,15 @@ int main(int argc, const char * argv[])
     
     
     // Some hard-coded example featuring two meshed sphere is close vicinity to to each other.
-    constexpr INT domain_dimension       = 2;
-    constexpr INT ambient_dimension      = 3;
+    constexpr INT dom_dim       = 2;
+    constexpr INT amb_dim      = 3;
     constexpr INT vertex_count           = 162;
     constexpr INT simplex_count          = 320;
     
     constexpr INT obstacle_vertex_count  = 162;
     constexpr INT obstacle_simplex_count = 320;
 
-    REAL vertex_coordinates [vertex_count][ambient_dimension] = {
+    REAL vertex_coordinates [vertex_count][amb_dim] = {
         {-0.0000000000000000, 0.0000000000000000, 0.0039062500000000},
         {0.0000000000000000, 0.0000000000000000, 2.0039062500000000},
         {-0.8944271909999160, 0.0000000000000000, 0.5566926545000421},
@@ -217,7 +217,7 @@ int main(int argc, const char * argv[])
         {-0.1476132178595674, 0.9510037209628170, 1.2755719648556310}
     };
     
-    INT simplices [simplex_count][domain_dimension+1] = {
+    INT simplices [simplex_count][dom_dim+1] = {
         {  5,  68,  69}, { 27, 146,  68}, { 30,  69, 146}, {146,  69,  68}, {  3,  58,  59},
         { 26, 141,  58}, { 27,  59, 141}, {141,  59,  58}, {  4,  64,  63}, { 30, 143,  64},
         { 26,  63, 143}, {143,  63,  64}, { 26, 143, 141}, { 30, 146, 143}, { 27, 141, 146},
@@ -448,7 +448,7 @@ int main(int argc, const char * argv[])
         {-0.1476132178595674, 0.9510037209628170, -0.7322405351443689}
     };
 
-    INT obstacle_simplices [obstacle_simplex_count][domain_dimension+1] = {
+    INT obstacle_simplices [obstacle_simplex_count][dom_dim+1] = {
         {  5,  68,  69}, { 27, 146,  68}, { 30,  69, 146}, {146,  69,  68}, {  3,  58,  59},
         { 26, 141,  58}, { 27,  59, 141}, {141,  59,  58}, {  4,  64,  63}, { 30, 143,  64},
         { 26,  63, 143}, {143,  63,  64}, { 26, 143, 141}, { 30, 146, 143}, { 27, 141, 146},
@@ -516,7 +516,7 @@ int main(int argc, const char * argv[])
     
     // Meaning of template parameters:
     
-    // MakeSimplicialMesh<Real, Int, SReal, ExtReal, ExtInt>;
+    // Make_SimplicialMesh<Real, Int, SReal, ExtReal, ExtInt>;
     //
     // Real    = floating point type used for computations regarding energy and metric
     // Int     = signed integer type used internally, in particular as indices for sparse arrays.
@@ -526,19 +526,28 @@ int main(int argc, const char * argv[])
     // ExtReal = ("external real") floating point type that is used by the outer world, e.g. for submitting the mesh's vertex coordinates and vectors to multiply against the metric.
     // ExtInt = ("external real") integer type that is used by the outer world, e.g. for submitting the mesh's vertex coordinates and vectors to multiply against the metric.
     
-
+    // Initialize mesh by the factory Make_SimplicialMesh to allow runtime polymorphism.
     tic("Initializing mesh");
-    SimplicialMesh<domain_dimension,ambient_dimension,REAL,INT,REAL,REAL> M (
-        &vertex_coordinates[0][0],  vertex_count,
-        &simplices[0][0],          simplex_count,
+    std::unique_ptr<SimplicialMeshBase<REAL,INT,REAL,REAL>> M_ptr = Make_SimplicialMesh<REAL,INT,REAL,REAL>(
+        &vertex_coordinates[0][0],  vertex_count, amb_dim,
+        &simplices[0][0],          simplex_count, dom_dim+1,
         thread_count
     );
+    
+    auto & M = *M_ptr;
+    
+//    tic("Initializing mesh");
+//    SimplicialMesh<dom_dim,amb_dim,REAL,INT,REAL,REAL> M (
+//        &vertex_coordinates[0][0],  vertex_count,
+//        &simplices[0][0],          simplex_count,
+//        thread_count
+//    );
 
     toc("Initializing mesh");
     
-//    // Alternatively, you can do this, independent on which dimensions are enabled for MakeSimplicialMesh. However, domain_dimension, and ambient_dimension have to be known at compile time:
+//    // Alternatively, you can do this, independent on which dimensions are enabled for Make_SimplicialMesh. However, dom_dim, and amb_dim have to be known at compile time:
 //
-//    auto M = std::make_unique<SimplicialMesh<domain_dimension,ambient_dimension,REAL,INT,REAL,REAL>>(
+//    auto M = std::make_unique<SimplicialMesh<dom_dim,amb_dim,REAL,INT,REAL,REAL>>(
 //        &vertex_coordinates[0][0], vertex_count,
 //        &simplices[0][0],          simplex_count,
 //        thread_pool.ThreadCount()
@@ -575,7 +584,11 @@ int main(int argc, const char * argv[])
     const double p = 12;
     const double weight = 1;
     
-    TangentPoint<domain_dimension,ambient_dimension,REAL,INT,REAL,REAL> tpe (q,p);
+    
+    std::unique_ptr<EnergyBase<REAL,INT,REAL,REAL>>
+        tpe_ptr = Make_TangentPointEnergy<REAL,INT,REAL,REAL> (dom_dim,amb_dim,weight,q,p);
+    
+    auto & tpe = *tpe_ptr;
     
     double en;
     
@@ -592,7 +605,6 @@ int main(int argc, const char * argv[])
     tic("Compute tangent-point energy");
     (void)tpe.Value(M);
     toc("Compute tangent-point energy");
-    
     
     M.ClearCache();
     
@@ -634,19 +646,19 @@ int main(int argc, const char * argv[])
 //    // You can also pass Tensor1 and Tensor2 objects directly.
 //    M.TangentPointEnergy_Differential(diff, add_to);                // Simply overwrite diff.
 //
-//    // Initialize mesh by the factory MakeSimplicialMesh to allow runtime polymorphism.
+//    // Initialize mesh by the factory Make_SimplicialMesh to allow runtime polymorphism.
 //    tic("Initialize obstacle mesh");
-//    std::unique_ptr<SimplicialMeshBase<REAL,INT,REAL,REAL>> Q = MakeSimplicialMesh<REAL,INT,REAL,REAL>(
-//        &obstacle_vertex_coordinates[0][0],  obstacle_vertex_count, ambient_dimension,
-//        &obstacle_simplices[0][0],          obstacle_simplex_count, domain_dimension+1,
+//    std::unique_ptr<SimplicialMeshBase<REAL,INT,REAL,REAL>> Q = Make_SimplicialMesh<REAL,INT,REAL,REAL>(
+//        &obstacle_vertex_coordinates[0][0],  obstacle_vertex_count, amb_dim,
+//        &obstacle_simplices[0][0],          obstacle_simplex_count, dom_dim+1,
 //        thread_count
 //      );
 //    toc("Initialize obstacle mesh");
 //    print("");
 //
-//    // Alternatively, you can do this, independent on which dimensions are enabled for MakeSimplicialMesh. However, domain_dimension, and ambient_dimension have to be known at compile time:
+//    // Alternatively, you can do this, independent on which dimensions are enabled for Make_SimplicialMesh. However, dom_dim, and amb_dim have to be known at compile time:
 ////    Q = std::unique_ptr<SimplicialMeshBase<double,int,double,double>>(
-////        new SimplicialMesh<domain_dimension,ambient_dimension,double,int,double,double>(
+////        new SimplicialMesh<dom_dim,amb_dim,double,int,double,double>(
 ////            &obstacle_vertex_coordinates[0][0],  obstacle_vertex_count,
 ////            &obstacle_simplices[0][0],          obstacle_simplex_count,
 ////            thread_pool.ThreadCount()

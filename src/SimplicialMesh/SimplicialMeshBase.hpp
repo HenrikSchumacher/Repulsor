@@ -8,12 +8,8 @@
 
 namespace Repulsor
 {
-#ifdef ENABLE_ENERGIES
-    
     template<typename Real, typename Int, typename SReal, typename ExtReal>
     class EnergyBase;
-    
-#endif
     
     template<typename Real, typename Int, typename SReal, typename ExtReal>
     class SimplicialRemesherBase;

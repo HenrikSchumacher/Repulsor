@@ -160,7 +160,7 @@ namespace Repulsor
                 
                 global_sum += local_sum;
             }
-        
+            
             ptoc(ClassName()+"::Compute");
 
             return global_sum;

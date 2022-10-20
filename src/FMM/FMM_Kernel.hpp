@@ -41,7 +41,7 @@ namespace Repulsor
         static constexpr Real one  = static_cast<Real>(1);
         static constexpr Real two  = static_cast<Real>(2);
         
-        static constexpr Real symmetry_factor = one / (one + static_cast<Real>(is_symmetric) );
+        static constexpr Real symmetry_factor = one / (one + !static_cast<Real>(is_symmetric) );
                                                         
         Int tri_i [PROJ_DIM] = {};
         Int tri_j [PROJ_DIM] = {};
@@ -104,8 +104,8 @@ namespace Repulsor
         :   S                  ( other.S                  )
         ,   T                  ( other.T                  )
         ,   metric_values      ( other.metric_values      )
-        ,   metric_values_data ( other.metric_values_data ) // In compute the pointers are also needed!
         ,   prec_values        ( other.prec_values        )
+        ,   metric_values_data ( other.metric_values_data ) // In compute the pointers are also needed!
         ,   prec_values_data   ( other.prec_values_data   ) // In compute the pointers are also needed!
         {
             Init();

@@ -1,13 +1,14 @@
 #pragma once
 
-#include "TangentPointEnergy/TP_Kernel_FF.hpp"
-#include "TangentPointEnergy/TP_Kernel_NF.hpp"
-#include "TangentPointEnergy/TP_Kernel_VF.hpp"
-#include "TangentPointEnergy/TP_Traversor.hpp"
+#include "Area/Area_Kernel_FF.hpp"
+#include "Area/Area_Kernel_NF.hpp"
+#include "Area/Area_Kernel_VF.hpp"
+#include "Area/Area_Traversor.hpp"
 
 
-#define CLASS TangentPoint
+#define CLASS Area
 #define BASE  EnergyDimRestricted<DOM_DIM,AMB_DIM,Real,Int,SReal,ExtReal>
+#define ROOT  EnergyBase<Real,Int,SReal,ExtReal>
 
 namespace Repulsor
 {
@@ -23,20 +24,15 @@ namespace Repulsor
         using Differential_T          = typename BASE::Differential_T;
         using TangentVector_T         = typename BASE::TangentVector_T;
         
-
         
-        template<typename T_q, typename T_p>
-        CLASS( const T_q q_, const T_p p_ )
-        :   q( static_cast<Real>(q_) )
-        ,   p( static_cast<Real>(p_) )
+        
+        CLASS( const Real weight_ )
+        :   BASE ( weight_               )
         {}
         
         virtual ~CLASS() = default;
         
     protected:
-        
-        const Real q;
-        const Real p;
         
     public:
         
@@ -46,8 +42,8 @@ namespace Repulsor
             std::array<ValueContainer_T,3> metric_values;
             std::array<ValueContainer_T,3> prec_values;
             
-            TP_Traversor<DOM_DIM,DOM_DIM,BlockClusterTree_T,false,true,false,false>
-                traversor( M.GetBlockClusterTree(), metric_values, prec_values, p, q );
+            Area_Traversor<DOM_DIM,DOM_DIM,BlockClusterTree_T,true,true,false,false>
+            traversor( M.GetBlockClusterTree(), metric_values, prec_values );
             
             return traversor.Compute();
         }
@@ -58,20 +54,20 @@ namespace Repulsor
             std::array<ValueContainer_T,3> metric_values;
             std::array<ValueContainer_T,3> prec_values;
             
-            TP_Traversor<DOM_DIM,DOM_DIM,BlockClusterTree_T,true,false,false,false>
-                traversor( M.GetBlockClusterTree(), metric_values, prec_values, p, q );
+            Area_Traversor<DOM_DIM,DOM_DIM,BlockClusterTree_T,true,false,false,false>
+                traversor( M.GetBlockClusterTree(), metric_values, prec_values );
             
             return traversor.Compute();
         }
-
+        
         virtual void differential( const Mesh_T & M ) const override
         {
             // Create some dummies.
             std::array<ValueContainer_T,3> metric_values;
             std::array<ValueContainer_T,3> prec_values;
             
-            TP_Traversor<DOM_DIM,DOM_DIM,BlockClusterTree_T,false,true,false,false>
-                traversor( M.GetBlockClusterTree(), metric_values, prec_values, p, q );
+            Area_Traversor<DOM_DIM,DOM_DIM,BlockClusterTree_T,false,true,false,false>
+                traversor( M.GetBlockClusterTree(), metric_values, prec_values );
             
             (void)traversor.Compute();
         }
@@ -80,9 +76,9 @@ namespace Repulsor
     public:
         
         
-        static std::string className()
+        std::string className() const
         {
-            return TO_STD_STRING(CLASS)+"<"+ToString(DOM_DIM)+","+ToString(AMB_DIM)+","+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+">";
+            return TO_STD_STRING(CLASS)+"<"+ToString(DOM_DIM)+","+ToString(AMB_DIM)+","+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+"("+")";
         }
         
         virtual std::string ClassName() const override
@@ -91,6 +87,14 @@ namespace Repulsor
         }
     };
     
-}
+} // namespace Repulsor
 
+
+#include "Area/Make_Area.hpp"
+
+#undef ROOT
+#undef BASE
 #undef CLASS
+
+
+
