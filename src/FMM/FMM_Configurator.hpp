@@ -18,7 +18,8 @@ namespace Repulsor
         using SReal   = typename ClusterTree_T::SReal;
         using ExtReal = typename ClusterTree_T::ExtReal;
         
-        using ValueContainer_T = Tensor2<Real,Int>;
+        using Values_T         = Tensor2<Real,Int>;
+        using ValueContainer_T = std::array<Values_T,3>;
         
     protected:
         
@@ -30,8 +31,8 @@ namespace Repulsor
         CLASS(
             const ClusterTree_T & S_,
             const ClusterTree_T & T_,
-            ValueContainer_T & metric_values_,
-            ValueContainer_T & prec_values_
+            Values_T & metric_values_,
+            Values_T & prec_values_
         )
         :   S             ( S_                  )
         ,   T             ( T_                  )
@@ -54,8 +55,8 @@ namespace Repulsor
         const ClusterTree_T & S;
         const ClusterTree_T & T;
         
-        ValueContainer_T & metric_values;
-        ValueContainer_T & prec_values;
+        Values_T & metric_values;
+        Values_T & prec_values;
         
     public:
         
@@ -69,12 +70,12 @@ namespace Repulsor
             return T;
         }
         
-        ValueContainer_T & MetricValues() const
+        Values_T & MetricValues() const
         {
             return metric_values;
         }
         
-        ValueContainer_T & PreconditionerValues() const
+        Values_T & PreconditionerValues() const
         {
             return prec_values;
         }

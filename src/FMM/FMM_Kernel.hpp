@@ -7,7 +7,7 @@ namespace Repulsor
     template<
         typename ClusterTree_T_,
         bool is_symmetric_,
-        bool energy_flag_, bool diff_flag_, bool hess_flag_, bool metric_flag_
+        bool energy_flag_, bool diff_flag_, bool hess_flag_, bool metric_flag_, bool prec_flag_
     >
     class alignas( OBJECT_ALIGNMENT ) CLASS
     {
@@ -21,9 +21,10 @@ namespace Repulsor
         using SReal   = typename ClusterTree_T::SReal;
         using ExtReal = typename ClusterTree_T::ExtReal;
         
-        using ValueContainer_T = Tensor2<Real,Int>;
+        using Values_T         = Tensor2<Real,Int>;
+        using ValueContainer_T = std::array<Values_T,3>;
         
-        using Configurator_T = FMM_Configurator<ClusterTree_T>;
+        using Configurator_T   = FMM_Configurator<ClusterTree_T>;
         
         static constexpr bool is_symmetric = is_symmetric_;
         
@@ -34,6 +35,7 @@ namespace Repulsor
         static constexpr bool diff_flag   = diff_flag_;
         static constexpr bool hess_flag   = hess_flag_;
         static constexpr bool metric_flag = metric_flag_;
+        static constexpr bool prec_flag   = prec_flag_;
         
     protected:
         
@@ -105,8 +107,8 @@ namespace Repulsor
         ,   T                  ( other.T                  )
         ,   metric_values      ( other.metric_values      )
         ,   prec_values        ( other.prec_values        )
-        ,   metric_values_data ( other.metric_values_data ) // In compute the pointers are also needed!
-        ,   prec_values_data   ( other.prec_values_data   ) // In compute the pointers are also needed!
+        ,   metric_data        ( other.metric_data ) // In compute the pointers are also needed!
+        ,   prec_data          ( other.prec_data   ) // In compute the pointers are also needed!
         {
             Init();
         }
@@ -114,6 +116,15 @@ namespace Repulsor
         virtual ~CLASS() = default;
 
     public:
+        const ClusterTree_T & GetS() const
+        {
+            return S;
+        }
+        
+        const ClusterTree_T & GetT() const
+        {
+            return T;
+        }
         
         void Allocate( const Int nnz )
         {
@@ -125,34 +136,43 @@ namespace Repulsor
                    metric_values.Dimensions(1) != MetricNonzeroCount()
                    )
                 {
-                    metric_values = Tensor2<Real,Int>( nnz, MetricNonzeroCount() );
+                    metric_values = Values_T( nnz, MetricNonzeroCount() );
                 }
-                
+            }
+            
+            if constexpr ( prec_flag )
+            {
                 if(
                    prec_values.Dimensions(0) != nnz
                    ||
                    prec_values.Dimensions(1) != PreconditionerNonzeroCount()
                    )
                 {
-                    prec_values = Tensor2<Real,Int>( nnz, PreconditionerNonzeroCount() );
+                    prec_values = Values_T( nnz, PreconditionerNonzeroCount() );
                 }
             }
         }
         
         bool PointersInititializedQ() const
         {
-            if( metric_values_data == nullptr )
+            if constexpr ( metric_flag )
             {
-                eprint(ClassName()+"::PointersInititializedQ: Pointers for metric_values not initialized. Make sure to initialize the kernel via the copy constructor.");
-                
-                return false;
+                if( metric_data == nullptr )
+                {
+                    eprint(ClassName()+"::PointersInititializedQ: Pointers for metric_values not initialized. Make sure to initialize the kernel via the copy constructor.");
+                    
+                    return false;
+                }
             }
             
-            if( metric_values_data == nullptr )
+            if constexpr ( prec_flag )
             {
-                eprint(ClassName()+"::PointersInititializedQ: Pointers for prec_values not initialized. Make sure to initialize the kernel via the copy constructor.");
-                
-                return false;
+                if( prec_data == nullptr )
+                {
+                    eprint(ClassName()+"::PointersInititializedQ: Pointers for prec_values not initialized. Make sure to initialize the kernel via the copy constructor.");
+                    
+                    return false;
+                }
             }
             
             return true;
@@ -184,11 +204,11 @@ namespace Repulsor
         const ClusterTree_T & S;
         const ClusterTree_T & T;
         
-        ValueContainer_T & metric_values;
-        ValueContainer_T & prec_values;
+        Values_T & metric_values;
+        Values_T & prec_values;
         
-        Real * restrict const metric_values_data = nullptr;
-        Real * restrict const   prec_values_data = nullptr;
+        Real * restrict const metric_data = nullptr;
+        Real * restrict const   prec_data = nullptr;
         
         Int S_ID = -1;
         Int T_ID = -1;

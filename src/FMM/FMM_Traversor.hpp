@@ -16,7 +16,8 @@ namespace Repulsor
         using SReal   = typename Kernel_T::SReal;
         using ExtReal = typename Kernel_T::ExtReal;
         
-        using ValueContainer_T  = Tensor2<Real,Int>;
+        using Values_T          = Tensor2<Real,Int>;
+        using ValueContainer_T  = std::array<Values_T,3>;
         
         using SparsityPattern_T = SparsityPatternCSR<Int>;
         
@@ -48,12 +49,7 @@ namespace Repulsor
         Kernel_T kernel;
         
     public:
-        
 
-//##############################################################################################
-//      Matrix multiplication
-//##############################################################################################
-        
         Real Compute() const
         {
             ptic(ClassName()+"::Compute");
@@ -76,7 +72,7 @@ namespace Repulsor
                 (void)pattern.Diag();
             }
             
-            if constexpr ( Kernel_T::metric_flag )
+            if constexpr ( Kernel_T::diff_flag )
             {
                 kernel.GetS().CleanseDerivativeBuffers();
                 

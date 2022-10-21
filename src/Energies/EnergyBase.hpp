@@ -16,9 +16,10 @@ namespace Repulsor
         
         using MeshBase_T = SimplicialMeshBase<Real,Int,SReal,ExtReal>;
 
-        using ValueContainer_T = Tensor2<ExtReal,Int>;
-        using Differential_T   = Tensor2<ExtReal,Int>;
-        using TangentVector_T  = Tensor2<ExtReal,Int>;
+        using TangentVector_T   = Tensor2<ExtReal,Int>;
+        using CotangentVector_T = Tensor2<ExtReal,Int>;
+        using Values_T          = Tensor2<   Real,Int>;
+        using ValueContainer_T  = std::array<Values_T,3>;
         
         explicit CLASS( ExtReal weight_ = static_cast<ExtReal>(1) )
         :
@@ -32,24 +33,20 @@ namespace Repulsor
             ptic(ClassName()+"::Compute");
             
             // Create some dummies.
-            std::array<ValueContainer_T,3> metric_values;
-            std::array<ValueContainer_T,3> prec_values;
-            
-            M.GetClusterTree().CleanseDerivativeBuffers();
+            ValueContainer_T metric_values;
+            ValueContainer_T prec_values;
             
             std::any energy = weight * compute(M);
             
-            M.SetCache(ClassName()+"::Value", energy );
+            M.SetCache( ClassName()+"::Value", energy );
             
-            std::any diff = std::make_any<Differential_T>( M.VertexCount(), M.AmbDim(), -1. );
+            CotangentVector_T diff ( M.VertexCount(), M.AmbDim() );
+
+            M.Assemble_ClusterTree_Derivatives( diff.data(), weight, false );
             
-            M.Assemble_ClusterTree_Derivatives(
-                std::any_cast<Differential_T>(diff).data(),
-                weight,
-                false
-            );
+            std::any thing = diff;
             
-            M.SetCache(ClassName()+"::Differential", diff);
+            M.SetCache( ClassName()+"::Differential", thing );
             
             ptoc(ClassName()+"::Compute");
         }
@@ -66,7 +63,7 @@ namespace Repulsor
             {
                 std::any energy = weight * value(M);
                 
-                M.SetCache(ClassName()+"::Value", energy);
+                M.SetCache( ClassName()+"::Value", energy );
             }
             
             ptoc(ClassName()+"::Value");
@@ -78,33 +75,27 @@ namespace Repulsor
         virtual ExtReal value( const MeshBase_T & M ) const = 0;
         
         // Return the differential of the energy; use caching.
-        const Differential_T & Differential( const MeshBase_T & M ) const
+        const CotangentVector_T & Differential( const MeshBase_T & M ) const
         {
             ptic(ClassName()+"::Differential");
             
             if( !M.IsCached(ClassName()+"::Differential"))
             {
-                M.GetClusterTree().CleanseDerivativeBuffers();
-                
                 differential(M);
                 
-                Differential_T diff ( M.VertexCount(), M.AmbDim(), -1 );
+                CotangentVector_T diff ( M.VertexCount(), M.AmbDim() );
 
-                M.Assemble_ClusterTree_Derivatives(
-                    diff.data(),
-                    weight,
-                    false
-                );
+                M.Assemble_ClusterTree_Derivatives( diff.data(), weight, false );
                 
                 // TODO: Find out whether this incurs a copy operation.
                 std::any thing = diff;
                 
-                M.SetCache(ClassName()+"::Differential", thing);
+                M.SetCache( ClassName()+"::Differential", thing );
             }
             
             ptoc(ClassName()+"::Differential");
             
-            return std::any_cast<Differential_T &>(
+            return std::any_cast<CotangentVector_T &>(
                 M.GetCache(ClassName()+"::Differential")
             );
         }
@@ -112,13 +103,58 @@ namespace Repulsor
         // Actual implementation to be specified by descendants.
         virtual void differential( const MeshBase_T & M ) const = 0;
         
-//        virtual ExtReal Differential( const MESH_T & M, ExtReal * output, bool addTo = false ) const = 0;
-        
-//        virtual Differential_T & Metric( const MeshBase_T & M, const TangentVector_T & U ) const = 0;
-        
 //        virtual void SimplexEnergies( const MeshBase_T & M, ExtReal * output, bool addTo = false ) const = 0;
 //        
 //        virtual void Density( const MeshBase_T & M, ExtReal * output, bool addTo = false ) const = 0;
+        
+        
+        // Return the differential of the energy; use caching.
+        void ComputeMetric( const MeshBase_T & M ) const
+        {
+            ptic(ClassName()+"::ComputeMetric");
+            
+            if( !M.IsCached(ClassName()+"::MetricValues"))
+            {
+                std::any thing = compute_metric(M);
+                
+                M.SetCache( ClassName()+"::MetricValues", thing );
+            }
+            
+            ptoc(ClassName()+"::ComputeMetric");
+            
+            return std::any_cast<CotangentVector_T &>(
+                M.GetCache(ClassName()+"::MetricValues")
+            );
+        }
+        
+        // Actual implementation to be specified by descendants.
+        virtual ValueContainer_T compute_metric( const MeshBase_T & M ) const = 0;
+        
+        
+        // Return the differential of the energy; use caching.
+        void MultiplyMetric(
+            const MeshBase_T & M,
+            const ExtReal alpha,
+            const TangentVector_T & u,
+            const ExtReal beta,
+                  CotangentVector_T & v
+        ) const
+        {
+            ptic(ClassName()+"::MetricValues");
+            
+            metric_multiply( M, alpha, u, beta, v );
+            
+            ptoc(ClassName()+"::MetricValues");
+        }
+        
+        // Actual implementation to be specified by descendants.
+        virtual void multiply_metric(
+             const MeshBase_T & M,
+             const ExtReal alpha,
+             const TangentVector_T & u,
+             const ExtReal beta,
+                   CotangentVector_T & v
+        ) const = 0;
         
         ExtReal GetWeight()  const
         {

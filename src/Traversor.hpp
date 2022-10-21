@@ -30,14 +30,14 @@ namespace Repulsor
         )
         :   kernels (kernels_)
         ,   thread_count( static_cast<Int>(kernels.size()) )
-        ,   S_C_left  ( S_.ClusterLeft().data() )
+        ,   S_C_left  ( S_.ClusterLeft().data()  )
         ,   S_C_right ( S_.ClusterRight().data() )
         ,   S_C_begin ( S_.ClusterBegin().data() )
-        ,   S_C_end   ( S_.ClusterEnd().data() )
-        ,   T_C_left  ( T_.ClusterLeft().data() )
+        ,   S_C_end   ( S_.ClusterEnd().data()   )
+        ,   T_C_left  ( T_.ClusterLeft().data()  )
         ,   T_C_right ( T_.ClusterRight().data() )
         ,   T_C_begin ( T_.ClusterBegin().data() )
-        ,   T_C_end   ( T_.ClusterEnd().data() )
+        ,   T_C_end   ( T_.ClusterEnd().data()   )
         {
             ptic(className());
             

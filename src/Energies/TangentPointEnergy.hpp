@@ -3,8 +3,12 @@
 #include "TangentPointEnergy/TP_Kernel_FF.hpp"
 #include "TangentPointEnergy/TP_Kernel_NF.hpp"
 #include "TangentPointEnergy/TP_Kernel_VF.hpp"
-#include "TangentPointEnergy/TP_Traversor.hpp"
 
+#include "TangentPointEnergy/TP_Kernel_FF_MultiplyMetric.hpp"
+#include "TangentPointEnergy/TP_Kernel_NF_MultiplyMetric.hpp"
+#include "TangentPointEnergy/TP_Kernel_VF_MultiplyMetric.hpp"
+
+#include "TangentPointEnergy/TP_Traversor.hpp"
 
 #define CLASS TangentPointEnergy
 #define BASE  EnergyDimRestricted<DOM_DIM,AMB_DIM,Real,Int,SReal,ExtReal>
@@ -20,10 +24,10 @@ namespace Repulsor
         using Mesh_T                  = typename BASE::Mesh_T;
         using BlockClusterTree_T      = typename Mesh_T::BlockClusterTree_T;
         
+        using Values_T                = typename BASE::Values_T;
         using ValueContainer_T        = typename BASE::ValueContainer_T;
-        using Differential_T          = typename BASE::Differential_T;
         using TangentVector_T         = typename BASE::TangentVector_T;
-        
+        using CotangentVector_T       = typename BASE::CotangentVector_T;
         
         
         CLASS( const Real weight_, const Real q_, const Real p_ )
@@ -44,10 +48,10 @@ namespace Repulsor
         virtual ExtReal compute( const Mesh_T & M ) const override
         {
             // Create some dummies.
-            std::array<ValueContainer_T,3> metric_values;
-            std::array<ValueContainer_T,3> prec_values;
+            ValueContainer_T metric_values;
+            ValueContainer_T prec_values;
             
-            TP_Traversor<DOM_DIM,DOM_DIM,BlockClusterTree_T,true,true,false,false>
+            TP_Traversor<DOM_DIM,DOM_DIM,BlockClusterTree_T,true,true,false,false,false>
             traversor( M.GetBlockClusterTree(), metric_values, prec_values, q, p );
             
             return traversor.Compute();
@@ -56,10 +60,10 @@ namespace Repulsor
         virtual ExtReal value( const Mesh_T & M ) const override
         {
             // Create some dummies.
-            std::array<ValueContainer_T,3> metric_values;
-            std::array<ValueContainer_T,3> prec_values;
+            ValueContainer_T metric_values;
+            ValueContainer_T prec_values;
             
-            TP_Traversor<DOM_DIM,DOM_DIM,BlockClusterTree_T,true,false,false,false>
+            TP_Traversor<DOM_DIM,DOM_DIM,BlockClusterTree_T,true,false,false,false,false>
                 traversor( M.GetBlockClusterTree(), metric_values, prec_values, q, p );
             
             return traversor.Compute();
@@ -68,15 +72,45 @@ namespace Repulsor
         virtual void differential( const Mesh_T & M ) const override
         {
             // Create some dummies.
-            std::array<ValueContainer_T,3> metric_values;
-            std::array<ValueContainer_T,3> prec_values;
+            ValueContainer_T metric_values;
+            ValueContainer_T prec_values;
             
-            TP_Traversor<DOM_DIM,DOM_DIM,BlockClusterTree_T,false,true,false,false>
+            TP_Traversor<DOM_DIM,DOM_DIM,BlockClusterTree_T,false,true,false,false,false>
                 traversor( M.GetBlockClusterTree(), metric_values, prec_values, q, p );
             
             (void)traversor.Compute();
         }
         
+        virtual ValueContainer_T compute_metric( const Mesh_T & M ) const override
+        {
+            ValueContainer_T metric_values;
+            
+            // Create some dummies.
+            ValueContainer_T prec_values;
+        
+            TP_Traversor<DOM_DIM,DOM_DIM,BlockClusterTree_T,false,false,false,true,false>
+                traversor( M.GetBlockClusterTree(), metric_values, prec_values, q, p );
+            
+            (void)traversor.Compute();
+            
+            return metric_values;
+        }
+        
+        virtual void multiply_metric(
+            const Mesh_T & M,
+            const ValueContainer_T & metric_values
+        ) const override
+        {
+            // Create some dummies.
+            ValueContainer_T prec_values;
+        
+            TP_Traversor<DOM_DIM,DOM_DIM,BlockClusterTree_T,false,false,false,true,false>
+                traversor( M.GetBlockClusterTree(), metric_values, prec_values, q, p );
+            
+            (void)traversor.Compute();
+            
+            return metric_values;
+        }
         
     public:
         

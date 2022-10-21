@@ -1,14 +1,14 @@
 #pragma once
 
 #define CLASS TP_Kernel_FF
-#define BASE  FMM_Kernel_FF<ClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,hess_flag_,metric_flag_>
+#define BASE  FMM_Kernel_FF<ClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,hess_flag_,metric_flag_,prec_flag_>
 
 namespace Repulsor
 {
     template<
         typename ClusterTree_T_, typename T1, typename T2,
         bool is_symmetric_,
-        bool energy_flag_, bool diff_flag_, bool hess_flag_, bool metric_flag_
+        bool energy_flag_, bool diff_flag_, bool hess_flag_, bool metric_flag_, bool prec_flag_
     >
     class CLASS : public BASE
     {
@@ -72,8 +72,8 @@ namespace Repulsor
         
     protected:
 
-        using BASE::metric_values;
-        using BASE::prec_values;
+        using BASE::metric_data;
+        using BASE::prec_data;
         
         using BASE::S_data;
         using BASE::S_D_data;
@@ -202,7 +202,7 @@ namespace Repulsor
                 
                 if constexpr ( metric_flag )
                 {
-                    Real * restrict const m_vals = &metric_values[ METRIC_NNZ * block_ID ];
+                    Real * restrict const m_vals = &metric_data[ METRIC_NNZ * block_ID ];
     //                Real * restrict const p_vals = &prec_values  [ PREC_NNZ   * block_ID ];
                     
 //                     The metric block looks like this for AMB_DIM == 3:
@@ -222,12 +222,12 @@ namespace Repulsor
 //                     With sparse matrix multiplication the bottleneck will be the bandwidth.
 //                     Hence instead, we store this data in only 2 + AMB_DIM values by just storing
 //
-//                              -K_xy, K_yx, v[0], ..., v[AMB_DIM-1]!
+//                              K_xy, K_yx, v[0], ..., v[AMB_DIM-1]!
 //
 //                     We just must not forget to recompute these values in the matrix multiplication kernel.
                     
-                    m_vals[0] = - K_xy;
-                    m_vals[1] =   K_yx;
+                    m_vals[0] = K_xy;
+                    m_vals[1] = K_yx;
                     
                     for( Int l = 0; l < AMB_DIM; ++l )
                     {

@@ -9,13 +9,14 @@ namespace Repulsor
     class CLASS : public BASE
     {
     public:
-        using MeshBase_T       = typename BASE::MeshBase_T;
+        using MeshBase_T        = typename BASE::MeshBase_T;
 
-        using ValueContainer_T = typename BASE::ValueContainer_T;
-        using Differential_T   = typename BASE::Differential_T;
-        using TangentVector_T  = typename BASE::TangentVector_T;
+        using Values_T          = typename BASE::Values_T;
+        using ValueContainer_T  = typename BASE::ValueContainer_T;
+        using TangentVector_T   = typename BASE::TangentVector_T;
+        using CotangentVector_T = typename BASE::CotangentVector_T;
         
-        using Mesh_T           = SimplicialMesh<DOM_DIM,AMB_DIM,Real,Int,SReal,ExtReal>;
+        using Mesh_T            = SimplicialMesh<DOM_DIM,AMB_DIM,Real,Int,SReal,ExtReal>;
 
         
         explicit CLASS( ExtReal weight_ = static_cast<ExtReal>(1) )
@@ -43,7 +44,7 @@ namespace Repulsor
         // Actual implementation to be specified by descendants.
         virtual ExtReal compute( const Mesh_T & M ) const = 0;
         
-        // Do a down casy and delegate implementation further to descendant class.
+        // Do a down cast and delegate implementation further to descendant class.
         ExtReal value( const MeshBase_T & M ) const override
         {
             const Mesh_T * Q = dynamic_cast<const Mesh_T *>(&M);
@@ -63,7 +64,7 @@ namespace Repulsor
         virtual ExtReal value( const Mesh_T & M ) const = 0;
 
         
-        // Do a down casy and delegate implementation further to descendant class.
+        // Do a down cast and delegate implementation further to descendant class.
         void differential( const MeshBase_T & M ) const override
         {
             const Mesh_T * Q = dynamic_cast<const Mesh_T *>(&M);
@@ -80,7 +81,59 @@ namespace Repulsor
         
         // Actual implementation to be specified by descendants.
         virtual void differential( const Mesh_T & M ) const = 0;
+        
+        // Do a down cast and delegate implementation further to descendant class.
+        ValueContainer_T compute_metric( const MeshBase_T & M ) const override
+        {
+            const Mesh_T * Q = dynamic_cast<const Mesh_T *>(&M);
+                        
+            if( Q != nullptr )
+            {
+                return compute_metric(*Q);
+            }
+            else
+            {
+                eprint(ClassName()+"::differential: Input could not be downcast to compatible type. Doing nothing.");
+                
+                return ValueContainer_T();
+            }
+        }
+        
+        // Actual implementation to be specified by descendants.
+        virtual ValueContainer_T compute_metric( const Mesh_T & M ) const = 0;
 
+        // Actual implementation to be specified by descendants.
+        virtual void metric_multiply(
+             const MeshBase_T & M,
+             const ExtReal alpha,
+             const TangentVector_T & u,
+             const ExtReal beta,
+                   CotangentVector_T & v
+        ) const override
+        {
+            const Mesh_T * Q = dynamic_cast<const Mesh_T *>(&M);
+                        
+            if( Q != nullptr )
+            {
+                metric_multiply( *Q, alpha, u, beta, v );
+            }
+            else
+            {
+                eprint(ClassName()+"::differential: Input could not be downcast to compatible type. Doing nothing.");
+            }
+        }
+        
+        // Actual implementation to be specified by descendants.
+        virtual void metric_multiply(
+             const Mesh_T & M,
+             const ExtReal alpha,
+             const TangentVector_T & u,
+             const ExtReal beta,
+                   CotangentVector_T & v
+        )
+        {
+            
+        }
 //
 //        void SimplexEnergies( const MeshBase_T & M, ExtReal * output, bool addTo = false ) const override
 //        {

@@ -2,7 +2,6 @@
 
 #include "Energies/EnergyBase.hpp"
 #include "Energies/EnergyDimRestricted.hpp"
-#include "Energies/Area.hpp"
 #include "Energies/TangentPointEnergy.hpp"
 
 //#include "Energies/Energy__NFK.hpp"

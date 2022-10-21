@@ -190,38 +190,6 @@ namespace Repulsor
         
 #endif
         
-//##############################################################################################
-//      Custom energy (allows for loading arbitrary EnergyBase object )
-//##############################################################################################
-        
-#ifdef ENABLE_ENERGIES
-        
-    public:
-        
-        virtual void LoadCustomEnergy( std::unique_ptr<EnergyBase<Real,Int,SReal,ExtReal>> e ) const = 0;
-        
-        virtual ExtReal GetCustomEnergyWeight() const = 0;
-
-        virtual void SetCustomEnergyWeight( const ExtReal weight ) const = 0;
-
-        virtual ExtReal CustomEnergy() const = 0;
-
-        virtual ExtReal CustomEnergy_Differential( ExtReal * output, bool addTo = false ) const = 0;
- 
-        virtual ExtReal CustomEnergy_Differential( Tensor1<ExtReal,Int> & output, bool addTo = false ) const = 0;
-        
-        virtual ExtReal CustomEnergy_Differential( Tensor2<ExtReal,Int> & output, bool addTo = false ) const = 0;
-        
-        
-        virtual void CustomEnergy_Density( ExtReal * output, bool addTo = false ) const  = 0;
-        
-        virtual void CustomEnergy_Density( Tensor1<ExtReal,Int> & output, bool addTo = false ) const =0;
-        
-        virtual void CustomEnergy_SimplexEnergies( ExtReal * output, bool addTo = false ) const  = 0;
-        
-        virtual void CustomEnergy_SimplexEnergies( Tensor1<ExtReal,Int> & output, bool addTo = false ) const  = 0;
-        
-#endif
         
 //##############################################################################################
 //      Trivial energy (for debugging purposes)
