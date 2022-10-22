@@ -35,6 +35,7 @@ namespace Repulsor
         using BASE::diff_flag;
         using BASE::hess_flag;
         using BASE::metric_flag;
+        using BASE::prec_flag;
         
         static constexpr Int METRIC_NNZ = 2 + AMB_DIM;
         static constexpr Int PREC_NNZ   = 1;
@@ -234,7 +235,6 @@ namespace Repulsor
 //                          |   - K_xy * v[1]         0              0              0         |
 //                          |                                                                 |
 //                          |   - K_xy * v[2]         0              0              0         |
-//                          |                                                                 |
 //                          \                                                                 /
 //
 //                     This are 1 + 2 * AMB_DIM nonzero values.
@@ -245,8 +245,8 @@ namespace Repulsor
 //
 //                     We just must not forget to recompute these values in the matrix multiplication kernel.
                     
-                    m_vals[0] = - K_xy;
-                    m_vals[1] = - K_yx;
+                    m_vals[0] = K_xy;
+                    m_vals[1] = K_yx;
                     
                     for( Int l = 0; l < AMB_DIM; ++l )
                     {

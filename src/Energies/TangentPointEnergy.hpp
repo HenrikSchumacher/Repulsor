@@ -46,13 +46,13 @@ namespace Repulsor
         
     public:
         
-        virtual ExtReal compute( const Mesh_T & M ) const override
+        virtual ExtReal compute(
+            const Mesh_T & M,
+            ValueContainer_T & metric_values,
+            ValueContainer_T & prec_values
+        ) const override
         {
-            // Create some dummies.
-            ValueContainer_T metric_values;
-            ValueContainer_T prec_values;
-            
-            TP_Traversor<DOM_DIM,DOM_DIM,BlockClusterTree_T,true,true,false,false,false>
+            TP_Traversor<DOM_DIM,DOM_DIM,BlockClusterTree_T,true,true,false,true,false>
             traversor( M.GetBlockClusterTree(), metric_values, prec_values, q, p );
             
             return traversor.Compute();

@@ -1,7 +1,8 @@
 #pragma once
 
 #define CLASS TP_Kernel_NF_MultiplyMetric
-#define BASE  BlockKernel_gen<AMB_DIM_,AMB_DIM_,MAX_RHS_COUNT_,Scalar_,Int_,Scalar_in_,Scalar_out_,   \
+#define BASE  BlockKernel_fixed<AMB_DIM_+1,AMB_DIM_+1,MAX_RHS_COUNT_,                           \
+    Scalar_,Int_,Scalar_in_,Scalar_out_,                                                        \
     x_RM,  y_RM,                                                                                \
     alpha_flag, beta_flag                                                                       \
 >
@@ -83,7 +84,7 @@ namespace Repulsor
         }
                 
         virtual force_inline void TransposeBlock( const Int from, const Int to ) const override
-        {            
+        {
             const Scalar * restrict const a_from = &A[ NONZERO_COUNT * from];
                   Scalar * restrict const a_to   = &A[ NONZERO_COUNT * to  ];
             
@@ -115,7 +116,6 @@ namespace Repulsor
 //              |   - K_xy * v[1]         0              0              0         |
 //              |                                                                 |
 //              |   - K_xy * v[2]         0              0              0         |
-//              |                                                                 |
 //              \                                                                 /
 //
 //            This are 1 + 2 * AMB_DIM nonzero values.
@@ -124,11 +124,11 @@ namespace Repulsor
 //
 //                   K_xy, K_yx, v[0], ..., v[AMB_DIM-1]!
             
-            for( Int k = 0; k < rhs_count; ++k )
+            for( Int k = 0; k < MAX_RHS_COUNT; ++k )
             {
                 z[k][0] -= (a[0] + a[1]) * x[k][0];
                 
-                for( Int i = 1; i < AMB_DIM; ++i )
+                for( Int i = 1; i < ROWS; ++i )
                 {
                     z[k][0] += a[1] * a[i+1] * x[k][i];
                     z[k][i] -= a[0] * a[i+1] * x[k][0];
@@ -159,4 +159,5 @@ namespace Repulsor
 
 #undef BASE
 #undef CLASS
+
 

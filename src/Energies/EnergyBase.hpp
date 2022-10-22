@@ -36,7 +36,7 @@ namespace Repulsor
             ValueContainer_T metric_values;
             ValueContainer_T prec_values;
             
-            std::any energy = weight * compute(M);
+            std::any energy = weight * compute( M, metric_values, prec_values );
             
             M.SetCache( ClassName()+"::Value", energy );
             
@@ -44,15 +44,35 @@ namespace Repulsor
 
             M.Assemble_ClusterTree_Derivatives( diff.data(), weight, false );
             
-            std::any thing = diff;
+            ptic("A");
+            {
+                std::any thing ( std::move(diff) );
+                
+                M.SetCache( ClassName()+"::Differential", thing );
+            }
+            ptoc("A");
             
-            M.SetCache( ClassName()+"::Differential", thing );
+            ptic("B");
+            {
+                ptic("B.1");
+                std::any thing ( std::move(metric_values) );
+                ptoc("B.1");
+                ptic("B.2");
+                M.SetCache( ClassName()+"::MetricValues", thing );
+                ptoc("B.2");
+            }
+            ptoc("B");
             
             ptoc(ClassName()+"::Compute");
         }
         
         // Actual implementation to be specified by descendants.
-        virtual ExtReal compute( const MeshBase_T & M ) const = 0;
+        virtual ExtReal compute(
+            const MeshBase_T & M,
+            ValueContainer_T & metric_values,
+            ValueContainer_T & prec_values
+        ) const = 0;
+        
         
         // Return the value of the energy; use caching.
         ExtReal Value( const MeshBase_T & M ) const
@@ -90,9 +110,8 @@ namespace Repulsor
 
                 M.Assemble_ClusterTree_Derivatives( diff.data(), weight, false );
                 
+                std::any thing ( std::move(diff) );
                 // TODO: Find out whether this incurs a copy operation.
-                std::any thing = diff;
-                
                 M.SetCache( ClassName()+"::Differential", thing );
             }
             
@@ -118,16 +137,18 @@ namespace Repulsor
             
             if( !M.IsCached(ClassName()+"::MetricValues"))
             {
-                std::any thing = compute_metric(M);
+                std::any thing ( std::move(compute_metric(M)) );
                 
                 M.SetCache( ClassName()+"::MetricValues", thing );
             }
             
             ptoc(ClassName()+"::MetricValues");
             
-            return std::any_cast<ValueContainer_T &>(
-                M.GetCache(ClassName()+"::MetricValues")
+            auto & result = std::any_cast<ValueContainer_T &>(
+                  M.GetCache(ClassName()+"::MetricValues")
             );
+                                                              
+            return result;
         }
         
         // Actual implementation to be specified by descendants.
@@ -151,10 +172,62 @@ namespace Repulsor
             
             T.Pre( X, rhs_count, KernelType::MixedOrder );
             
+            dump(T.PrimitiveInputBuffer()[ 0]);
+            dump(T.PrimitiveInputBuffer()[ 1]);
+            dump(T.PrimitiveInputBuffer()[ 2]);
+            dump(T.PrimitiveInputBuffer()[ 3]);
+            dump(T.PrimitiveInputBuffer()[ 4]);
+            dump(T.PrimitiveInputBuffer()[ 5]);
+            dump(T.PrimitiveInputBuffer()[ 6]);
+            dump(T.PrimitiveInputBuffer()[ 7]);
+            dump(T.PrimitiveInputBuffer()[ 8]);
+            dump(T.PrimitiveInputBuffer()[ 9]);
+            dump(T.PrimitiveInputBuffer()[10]);
+            dump(T.PrimitiveInputBuffer()[11]);
+            
+            dump(T.ClusterInputBuffer()[ 0]);
+            dump(T.ClusterInputBuffer()[ 1]);
+            dump(T.ClusterInputBuffer()[ 2]);
+            dump(T.ClusterInputBuffer()[ 3]);
+            dump(T.ClusterInputBuffer()[ 4]);
+            dump(T.ClusterInputBuffer()[ 5]);
+            dump(T.ClusterInputBuffer()[ 6]);
+            dump(T.ClusterInputBuffer()[ 7]);
+            dump(T.ClusterInputBuffer()[ 8]);
+            dump(T.ClusterInputBuffer()[ 9]);
+            dump(T.ClusterInputBuffer()[10]);
+            dump(T.ClusterInputBuffer()[11]);
+            
             S.RequireBuffers( T.BufferDimension() ); // Tell the S-side what it has to expect.
             
             multiply_metric(M);
 
+            dump(S.ClusterOutputBuffer()[ 0]);
+            dump(S.ClusterOutputBuffer()[ 1]);
+            dump(S.ClusterOutputBuffer()[ 2]);
+            dump(S.ClusterOutputBuffer()[ 3]);
+            dump(S.ClusterOutputBuffer()[ 4]);
+            dump(S.ClusterOutputBuffer()[ 5]);
+            dump(S.ClusterOutputBuffer()[ 6]);
+            dump(S.ClusterOutputBuffer()[ 7]);
+            dump(S.ClusterOutputBuffer()[ 8]);
+            dump(S.ClusterOutputBuffer()[ 9]);
+            dump(S.ClusterOutputBuffer()[10]);
+            dump(S.ClusterOutputBuffer()[11]);
+            
+            dump(S.PrimitiveOutputBuffer()[ 0]);
+            dump(S.PrimitiveOutputBuffer()[ 1]);
+            dump(S.PrimitiveOutputBuffer()[ 2]);
+            dump(S.PrimitiveOutputBuffer()[ 3]);
+            dump(S.PrimitiveOutputBuffer()[ 4]);
+            dump(S.PrimitiveOutputBuffer()[ 5]);
+            dump(S.PrimitiveOutputBuffer()[ 6]);
+            dump(S.PrimitiveOutputBuffer()[ 7]);
+            dump(S.PrimitiveOutputBuffer()[ 8]);
+            dump(S.PrimitiveOutputBuffer()[ 9]);
+            dump(S.PrimitiveOutputBuffer()[10]);
+            dump(S.PrimitiveOutputBuffer()[11]);
+            
             S.Post( Y, alpha, beta, KernelType::MixedOrder );
             
             ptoc(ClassName()+"::MultiplyMetric");

@@ -41,6 +41,7 @@ namespace Repulsor
         using BASE::diff_flag;
         using BASE::hess_flag;
         using BASE::metric_flag;
+        using BASE::prec_flag;
         
     public:
         
@@ -215,7 +216,6 @@ namespace Repulsor
 //                          |   - K_xy * v[1]         0              0              0         |
 //                          |                                                                 |
 //                          |   - K_xy * v[2]         0              0              0         |
-//                          |                                                                 |
 //                          \                                                                 /
 //
 //                     This are 1 + 2 * AMB_DIM nonzero values.

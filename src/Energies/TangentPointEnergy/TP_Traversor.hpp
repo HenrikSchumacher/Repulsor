@@ -29,7 +29,7 @@ namespace Repulsor
         using TangentVector_T   = Tensor2<ExtReal,Int>;
         using CotangentVector_T = Tensor2<ExtReal,Int>;
         
-        using Configurator_T   = FMM_Configurator<ClusterTree_T>;
+        using Configurator_T    = FMM_Configurator<ClusterTree_T>;
         
         using Kernel_VF_MultiplyMetric_T = TP_Kernel_VF_MultiplyMetric<
             AMB_DIM,AMB_DIM,

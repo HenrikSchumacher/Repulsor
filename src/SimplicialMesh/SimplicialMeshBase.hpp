@@ -359,12 +359,19 @@ namespace Repulsor
             }
         }
         
+        // Caution! This function is destructive.
         void SetCache( const std::string & s, std::any & thing ) const
         {
+            ptic("C");
             #pragma omp critical (cache)
             {
-                cache[s] = thing;
+                cache[s] = std::move(thing);
+                
+//                std::any nothing;
+//                cache[s] = nothing;
+//                cache[s].swap(thing);
             }
+            ptoc("C");
         }
         
         void ClearCache() const

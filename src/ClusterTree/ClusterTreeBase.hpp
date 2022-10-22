@@ -809,11 +809,13 @@ namespace Repulsor
                 
                 // Caution: Some magic is going on here high order term...
                 // Apply diff/averaging operate, reorder and multiply by weights.
+                ptic(ClassName()+" pre->Dot");
                 pre->Dot(
                     static_cast<Real>(1), input,
                     static_cast<Real>(0), P_in.data(),
                     cols
                 );
+                ptoc(ClassName()+" pre->Dot");
                 
                 // Accumulate into leaf clusters.
                 PrimitivesToClusters(false);
@@ -871,11 +873,14 @@ namespace Repulsor
                 ClustersToPrimitives( true );
                                 
                 // Multiply by weights, restore external ordering, and apply transpose of diff/averaging operator.
+                
+                ptic(ClassName()+" post->Dot");
                 post->Dot(
                     alpha, P_out.data(),
                     beta,  output,
                     ( PrimitiveCount() * buffer_dim ) / post->ColCount()
                 );
+                ptoc(ClassName()+" post->Dot");
             }
             else
             {

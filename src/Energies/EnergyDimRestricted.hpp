@@ -28,13 +28,17 @@ namespace Repulsor
         virtual ~CLASS() override = default;
         
         // Actual implementation to be specified by descendants.
-        ExtReal compute( const MeshBase_T & M ) const override
+        ExtReal compute(
+            const MeshBase_T & M,
+            ValueContainer_T & metric_values,
+            ValueContainer_T & prec_values
+        ) const override
         {
             const Mesh_T * Q = dynamic_cast<const Mesh_T *>(&M);
                         
             if( Q != nullptr )
             {
-                return value(*Q);
+                return compute(*Q, metric_values, prec_values);
             }
             else
             {
@@ -44,7 +48,13 @@ namespace Repulsor
         }
         
         // Actual implementation to be specified by descendants.
-        virtual ExtReal compute( const Mesh_T & M ) const = 0;
+        virtual ExtReal compute(
+            const Mesh_T & M,
+            ValueContainer_T & metric_values,
+            ValueContainer_T & prec_values
+        ) const = 0;
+        
+        
         
         // Do a down cast and delegate implementation further to descendant class.
         ExtReal value( const MeshBase_T & M ) const override
