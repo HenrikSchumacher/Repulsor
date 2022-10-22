@@ -808,15 +808,12 @@ namespace Repulsor
                 }
                 
                 // Caution: Some magic is going on here high order term...
-                ptic(ClassName()+"  pre->Dot");
-                
-                //     Apply diff/averaging operate, reorder and multiply by weights.
+                // Apply diff/averaging operate, reorder and multiply by weights.
                 pre->Dot(
                     static_cast<Real>(1), input,
                     static_cast<Real>(0), P_in.data(),
                     cols
                 );
-                ptoc(ClassName()+"  pre->Dot");
                 
                 // Accumulate into leaf clusters.
                 PrimitivesToClusters(false);
@@ -831,7 +828,7 @@ namespace Repulsor
         }; // Pre
 
 
-        void Post( ExtReal * output, const KernelType type, const ExtReal b ) const
+        void Post( ExtReal * output, const ExtReal alpha, const ExtReal beta, const KernelType type ) const
         {
             ptic(ClassName()+"::Post");
             
@@ -874,13 +871,11 @@ namespace Repulsor
                 ClustersToPrimitives( true );
                                 
                 // Multiply by weights, restore external ordering, and apply transpose of diff/averaging operator.
-                ptic(ClassName()+"  post->Dot");
                 post->Dot(
-                    static_cast<Real>(1), P_out.data(),
-                    b,                    output,
+                    alpha, P_out.data(),
+                    beta,  output,
                     ( PrimitiveCount() * buffer_dim ) / post->ColCount()
                 );
-                ptoc(ClassName()+"  post->Dot");
             }
             else
             {
@@ -890,9 +885,9 @@ namespace Repulsor
         }; // Post
         
         
-//####################################################################################################
-//##        Neigbors
-//####################################################################################################
+//################################################################################################
+//##        Neighbors
+//################################################################################################
         
         
     public:

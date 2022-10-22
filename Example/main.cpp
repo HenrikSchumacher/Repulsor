@@ -39,7 +39,7 @@ int main(int argc, const char * argv[])
     Profiler::Clear( path );
 
     
-    int thread_count = 8;
+    int thread_count = 1;
     omp_set_num_threads(thread_count);
     
     
@@ -568,6 +568,8 @@ int main(int argc, const char * argv[])
     M.GetBlockClusterTree();
     toc("Creating BlockClusterTree");
 
+    print(M.GetBlockClusterTree().Stats());
+    
     valprint("M.GetClusterTree().ThreadCount()",M.GetClusterTree().ThreadCount());
 
     valprint("M.GetClusterTree().NearDim()",M.GetClusterTree().NearDim());
@@ -618,8 +620,19 @@ int main(int argc, const char * argv[])
    
     dump(en);
    
-    
+    // Tensor2 is a simple container class for matrices.
+    Tensor2<REAL,INT> X ( M.VertexCount(), M.AmbDim() );
+    Tensor2<REAL,INT> Y ( M.VertexCount(), M.AmbDim() );
 
+    // Load some random data into U.
+    X.Random();
+
+    const REAL alpha = 1.0;
+    const REAL beta  = 0.0;
+    //Performs generalized matrix-matrix product Y = alpha * A * X + beta * Y, where A is the tangent-point metric.
+    tic("Matrix multiplication");
+    tpe.MultiplyMetric(M, alpha, X, beta, Y);
+    toc("Matrix multiplication");
    
 //    M.SetTangentPointExponents(alpha, beta);
 //    M.SetTangentPointWeight(weight);

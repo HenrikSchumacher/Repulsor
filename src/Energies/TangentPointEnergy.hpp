@@ -29,6 +29,7 @@ namespace Repulsor
         using TangentVector_T         = typename BASE::TangentVector_T;
         using CotangentVector_T       = typename BASE::CotangentVector_T;
         
+        using BASE::MetricValues;
         
         CLASS( const Real weight_, const Real q_, const Real p_ )
         :   BASE ( weight_               )
@@ -96,20 +97,15 @@ namespace Repulsor
             return metric_values;
         }
         
-        virtual void multiply_metric(
-            const Mesh_T & M,
-            const ValueContainer_T & metric_values
-        ) const override
+        virtual void multiply_metric( const Mesh_T & M ) const override
         {
             // Create some dummies.
             ValueContainer_T prec_values;
         
             TP_Traversor<DOM_DIM,DOM_DIM,BlockClusterTree_T,false,false,false,true,false>
-                traversor( M.GetBlockClusterTree(), metric_values, prec_values, q, p );
+                traversor( M.GetBlockClusterTree(), MetricValues(M), prec_values, q, p );
             
-            (void)traversor.Compute();
-            
-            return metric_values;
+            (void)traversor.MultiplyMetric();
         }
         
     public:

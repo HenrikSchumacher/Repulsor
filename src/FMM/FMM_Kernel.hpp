@@ -103,12 +103,14 @@ namespace Repulsor
         
         // Copy constructor. Must be used for compute mode!
         CLASS( const CLASS & other )
-        :   S                  ( other.S                  )
-        ,   T                  ( other.T                  )
-        ,   metric_values      ( other.metric_values      )
-        ,   prec_values        ( other.prec_values        )
-        ,   metric_data        ( other.metric_data ) // In compute the pointers are also needed!
-        ,   prec_data          ( other.prec_data   ) // In compute the pointers are also needed!
+        :   S                  ( other.S                    )
+        ,   T                  ( other.T                    )
+        ,   metric_values      ( other.metric_values        )
+        ,   prec_values        ( other.prec_values          )
+        // In compute mode the pointers are needed!
+        ,   metric_data        ( other.metric_values.data() )
+        // In compute mode the pointers are needed!
+        ,   prec_data          ( other.prec_values.data()   )
         {
             Init();
         }
@@ -131,9 +133,9 @@ namespace Repulsor
             if constexpr ( metric_flag )
             {
                 if(
-                   metric_values.Dimensions(0) != nnz
+                   metric_values.Dimension(0) != nnz
                    ||
-                   metric_values.Dimensions(1) != MetricNonzeroCount()
+                   metric_values.Dimension(1) != MetricNonzeroCount()
                    )
                 {
                     metric_values = Values_T( nnz, MetricNonzeroCount() );
@@ -143,9 +145,9 @@ namespace Repulsor
             if constexpr ( prec_flag )
             {
                 if(
-                   prec_values.Dimensions(0) != nnz
+                   prec_values.Dimension(0) != nnz
                    ||
-                   prec_values.Dimensions(1) != PreconditionerNonzeroCount()
+                   prec_values.Dimension(1) != PreconditionerNonzeroCount()
                    )
                 {
                     prec_values = Values_T( nnz, PreconditionerNonzeroCount() );

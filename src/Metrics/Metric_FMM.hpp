@@ -259,13 +259,13 @@ namespace Repulsor
 
             S.RequireBuffers(buffer_dim); // Tell the S-side what it has to expect.
             
-            ApplyVeryNearFieldKernel( weight * alpha );
+            ApplyVeryNearFieldKernel(1);
             
-            ApplyNearFieldKernel    ( weight * alpha );
+            ApplyNearFieldKernel    (1);
             
-            ApplyFarFieldKernel     ( weight * alpha );
+            ApplyFarFieldKernel     (1);
 
-            S.Post( Y, KernelType::MixedOrder, beta );
+            S.Post( Y, weight * alpha, beta, KernelType::MixedOrder );
             
             ptoc(ClassName()+"::Multiply_DenseMatrix");
         }

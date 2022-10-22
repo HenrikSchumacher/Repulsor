@@ -10,14 +10,17 @@ namespace Repulsor
 {
     
     
-    template<int AMB_DIM, typename Real_, typename Int_, typename SReal_, typename ExtReal_, bool is_symmetric>
+    template<int AMB_DIM_, typename Real_, typename Int_, typename SReal_, typename ExtReal_, bool is_symmetric>
     class CLASS : public BASE
     {
     public:
+        
         using Real    = Real_;
         using Int     = Int_;
         using SReal   = SReal_;
         using ExtReal = ExtReal_;
+        
+        static constexpr Int AMB_DIM = AMB_DIM_;
         
         using BlockClusterTreeBase_T = BASE;
         
@@ -35,7 +38,6 @@ namespace Repulsor
         using BoundingVolume_T  = typename ClusterTree_T::BoundingVolume_T;
     
         using GJK_T             = GJK_Algorithm<AMB_DIM,GJK_Real,Int>;
-        
 
         using BASE::AmbDim;
         using BASE::ThreadCount;

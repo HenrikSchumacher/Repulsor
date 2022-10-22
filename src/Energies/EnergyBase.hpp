@@ -74,6 +74,7 @@ namespace Repulsor
         // Actual implementation to be specified by descendants.
         virtual ExtReal value( const MeshBase_T & M ) const = 0;
         
+
         // Return the differential of the energy; use caching.
         const CotangentVector_T & Differential( const MeshBase_T & M ) const
         {
@@ -81,6 +82,8 @@ namespace Repulsor
             
             if( !M.IsCached(ClassName()+"::Differential"))
             {
+//                M.GetS().CleanseDerivativeBuffers();
+
                 differential(M);
                 
                 CotangentVector_T diff ( M.VertexCount(), M.AmbDim() );
@@ -109,9 +112,9 @@ namespace Repulsor
         
         
         // Return the differential of the energy; use caching.
-        void ComputeMetric( const MeshBase_T & M ) const
+        ValueContainer_T & MetricValues( const MeshBase_T & M ) const
         {
-            ptic(ClassName()+"::ComputeMetric");
+            ptic(ClassName()+"::MetricValues");
             
             if( !M.IsCached(ClassName()+"::MetricValues"))
             {
@@ -120,9 +123,9 @@ namespace Repulsor
                 M.SetCache( ClassName()+"::MetricValues", thing );
             }
             
-            ptoc(ClassName()+"::ComputeMetric");
+            ptoc(ClassName()+"::MetricValues");
             
-            return std::any_cast<CotangentVector_T &>(
+            return std::any_cast<ValueContainer_T &>(
                 M.GetCache(ClassName()+"::MetricValues")
             );
         }
@@ -130,31 +133,47 @@ namespace Repulsor
         // Actual implementation to be specified by descendants.
         virtual ValueContainer_T compute_metric( const MeshBase_T & M ) const = 0;
         
+
+        // Return the differential of the energy; use caching.
+        void MultiplyMetric(
+            const MeshBase_T &             M,
+            const ExtReal                  alpha,
+            const ExtReal * restrict const X,
+            const ExtReal                  beta,
+                  ExtReal * restrict const Y,
+            const Int                      rhs_count
+        ) const
+        {
+            ptic(ClassName()+"::MultiplyMetric");
+            
+            auto & S = M.GetClusterTree();
+            auto & T = M.GetClusterTree();
+            
+            T.Pre( X, rhs_count, KernelType::MixedOrder );
+            
+            S.RequireBuffers( T.BufferDimension() ); // Tell the S-side what it has to expect.
+            
+            multiply_metric(M);
+
+            S.Post( Y, alpha, beta, KernelType::MixedOrder );
+            
+            ptoc(ClassName()+"::MultiplyMetric");
+        }
         
         // Return the differential of the energy; use caching.
         void MultiplyMetric(
             const MeshBase_T & M,
             const ExtReal alpha,
-            const TangentVector_T & u,
+            const TangentVector_T & X,
             const ExtReal beta,
-                  CotangentVector_T & v
+                  CotangentVector_T & Y
         ) const
         {
-            ptic(ClassName()+"::MetricValues");
-            
-            metric_multiply( M, alpha, u, beta, v );
-            
-            ptoc(ClassName()+"::MetricValues");
+            MultiplyMetric( M, alpha, X.data(), beta, Y.data(), X.Dimension(1) );
         }
         
         // Actual implementation to be specified by descendants.
-        virtual void multiply_metric(
-             const MeshBase_T & M,
-             const ExtReal alpha,
-             const TangentVector_T & u,
-             const ExtReal beta,
-                   CotangentVector_T & v
-        ) const = 0;
+        virtual void multiply_metric( const MeshBase_T & M ) const = 0;
         
         ExtReal GetWeight()  const
         {

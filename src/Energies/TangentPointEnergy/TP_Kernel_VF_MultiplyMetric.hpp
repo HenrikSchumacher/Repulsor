@@ -6,8 +6,7 @@
     alpha_flag, beta_flag                                                                       \
 >
 
-////    x_RowMajor,y_RowMajor,
-namespace Tensors
+namespace Repulsor
 {
     template<
         int AMB_DIM_, int MAX_RHS_COUNT_,
@@ -47,9 +46,7 @@ namespace Tensors
         
         CLASS() = delete;
         
-        explicit CLASS(
-            const Scalar     * restrict const A_
-        )
+        explicit CLASS( Scalar * restrict const A_ )
         :   BASE( A_ )
         {}
         
@@ -157,7 +154,7 @@ namespace Tensors
         }
 
     };
-} // namespace Tensors
+} // namespace Repulsor
 
 #undef BASE
 #undef CLASS

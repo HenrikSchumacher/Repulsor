@@ -9,6 +9,7 @@ namespace Repulsor
     class CLASS : public BASE
     {
     public:
+        
         using MeshBase_T        = typename BASE::MeshBase_T;
 
         using Values_T          = typename BASE::Values_T;
@@ -18,6 +19,7 @@ namespace Repulsor
         
         using Mesh_T            = SimplicialMesh<DOM_DIM,AMB_DIM,Real,Int,SReal,ExtReal>;
 
+        using BASE::MetricValues;
         
         explicit CLASS( ExtReal weight_ = static_cast<ExtReal>(1) )
         :   BASE(weight_)
@@ -103,37 +105,22 @@ namespace Repulsor
         virtual ValueContainer_T compute_metric( const Mesh_T & M ) const = 0;
 
         // Actual implementation to be specified by descendants.
-        virtual void metric_multiply(
-             const MeshBase_T & M,
-             const ExtReal alpha,
-             const TangentVector_T & u,
-             const ExtReal beta,
-                   CotangentVector_T & v
-        ) const override
+        virtual void multiply_metric( const MeshBase_T & M ) const override
         {
             const Mesh_T * Q = dynamic_cast<const Mesh_T *>(&M);
                         
             if( Q != nullptr )
             {
-                metric_multiply( *Q, alpha, u, beta, v );
+                multiply_metric(*Q);
             }
             else
             {
-                eprint(ClassName()+"::differential: Input could not be downcast to compatible type. Doing nothing.");
+                eprint(ClassName()+"::multiply_metric: Input could not be downcast to compatible type. Doing nothing.");
             }
         }
         
         // Actual implementation to be specified by descendants.
-        virtual void metric_multiply(
-             const Mesh_T & M,
-             const ExtReal alpha,
-             const TangentVector_T & u,
-             const ExtReal beta,
-                   CotangentVector_T & v
-        )
-        {
-            
-        }
+        virtual void multiply_metric( const Mesh_T & M ) const = 0;
 //
 //        void SimplexEnergies( const MeshBase_T & M, ExtReal * output, bool addTo = false ) const override
 //        {

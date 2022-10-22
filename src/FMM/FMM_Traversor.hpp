@@ -44,13 +44,13 @@ namespace Repulsor
         
     protected:
         
-        const SparsityPattern_T   & pattern;
+        const SparsityPattern_T & pattern;
         
         Kernel_T kernel;
         
     public:
 
-        Real Compute() const
+        Real Compute()
         {
             ptic(ClassName()+"::Compute");
 
@@ -72,15 +72,7 @@ namespace Repulsor
                 (void)pattern.Diag();
             }
             
-            if constexpr ( Kernel_T::diff_flag )
-            {
-                kernel.GetS().CleanseDerivativeBuffers();
-                
-                if( !is_symmetric )
-                {
-                    kernel.GetT().CleanseDerivativeBuffers();
-                }
-            }
+            kernel.Allocate( pattern.NonzeroCount() );
             
             const Int thread_count = job_ptr.Size()-1;
             
