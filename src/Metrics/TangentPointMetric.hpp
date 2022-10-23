@@ -39,6 +39,10 @@ namespace Repulsor
         virtual ValueContainer_T compute_metric( const Mesh_T & M ) const override
         {
             ValueContainer_T metric_values;
+                        
+//            std::vector<Values_T> diag_values ( M.GetBlockClusterTree().ThreadCount() );
+
+            
          
             TP_Traversor<DOM_DIM,DOM_DIM,BlockClusterTree_T,false,false,true>
                 traversor( M.GetBlockClusterTree(), metric_values, q, p );

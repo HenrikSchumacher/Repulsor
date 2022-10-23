@@ -38,14 +38,13 @@ namespace Repulsor
             
             if( !M.IsCached(ClassName()+"::MetricValues"))
             {
-                print("A.1");
                 std::any thing ( std::move(compute_metric(M)) );
                 
                 M.SetCache( ClassName()+"::MetricValues", thing );
             }
             
             ptoc(ClassName()+"::MetricValues");
-            print("A.2");
+
             auto & result = std::any_cast<ValueContainer_T &>(
                   M.GetCache(ClassName()+"::MetricValues")
             );

@@ -28,7 +28,8 @@ namespace Repulsor
         using BASE::S_DATA_DIM;
         
         static constexpr Int METRIC_NNZ = 1 + 2 * AMB_DIM;
-        static constexpr Int PREC_NNZ   = 1;
+        static constexpr Int DIAG_NNZ   = (AMB_DIM+1) * (AMB_DIM+1);
+
 
         using BASE::S;
         using BASE::T;
@@ -72,6 +73,7 @@ namespace Repulsor
     protected:
 
         using BASE::metric_data;
+        using BASE::diag_data;
         
         using BASE::S_data;
         using BASE::S_D_data;
@@ -105,6 +107,8 @@ namespace Repulsor
         const T2   p_half;
         const T2   minus_p_half;
         const T2   minus_p_half_minus_1;
+        
+        Real diag_block [AMB_DIM+1][AMB_DIM+1];
         
     public:
         
@@ -242,16 +246,27 @@ namespace Repulsor
         
     public:
         
+        virtual force_inline void CleanseDiagonalBlock() override
+        {
+            if constexpr ( metric_flag )
+            {
+//                zerofy_buffer(&diag_block[0][0], DIAG_NNZ );
+            }
+        }
+        
+        virtual force_inline void WriteDiagonalBlock() const override
+        {
+            if constexpr ( metric_flag )
+            {
+//                copy_buffer( &diag_block[0][0], &diag_data[DIAG_NNZ * S_ID] );
+            }
+        }
+        
         virtual Int MetricNonzeroCount() const override
         {
             return METRIC_NNZ;
         }
 
-        virtual Int PreconditionerNonzeroCount() const override
-        {
-            return PREC_NNZ;
-        }
-        
         virtual std::string ClassName() const override
         {
             return className();

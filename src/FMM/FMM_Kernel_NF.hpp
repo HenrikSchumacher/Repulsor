@@ -238,6 +238,10 @@ namespace Repulsor
             }
         }
         
+        virtual void CleanseDiagonalBlock() override = 0;
+        
+        virtual void WriteDiagonalBlock() const override = 0;
+        
     public:
         
         virtual std::string ClassName() const override

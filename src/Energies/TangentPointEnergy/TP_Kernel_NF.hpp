@@ -41,7 +41,7 @@ namespace Repulsor
         
 //        static constexpr Int METRIC_NNZ = 2 + AMB_DIM;
         static constexpr Int METRIC_NNZ = 1 + 2 * AMB_DIM;
-        static constexpr Int PREC_NNZ   = 1;
+        static constexpr Int DIAG_NNZ   = (AMB_DIM+1) * (AMB_DIM+1);
 
         using BASE::S;
         using BASE::T;
@@ -85,6 +85,7 @@ namespace Repulsor
     protected:
         
         using BASE::metric_data;
+        using BASE::diag_data;
         
         using BASE::S_data;
         using BASE::S_D_data;
@@ -126,14 +127,13 @@ namespace Repulsor
         
         virtual force_inline Real compute( const Int block_ID ) override
         {
-            const Real delta = static_cast<Real>(S_ID == T_ID);
             Real v    [AMB_DIM ] = {};
             Real Pv   [AMB_DIM ] = {};
             Real Qv   [AMB_DIM ] = {};
             Real dEdv [AMB_DIM ] = {};
             Real V    [PROJ_DIM] = {};
-            
-            Real r2        = delta;
+
+            Real r2        = zero;
             Real rCosPhi_2 = zero;
             Real rCosPsi_2 = zero;
             
@@ -164,7 +164,7 @@ namespace Repulsor
             // |Q*(y-x)|^{q-2}
             const Real rCosPsi_q_minus_2 = MyMath::pow<Real,T1>( fabs(rCosPsi_2), q_half_minus_1);
             // r^{2-p}
-            const Real r_minus_p_minus_2 = (one-delta) * MyMath::pow<Real,T2>( r2, minus_p_half_minus_1 );
+            const Real r_minus_p_minus_2 = MyMath::pow<Real,T2>( r2, minus_p_half_minus_1 );
             // |y-x|^-p
             const Real r_minus_p = r_minus_p_minus_2 * r2;
             // |P*(y-x)|^q
@@ -225,6 +225,7 @@ namespace Repulsor
                 if constexpr ( metric_flag )
                 {
                     Real * restrict const m_vals = &metric_data[ METRIC_NNZ * block_ID ];
+                    Real * restrict const d_vals = &diag_data[ DIAG_NNZ * block_ID ];
                     
 //                     The metric block looks like this for AMB_DIM == 3:
 //
@@ -266,17 +267,30 @@ namespace Repulsor
             }
         }
         
+        
     public:
+        
+        virtual force_inline void CleanseDiagonalBlock() override
+        {
+            if constexpr ( metric_flag )
+            {
+//                zerofy_buffer(&diag_block[0][0], DIAG_NNZ );
+            }
+        }
+        
+        virtual force_inline void WriteDiagonalBlock() const override
+        {
+            if constexpr ( metric_flag )
+            {
+//                copy_buffer( &diag_block[0][0], &diag_data[DIAG_NNZ * S_ID] );
+            }
+        }
         
         virtual Int MetricNonzeroCount() const override
         {
             return METRIC_NNZ;
         }
-
-        virtual Int PreconditionerNonzeroCount() const override
-        {
-            return PREC_NNZ;
-        }
+    
         
         virtual std::string ClassName() const override
         {

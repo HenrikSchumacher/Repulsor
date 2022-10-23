@@ -96,9 +96,9 @@ namespace Repulsor
         }
         
         CLASS( const CLASS & other )
-        :   S             ( other.S                    )
-        ,   T             ( other.T                    )
-        ,   metric_values ( other.metric_values        )
+        :   S             ( other.S              )
+        ,   T             ( other.T              )
+        ,   metric_values ( other.metric_values  )
         // In compute mode the pointers are needed!
         ,   metric_data   ( metric_values.data() )
         {
@@ -134,6 +134,7 @@ namespace Repulsor
         virtual void WriteS() = 0;
         
         virtual void WriteT() = 0;
+
         
         
         void Allocate( const Int nnz )
@@ -167,8 +168,10 @@ namespace Repulsor
         }
         
         virtual Int MetricNonzeroCount() const = 0;
-
-        virtual Int PreconditionerNonzeroCount() const = 0;
+        
+        virtual void CleanseDiagonalBlock() = 0;
+        
+        virtual void WriteDiagonalBlock() const = 0;
         
     protected:
         
@@ -178,7 +181,7 @@ namespace Repulsor
         Values_T & metric_values;
         
         Real * restrict const metric_data = nullptr;
-        
+        Real * restrict const diag_data   = nullptr;
         Int S_ID = -1;
         Int T_ID = -1;
         

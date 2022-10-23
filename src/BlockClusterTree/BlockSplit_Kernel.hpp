@@ -187,9 +187,7 @@ namespace Repulsor
         
         virtual force_inline void ComputeLeafDiagonal() override
         {
-//            near_idx.push_back(P_i);
-//            near_jdx.push_back(P_i);
-            near_idx.Push( P_i, P_i );
+//            near_idx.Push( P_i, P_i );
         }
         
         virtual force_inline void ComputeLeaf() override

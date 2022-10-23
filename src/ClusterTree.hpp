@@ -1299,22 +1299,24 @@ namespace Repulsor
             
             this->RequireBuffers(far_dim);
             
-            // Write first slice.
-            copy_buffer( thread_C_D_far.data(0), C_out.data(), cluster_count * far_dim );
+            thread_C_D_far.AdditiveReduction( C_out.data(), false );
             
-            // Add the other slices.
-            for( Int thread = 1; thread < thread_count; ++thread )
-            {
-                const Real * restrict const from = thread_C_D_far.data(thread);
-                      Real * restrict const to   = C_out.data();
-                const Int last = cluster_count * far_dim;
-                
-                #pragma omp parallel for simd num_threads( thread_count )
-                for( Int i = 0; i < last; ++i )
-                {
-                    to[i] += from[i];
-                }
-            }
+//            // Write first slice.
+//            copy_buffer( thread_C_D_far.data(0), C_out.data(), cluster_count * far_dim );
+//            
+//            // Add the other slices.
+//            for( Int thread = 1; thread < thread_count; ++thread )
+//            {
+//                const Real * restrict const from = thread_C_D_far.data(thread);
+//                      Real * restrict const to   = C_out.data();
+//                const Int last = cluster_count * far_dim;
+//                
+//                #pragma omp parallel for simd num_threads( thread_count )
+//                for( Int i = 0; i < last; ++i )
+//                {
+//                    to[i] += from[i];
+//                }
+//            }
             
             this->PercolateDown();
             

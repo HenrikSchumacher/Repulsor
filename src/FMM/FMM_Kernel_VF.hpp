@@ -335,7 +335,11 @@ namespace Repulsor
         
         virtual Real compute(  const Int block_ID ) override = 0;
         
-
+        virtual Int MetricNonzeroCount() const override = 0;
+        
+        virtual void CleanseDiagonalBlock() override = 0;
+        
+        virtual void WriteDiagonalBlock() const override = 0;
         
     public:
         

@@ -142,6 +142,11 @@ namespace Repulsor
             {
                 zerofy_buffer( &DX[0], S_DATA_DIM );
             }
+            
+            if constexpr ( metric_flag )
+            {
+                CleanseDiagonalBlock();
+            }
         }
         
         virtual force_inline void LoadT( const Int j ) override
@@ -184,7 +189,7 @@ namespace Repulsor
             
         virtual force_inline void WriteS() override
         {
-            if constexpr (diff_flag )
+            if constexpr ( diff_flag )
             {
                 Real * restrict const to = &S_D_data[S_DATA_DIM * S_ID];
                 
@@ -192,6 +197,11 @@ namespace Repulsor
                 {
                     to[k] += symmetry_factor * DX[k];
                 }
+            }
+            
+            if constexpr ( metric_flag )
+            {
+                WriteDiagonalBlock();
             }
         }
         
@@ -211,8 +221,10 @@ namespace Repulsor
     public:
         
         virtual Int MetricNonzeroCount() const override = 0;
-
-        virtual Int PreconditionerNonzeroCount() const override= 0;
+        
+        virtual void CleanseDiagonalBlock() override = 0;
+        
+        virtual void WriteDiagonalBlock() const override = 0;
         
     public:
         

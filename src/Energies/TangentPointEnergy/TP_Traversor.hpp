@@ -114,7 +114,7 @@ namespace Repulsor
         {
             en = zero;
             
-            if( diff_flag )
+            if constexpr ( diff_flag )
             {
                 bct.GetS().CleanseDerivativeBuffers();
                 
@@ -188,7 +188,7 @@ namespace Repulsor
             FMM_Traversor<Kernel_T> traversor ( pattern, ker );
             en += traversor.Compute();
 
-            if( metric_flag )
+            if constexpr ( metric_flag )
             {
                 if constexpr ( is_symmetric )
                 {
@@ -226,7 +226,7 @@ namespace Repulsor
 
             en += traversor.Compute();
 
-            if( metric_flag )
+            if constexpr ( metric_flag )
             {
                 if constexpr ( is_symmetric )
                 {
@@ -263,7 +263,7 @@ namespace Repulsor
             
             en += traversor.Compute();
             
-            if( metric_flag )
+            if constexpr ( metric_flag )
             {
                 if constexpr ( is_symmetric )
                 {
@@ -284,7 +284,7 @@ namespace Repulsor
         
         void MultiplyMetric(const bool VF_flag, const bool NF_flag, const bool FF_flag ) const
         {
-            if( metric_flag )
+            if constexpr ( metric_flag )
             {
                 const Int rhs_count = bct.GetS().BufferDimension() / Kernel_NF_MultiplyMetric_T::ROWS;                
          
@@ -358,7 +358,7 @@ namespace Repulsor
         
         void FF_MultiplyMetric( const Int rhs_count ) const
         {
-            if( metric_flag )
+            if constexpr ( metric_flag )
             {
                 constexpr Type type = Type::FF;
                 
