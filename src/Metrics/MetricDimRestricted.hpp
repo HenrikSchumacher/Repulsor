@@ -1,7 +1,7 @@
 #pragma once
 
-#define CLASS EnergyDimRestricted
-#define BASE  EnergyBase<Real,Int,SReal,ExtReal>
+#define CLASS MetricDimRestricted
+#define BASE  MetricBase<Real,Int,SReal,ExtReal>
 
 namespace Repulsor
 {
@@ -18,52 +18,58 @@ namespace Repulsor
         using CotangentVector_T = typename BASE::CotangentVector_T;
         
         using Mesh_T            = SimplicialMesh<DOM_DIM,AMB_DIM,Real,Int,SReal,ExtReal>;
+
+        using BASE::MetricValues;
         
         CLASS() = default;
 
         virtual ~CLASS() override = default;
         
         // Do a down cast and delegate implementation further to descendant class.
-        ExtReal value( const MeshBase_T & M ) const override
+        ValueContainer_T compute_metric( const MeshBase_T & M ) const override
         {
             const Mesh_T * Q = dynamic_cast<const Mesh_T *>(&M);
                         
             if( Q != nullptr )
             {
-                return value(*Q);
-            }
-            else
-            {
-                eprint(ClassName()+"::value: Input could not be downcast to compatible type. Doing nothing.");
-                return static_cast<ExtReal>(0);
-            }
-        }
-        
-        // Actual implementation to be specified by descendants.
-        virtual ExtReal value( const Mesh_T & M ) const = 0;
-
-        
-        // Do a down cast and delegate implementation further to descendant class.
-        void differential( const MeshBase_T & M ) const override
-        {
-            const Mesh_T * Q = dynamic_cast<const Mesh_T *>(&M);
-                        
-            if( Q != nullptr )
-            {
-                differential(*Q);
+                return compute_metric(*Q);
             }
             else
             {
                 eprint(ClassName()+"::differential: Input could not be downcast to compatible type. Doing nothing.");
+                
+                return ValueContainer_T();
             }
         }
         
         // Actual implementation to be specified by descendants.
-        virtual void differential( const Mesh_T & M ) const = 0;
+        virtual ValueContainer_T compute_metric( const Mesh_T & M ) const = 0;
+
+        // Actual implementation to be specified by descendants.
+        virtual void multiply_metric(
+            const MeshBase_T & M,
+            const bool VF_flag, const bool NF_flag, const bool FF_flag
+        ) const override
+        {
+            const Mesh_T * Q = dynamic_cast<const Mesh_T *>(&M);
+                        
+            if( Q != nullptr )
+            {
+                multiply_metric(*Q, VF_flag, NF_flag, FF_flag );
+            }
+            else
+            {
+                eprint(ClassName()+"::multiply_metric: Input could not be downcast to compatible type. Doing nothing.");
+            }
+        }
+        
+        // Actual implementation to be specified by descendants.
+        virtual void multiply_metric(
+            const Mesh_T & M,
+            const bool VF_flag, const bool NF_flag, const bool FF_flag
+        ) const = 0;
 
     public:
-        
-//        virtual std::string Stats() const override = 0;
         
         static std::string className()
         {

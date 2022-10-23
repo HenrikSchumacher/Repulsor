@@ -4,33 +4,36 @@
 
 namespace Repulsor
 {
+    using namespace FMM;
+    
     template<
         int S_DOM_DIM_, int T_DOM_DIM_,
         typename BlockClusterTree_T,
-        bool energy_flag, bool diff_flag, bool hess_flag, bool metric_flag, bool prec_flag
+        bool energy_flag, bool diff_flag, bool metric_flag
     >
     class CLASS
     {
     public:
         
-        using ClusterTree_T    = typename BlockClusterTree_T::ClusterTree_T;
-        using Real             = typename BlockClusterTree_T::Real;
-        using Int              = typename BlockClusterTree_T::Int;
-        using SReal            = typename BlockClusterTree_T::SReal;
-        using ExtReal          = typename BlockClusterTree_T::ExtReal;
+        using ClusterTree_T     = typename BlockClusterTree_T::ClusterTree_T;
+        using Real              = typename BlockClusterTree_T::Real;
+        using Int               = typename BlockClusterTree_T::Int;
+        using SReal             = typename BlockClusterTree_T::SReal;
+        using ExtReal           = typename BlockClusterTree_T::ExtReal;
         
-        static constexpr Int AMB_DIM   = BlockClusterTree_T::AMB_DIM;
-        static constexpr Int S_DOM_DIM = S_DOM_DIM_;
-        static constexpr Int T_DOM_DIM = T_DOM_DIM_;
+        static constexpr Int  AMB_DIM      = BlockClusterTree_T::AMB_DIM;
+        static constexpr Int  S_DOM_DIM    = S_DOM_DIM_;
+        static constexpr Int  T_DOM_DIM    = T_DOM_DIM_;
         static constexpr bool is_symmetric = BlockClusterTree_T::IsSymmetric();
         
-        using Values_T          = Tensor2<Real,Int>;
-        using ValueContainer_T  = std::array<Values_T,3>;
         using TangentVector_T   = Tensor2<ExtReal,Int>;
         using CotangentVector_T = Tensor2<ExtReal,Int>;
         
-        using Configurator_T    = FMM_Configurator<ClusterTree_T>;
+        using Values_T          = Tensor2<Real,Int>;
+        using ValueContainer_T  = std::array<Values_T,3>;
         
+        using Configurator_T    = FMM_Configurator<ClusterTree_T>;
+
         using Kernel_VF_MultiplyMetric_T = TP_Kernel_VF_MultiplyMetric<
             AMB_DIM,AMB_DIM,
             Real,Int,Real,Real,
@@ -49,28 +52,33 @@ namespace Repulsor
             true,true,1,0
         >;
         
+    protected:
+        
+        static constexpr Real zero = 0;
+        static constexpr Real one  = 1;
+        static constexpr Real two  = 2;
+        
+    
     public:
         
         CLASS() = delete;
         
         CLASS(
               const BlockClusterTree_T & bct_,
-              ValueContainer_T & metric_values_,
-              ValueContainer_T & prec_values_,
+              ValueContainer_T & metric_values,
               const Real q_,
               const Real p_
         )
         :   bct(bct_)
+        ,   metric_values ( metric_values )
         ,   q             ( q_ )
         ,   p             ( p_ )
-        ,   q_half_real   ( q / static_cast<Real>(2) )
-        ,   p_half_real   ( p / static_cast<Real>(2) )
+        ,   q_half_real   ( q / two )
+        ,   p_half_real   ( p / two )
         ,   q_half_int    ( q_half_real )
         ,   p_half_int    ( p_half_real )
         ,   q_half_is_int ( q_half_real == static_cast<Real>(q_half_int) )
         ,   p_half_is_int ( p_half_real == static_cast<Real>(p_half_int) )
-        ,   metric_values ( metric_values_ )
-        ,   prec_values   ( prec_values_   )
         {}
 
         ~CLASS() = default;
@@ -79,6 +87,8 @@ namespace Repulsor
     protected:
 
         const BlockClusterTree_T & bct;
+        
+        ValueContainer_T & metric_values;
         
         const Real q;
         const Real p;
@@ -91,10 +101,7 @@ namespace Repulsor
         const bool q_half_is_int;
         const bool p_half_is_int;
         
-        ValueContainer_T & metric_values;
-        ValueContainer_T & prec_values;
-        
-        Real en = 0;
+        Real en = zero;
         
     public:
         
@@ -105,7 +112,7 @@ namespace Repulsor
         
         Real Compute()
         {
-            en = static_cast<Real>(0);
+            en = zero;
             
             if( diff_flag )
             {
@@ -121,133 +128,138 @@ namespace Repulsor
             {
                 if( p_half_is_int )
                 {
-                    Compute_VF<Int,Int>( q_half_int, p_half_int );
-                    Compute_NF<Int,Int>( q_half_int, p_half_int );
-                    Compute_FF<Int,Int>( q_half_int, p_half_int );
+                    VF_Compute<Int,Int>( q_half_int, p_half_int );
+                    NF_Compute<Int,Int>( q_half_int, p_half_int );
+                    FF_Compute<Int,Int>( q_half_int, p_half_int );
                 }
                 else
                 {
-                    Compute_VF<Int,Real>( q_half_int, p_half_real );
-                    Compute_NF<Int,Real>( q_half_int, p_half_real );
-                    Compute_FF<Int,Real>( q_half_int, p_half_real );
+                    VF_Compute<Int,Real>( q_half_int, p_half_real );
+                    NF_Compute<Int,Real>( q_half_int, p_half_real );
+                    FF_Compute<Int,Real>( q_half_int, p_half_real );
                 }
             }
             else
             {
                 if( p_half_is_int)
                 {
-                    Compute_VF<Real,Int>( q_half_real, p_half_int );
-                    Compute_NF<Real,Int>( q_half_real, p_half_int );
-                    Compute_FF<Real,Int>( q_half_real, p_half_int );
+                    VF_Compute<Real,Int>( q_half_real, p_half_int );
+                    NF_Compute<Real,Int>( q_half_real, p_half_int );
+                    FF_Compute<Real,Int>( q_half_real, p_half_int );
                 }
                 else
                 {
-                    Compute_VF<Real,Real>( q_half_real, p_half_real );
-                    Compute_NF<Real,Real>( q_half_real, p_half_real );
-                    Compute_FF<Real,Real>( q_half_real, p_half_real );
+                    VF_Compute<Real,Real>( q_half_real, p_half_real );
+                    NF_Compute<Real,Real>( q_half_real, p_half_real );
+                    FF_Compute<Real,Real>( q_half_real, p_half_real );
                 }
             }
-
+            
             return en;
         }
         
+//##############################################################################################
+//      Compute subroutines
+//##############################################################################################
+    
     protected:
         
         template< typename T1, typename T2 >
-        void Compute_VF( const T1 q_half_, const T1 p_half_ )
+        void VF_Compute( const T1 q_half_, const T1 p_half_ )
         {
-            ptic(ClassName()+"::Compute_VF");
+            ptic(ClassName()+"::VF_Compute");
             
-                Configurator_T conf (
-                    bct.GetS(), bct.GetT(),
-                    metric_values[FMM::Type::VF], prec_values[FMM::Type::VF]
-                );
-                
-                using Kernel_T = TP_Kernel_VF<
-                    S_DOM_DIM, T_DOM_DIM,
-                    ClusterTree_T, T1, T2,
-                    BlockClusterTree_T::IsSymmetric(),
-                    energy_flag, diff_flag, hess_flag, metric_flag, prec_flag
-                >;
-                
-                Kernel_T ker ( conf, bct.NearFieldSeparationParameter(), 20, q_half_, p_half_ );
-                
-                FMM_Traversor<Kernel_T> traversor ( bct.VeryNear(), ker );
-                en += traversor.Compute();
-
+            const Type type = Type::VF;
+            const int idx = std::__to_underlying(type);
             
-            if( metric_flag )
-            {
-                if constexpr ( is_symmetric )
-                {
-                    SparseKernelMatrixCSR_gen<Kernel_VF_MultiplyMetric_T> matrix ( bct.VeryNear() );
-                    
-                    matrix.FillLowerTriangleFromUpperTriangle( metric_values[FMM::Type::VF].data() );
-                }
-                
-                wprint(ClassName()+"::Compute_VF: TODO: Correct the diagonal blocks!");
-            }
-            
-            ptoc(ClassName()+"::Compute_VF");
-        }
-            
-        template< typename T1, typename T2 >
-        void Compute_NF( const T1 q_half_, const T1 p_half_ )
-        {
-            ptic(ClassName()+"::Compute_NF");
-            
-                Configurator_T conf (
-                    bct.GetS(), bct.GetT(),
-                    metric_values[FMM::Type::NF], prec_values[FMM::Type::NF]
-                );
+            auto & pattern = bct.template GetMatrix<type>();
         
-                using Kernel_T = TP_Kernel_NF<
-                    S_DOM_DIM, T_DOM_DIM,
-                    ClusterTree_T, T1, T2,
-                    BlockClusterTree_T::IsSymmetric(),
-                    energy_flag, diff_flag, hess_flag, metric_flag, prec_flag
-                >;
-                
-                Kernel_T ker ( conf, q_half_, p_half_ );
+            Configurator_T conf ( bct.GetS(), bct.GetT(), metric_values[idx] );
 
-                FMM_Traversor<Kernel_T> traversor ( bct.Near(), ker );
+            using Kernel_T = TP_Kernel_VF<
+                S_DOM_DIM, T_DOM_DIM,
+                ClusterTree_T, T1, T2,
+                BlockClusterTree_T::IsSymmetric(),
+                energy_flag, diff_flag, metric_flag
+            >;
 
-                en += traversor.Compute();
-            
+            Kernel_T ker ( conf, bct.NearFieldSeparationParameter(), 20, q_half_, p_half_ );
+
+            FMM_Traversor<Kernel_T> traversor ( pattern, ker );
+            en += traversor.Compute();
+
             if( metric_flag )
             {
                 if constexpr ( is_symmetric )
                 {
-                    SparseKernelMatrixCSR_gen<Kernel_NF_MultiplyMetric_T> matrix ( bct.Near() );
+                    SparseKernelMatrixCSR_gen<Kernel_NF_MultiplyMetric_T> matrix ( pattern );
                     
-                    matrix.FillLowerTriangleFromUpperTriangle( metric_values[FMM::Type::NF].data() );
+                    matrix.FillLowerTriangleFromUpperTriangle( metric_values[idx].data() );
                 }
-                
-                wprint(ClassName()+"::Compute_NF: TODO: Correct the diagonal blocks!");
             }
             
-            ptoc(ClassName()+"::Compute_NF");
+            ptoc(ClassName()+"::VF_Compute");
         }
             
         template< typename T1, typename T2 >
-        void Compute_FF( const T1 q_half_, const T1 p_half_ )
+        void NF_Compute( const T1 q_half_, const T1 p_half_ )
         {
-            ptic(ClassName()+"::Compute_FF");
+            ptic(ClassName()+"::NF_Compute");
             
-            Configurator_T conf (
-                bct.GetS(), bct.GetT(),
-                metric_values[FMM::Type::FF], prec_values[FMM::Type::FF]
-            );
+            const Type type = Type::NF;
+            const int idx = std::__to_underlying(type);
+            
+            auto & pattern = bct.template GetMatrix<type>();
+            
+            Configurator_T conf ( bct.GetS(), bct.GetT(), metric_values[idx] );
+    
+            using Kernel_T = TP_Kernel_NF<
+                S_DOM_DIM, T_DOM_DIM,
+                ClusterTree_T, T1, T2,
+                BlockClusterTree_T::IsSymmetric(),
+                energy_flag, diff_flag, metric_flag
+            >;
+            
+            Kernel_T ker ( conf, q_half_, p_half_ );
+
+            FMM_Traversor<Kernel_T> traversor ( pattern, ker );
+
+            en += traversor.Compute();
+
+            if( metric_flag )
+            {
+                if constexpr ( is_symmetric )
+                {
+                    SparseKernelMatrixCSR_gen<Kernel_NF_MultiplyMetric_T> matrix ( pattern );
+                    
+                    matrix.FillLowerTriangleFromUpperTriangle( metric_values[idx].data() );
+                }
+            }
+            
+            ptoc(ClassName()+"::NF_Compute");
+        }
+            
+        template< typename T1, typename T2 >
+        void FF_Compute( const T1 q_half_, const T1 p_half_ )
+        {
+            ptic(ClassName()+"::FF_Compute");
+            
+            const Type type = Type::FF;
+            const int idx = std::__to_underlying(type);
+            
+            auto & pattern = bct.template GetMatrix<type>();
+            
+            Configurator_T conf ( bct.GetS(), bct.GetT(), metric_values[idx] );
             
             using Kernel_T = TP_Kernel_FF<
                 ClusterTree_T, T1, T2,
                 BlockClusterTree_T::IsSymmetric(),
-                energy_flag, diff_flag, hess_flag, metric_flag, prec_flag
+                energy_flag, diff_flag, metric_flag
             >;
             
             Kernel_T ker ( conf, q_half_, p_half_ );
             
-            FMM_Traversor<Kernel_T> traversor ( bct.Far(), ker );
+            FMM_Traversor<Kernel_T> traversor ( pattern, ker );
             
             en += traversor.Compute();
             
@@ -255,72 +267,110 @@ namespace Repulsor
             {
                 if constexpr ( is_symmetric )
                 {
-                    SparseKernelMatrixCSR_gen<Kernel_FF_MultiplyMetric_T> matrix ( bct.Far() );
+                    SparseKernelMatrixCSR_gen<Kernel_NF_MultiplyMetric_T> matrix ( pattern );
                     
-                    matrix.FillLowerTriangleFromUpperTriangle( metric_values[FMM::Type::FF].data() );
+                    matrix.FillLowerTriangleFromUpperTriangle( metric_values[idx].data() );
                 }
-                
-                wprint(ClassName()+"::Compute_FF: TODO: Correct the diagonal blocks!");
             }
-            ptoc(ClassName()+"::Compute_FF");
+            
+            ptoc(ClassName()+"::FF_Compute");
         }
+        
+//##############################################################################################
+//      Multiply metric
+//##############################################################################################
         
     public:
         
-        void MultiplyMetric() const
+        void MultiplyMetric(const bool VF_flag, const bool NF_flag, const bool FF_flag ) const
         {
-            const Int rhs_count = bct.GetS().BufferDimension()/(1+AMB_DIM);
-            
             if( metric_flag )
             {
-                MultiplyMetric_NF(rhs_count);
-                MultiplyMetric_VF(rhs_count);
-                MultiplyMetric_FF(rhs_count);
+                const Int rhs_count = bct.GetS().BufferDimension() / Kernel_NF_MultiplyMetric_T::ROWS;                
+         
+                if( NF_flag )
+                {
+                    NF_MultiplyMetric(rhs_count);
+                }
+                else
+                {
+                    bct.GetS().PrimitiveOutputBuffer().SetZero();
+                }
+                
+                if( VF_flag )
+                {
+                    VF_MultiplyMetric(rhs_count);
+                }
+                
+                if( FF_flag )
+                {
+                    FF_MultiplyMetric(rhs_count);
+                }
+                else
+                {
+                    bct.GetS().ClusterOutputBuffer().SetZero();
+                }
             }
         }
+        
+//##############################################################################################
+//      Multiply metric subroutines
+//##############################################################################################
         
     protected:
 
-        void MultiplyMetric_NF( const Int rhs_count ) const
+        void NF_MultiplyMetric( const Int rhs_count ) const
         {
-            if( metric_flag )
-            {
-                SparseKernelMatrixCSR_gen<Kernel_NF_MultiplyMetric_T> matrix ( bct.Near() );
-                
-                matrix.Dot(
-                    metric_values[FMM::Type::NF].data(),
-                    static_cast<Real>(1), bct.GetT().PrimitiveInputBuffer().data(),
-                    static_cast<Real>(0), bct.GetS().PrimitiveOutputBuffer().data(),
-                    rhs_count
-               );
-            }
+            constexpr Type type = Type::NF;
+            
+            const int idx = std::__to_underlying(type);
+            auto & pattern = bct.template GetMatrix<type>();
+            
+            SparseKernelMatrixCSR_gen<Kernel_NF_MultiplyMetric_T> matrix ( pattern );
+            
+            matrix.Dot(
+                metric_values[idx].data(),
+                one,  bct.GetT().template GetBuffer<type,InOut::In >().data(),
+                zero, bct.GetS().template GetBuffer<type,InOut::Out>().data(),
+                rhs_count
+           );
         }
         
-        void MultiplyMetric_VF( const Int rhs_count ) const
+        void VF_MultiplyMetric( const Int rhs_count ) const
         {
             if constexpr ( metric_flag )
             {
-                SparseKernelMatrixCSR_gen<Kernel_VF_MultiplyMetric_T> matrix ( bct.VeryNear() );
+                constexpr Type type = Type::VF;
+                
+                const int idx = std::__to_underlying(type);
+                auto & pattern = bct.template GetMatrix<type>();
+                
+                SparseKernelMatrixCSR_gen<Kernel_VF_MultiplyMetric_T> matrix ( pattern );
                 
                 matrix.Dot(
-                    metric_values[FMM::Type::VF].data(),
-                    static_cast<Real>(1), bct.GetT().PrimitiveInputBuffer().data(),
-                    static_cast<Real>(1), bct.GetS().PrimitiveOutputBuffer().data(),
+                    metric_values[idx].data(),
+                    one,  bct.GetT().template GetBuffer<type,InOut::In >().data(),
+                    one,  bct.GetS().template GetBuffer<type,InOut::Out>().data(),
                     rhs_count
                 );
             }
         }
         
-        void MultiplyMetric_FF( const Int rhs_count ) const
+        void FF_MultiplyMetric( const Int rhs_count ) const
         {
             if( metric_flag )
             {
-                SparseKernelMatrixCSR_gen<Kernel_FF_MultiplyMetric_T> matrix ( bct.Near() );
+                constexpr Type type = Type::FF;
+                
+                const int idx = std::__to_underlying(type);
+                auto & pattern = bct.template GetMatrix<type>();
+                
+                SparseKernelMatrixCSR_gen<Kernel_FF_MultiplyMetric_T> matrix ( pattern );
                 
                 matrix.Dot(
-                    metric_values[FMM::Type::FF].data(),
-                    static_cast<Real>(1), bct.GetT().ClusterInputBuffer().data(),
-                    static_cast<Real>(0), bct.GetS().ClusterOutputBuffer().data(),
+                    metric_values[idx].data(),
+                    one,  bct.GetT().template GetBuffer<type,InOut::In >().data(),
+                    zero, bct.GetS().template GetBuffer<type,InOut::Out>().data(),
                     rhs_count
                );
             }
@@ -337,9 +387,7 @@ namespace Repulsor
                 + bct.ClassName()       + ","
                 + ToString(energy_flag) + ","
                 + ToString(diff_flag)   + ","
-                + ToString(hess_flag)   + ","
-                + ToString(metric_flag) + ","
-                + ToString(prec_flag)
+                + ToString(metric_flag) +
                 + ">";
         }
     };

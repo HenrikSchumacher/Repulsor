@@ -4,9 +4,7 @@
 
 namespace Repulsor
 {
-    template<
-        typename ClusterTree_T_
-    >
+    template< typename ClusterTree_T_ >
     class alignas( OBJECT_ALIGNMENT ) CLASS
     {
     public:
@@ -21,8 +19,6 @@ namespace Repulsor
         using Values_T         = Tensor2<Real,Int>;
         using ValueContainer_T = std::array<Values_T,3>;
         
-    protected:
-        
         
     public:
 
@@ -31,13 +27,11 @@ namespace Repulsor
         CLASS(
             const ClusterTree_T & S_,
             const ClusterTree_T & T_,
-            Values_T & metric_values_,
-            Values_T & prec_values_
+            Values_T & metric_values_
         )
         :   S             ( S_                  )
         ,   T             ( T_                  )
         ,   metric_values ( metric_values_      )
-        ,   prec_values   ( prec_values_        )
         {}
         
         // Copy constructor
@@ -45,19 +39,17 @@ namespace Repulsor
         :   S             ( other.S             )
         ,   T             ( other.T             )
         ,   metric_values ( other.metric_values )
-        ,   prec_values   ( other.prec_values   )
         {}
         
         virtual ~CLASS() = default;
 
     protected:
-        
+
         const ClusterTree_T & S;
         const ClusterTree_T & T;
         
         Values_T & metric_values;
-        Values_T & prec_values;
-        
+
     public:
         
         const ClusterTree_T & GetS() const
@@ -74,12 +66,6 @@ namespace Repulsor
         {
             return metric_values;
         }
-        
-        Values_T & PreconditionerValues() const
-        {
-            return prec_values;
-        }
-        
         
         virtual std::string ClassName() const
         {

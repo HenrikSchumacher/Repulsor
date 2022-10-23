@@ -10,35 +10,6 @@ namespace Repulsor
 //    template<int DOM_DIM, int AMB_DIM, typename Real, typename Int, typename SReal, typename ExtReal>
 //    class TangentPoint;
     
-#ifdef ENABLE_ENERGIES
-    
-    template<int DOM_DIM, int AMB_DIM, typename Real, typename Int, typename SReal, typename ExtReal>
-    class Energy_Restricted;
-    
-    template<int DOM_DIM, int AMB_DIM, int DEGREE, typename Real, typename Int, typename SReal, typename ExtReal>
-    class TP_Energy_FMM_Adaptive;
-    
-    template<int DOM_DIM1, int DOM_DIM2, int AMB_DIM, int DEGREE, typename Real, typename Int, typename SReal, typename ExtReal>
-    class TP_ObstacleEnergy_FMM_Adaptive;
-
-    template<int DOM_DIM, int AMB_DIM, int DEGREE, typename Real, typename Int, typename SReal, typename ExtReal>
-    class TrivialEnergy_FMM_Adaptive;
-    
-    template<int DOM_DIM1, int DOM_DIM2, int AMB_DIM, int DEGREE, typename Real, typename Int, typename SReal, typename ExtReal>
-    class TrivialObstacleEnergy_FMM_Adaptive;
-    
-#endif
-
-#ifdef ENABLE_METRICS
-    
-    template<int DOM_DIM, int AMB_DIM, int DEGREE, typename Real, typename Int, typename SReal, typename ExtReal>
-    class TP_Metric_FMM_Adaptive;
-    
-    //    template<int DOM_DIM, int AMB_DIM, int DEGREE, typename Real, typename Int, typename SReal, typename ExtReal>
-    //    class TP_SingularMetric_FMM_Adaptive;
-        
-#endif
-    
     template<typename Real, typename Int, typename SReal, typename ExtReal>
     class SimplicialRemesherBase;
     
@@ -49,6 +20,9 @@ namespace Repulsor
     class CLASS : public BASE
     {
     public :
+        
+        using TangentVector_T    = typename BASE::TangentVector_T;
+        using CotangentVector_T  = typename BASE::CotangentVector_T;
         
         using       Primitive_T  =        Polytope<DOM_DIM+1,AMB_DIM,GJK_Real,Int,SReal,Real,Int>;
         using MovingPrimitive_T  =  MovingPolytope<DOM_DIM+1,AMB_DIM,GJK_Real,Int,SReal,Real,Int>;
@@ -64,10 +38,6 @@ namespace Repulsor
         using Remesher_T         =     SimplicialRemesher<DOM_DIM,AMB_DIM,Real,Int,SReal,ExtReal>;
         using RemesherBase_T     = SimplicialRemesherBase<                Real,Int,SReal,ExtReal>;
         using Obstacle_T         = BASE;
-        
-#ifdef ENABLE_ENERGIES
-        using Energy_T           =      Energy_Restricted<DOM_DIM,AMB_DIM,Real,Int,SReal,ExtReal>;
-#endif
         
         CLASS() = default;
 
@@ -632,11 +602,6 @@ namespace Repulsor
             obstacle->cluster_tree_settings = cluster_tree_settings;
             
             obstacle_initialized = true;
-            
-#ifdef ENABLE_ENERGIES
-            tpo_initialized = false;
-            trivial_oe_initialized = false;
-#endif
         }
         
         const Obstacle_T & GetObstacle() const override
@@ -699,117 +664,6 @@ namespace Repulsor
             }
             return *obstacle_collision_tree;
         }
-        
-//##############################################################################################
-//      Tangent-point
-//##############################################################################################
-     
-    protected:
-        
-        mutable Real    tp_alpha  = 2 * (DOM_DIM+1);
-        mutable Real    tp_beta   = 4 * (DOM_DIM+1);
-        mutable ExtReal tp_weight = 1;
-        
-        
-#ifdef ENABLE_ENERGIES
-        
-        mutable bool tpe_initialized = false;
-        mutable std::unique_ptr<TP_Energy_FMM_Adaptive<DOM_DIM,AMB_DIM,0,Real,Int,SReal,ExtReal>> tpe;
-
-        mutable bool tpo_initialized = false;
-        mutable std::unique_ptr<Energy_T> tpo;
-        
-#endif
-        
-#ifdef ENABLE_METRICS
-  
-        mutable bool tpm_initialized = false;
-        mutable std::unique_ptr<TP_Metric_FMM_Adaptive<DOM_DIM,AMB_DIM,0,Real,Int,SReal,ExtReal>> tpm;
-
-//        mutable bool tpsm_initialized = false;
-//        mutable std::unique_ptr<TP_SingularMetric_FMM_Adaptive<DOM_DIM,AMB_DIM,0,Real,Int,SReal,ExtReal>> tpsm;
-        
-#endif
-        
-    public:
-        
-        ExtReal GetTangentPointWeight() const override
-        {
-           return tp_weight;
-        }
-
-        void SetTangentPointWeight( const ExtReal weight ) const override
-        {
-            tp_weight = weight;
-#ifdef ENABLE_ENERGIES
-            if( tpe_initialized )
-            {
-                tpe->SetWeight(tp_weight);
-            }
-            if( tpo_initialized )
-            {
-                tpo->SetWeight(tp_weight);
-            }
-#endif
-            
-#ifdef ENABLE_METRICS
-            if( tpm_initialized )
-            {
-                tpm->SetWeight(tp_weight);
-            }
-//            if( tpsm_initialized )
-//            {
-//                tpsm->SetWeight(tp_weight);
-//            }
-#endif
-        }
-                                               
-        std::pair<Real,Real> GetTangentPointExponents() const override
-        {
-           return std::pair<Real,Real>( tp_alpha, tp_beta );
-        }
-
-        void SetTangentPointExponents( const Real alpha_, const Real beta_ ) const override
-        {
-           if( alpha_ != tp_alpha || beta_ != tp_beta )
-           {
-               tp_alpha = alpha_;
-               tp_beta  = beta_;
-
-#ifdef ENABLE_ENERGIES
-               
-               tpe_initialized  = false;
-               tpo_initialized  = false;
-               
-#endif
-         
-#ifdef ENABLE_METRICS
-               tpm_initialized  = false;
-//               tpsm_initialized = false;
-#endif
-           }
-        }
-        
-
-#ifdef ENABLE_ENERGIES
-
-    #include "TangentPointEnergy.hpp"
-        
-    #include "TangentPointObstacleEnergy.hpp"
-  
-    #include "CustomEnergy.hpp"
-
-    #include "TrivialEnergy.hpp"
-        
-#endif
-        
-#ifdef ENABLE_METRICS
-        
-//    #include "TangentPointMetric.hpp"
-//
-//    #include "TangentPointSingularMetric.hpp"
-        
-#endif
 
         
 //##############################################################################################

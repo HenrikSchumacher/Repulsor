@@ -166,7 +166,30 @@ namespace Repulsor
         {
             return far;
         }
-
+        
+        template<FMM::Type fmm>
+        const Far_T & GetMatrix() const
+        {
+            switch( fmm )
+            {
+                case FMM::Type::IN:
+                {
+                    return inter;
+                }
+                case FMM::Type::VF:
+                {
+                    return verynear;
+                }
+                case FMM::Type::NF:
+                {
+                    return near;
+                }
+                case FMM::Type::FF:
+                {
+                    return far;
+                }
+            }
+        }
         
         const ClusterTree_T & GetS() const override
         {

@@ -1,7 +1,7 @@
 #pragma once
 
 #define CLASS TP_Kernel_VF
-#define BASE  FMM_Kernel_VF<S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,hess_flag_,metric_flag_,prec_flag_>
+#define BASE  FMM_Kernel_VF<S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,metric_flag_>
 
 namespace Repulsor
 {
@@ -9,7 +9,7 @@ namespace Repulsor
         int S_DOM_DIM_, int T_DOM_DIM_,
         typename ClusterTree_T_, typename T1, typename T2,
         bool is_symmetric_,
-        bool energy_flag_, bool diff_flag_, bool hess_flag_, bool metric_flag_, bool prec_flag_
+        bool energy_flag_, bool diff_flag_, bool metric_flag_
     >
     class CLASS : public BASE
     {
@@ -33,17 +33,13 @@ namespace Repulsor
         using BASE::S_DATA_DIM;
         using BASE::energy_flag;
         using BASE::diff_flag;
-        using BASE::hess_flag;
         using BASE::metric_flag;
-        using BASE::prec_flag;
 
         static constexpr Int METRIC_NNZ = 1 + 2 * AMB_DIM;
         static constexpr Int PREC_NNZ   = 1;
         
         using BASE::S;
         using BASE::T;
-//        using BASE::S_Tree;
-//        using BASE::T_Tree;
         
         using BASE::zero;
         using BASE::one;
@@ -85,7 +81,6 @@ namespace Repulsor
     protected:
         
         using BASE::metric_data;
-        using BASE::prec_data;
         
         using BASE::S_data;
         using BASE::S_D_data;
@@ -132,14 +127,19 @@ namespace Repulsor
         
     public:
         
+        virtual force_inline void CleanseBlock( const Int block_ID ) override
+        {
+            zerofy_buffer( &metric_data[METRIC_NNZ * block_ID], METRIC_NNZ );
+        }
+        
         virtual force_inline Real compute( const Int block_ID ) override
         {
-            Real x    [AMB_DIM] = {};
-            Real y    [AMB_DIM] = {};
-            Real v    [AMB_DIM] = {};
-            Real Pv   [AMB_DIM] = {};
-            Real Qv   [AMB_DIM] = {};
-            Real dEdv [AMB_DIM] = {};
+            Real x    [AMB_DIM]  = {};
+            Real y    [AMB_DIM]  = {};
+            Real v    [AMB_DIM]  = {};
+            Real Pv   [AMB_DIM]  = {};
+            Real Qv   [AMB_DIM]  = {};
+            Real dEdv [AMB_DIM]  = {};
             Real V    [PROJ_DIM] = {};
             
             Real r2        = zero;
@@ -166,7 +166,7 @@ namespace Repulsor
                 v[i] = y[i] - x[i];
                 r2  += v[i] * v[i];
             }
-
+            
             for( Int i = 0; i < AMB_DIM; ++i )
             {
                 for( Int j = 0; j < AMB_DIM; ++j )
@@ -182,6 +182,8 @@ namespace Repulsor
                 rCosPhi_2 += v[i] * Pv[i];
                 rCosPsi_2 += v[i] * Qv[i];
             }
+            
+            // TODO: It probably suffices to multiply w only once against r_minus_p_minus_2, because the latter is multiplied to almost everything.
             
             // |P*(y-x)|^{q-2}
             const Real rCosPhi_q_minus_2 = MyMath::pow<Real,T1>( fabs(rCosPhi_2), q_half_minus_1);
@@ -211,7 +213,6 @@ namespace Repulsor
 
                 if constexpr ( diff_flag )
                 {
-                    const Real factor = q_half * r_minus_p;
                     const Real H = - p * r_minus_p_minus_2 * Num;
                     
                     Real dEdvx = zero;
@@ -253,7 +254,6 @@ namespace Repulsor
                 if constexpr ( metric_flag )
                 {
                     Real * restrict const m_vals = &metric_data[ METRIC_NNZ * block_ID ];
-    //                Real * restrict const p_vals = &prec_values  [ PREC_NNZ   * block_ID ];
                     
 //                     The metric block looks like this for AMB_DIM == 3:
 //
@@ -272,13 +272,17 @@ namespace Repulsor
 //                     BUT we have to add the local matrices from several subtriangles!
 //                     Thus this structure cannot be exploited.
                     
-                    // TODO: Make sure that the block is set to zero, so that we can added into like so:
-                    m_vals[0] -= (K_xy + K_yx);
+                    // CAUTION: We have to do a _weighted_ add-in here! In particular, this requires that CleanseBlock() has been called somewhen before the traversal into the pair of SimplexHierarchies starts.
+                    
+                    const Real w_K_xy = w * K_xy;
+                    const Real w_K_yx = w * K_yx;
+                    
+                    m_vals[0] -= (w_K_xy + w_K_yx);
                     
                     for( Int l = 0; l < AMB_DIM; ++l )
                     {
-                        m_vals[1+l]         += K_yx * v[l];
-                        m_vals[1+AMB_DIM+l] -= K_xy * v[l];
+                        m_vals[1+l]         += w_K_yx * v[l];
+                        m_vals[1+AMB_DIM+l] -= w_K_xy * v[l];
                     }
                 }
             }
@@ -323,8 +327,7 @@ namespace Repulsor
             + ToString(is_symmetric) + ","
             + ToString(energy_flag) + ","
             + ToString(diff_flag) + ","
-            + ToString(hess_flag) + ","
-            + ToString(metric_flag) + ","
+            + ToString(metric_flag) +
             ">";
         }
     };

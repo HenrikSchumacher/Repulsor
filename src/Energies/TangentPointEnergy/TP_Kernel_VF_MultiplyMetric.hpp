@@ -41,7 +41,6 @@ namespace Repulsor
         using BASE::Y;
         using BASE::x;
         using BASE::z;
-        using BASE::rhs_count;
         
     public:
         
@@ -89,7 +88,7 @@ namespace Repulsor
                   Scalar * restrict const a_to   = &A[ NONZERO_COUNT * to  ];
             
             a_to[0] = a_from[0];
-            for( int k = 0; k < AMB_DIM; ++k )
+            for( Int k = 0; k < AMB_DIM; ++k )
             {
                 a_to[1    + k] = - a_from[ROWS + k];
                 a_to[ROWS + k] = - a_from[1    + k];
@@ -119,7 +118,7 @@ namespace Repulsor
 //              \                                                                 /
 //
 //            This are 1 + 2 * AMB_DIM nonzero values.
-//            It is tempting to compress also this to 2 + AMB_DIM values.
+//            It is tempting to compress this to 2 + AMB_DIM values.
 //            BUT we have to add the local matrices from several subtriangles!
 //            Thus this structure cannot be exploited.
             

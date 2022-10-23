@@ -52,6 +52,7 @@
 //
 #include "src/FMM.hpp"
 #include "src/Energies.hpp"
+#include "src/Metrics.hpp"
 //    #include "src/Metrics.hpp"
 
 #endif

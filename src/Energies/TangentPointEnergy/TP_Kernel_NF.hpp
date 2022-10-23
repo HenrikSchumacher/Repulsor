@@ -1,7 +1,11 @@
 #pragma once
 
 #define CLASS TP_Kernel_NF
-#define BASE FMM_Kernel_NF<S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,hess_flag_,metric_flag_,prec_flag_>
+#define BASE FMM_Kernel_NF<                 \
+    S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,   \
+    is_symmetric_,                          \
+    energy_flag_,diff_flag_,metric_flag_    \
+>
 
 namespace Repulsor
 {
@@ -9,7 +13,7 @@ namespace Repulsor
         int S_DOM_DIM_, int T_DOM_DIM_,
         typename ClusterTree_T_, typename T1, typename T2,
         bool is_symmetric_,
-        bool energy_flag_, bool diff_flag_, bool hess_flag_, bool metric_flag_, bool prec_flag_
+        bool energy_flag_, bool diff_flag_, bool metric_flag_
     >
     class CLASS : public BASE
     {
@@ -33,11 +37,10 @@ namespace Repulsor
         using BASE::S_DATA_DIM;
         using BASE::energy_flag;
         using BASE::diff_flag;
-        using BASE::hess_flag;
         using BASE::metric_flag;
-        using BASE::prec_flag;
         
-        static constexpr Int METRIC_NNZ = 2 + AMB_DIM;
+//        static constexpr Int METRIC_NNZ = 2 + AMB_DIM;
+        static constexpr Int METRIC_NNZ = 1 + 2 * AMB_DIM;
         static constexpr Int PREC_NNZ   = 1;
 
         using BASE::S;
@@ -82,7 +85,6 @@ namespace Repulsor
     protected:
         
         using BASE::metric_data;
-        using BASE::prec_data;
         
         using BASE::S_data;
         using BASE::S_D_data;
@@ -123,14 +125,15 @@ namespace Repulsor
     public:
         
         virtual force_inline Real compute( const Int block_ID ) override
-        {            
+        {
+            const Real delta = static_cast<Real>(S_ID == T_ID);
             Real v    [AMB_DIM ] = {};
             Real Pv   [AMB_DIM ] = {};
             Real Qv   [AMB_DIM ] = {};
             Real dEdv [AMB_DIM ] = {};
             Real V    [PROJ_DIM] = {};
             
-            Real r2        = zero;
+            Real r2        = delta;
             Real rCosPhi_2 = zero;
             Real rCosPsi_2 = zero;
             
@@ -139,7 +142,7 @@ namespace Repulsor
                 v[i] = y[i] - x[i];
                 r2  += v[i] * v[i];
             }
-
+            
             for( Int i = 0; i < AMB_DIM; ++i )
             {
                 for( Int j = 0; j < AMB_DIM; ++j )
@@ -161,7 +164,7 @@ namespace Repulsor
             // |Q*(y-x)|^{q-2}
             const Real rCosPsi_q_minus_2 = MyMath::pow<Real,T1>( fabs(rCosPsi_2), q_half_minus_1);
             // r^{2-p}
-            const Real r_minus_p_minus_2 = MyMath::pow<Real,T2>( r2, minus_p_half_minus_1 );
+            const Real r_minus_p_minus_2 = (one-delta) * MyMath::pow<Real,T2>( r2, minus_p_half_minus_1 );
             // |y-x|^-p
             const Real r_minus_p = r_minus_p_minus_2 * r2;
             // |P*(y-x)|^q
@@ -184,7 +187,6 @@ namespace Repulsor
                 
                 if constexpr ( diff_flag )
                 {
-                    const Real factor = q_half * r_minus_p;
                     const Real H = - p * r_minus_p_minus_2 * Num;
                     
                     Real dEdvx = zero;
@@ -223,7 +225,6 @@ namespace Repulsor
                 if constexpr ( metric_flag )
                 {
                     Real * restrict const m_vals = &metric_data[ METRIC_NNZ * block_ID ];
-    //                Real * restrict const p_vals = &prec_values  [ PREC_NNZ   * block_ID ];
                     
 //                     The metric block looks like this for AMB_DIM == 3:
 //
@@ -238,19 +239,19 @@ namespace Repulsor
 //                          \                                                                 /
 //
 //                     This are 1 + 2 * AMB_DIM nonzero values.
-//                     With sparse matrix multiplication the bottleneck will be the bandwidth.
-//                     Hence instead, we store this data in only 2 + AMB_DIM values by just storing
-//
-//                              K_xy, K_yx, v[0], ..., v[AMB_DIM-1]!
-//
-//                     We just must not forget to recompute these values in the matrix multiplication kernel.
+//                     It is tempting to compress this into 2 + AMB_DIM values.
+//                     BUT we have to add into the diagonal entries.
+//                     Thus this structure cannot be exploited.
+//                     And it did not appear to be much faster.
                     
-                    m_vals[0] = K_xy;
-                    m_vals[1] = K_yx;
+                    // CAUTION: We have _set_ the values here.! Otherwise we would have to zerofy metric_data first (which we don't want for performance reasons).
+                    
+                    m_vals[0] = (K_xy + K_yx);
                     
                     for( Int l = 0; l < AMB_DIM; ++l )
                     {
-                        m_vals[2+l] = v[l];
+                        m_vals[1+l]         = K_yx * v[l];
+                        m_vals[1+AMB_DIM+l] = K_xy * v[l];
                     }
                 }
             }
@@ -295,7 +296,6 @@ namespace Repulsor
             + ToString(is_symmetric) + ","
             + ToString(energy_flag) + ","
             + ToString(diff_flag) + ","
-            + ToString(hess_flag) + ","
             + ToString(metric_flag) + ","
             ">";
         }

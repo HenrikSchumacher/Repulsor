@@ -7,7 +7,7 @@ namespace Repulsor
     template<
         typename ClusterTree_T_,
         bool is_symmetric_,
-        bool energy_flag_, bool diff_flag_, bool hess_flag_, bool metric_flag_, bool prec_flag_
+        bool energy_flag_, bool diff_flag_, bool metric_flag_
     >
     class alignas( OBJECT_ALIGNMENT ) CLASS
     {
@@ -21,21 +21,17 @@ namespace Repulsor
         using SReal   = typename ClusterTree_T::SReal;
         using ExtReal = typename ClusterTree_T::ExtReal;
         
-        using Values_T         = Tensor2<Real,Int>;
-        using ValueContainer_T = std::array<Values_T,3>;
-        
-        using Configurator_T   = FMM_Configurator<ClusterTree_T>;
+        using Configurator_T    = FMM_Configurator<ClusterTree_T>;
+        using Values_T          = Tensor2<Real,Int>;
+        using ValueContainer_T  = std::array<Values_T,3>;
         
         static constexpr bool is_symmetric = is_symmetric_;
+        static constexpr bool energy_flag = energy_flag_;
+        static constexpr bool diff_flag   = diff_flag_;
+        static constexpr bool metric_flag = metric_flag_;
         
         static constexpr Int AMB_DIM   = ClusterTree_T::AMB_DIM;
         static constexpr Int PROJ_DIM  = (AMB_DIM*(AMB_DIM+1))/2;
-        
-        static constexpr bool energy_flag = energy_flag_;
-        static constexpr bool diff_flag   = diff_flag_;
-        static constexpr bool hess_flag   = hess_flag_;
-        static constexpr bool metric_flag = metric_flag_;
-        static constexpr bool prec_flag   = prec_flag_;
         
     protected:
         
@@ -91,26 +87,20 @@ namespace Repulsor
 
         CLASS() = delete;
         
-        // To be used for configuration of kernel. CANNOT BE USED FOR COMPUTE MODE!
         CLASS( Configurator_T & conf )
-        :   S             ( conf.GetS()                 )
-        ,   T             ( conf.GetT()                 )
-        ,   metric_values ( conf.MetricValues()         )   // In configure mode, kernels needs access to refs.
-        ,   prec_values   ( conf.PreconditionerValues() )   // for allocation.
+        :   S             ( conf.GetS()         )
+        ,   T             ( conf.GetT()         )
+        ,   metric_values ( conf.MetricValues() )   // In configure mode, kernels needs
         {
             Init();
         }
         
-        // Copy constructor. Must be used for compute mode!
         CLASS( const CLASS & other )
-        :   S                  ( other.S                    )
-        ,   T                  ( other.T                    )
-        ,   metric_values      ( other.metric_values        )
-        ,   prec_values        ( other.prec_values          )
+        :   S             ( other.S                    )
+        ,   T             ( other.T                    )
+        ,   metric_values ( other.metric_values        )
         // In compute mode the pointers are needed!
-        ,   metric_data        ( other.metric_values.data() )
-        // In compute mode the pointers are needed!
-        ,   prec_data          ( other.prec_values.data()   )
+        ,   metric_data   ( metric_values.data() )
         {
             Init();
         }
@@ -127,62 +117,6 @@ namespace Repulsor
         {
             return T;
         }
-        
-        void Allocate( const Int nnz )
-        {
-            if constexpr ( metric_flag )
-            {
-                if(
-                   metric_values.Dimension(0) != nnz
-                   ||
-                   metric_values.Dimension(1) != MetricNonzeroCount()
-                   )
-                {
-                    metric_values = Values_T( nnz, MetricNonzeroCount() );
-                }
-            }
-            
-            if constexpr ( prec_flag )
-            {
-                if(
-                   prec_values.Dimension(0) != nnz
-                   ||
-                   prec_values.Dimension(1) != PreconditionerNonzeroCount()
-                   )
-                {
-                    prec_values = Values_T( nnz, PreconditionerNonzeroCount() );
-                }
-            }
-        }
-        
-        bool PointersInititializedQ() const
-        {
-            if constexpr ( metric_flag )
-            {
-                if( metric_data == nullptr )
-                {
-                    eprint(ClassName()+"::PointersInititializedQ: Pointers for metric_values not initialized. Make sure to initialize the kernel via the copy constructor.");
-                    
-                    return false;
-                }
-            }
-            
-            if constexpr ( prec_flag )
-            {
-                if( prec_data == nullptr )
-                {
-                    eprint(ClassName()+"::PointersInititializedQ: Pointers for prec_values not initialized. Make sure to initialize the kernel via the copy constructor.");
-                    
-                    return false;
-                }
-            }
-            
-            return true;
-        }
-        
-        virtual Int MetricNonzeroCount() const = 0;
-
-        virtual Int PreconditionerNonzeroCount() const = 0;
         
         virtual void LoadS( const Int i ) = 0;
         
@@ -201,16 +135,49 @@ namespace Repulsor
         
         virtual void WriteT() = 0;
         
+        
+        void Allocate( const Int nnz )
+        {
+            if constexpr ( metric_flag )
+            {
+                if(
+                   metric_values.Dimension(0) != nnz
+                   ||
+                   metric_values.Dimension(1) != MetricNonzeroCount()
+                   )
+                {
+                    metric_values = Values_T( nnz, MetricNonzeroCount() );
+                }
+            }
+        }
+        
+        bool PointersInititializedQ() const
+        {
+            if constexpr ( metric_flag )
+            {
+                if( metric_data == nullptr )
+                {
+                    eprint(ClassName()+"::PointersInititializedQ: Pointers for metric_values not initialized. Make sure to initialize the kernel via the copy constructor.");
+                    
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+        
+        virtual Int MetricNonzeroCount() const = 0;
+
+        virtual Int PreconditionerNonzeroCount() const = 0;
+        
     protected:
         
         const ClusterTree_T & S;
         const ClusterTree_T & T;
         
         Values_T & metric_values;
-        Values_T & prec_values;
         
         Real * restrict const metric_data = nullptr;
-        Real * restrict const   prec_data = nullptr;
         
         Int S_ID = -1;
         Int T_ID = -1;

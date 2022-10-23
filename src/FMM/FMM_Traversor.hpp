@@ -5,7 +5,11 @@
 // TODO: Handle symmetric/asymmetric cases correctly!
 
 namespace Repulsor
-{    
+{
+    
+    // FMM_Traversor is a class to map kernel over all nonzero positions of a sparsity pattern (SparsityPatternCSR<Int>).
+    // This can be used, for example, to compute nonlocal energies, their derivatives, and the nonzero values of hierarchical matrices.
+    // Mostly intended to be used with the results of BlockClusterTree's GetMatrix<...>() routine the verynear/near/far block matrices.
     template<typename Kernel_T>
     class CLASS
     {
@@ -71,7 +75,7 @@ namespace Repulsor
             {
                 (void)pattern.Diag();
             }
-            
+
             kernel.Allocate( pattern.NonzeroCount() );
             
             const Int thread_count = job_ptr.Size()-1;
@@ -102,7 +106,7 @@ namespace Repulsor
                 for( Int i = i_begin; i < i_end; ++i )
                 {
                     // These are the corresponding nonzero blocks in i-th row.
-                    const Int k_begin = COND( is_symmetric, diag[i]+1, rp[i] );
+                    const Int k_begin = COND( is_symmetric, diag[i], rp[i] );
                     const Int k_end   = rp[i+1];
                     
                     if( k_end > k_begin )

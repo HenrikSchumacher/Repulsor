@@ -329,7 +329,6 @@ namespace Repulsor
             return P_out;
         }
         
-        
         const SparseMatrixCSR<Real,Int> & LowOrderPreprocessor() const
         {
             return lo_pre;
@@ -351,16 +350,16 @@ namespace Repulsor
             return hi_post;
         }
         
+        const SparseMatrixCSR<Real,Int> & MixedOrderPreprocessor() const
+        {
+            return mixed_pre;
+        }
         
         const SparseMatrixCSR<Real,Int> & MixedOrderPostprocessor() const
         {
             return mixed_post;
         }
-        
-        const SparseMatrixCSR<Real,Int> & MixedOrderPreprocessor() const
-        {
-            return mixed_pre;
-        }
+
         
         
         const SparseBinaryMatrixCSR<Int> & ClusterToPrimitiveMatrix() const
@@ -806,7 +805,7 @@ namespace Repulsor
                         return;
                     }
                 }
-                
+
                 // Caution: Some magic is going on here high order term...
                 // Apply diff/averaging operate, reorder and multiply by weights.
                 ptic(ClassName()+" pre->Dot");
@@ -867,7 +866,7 @@ namespace Repulsor
                         return;
                     }
                 }
-
+              
                 PercolateDown();
                 
                 ClustersToPrimitives( true );

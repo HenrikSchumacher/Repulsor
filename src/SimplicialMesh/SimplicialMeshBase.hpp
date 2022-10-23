@@ -2,15 +2,8 @@
 
 #define CLASS SimplicialMeshBase
 
-
-//#define ENABLE_ENERGIES
-//#define ENABLE_METRICS
-
 namespace Repulsor
 {
-    template<typename Real, typename Int, typename SReal, typename ExtReal>
-    class EnergyBase;
-    
     template<typename Real, typename Int, typename SReal, typename ExtReal>
     class SimplicialRemesherBase;
     
@@ -22,7 +15,6 @@ namespace Repulsor
         ASSERT_FLOAT(SReal);
         ASSERT_FLOAT(ExtReal);
         
-        
     public:
         
         using ClusterTree_T              =        ClusterTreeBase<Real,Int,SReal,ExtReal>;
@@ -31,6 +23,9 @@ namespace Repulsor
         using ObstacleBlockClusterTree_T =   BlockClusterTreeBase<Real,Int,SReal,ExtReal,false>;
         using ObstacleCollisionTree_T    =      CollisionTreeBase<Real,Int,SReal,ExtReal,false>;
         using Remesher_T                 = SimplicialRemesherBase<Real,Int,SReal,ExtReal>;
+        
+        using TangentVector_T            = Tensor2<ExtReal,Int>;
+        using CotangentVector_T          = Tensor2<ExtReal,Int>;
         
         CLASS () {}
         
@@ -114,202 +109,23 @@ namespace Repulsor
 //      Obstacle
 //#######################################################################################
         
+    // TODO: Make list of obstacles.
+        
     public:
         
-        virtual void LoadObstacle( std::unique_ptr<CLASS> obstacle_ ) = 0;
+        virtual void  LoadObstacle( std::unique_ptr<CLASS> obstacle_ ) = 0;
 
         virtual const CLASS & GetObstacle() const = 0;
         
-        virtual bool ObstacleInitialized() const = 0;
+        virtual bool  ObstacleInitialized() const = 0;
         
         virtual const ClusterTree_T & GetObstacleClusterTree() const = 0;
         
         virtual const ObstacleBlockClusterTree_T & GetObstacleBlockClusterTree() const = 0;
         
         virtual const ObstacleCollisionTree_T & GetObstacleCollisionTree() const = 0;
-        
-//##############################################################################################
-//      Tangent-point
-//##############################################################################################
-
-    public:
-        
-        virtual std::pair<Real,Real> GetTangentPointExponents() const = 0;
-        
-        virtual void SetTangentPointExponents( const Real alpha, const Real beta ) const = 0;
-        
-        virtual ExtReal GetTangentPointWeight() const = 0;
-        
-        virtual void SetTangentPointWeight( const ExtReal weight ) const = 0;
-        
-//##############################################################################################
-//      TangentPointEnergy
-//##############################################################################################
-
-#ifdef ENABLE_ENERGIES
-        
-        virtual ExtReal TangentPointEnergy() const = 0;
-
-        virtual ExtReal TangentPointEnergy_Differential( ExtReal * output, bool addTo = false ) const  = 0;
-        
-        virtual ExtReal TangentPointEnergy_Differential( Tensor1<ExtReal,Int> & output, bool addTo = false ) const  = 0;
-        
-        virtual ExtReal TangentPointEnergy_Differential( Tensor2<ExtReal,Int> & output, bool addTo = false ) const  = 0;
-        
-        virtual void TangentPointEnergy_Density( ExtReal * output, bool addTo = false ) const  = 0;
-        
-        virtual void TangentPointEnergy_Density( Tensor1<ExtReal,Int> & output, bool addTo = false ) const  = 0;
-        
-        virtual void TangentPointEnergy_SimplexEnergies( ExtReal * output, bool addTo = false ) const  = 0;
-        
-        virtual void TangentPointEnergy_SimplexEnergies( Tensor1<ExtReal,Int> & output, bool addTo = false ) const  = 0;
-        
-#endif
-        
-//##############################################################################################
-//      TangentPointObstacleEnergy
-//##############################################################################################
-
-#ifdef ENABLE_ENERGIES
-        
-        virtual ExtReal TangentPointObstacleEnergy() const = 0;
-
-        virtual ExtReal TangentPointObstacleEnergy_Differential( ExtReal * output, bool addTo = false ) const  = 0;
-        
-        virtual ExtReal TangentPointObstacleEnergy_Differential( Tensor1<ExtReal,Int> & output, bool addTo = false ) const = 0;
-        
-        virtual ExtReal TangentPointObstacleEnergy_Differential( Tensor2<ExtReal,Int> & output, bool addTo = false ) const = 0;
-        
-        virtual void TangentPointObstacleEnergy_Density( ExtReal * output, bool addTo = false ) const  = 0;
-        
-        virtual void TangentPointObstacleEnergy_Density( Tensor1<ExtReal,Int> & output, bool addTo = false ) const = 0;
-   
-        virtual void TangentPointObstacleEnergy_SimplexEnergies( ExtReal * output, bool addTo = false ) const  = 0;
-        
-        virtual void TangentPointObstacleEnergy_SimplexEnergies( Tensor1<ExtReal,Int> & output, bool addTo = false ) const  = 0;
-        
-#endif
-        
-        
-//##############################################################################################
-//      Trivial energy (for debugging purposes)
-//##############################################################################################
-        
-#ifdef ENABLE_ENERGIES
-        
-        virtual ExtReal GetTrivialEnergyWeight() const = 0;
-
-        virtual void SetTrivialEnergyWeight( const ExtReal weight ) const = 0;
-
-        virtual ExtReal TrivialEnergy() const = 0;
-
-        virtual ExtReal TrivialEnergy_Differential( ExtReal * output, bool addTo = false ) const = 0;
-
-        virtual ExtReal TrivialEnergy_Differential( Tensor1<ExtReal,Int> & output, bool addTo = false ) const = 0;
-        
-        virtual ExtReal TrivialEnergy_Differential( Tensor2<ExtReal,Int> & output, bool addTo = false ) const = 0;
-        
-#endif
-        
-//##############################################################################################
-//      TrivialObstacleEnergy (for debugging purposes)
-//##############################################################################################
-         
-#ifdef ENABLE_ENERGIES
-        
-        virtual ExtReal TrivialObstacleEnergy() const = 0;
-
-        virtual ExtReal TrivialObstacleEnergy_Differential( ExtReal * output, bool addTo = false ) const = 0;
-        
-        virtual ExtReal TrivialObstacleEnergy_Differential( Tensor1<ExtReal,Int> & output, bool addTo = false ) const = 0;
-        
-        virtual ExtReal TrivialObstacleEnergy_Differential( Tensor2<ExtReal,Int> & output, bool addTo = false ) const = 0;
-
-#endif
-        
-//##############################################################################################
-//      TangentPointMetric
-//##############################################################################################
-
-#ifdef ENABLE_METRICS
-        
-        virtual void TangentPointMetric_Multiply(
-            const ExtReal alpha, const ExtReal * U,
-            const ExtReal  beta,       ExtReal * V,
-            Int cols
-        ) const  = 0;
-        
-        virtual void TangentPointMetric_Multiply(
-            const ExtReal alpha, const Tensor1<ExtReal,Int> & U,
-            const ExtReal  beta,       Tensor1<ExtReal,Int> & V
-        ) const = 0;
-        
-        virtual void TangentPointMetric_Multiply(
-            const ExtReal alpha, const Tensor2<ExtReal,Int> & U,
-            const ExtReal  beta,       Tensor2<ExtReal,Int> & V
-        ) const = 0;
-        
-        virtual void TangentPointMetric_Multiply(
-            const ExtReal alpha, const ExtReal * U,
-            const ExtReal  beta,       ExtReal * V,
-            Int cols,
-            KernelType kernel
-        ) const = 0;
-        
-        virtual void TangentPointMetric_Multiply(
-            const ExtReal alpha, const Tensor1<ExtReal,Int> & U,
-            const ExtReal  beta,       Tensor1<ExtReal,Int> & V,
-            KernelType kernel
-        ) const = 0;
-        
-        virtual void TangentPointMetric_Multiply(
-            const ExtReal alpha, const Tensor2<ExtReal,Int> & U,
-            const ExtReal  beta,       Tensor2<ExtReal,Int> & V,
-            KernelType kernel
-        ) const = 0;
-        
-        
-        virtual const Tensor1<Real,Int> & TangentPointMetric_Values(
-            const bool farQ,
-            const KernelType kernel
-        ) const = 0;
-        
-        virtual void TangentPointMetric_ApplyKernel(
-            const bool farQ,
-            const KernelType kernel
-        ) const = 0;
-        
-#endif
-        
-////##############################################################################################
-////      TangentPointSingularMetric
-////##############################################################################################
-//
-//        
-//        virtual void TangentPointSingularMetric_Multiply(
-//            const ExtReal alpha, const ExtReal * U,
-//            const ExtReal  beta,       ExtReal * V,
-//            Int cols
-//        ) const  = 0;
-//        
-//        virtual void TangentPointSingularMetric_Multiply(
-//            const ExtReal alpha, const Tensor1<ExtReal,Int> & U,
-//            const ExtReal  beta,       Tensor1<ExtReal,Int> & V
-//        ) const = 0;
-//        
-//        virtual void TangentPointSingularMetric_Multiply(
-//            const ExtReal alpha, const Tensor2<ExtReal,Int> & U,
-//            const ExtReal  beta,       Tensor2<ExtReal,Int> & V
-//        ) const = 0;
-//        
-//        virtual const Tensor1<Real,Int> & TangentPointSingularMetric_Values(
-//            const bool farQ
-//        ) const = 0;
-//        
-//        virtual void TangentPointSingularMetric_ApplyKernel(
-//            const bool farQ
-//        ) const = 0;
-        
+    
+            
 //##############################################################################################
 //      IO
 //##############################################################################################
@@ -325,10 +141,6 @@ namespace Repulsor
     public:
         
         virtual std::unique_ptr<Remesher_T> CreateRemesher() = 0;
-//        
-//        virtual Real TangentPointEnergy_New() const = 0;
-//        
-//        virtual Real TangentPointEnergy_New_Differential( ExtReal * output, bool addTo = false ) const = 0;
         
 //##############################################################################################
 //      Standard interface
@@ -362,16 +174,10 @@ namespace Repulsor
         // Caution! This function is destructive.
         void SetCache( const std::string & s, std::any & thing ) const
         {
-            ptic("C");
             #pragma omp critical (cache)
             {
                 cache[s] = std::move(thing);
-                
-//                std::any nothing;
-//                cache[s] = nothing;
-//                cache[s].swap(thing);
             }
-            ptoc("C");
         }
         
         void ClearCache() const

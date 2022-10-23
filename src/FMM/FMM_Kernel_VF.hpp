@@ -1,7 +1,7 @@
 #pragma once
 
 #define CLASS FMM_Kernel_VF
-#define BASE  FMM_Kernel_NF<S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,hess_flag_,metric_flag_,prec_flag_>
+#define BASE  FMM_Kernel_NF<S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_, metric_flag_>
 
 namespace Repulsor
 {
@@ -9,7 +9,7 @@ namespace Repulsor
         int S_DOM_DIM_, int T_DOM_DIM_,
         typename ClusterTree_T_,
         bool is_symmetric_,
-        bool energy_flag_, bool diff_flag_, bool hess_flag_, bool metric_flag_, bool prec_flag_
+        bool energy_flag_, bool diff_flag_, bool metric_flag_
     >
     class CLASS : public BASE
     {
@@ -29,9 +29,7 @@ namespace Repulsor
         using BASE::is_symmetric;
         using BASE::energy_flag;
         using BASE::diff_flag;
-        using BASE::hess_flag;
         using BASE::metric_flag;
-        using BASE::prec_flag;
         
         using BASE::S_DOM_DIM;
         using BASE::T_DOM_DIM;
@@ -84,6 +82,8 @@ namespace Repulsor
         using BASE::tri_i;
         using BASE::tri_j;
         using BASE::lin_k;
+        
+        using BASE::metric_values;
         
         mutable S_Tree_T S_Tree;
         mutable T_Tree_T T_Tree;
@@ -225,10 +225,10 @@ namespace Repulsor
             }
         }
         
-        virtual Real compute(  const Int block_ID ) override = 0;
-        
-        virtual Real Compute(  const Int block_ID ) override
+        virtual Real Compute( const Int block_ID ) override
         {
+            CleanseBlock( block_ID );
+            
             Real sum = static_cast<Real>(0);
             
             ++primitive_count;
@@ -331,6 +331,12 @@ namespace Repulsor
             return symmetry_factor * sum;
         }
         
+        virtual void CleanseBlock(  const Int block_ID ) = 0;
+        
+        virtual Real compute(  const Int block_ID ) override = 0;
+        
+
+        
     public:
         
         virtual void CreateLogFile() const
@@ -367,10 +373,6 @@ namespace Repulsor
         
     public:
         
-        virtual Int MetricNonzeroCount() const override = 0;
-
-        virtual Int PreconditionerNonzeroCount() const override = 0;
-        
         virtual std::string ClassName() const override
         {
             return className();
@@ -387,7 +389,6 @@ namespace Repulsor
             + ToString(is_symmetric) + ","
             + ToString(energy_flag) + ","
             + ToString(diff_flag) + ","
-            + ToString(hess_flag) + ","
             + ToString(metric_flag) + ","
             ">";
         }

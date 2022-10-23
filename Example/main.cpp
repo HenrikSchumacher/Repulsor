@@ -526,9 +526,12 @@ int main(int argc, const char * argv[])
     // ExtReal = ("external real") floating point type that is used by the outer world, e.g. for submitting the mesh's vertex coordinates and vectors to multiply against the metric.
     // ExtInt = ("external real") integer type that is used by the outer world, e.g. for submitting the mesh's vertex coordinates and vectors to multiply against the metric.
     
+    
+    using Mesh_T = SimplicialMeshBase<REAL,INT,REAL,REAL>;
+    
     // Initialize mesh by the factory Make_SimplicialMesh to allow runtime polymorphism.
     tic("Initializing mesh");
-    std::unique_ptr<SimplicialMeshBase<REAL,INT,REAL,REAL>> M_ptr = Make_SimplicialMesh<REAL,INT,REAL,REAL>(
+    std::unique_ptr<Mesh_T> M_ptr = Make_SimplicialMesh<REAL,INT,REAL,REAL>(
         &vertex_coordinates[0][0],  vertex_count, amb_dim,
         &simplices[0][0],          simplex_count, dom_dim+1,
         thread_count
@@ -568,7 +571,7 @@ int main(int argc, const char * argv[])
     M.GetBlockClusterTree();
     toc("Creating BlockClusterTree");
 
-    print(M.GetBlockClusterTree().Stats());
+//    print(M.GetBlockClusterTree().Stats());
     
     valprint("M.GetClusterTree().ThreadCount()",M.GetClusterTree().ThreadCount());
 
@@ -579,24 +582,27 @@ int main(int argc, const char * argv[])
 
     print("");
 
-    // Tensor2 is a simple container class for heap-allocated matrices.
-    Tensor2<REAL,INT> diff ( M.VertexCount(), M.AmbDim() );
-
     const double q = 6;
     const double p = 12;
-    const double weight = 1;
-    
+//    const double weight = 1;
     
     std::unique_ptr<EnergyBase<REAL,INT,REAL,REAL>>
-        tpe_ptr = Make_TangentPointEnergy<REAL,INT,REAL,REAL> (dom_dim,amb_dim,weight,q,p);
+        tpe_ptr = Make_TangentPointEnergy<REAL,INT,REAL,REAL> (dom_dim,amb_dim,q,p);
     
     auto & tpe = *tpe_ptr;
     
-    double en;
+    std::unique_ptr<MetricBase<REAL,INT,REAL,REAL>>
+        tpm_ptr = Make_TangentPointMetric<REAL,INT,REAL,REAL> (dom_dim,amb_dim,q,p);
     
-    tic("tpe.Compute(M)");
-    tpe.Compute(M);
-    toc("tpe.Compute(M)");
+    auto & tpm = *tpm_ptr;
+    
+    double en;
+    // Mesh_T::CotangentVector_T is Tensor2<REAL,INT> in this case. It is a simple container class for heap-allocated matrices.
+    Mesh_T::CotangentVector_T diff;
+//    
+//    tic("tpe.Compute(M)");
+//    tpe.Compute(M);
+//    toc("tpe.Compute(M)");
     
     tic("tpe.Energy(M)");
     en = tpe.Value(M);
@@ -605,24 +611,24 @@ int main(int argc, const char * argv[])
     dump(en);
     
     tic("Compute tangent-point energy");
-    (void)tpe.Value(M);
+    en = tpe.Value(M);
     toc("Compute tangent-point energy");
     
     M.ClearCache();
     
     tic("Compute tangent-point energy");
-    (void)tpe.Value(M);
+    en = tpe.Value(M);
     toc("Compute tangent-point energy");
     
     tic("tpe.Differential(M)");
-    (void)tpe.Differential(M);
+    diff = tpe.Differential(M);
     toc("tpe.Differential(M)");
    
     dump(en);
    
-    // Tensor2 is a simple container class for matrices.
-    Tensor2<REAL,INT> X ( M.VertexCount(), M.AmbDim() );
-    Tensor2<REAL,INT> Y ( M.VertexCount(), M.AmbDim() );
+    // Mesh_T::TangentVector_T and Mesh_T::CotangentVector_T are both Tensor2<REAL,INT> in this example.
+    Mesh_T::TangentVector_T   X ( M.VertexCount(), M.AmbDim() );
+    Mesh_T::CotangentVector_T Y ( M.VertexCount(), M.AmbDim() );
 
     // Load some random data into U.
     X.Random();
@@ -630,45 +636,29 @@ int main(int argc, const char * argv[])
     const REAL alpha = 1.0;
     const REAL beta  = 0.0;
     //Performs generalized matrix-matrix product Y = alpha * A * X + beta * Y, where A is the tangent-point metric.
+    
+    tpm.MetricValues(M);
+
     tic("Matrix multiplication");
-    tpe.MultiplyMetric(M, alpha, X, beta, Y);
+    tpm.MultiplyMetric(M, alpha, X, beta, Y);
+    toc("Matrix multiplication");
+
+    tic("Matrix multiplication");
+    tpm.MultiplyMetric(M, alpha, X, beta, Y);
     toc("Matrix multiplication");
    
-//    M.SetTangentPointExponents(alpha, beta);
-//    M.SetTangentPointWeight(weight);
-//
-//    tic("Compute tangent-point energy");
-//    double tpe = M.TangentPointEnergy();
-//    toc("Compute tangent-point energy");
-//
-//    print("");
-//
-//    valprint("tangent-point energy", tpe);
-//    print("");
-//    print("");
-//
-//    //Compute derivative of tangent-point energy.
-//    bool add_to = false;
-//
-//    // Passing by pointer (diff.data() is just a double*, pointing to the first element in the array ).
-//    tic("Compute differential of tangent-point energy");
-//    M.TangentPointEnergy_Differential(diff.data(), add_to);         // Simply overwrite diff.
-//    toc("Compute differential of tangent-point energy");
-//    print("");
-//
-//    // You can also pass Tensor1 and Tensor2 objects directly.
-//    M.TangentPointEnergy_Differential(diff, add_to);                // Simply overwrite diff.
-//
-//    // Initialize mesh by the factory Make_SimplicialMesh to allow runtime polymorphism.
-//    tic("Initialize obstacle mesh");
-//    std::unique_ptr<SimplicialMeshBase<REAL,INT,REAL,REAL>> Q = Make_SimplicialMesh<REAL,INT,REAL,REAL>(
-//        &obstacle_vertex_coordinates[0][0],  obstacle_vertex_count, amb_dim,
-//        &obstacle_simplices[0][0],          obstacle_simplex_count, dom_dim+1,
-//        thread_count
-//      );
-//    toc("Initialize obstacle mesh");
-//    print("");
-//
+
+
+    // Initialize mesh by the factory Make_SimplicialMesh to allow runtime polymorphism.
+    tic("Initialize obstacle mesh");
+    std::unique_ptr<Mesh_T> Q = Make_SimplicialMesh<REAL,INT,REAL,REAL>(
+        &obstacle_vertex_coordinates[0][0],  obstacle_vertex_count, amb_dim,
+        &obstacle_simplices[0][0],          obstacle_simplex_count, dom_dim+1,
+        thread_count
+      );
+    toc("Initialize obstacle mesh");
+    print("");
+
 //    // Alternatively, you can do this, independent on which dimensions are enabled for Make_SimplicialMesh. However, dom_dim, and amb_dim have to be known at compile time:
 ////    Q = std::unique_ptr<SimplicialMeshBase<double,int,double,double>>(
 ////        new SimplicialMesh<dom_dim,amb_dim,double,int,double,double>(
@@ -677,20 +667,20 @@ int main(int argc, const char * argv[])
 ////            thread_pool.ThreadCount()
 ////        )
 ////    );
-////
-//    // Load obstacle into mesh.
-//    tic("Load obstacle");
-//    M.LoadObstacle(std::move(Q));
-//    toc("Load obstacle");
-//    print("");
-//
-//    tic("Create obstacle trees");
-//    M.GetObstacleBlockClusterTree();
-//    toc("Create obstacle trees");
-//    print("");
-//
-////    print(M.GetObstacleBlockClusterTree().Stats() );
-//
+
+    // Load obstacle into mesh.
+    tic("Load obstacle");
+    M.LoadObstacle( std::move(Q) );
+    toc("Load obstacle");
+    print("");
+
+    tic("Create obstacle trees");
+    M.GetObstacleBlockClusterTree();
+    toc("Create obstacle trees");
+    print("");
+
+//    print(M.GetObstacleBlockClusterTree().Stats() );
+
 //    //Compute tangent-point energy between mesh and obstacle.
 //
 //    tic("Compute tangent-point energy between mesh and obstacle");

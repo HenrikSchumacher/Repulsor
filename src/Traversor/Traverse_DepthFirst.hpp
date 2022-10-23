@@ -22,13 +22,13 @@ public:
             K.LoadClusterS(i);
             K.LoadClusterT(j);
             
+            const Int left_i = S_C_left[i];
+            const Int left_j = T_C_left[j];
+            
             const bool admissable = (!( is_symmetric && (i == j) )) && K.IsAdmissable();
             
             if( !admissable )
             {
-                const Int left_i = S_C_left[i];
-                const Int left_j = T_C_left[j];
-
                 // Warning: This assumes that either both children are defined or empty.
                 if( left_i >= null || left_j >= null )
                 {

@@ -31,7 +31,7 @@ namespace Repulsor
         using BASE::COLS;
         using BASE::MAX_RHS_COUNT;
         
-        static constexpr Int NONZERO_COUNT = 2 + AMB_DIM;
+        static constexpr Int NONZERO_COUNT = 1 + 2 * AMB_DIM;
         
     protected:
         
@@ -41,7 +41,6 @@ namespace Repulsor
         using BASE::Y;
         using BASE::x;
         using BASE::z;
-        using BASE::rhs_count;
         
     public:
         
@@ -90,7 +89,7 @@ namespace Repulsor
             
             a_to[0] = a_from[1];
             a_to[1] = a_from[0];
-            for( int k = 2; k < NONZERO_COUNT; ++ k )
+            for( Int k = 2; k < NONZERO_COUNT; ++ k )
             {
                 a_to[k] = -a_from[k];
             }
@@ -119,19 +118,18 @@ namespace Repulsor
 //              \                                                                 /
 //
 //            This are 1 + 2 * AMB_DIM nonzero values.
-//            With sparse matrix multiplication the bottleneck will be the bandwidth.
-//            Hence instead, we store this data in only 2 + AMB_DIM values by just storing
-//
-//                   K_xy, K_yx, v[0], ..., v[AMB_DIM-1]!
+//            It is tempting to compress also this to 2 + AMB_DIM values.
+//            BUT we have to add the local matrices from several subtriangles!
+//            Thus this structure cannot be exploited.
             
             for( Int k = 0; k < MAX_RHS_COUNT; ++k )
             {
-                z[k][0] -= (a[0] + a[1]) * x[k][0];
+                z[k][0] += a[0] * x[k][0];
                 
                 for( Int i = 1; i < ROWS; ++i )
                 {
-                    z[k][0] += a[1] * a[i+1] * x[k][i];
-                    z[k][i] -= a[0] * a[i+1] * x[k][0];
+                    z[k][0] += a[i] * x[k][i];
+                    z[k][i] += a[AMB_DIM+i] * x[k][0];
                 }
             }
         }

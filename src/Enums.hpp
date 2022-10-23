@@ -47,6 +47,31 @@ namespace Repulsor
         LowOrder,
         SquaredDistance
     };
+  
+    enum class InOut : int
+    {
+        In,
+        Out
+    };
+    
+    namespace FMM
+    {
+        enum class Type : int
+        {
+            IN = -1,
+            VF =  0,
+            NF =  1,
+            FF =  2
+        };
+    }
+    
+//    namespace FMM
+//    {
+//        static constexpr int IN = -1;
+//        static constexpr int VF =  0;
+//        static constexpr int NF =  1;
+//        static constexpr int FF =  2;
+//    };
     
     static std::map<KernelType, std::string> KernelTypeName
     {

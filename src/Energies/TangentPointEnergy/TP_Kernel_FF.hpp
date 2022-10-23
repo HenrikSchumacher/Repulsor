@@ -1,14 +1,14 @@
 #pragma once
 
 #define CLASS TP_Kernel_FF
-#define BASE  FMM_Kernel_FF<ClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,hess_flag_,metric_flag_,prec_flag_>
+#define BASE  FMM_Kernel_FF<ClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,metric_flag_>
 
 namespace Repulsor
 {
     template<
         typename ClusterTree_T_, typename T1, typename T2,
         bool is_symmetric_,
-        bool energy_flag_, bool diff_flag_, bool hess_flag_, bool metric_flag_, bool prec_flag_
+        bool energy_flag_, bool diff_flag_, bool metric_flag_
     >
     class CLASS : public BASE
     {
@@ -27,7 +27,7 @@ namespace Repulsor
         using BASE::T_DATA_DIM;
         using BASE::S_DATA_DIM;
         
-        static constexpr Int METRIC_NNZ = 2 + AMB_DIM;
+        static constexpr Int METRIC_NNZ = 1 + 2 * AMB_DIM;
         static constexpr Int PREC_NNZ   = 1;
 
         using BASE::S;
@@ -39,9 +39,7 @@ namespace Repulsor
         using BASE::is_symmetric;
         using BASE::energy_flag;
         using BASE::diff_flag;
-        using BASE::hess_flag;
         using BASE::metric_flag;
-        using BASE::prec_flag;
         
     public:
         
@@ -74,7 +72,6 @@ namespace Repulsor
     protected:
 
         using BASE::metric_data;
-        using BASE::prec_data;
         
         using BASE::S_data;
         using BASE::S_D_data;
@@ -204,8 +201,7 @@ namespace Repulsor
                 if constexpr ( metric_flag )
                 {
                     Real * restrict const m_vals = &metric_data[ METRIC_NNZ * block_ID ];
-    //                Real * restrict const p_vals = &prec_values  [ PREC_NNZ   * block_ID ];
-                    
+                 
 //                     The metric block looks like this for AMB_DIM == 3:
 //
 //                          /                                                                 \
@@ -219,19 +215,17 @@ namespace Repulsor
 //                          \                                                                 /
 //
 //                     This are 1 + 2 * AMB_DIM nonzero values.
-//                     With sparse matrix multiplication the bottleneck will be the bandwidth.
-//                     Hence instead, we store this data in only 2 + AMB_DIM values by just storing
-//
-//                              K_xy, K_yx, v[0], ..., v[AMB_DIM-1]!
-//
-//                     We just must not forget to recompute these values in the matrix multiplication kernel.
+//                     It is tempting to compress this into 2 + AMB_DIM values.
+//                     But it did not appear to be faster
                     
-                    m_vals[0] = K_xy;
-                    m_vals[1] = K_yx;
+                    // CAUTION: We have _set_ the values here.! Otherwise we would have to zerofy metric_data first (which we don't want for performance reasons).
+                    
+                    m_vals[0] = (K_xy + K_yx);
                     
                     for( Int l = 0; l < AMB_DIM; ++l )
                     {
-                        m_vals[2+l] = v[l];
+                        m_vals[1+l]         = K_yx * v[l];
+                        m_vals[1+AMB_DIM+l] = K_xy * v[l];
                     }
                 }
             }
@@ -274,7 +268,6 @@ namespace Repulsor
             + ToString(is_symmetric) + ","
             + ToString(energy_flag) + ","
             + ToString(diff_flag) + ","
-            + ToString(hess_flag) + ","
             + ToString(metric_flag) + ","
             ">";
         }

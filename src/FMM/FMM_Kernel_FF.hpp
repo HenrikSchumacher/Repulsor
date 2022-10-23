@@ -1,14 +1,14 @@
 #pragma once
 
 #define CLASS FMM_Kernel_FF
-#define BASE  FMM_Kernel<ClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,hess_flag_,metric_flag_,prec_flag_>
+#define BASE  FMM_Kernel<ClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,metric_flag_>
 
 namespace Repulsor
 {
     template<
         typename ClusterTree_T_,
         bool is_symmetric_,
-        bool energy_flag_, bool diff_flag_, bool hess_flag_, bool metric_flag_, bool prec_flag_
+        bool energy_flag_, bool diff_flag_, bool metric_flag_
     >
     class CLASS : public BASE
     {
@@ -30,7 +30,6 @@ namespace Repulsor
         using BASE::is_symmetric;
         using BASE::energy_flag;
         using BASE::diff_flag;
-        using BASE::hess_flag;
         using BASE::metric_flag;
         
         static constexpr Int S_DATA_DIM  = 1 + AMB_DIM + PROJ_DIM;
@@ -231,8 +230,7 @@ namespace Repulsor
             + ToString(is_symmetric) + ","
             + ToString(energy_flag) + ","
             + ToString(diff_flag) + ","
-            + ToString(hess_flag) + ","
-            + ToString(metric_flag) + ","
+            + ToString(metric_flag) +
             ">";
         }
 
