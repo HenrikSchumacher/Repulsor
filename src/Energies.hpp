@@ -4,6 +4,8 @@
 #include "Energies/EnergyDimRestricted.hpp"
 #include "Energies/TangentPointEnergy.hpp"
 
+#include "Energies/TangentPointEnergy0.hpp"
+
 //#include "Energies/Energy__NFK.hpp"
 //#include "Energies/Energy__NFK_Adaptive.hpp"
 //#include "Energies/Energy__FFK_FMM.hpp"

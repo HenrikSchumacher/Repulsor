@@ -342,7 +342,7 @@ namespace Repulsor
             {
                 copy_buffer( &ij_block[0], &metric_data[BLOCK_NNZ * k_global], BLOCK_NNZ );
                 
-                add_to_buffer( &jj_block[0][0], &T_diag[DIAG_NNZ * j_global], DIAG_NNZ );
+                add_to_buffer<DIAG_NNZ>( &jj_block[0][0], &T_diag[DIAG_NNZ * j_global] );
             }
         }
         

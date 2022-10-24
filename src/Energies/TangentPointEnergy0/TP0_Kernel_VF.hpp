@@ -1,6 +1,6 @@
 #pragma once
 
-#define CLASS TP_Kernel_VF
+#define CLASS TP0_Kernel_VF
 #define BASE  FMM_Kernel_VF<S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,metric_flag_>
 
 namespace Repulsor
@@ -65,6 +65,8 @@ namespace Repulsor
         ,   p_half               (p_half_    )
         ,   minus_p_half         (-p_half    )
         ,   minus_p_half_minus_1 (-p_half-1  )
+        ,   s                    ((p - S_DOM_DIM) / q)
+        ,   s_exp                (static_cast<Real>(-0.5) * (static_cast<Real>(2) * (s - static_cast<Real>(1)) + S_DOM_DIM))
         {}
         
         CLASS( const CLASS & other )
@@ -76,6 +78,8 @@ namespace Repulsor
         ,   p_half               (other.p_half              )
         ,   minus_p_half         (other.minus_p_half        )
         ,   minus_p_half_minus_1 (other.minus_p_half_minus_1)
+        ,   s                    ((p - S_DOM_DIM) / q)
+        ,   s_exp                (static_cast<Real>(-0.5) * (static_cast<Real>(2) * (s - static_cast<Real>(1)) + S_DOM_DIM))
         {}
         
         virtual ~CLASS() = default;
@@ -129,10 +133,12 @@ namespace Repulsor
         const T2   minus_p_half;
         const T2   minus_p_half_minus_1;
         
+        const Real s;
+        const Real s_exp;
         
-        Real ij_block [BLOCK_NNZ]  = {};
-        Real ii_block [ROWS][COLS] = {{}};
-        Real jj_block [ROWS][COLS] = {{}};
+        Real ij_block [BLOCK_NNZ] = {};
+        Real ii_block [BLOCK_NNZ] = {};
+        Real jj_block [BLOCK_NNZ] = {};
         
     protected:
         
@@ -257,78 +263,56 @@ namespace Repulsor
                 
                 if constexpr ( metric_flag )
                 {
-                    const Real w_K_xy = w * K_xy;
-                    const Real w_K_yx = w * K_yx;
 // ij_block
-//    /                                                                 \
-//    |   - K_xy - K_yx    K_yx * v[0]    K_yx * v[1]    K_yx * v[2]    |
-//    |                                                                 |
-//    |   - K_xy * v[0]         0              0              0         |
-//    |                                                                 |
-//    |   - K_xy * v[1]         0              0              0         |
-//    |                                                                 |
-//    |   - K_xy * v[2]         0              0              0         |
-//    \                                                                 /
-//
-//    This are 1 + 2 * AMB_DIM nonzero values.
-//    It is tempting to compress this into 2 + AMB_DIM values.
-//    But it did not appear to be faster
+//              /                               \
+//              |  a[0]     0       0       0   |
+//              |                               |
+//              |   0      a[1]     0       0   |
+//              |                               |
+//              |   0       0      a[1]     0   |
+//              |                               |
+//              |   0       0       0      a[1] |
+//              \                               /
 
+// ii_block
+//              /                               \
+//              | -a[0]     0       0       0   |
+//              |                               |
+//              |   0     -a[1]     0       0   |
+//              |                               |
+//              |   0       0     -a[1]     0   |
+//              |                               |
+//              |   0       0       0     -a[1] |
+//              \                               /
                     
-// ii block
-//    /                                                                                 \
-//    |     K_xy + K_yx      K_xy * v[0]         K_xy * v[1]         K_xy * v[2]        |
-//    |                                                                                 |
-//    |     K_xy * v[0]   K_xy * v[0] * v[0]  K_xy * v[0] * v[1]  K_xy * v[0] * v[2]    |
-//    |                                                                                 |
-//    |     K_xy * v[1]   K_xy * v[1] * v[0]  K_xy * v[1] * v[1]  K_xy * v[1] * v[2]    |
-//    |                                                                                 |
-//    |     K_xy * v[2]   K_xy * v[2] * v[0]  K_xy * v[2] * v[1]  K_xy * v[2] * v[2]    |
-//    \                                                                                 /
-                    
-// jj block
-//
-//    /                                                                                 \
-//    |     K_xy + K_yx     - K_yx * v[0]       - K_yx * v[1]       - K_yx * v[2]       |
-//    |                                                                                 |
-//    |   - K_yx * v[0]   K_yx * v[0] * v[0]  K_yx * v[0] * v[1]  K_yx * v[0] * v[2]    |
-//    |                                                                                 |
-//    |   - K_yx * v[1]   K_yx * v[1] * v[0]  K_yx * v[1] * v[1]  K_yx * v[1] * v[2]    |
-//    |                                                                                 |
-//    |   - K_yx * v[2]   K_yx * v[2] * v[0]  K_yx * v[2] * v[1]  K_yx * v[2] * v[2]    |
-//    \                                                                                 /
+// jj_block
+//              /                               \
+//              | -a[0]     0       0       0   |
+//              |                               |
+//              |   0     -a[1]     0       0   |
+//              |                               |
+//              |   0       0     -a[1]     0   |
+//              |                               |
+//              |   0       0       0     -a[1] |
+//              \                               /
         
+                    const Real r4 = r2 * r2;
+
+                    // The following line makes up approx 2/3 of this function's runtime! This is why we avoid pow as much as possible and replace it with MyMath::pow.;
+                    // I got it down to this single call to pow. We might want to generate a lookup table for it...;
+                    // The factor of (-2.) is here, because we assemble the _metric_, not the kernel.;
+                    const Real a_1 = w * static_cast<Real>(-2) * MyMath::pow(r2, s_exp);
                     
-                    const Real w_K_sym = w_K_xy + w_K_yx;
+                    const Real a_0 = w * static_cast<Real>(0.5) * (rCosPhi_2 + rCosPsi_2) / r4 * a_1;
                     
-                    ij_block[0]    -= w_K_sym;
-                    ii_block[0][0] += w_K_sym;
-                    jj_block[0][0] += w_K_sym;
+                    ij_block[0] +=   a_0;
+                    ii_block[0] -=   a_0;
+                    jj_block[0] -=   a_0;
                     
-                    for( Int l = 0; l < AMB_DIM; ++l )
-                    {
-                        const Real w_K_xy_v = w_K_xy * v[l];
-                        const Real w_K_yx_v = w_K_yx * v[l];
-                        
-                        ij_block[1+l]         += w_K_yx_v;
-                        ij_block[1+AMB_DIM+l] -= w_K_xy_v;
-                        
-                        // store only upper triangle
-                        ii_block[0][1+l] +=   w_K_xy_v;
-                        jj_block[0][1+l] -=   w_K_yx_v;
-                    }
+                    ij_block[1] +=   a_1;
+                    ii_block[1] -=   a_1;
+                    jj_block[1] -=   a_1;
                     
-                    // store only upper triangle
-                    for( Int i = 1; i < ROWS; ++i )
-                    {
-                        for( Int j = i; j < COLS; ++j )
-                        {
-                            const Real vv = v[i-1] * v[j-1];
-                            
-                            ii_block[i][j] += K_xy * vv;
-                            jj_block[i][j] += K_yx * vv;
-                        }
-                    }
                 }
                 
             }
@@ -350,7 +334,7 @@ namespace Repulsor
         {
             if constexpr ( metric_flag )
             {
-                zerofy_buffer( &ii_block[0][0], DIAG_NNZ );
+                zerofy_buffer( &ii_block[0], DIAG_NNZ );
             }
         }
         
@@ -358,7 +342,7 @@ namespace Repulsor
         {
             if constexpr ( metric_flag )
             {
-                copy_buffer( &ii_block[0][0], &S_diag[DIAG_NNZ * i_global], DIAG_NNZ );
+                copy_buffer( &ii_block[0], &S_diag[DIAG_NNZ * i_global], DIAG_NNZ );
             }
         }
         
@@ -368,7 +352,7 @@ namespace Repulsor
             {
                 zerofy_buffer( &ij_block[0], BLOCK_NNZ );
                 
-                zerofy_buffer( &jj_block[0][0], DIAG_NNZ );
+                zerofy_buffer( &jj_block[0], DIAG_NNZ );
             }
         }
         
@@ -378,7 +362,7 @@ namespace Repulsor
             {
                 copy_buffer( &ij_block[0], &metric_data[BLOCK_NNZ * k_global], BLOCK_NNZ );
                 
-                add_to_buffer<DIAG_NNZ>( &jj_block[0][0], &T_diag[DIAG_NNZ * j_global] );
+                add_to_buffer<DIAG_NNZ>( &jj_block[0], &T_diag[DIAG_NNZ * j_global] );
             }
         }
         

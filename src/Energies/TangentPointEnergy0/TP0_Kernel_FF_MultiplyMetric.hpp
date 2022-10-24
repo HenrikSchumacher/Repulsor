@@ -1,6 +1,6 @@
 #pragma once
 
-#define CLASS TP_Kernel_FF_MultiplyMetric
+#define CLASS TP0_Kernel_FF_MultiplyMetric
 #define BASE  BlockKernel_fixed<AMB_DIM_+1,AMB_DIM_+1,MAX_RHS_COUNT_,                       \
     Scalar_,Int_,Scalar_in_,Scalar_out_,                                                    \
     x_RM,  y_RM,                                                                            \
@@ -29,8 +29,8 @@ namespace Repulsor
         using BASE::COLS;
         using BASE::MAX_RHS_COUNT;
         
-        static constexpr Int BLOCK_NNZ = 1 + 2 * AMB_DIM;
-        static constexpr Int DIAG_NNZ  = (1 + AMB_DIM) * (1 + AMB_DIM);
+        static constexpr Int BLOCK_NNZ = 2;
+        static constexpr Int DIAG_NNZ  = 2;
         
     protected:
         
@@ -41,6 +41,10 @@ namespace Repulsor
         using BASE::Y;
         using BASE::x;
         using BASE::y;
+        
+//        using BASE::i_global;
+//        using BASE::j_global;
+//        using BASE::k_global;
         
         using BASE::ReadX;
         
@@ -82,32 +86,25 @@ namespace Repulsor
                   Scalar * restrict const a_to   = &A[ BLOCK_NNZ * to  ];
             
             a_to[0] = a_from[0];
-            for( Int k = 0; k < AMB_DIM; ++k )
-            {
-                a_to[1    + k] = - a_from[ROWS + k];
-                a_to[ROWS + k] = - a_from[1    + k];
-            }
+            a_to[1] = a_from[1];
         }
         
         virtual force_inline void apply_block( const Int k_global, const Int j_global ) override
         {
-            // Since we need the casted vector ROWS times, it might be a good idea to do the conversion only once.
             ReadX( j_global );
-            // It's a bit mysterious to me why copying to a local array makes this run a couple of percents faster.
-            // Probably the copy has to be done anyways and this way the compiler has better guarantees.
-
+            
             const Scalar * restrict const a = &A_const[BLOCK_NNZ * k_global];
 //            The metric block looks like this for AMB_DIM == 3:
 //
-//              /                                                                 \
-//              |   - K_xy - K_yx     Kyx * v[0]     Kyx * v[1]     Kyx * v[2]    |
-//              |                                                                 |
-//              |   - K_xy * v[0]         0              0              0         |
-//              |                                                                 |
-//              |   - K_xy * v[1]         0              0              0         |
-//              |                                                                 |
-//              |   - K_xy * v[2]         0              0              0         |
-//              \                                                                 /
+//              /                               \
+//              |  a[0]     0       0       0   |
+//              |                               |
+//              |   0      a[1]     0       0   |
+//              |                               |
+//              |   0       0      a[1]     0   |
+//              |                               |
+//              |   0       0       0      a[1] |
+//              \                               /
 //
 //            This are 1 + 2 * AMB_DIM nonzero values.
 //            It is tempting to compress also this to 2 + AMB_DIM values.
@@ -117,11 +114,9 @@ namespace Repulsor
             for( Int k = 0; k < MAX_RHS_COUNT; ++k )
             {
                 y[k][0] += a[0] * x[k][0];
-                
-                for( Int i = 1; i < ROWS; ++i )
+                for( Int j = 1; j < COLS; ++j )
                 {
-                    y[k][0] += a[i] * x[k][i];
-                    y[k][i] += a[AMB_DIM+i] * x[k][0];
+                    y[k][j] += a[1] * x[k][j];
                 }
             }
         }

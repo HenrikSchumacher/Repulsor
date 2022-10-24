@@ -44,10 +44,6 @@ namespace Repulsor
         using BASE::x;
         using BASE::y;
         
-//        using BASE::i_global;
-//        using BASE::j_global;
-//        using BASE::k_global;
-        
         using BASE::ReadX;
         
     public:
