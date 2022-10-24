@@ -131,6 +131,12 @@ namespace Repulsor
         mutable std::ofstream emb_center_file;
 #endif
         
+        using BASE::loadS;
+        using BASE::loadT;
+        using BASE::compute;
+        using BASE::writeT;
+        using BASE::writeS;
+        
     public:
         
         CLASS() = default;
@@ -180,7 +186,7 @@ namespace Repulsor
 #ifdef REPULSOR__PRINT_REPORTS_FOR_ADAPTIVE_KERNELS
             logfile
             << "\n"
-            << "Report for class                    = " << this->ClassName() << "\n"
+            << "Report for class                    = " << ClassName() << "\n"
             << "Thread ID                           = " << omp_get_thread_num() << "\n"
             << "Number of primitive pairs processed = " << primitive_count << "\n"
             << "Total energy accumulated            = " << total_sum << "\n"
@@ -218,7 +224,7 @@ namespace Repulsor
                 zerofy_buffer( &DX[0], S_DATA_DIM );
             }
             
-            this->loadS();
+            loadS();
         }
         
         virtual void LoadT( const Int j_global_ ) override
@@ -242,7 +248,7 @@ namespace Repulsor
                 zerofy_buffer( &DY[0], T_DATA_DIM );
             }
             
-            this->loadT();
+            loadT();
         }
         
         virtual void Prefetch( const Int j ) const override
@@ -257,7 +263,7 @@ namespace Repulsor
             }
         }
         
-        virtual Real Compute( const Int k_global_ ) override
+        virtual force_inline Real Compute( const Int k_global_ ) override
         {
             k_global = k_global_;
             
@@ -281,7 +287,7 @@ namespace Repulsor
                         max_level_reached = max_level;
                         block_count++;
                         bottom_count++;
-                        sum += this->compute();
+                        sum += compute();
                         S_Tree.ToParent();
                         T_Tree.ToParent();
                         from_above = false;
@@ -299,7 +305,7 @@ namespace Repulsor
                             // We compute energy, go to parent, and prepare the next child of the parent.
                             max_level_reached = std::max( max_level_reached, S_Tree.Level() );
                             block_count++;
-                            sum += this->compute();
+                            sum += compute();
                             S_Tree.ToParent();
                             T_Tree.ToParent();
                             from_above = false;
@@ -375,7 +381,7 @@ namespace Repulsor
                 }
             }
             
-            this->writeS();
+            writeS();
         }
         
         virtual void WriteT() override
@@ -390,7 +396,7 @@ namespace Repulsor
                 }
             }
             
-            this->writeT();
+            writeT();
         }
         
     protected:

@@ -130,9 +130,9 @@ namespace Repulsor
         const T2   minus_p_half_minus_1;
         
         
-        Real ij_block [BLOCK_NNZ];
-        Real ii_block [ROWS][COLS];
-        Real jj_block [ROWS][COLS];
+        Real ij_block [BLOCK_NNZ]  = {};
+        Real ii_block [ROWS][COLS] = {{}};
+        Real jj_block [ROWS][COLS] = {{}};
         
     protected:
         

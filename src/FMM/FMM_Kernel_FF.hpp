@@ -79,6 +79,12 @@ namespace Repulsor
         
         using BASE::metric_data;
         
+        using BASE::loadS;
+        using BASE::loadT;
+        using BASE::compute;
+        using BASE::writeT;
+        using BASE::writeS;
+        
     public:
         
         CLASS() = default;
@@ -152,7 +158,7 @@ namespace Repulsor
                 zerofy_buffer( &DX[0], S_DATA_DIM );
             }
             
-            this->loadS();
+            loadS();
         }
         
         virtual void LoadT( const Int j_global_ ) override
@@ -173,7 +179,7 @@ namespace Repulsor
                 zerofy_buffer( &DY[0], T_DATA_DIM );
             }
             
-            this->loadT();
+            loadT();
         }
         
         virtual void Prefetch( const Int j_next ) const override
@@ -186,10 +192,10 @@ namespace Repulsor
             }
         }
         
-        virtual Real Compute( const Int k_global_ ) override
+        virtual force_inline Real Compute( const Int k_global_ ) override
         {
             k_global = k_global_;
-            return symmetry_factor * this->compute();
+            return symmetry_factor * compute();
         }
             
         virtual void WriteS() override
@@ -204,10 +210,10 @@ namespace Repulsor
                 }
             }
             
-            this->writeS();
+            writeS();
         }
         
-        virtual void WriteT() override
+        virtual force_inline void WriteT() override
         {
             if constexpr (diff_flag )
             {
@@ -219,7 +225,7 @@ namespace Repulsor
                 }
             }
             
-            this->writeT();
+            writeT();
         }
         
     protected:

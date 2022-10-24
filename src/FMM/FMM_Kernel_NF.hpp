@@ -87,6 +87,12 @@ namespace Repulsor
         static const constexpr Real S_scale = static_cast<Real>(1)/static_cast<Real>(S_DOM_DIM+1);
         static const constexpr Real T_scale = static_cast<Real>(1)/static_cast<Real>(T_DOM_DIM+1);
         
+        using BASE::loadS;
+        using BASE::loadT;
+        using BASE::compute;
+        using BASE::writeT;
+        using BASE::writeS;
+        
     public:
         
         CLASS() = default;
@@ -170,7 +176,7 @@ namespace Repulsor
                 zerofy_buffer( &DX[0], S_DATA_DIM );
             }
             
-            this->loadS();
+            loadS();
         }
         
         virtual void LoadT( const Int j_global_ ) override
@@ -200,7 +206,7 @@ namespace Repulsor
                 zerofy_buffer( &DY[0], T_DATA_DIM );
             }
             
-            this->loadT();
+            loadT();
         }
         
         virtual void Prefetch( const Int j_next ) const override
@@ -213,10 +219,10 @@ namespace Repulsor
             }
         }
         
-        virtual Real Compute( const Int k_global_ ) override
+        virtual force_inline Real Compute( const Int k_global_ ) override
         {
             k_global = k_global_;
-            return symmetry_factor * this->compute();
+            return symmetry_factor * compute();
         }
             
         virtual void WriteS() override
@@ -231,7 +237,7 @@ namespace Repulsor
                 }
             }
             
-            this->writeS();
+            writeS();
         }
         
         virtual void WriteT() override
@@ -246,7 +252,7 @@ namespace Repulsor
                 }
             }
             
-            this->writeT();
+            writeT();
         }
         
     protected:

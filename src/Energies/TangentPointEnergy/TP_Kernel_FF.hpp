@@ -113,9 +113,9 @@ namespace Repulsor
         const T2   minus_p_half;
         const T2   minus_p_half_minus_1;
         
-        Real ij_block [BLOCK_NNZ];
-        Real ii_block [ROWS][COLS];
-        Real jj_block [ROWS][COLS];
+        Real ij_block [BLOCK_NNZ]  = {};
+        Real ii_block [ROWS][COLS] = {{}};
+        Real jj_block [ROWS][COLS] = {{}};
         
     protected:
         
@@ -268,17 +268,30 @@ namespace Repulsor
                         // store only upper triangle
                         ii_block[0][i] +=   K_xy_v;
                         jj_block[0][i]  = - K_yx_v;
+                        
+                        // store also lower triangle
+                        ii_block[i][0] +=   K_xy_v;
+                        jj_block[i][0]  = - K_yx_v;
                     }
                     
                     // store only upper triangle
                     for( Int i = 1; i < ROWS; ++i )
                     {
-                        for( Int j = i; j < COLS; ++j )
+                        {
+                            const Real vv = v[i-1] * v[i-1];
+                            ii_block[i][i] += K_xy * vv;
+                            jj_block[i][i]  = K_yx * vv;
+                        }
+                        for( Int j = i+1; j < COLS; ++j )
                         {
                             const Real vv = v[i-1] * v[j-1];
                             
                             ii_block[i][j] += K_xy * vv;
                             jj_block[i][j]  = K_yx * vv;
+                            
+                            // store also lower triangle
+                            ii_block[j][i] += K_xy * vv;
+                            jj_block[j][i]  = K_yx * vv;
                         }
                     }
                 }

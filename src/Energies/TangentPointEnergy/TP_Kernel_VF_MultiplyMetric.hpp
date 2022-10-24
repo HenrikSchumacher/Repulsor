@@ -44,9 +44,11 @@ namespace Repulsor
         using BASE::x;
         using BASE::y;
         
-        using BASE::i_global;
-        using BASE::j_global;
-        using BASE::k_global;
+//        using BASE::i_global;
+//        using BASE::j_global;
+//        using BASE::k_global;
+        
+        using BASE::ReadX;
         
     public:
         
@@ -95,10 +97,10 @@ namespace Repulsor
         
         
         
-        virtual void apply_block() override
+        virtual force_inline void apply_block( const Int k_global, const Int j_global ) override
         {
             // Since we need the casted vector ROWS times, it might be a good idea to do the conversion only once.
-            this->ReadX( j_global );
+            ReadX( j_global );
             // It's a bit mysterious to me why copying to a local array makes this run a couple of percents faster.
             // Probably the copy has to be done anyways and this way the compiler has better guarantees.
             
@@ -132,10 +134,10 @@ namespace Repulsor
             }
         }
         
-        virtual void begin_row() override
+        virtual force_inline void begin_row( const Int i_global ) override
         {}
-        
-        virtual void end_row() override
+
+        virtual force_inline void end_row( const Int i_global ) override
         {
             // TODO: Multiply diagonal block
         }

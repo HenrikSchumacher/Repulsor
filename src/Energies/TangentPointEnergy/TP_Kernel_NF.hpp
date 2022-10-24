@@ -127,9 +127,9 @@ namespace Repulsor
         const T2   minus_p_half;
         const T2   minus_p_half_minus_1;
         
-        Real ij_block [BLOCK_NNZ];
-        Real ii_block [ROWS][COLS];
-        Real jj_block [ROWS][COLS];
+        Real ij_block [BLOCK_NNZ]  = {};
+        Real ii_block [ROWS][COLS] = {{}};
+        Real jj_block [ROWS][COLS] = {{}};
         
     protected:
         
@@ -278,28 +278,41 @@ namespace Repulsor
                     ii_block[0][0] +=   K_sym;
                     jj_block[0][0]  =   K_sym;
                     
-                    for( Int l = 0; l < AMB_DIM; ++l )
+                    for( Int i = 1; i < COLS; ++i )
                     {
-                        const Real K_xy_v = K_xy * v[l];
-                        const Real K_yx_v = K_yx * v[l];
+                        const Real K_xy_v = K_xy * v[i-1];
+                        const Real K_yx_v = K_yx * v[i-1];
                         
-                        ij_block[1+l]         =   K_yx_v;
-                        ij_block[1+AMB_DIM+l] = - K_xy_v;
+                        ij_block[i]         =   K_yx_v;
+                        ij_block[AMB_DIM+i] = - K_xy_v;
                         
                         // store only upper triangle
-                        ii_block[0][1+l] +=   K_xy_v;
-                        jj_block[0][1+l]  = - K_yx_v;
+                        ii_block[0][i] +=   K_xy_v;
+                        jj_block[0][i]  = - K_yx_v;
+                        
+                        // store also lower triangle
+                        ii_block[i][0] +=   K_xy_v;
+                        jj_block[i][0]  = - K_yx_v;
                     }
                     
-                    // store only upper triangle
                     for( Int i = 1; i < ROWS; ++i )
                     {
-                        for( Int j = i; j < COLS; ++j )
+                        {
+                            const Real vv = v[i-1] * v[i-1];
+                            ii_block[i][i] += K_xy * vv;
+                            jj_block[i][i]  = K_yx * vv;
+                        }
+                        for( Int j = i+1; j < COLS; ++j )
                         {
                             const Real vv = v[i-1] * v[j-1];
                             
+                            // store only upper triangle
                             ii_block[i][j] += K_xy * vv;
                             jj_block[i][j]  = K_yx * vv;
+                            
+                            // store also lower triangle
+                            ii_block[j][i] += K_xy * vv;
+                            jj_block[j][i]  = K_yx * vv;
                         }
                     }
                 }
