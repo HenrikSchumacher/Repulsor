@@ -125,7 +125,7 @@ namespace Repulsor
             for( Int k = 0; k < MAX_RHS_COUNT; ++k )
             {
                 y[k][0] += a[0] * x[k][0];
-                
+
                 for( Int i = 1; i < ROWS; ++i )
                 {
                     y[k][0] += a[i] * x[k][i];
