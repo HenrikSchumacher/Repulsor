@@ -20,37 +20,44 @@ namespace Repulsor
         using Int               = typename BlockClusterTree_T::Int;
         using SReal             = typename BlockClusterTree_T::SReal;
         using ExtReal           = typename BlockClusterTree_T::ExtReal;
+        using Accumulator_T     = typename ClusterTree_T::Accumulator_T;
         
         static constexpr Int  AMB_DIM      = BlockClusterTree_T::AMB_DIM;
         static constexpr Int  S_DOM_DIM    = S_DOM_DIM_;
         static constexpr Int  T_DOM_DIM    = T_DOM_DIM_;
         static constexpr bool is_symmetric = BlockClusterTree_T::IsSymmetric();
         
+
+        
         using TangentVector_T   = Tensor2<ExtReal,Int>;
         using CotangentVector_T = Tensor2<ExtReal,Int>;
         
         using Values_T          = Tensor2<Real,Int>;
-        using ValueContainer_T  = std::array<Values_T,3>;
+        using ValueContainer_T  = std::unordered_map<std::string,Values_T>;
         
         using Configurator_T    = FMM_Configurator<ClusterTree_T>;
 
-        using Kernel_VF_MultiplyMetric_T = TP_Kernel_VF_MultiplyMetric<
+        using Kernel_VF_Multiply_T = TP_Kernel_VF_MultiplyMetric<
             AMB_DIM,AMB_DIM,
             Real,Int,Real,Real,
             true,true,1,1 // Caution! We have to add-into and not to overwrite!
         >;
         
-        using Kernel_NF_MultiplyMetric_T = TP_Kernel_NF_MultiplyMetric<
+        using Kernel_NF_Multiply_T = TP_Kernel_NF_MultiplyMetric<
             AMB_DIM,AMB_DIM,
             Real,Int,Real,Real,
             true,true,1,0
         >;
         
-        using Kernel_FF_MultiplyMetric_T = TP_Kernel_FF_MultiplyMetric<
+        using Kernel_FF_Multiply_T = TP_Kernel_FF_MultiplyMetric<
             AMB_DIM,AMB_DIM,
             Real,Int,Real,Real,
             true,true,1,0
         >;
+    
+        static constexpr Int VF_block_size = Kernel_VF_Multiply_T::ROWS * Kernel_VF_Multiply_T::COLS;
+        static constexpr Int NF_block_size = Kernel_NF_Multiply_T::ROWS * Kernel_NF_Multiply_T::COLS;
+        static constexpr Int FF_block_size = Kernel_FF_Multiply_T::ROWS * Kernel_FF_Multiply_T::COLS;
         
     protected:
         
@@ -69,7 +76,9 @@ namespace Repulsor
               const Real q_,
               const Real p_
         )
-        :   bct(bct_)
+        :   bct( bct_ )
+        ,   S( bct.GetS() )
+        ,   T( bct.GetT() )
         ,   metric_values ( metric_values )
         ,   q             ( q_ )
         ,   p             ( p_ )
@@ -87,9 +96,17 @@ namespace Repulsor
     protected:
 
         const BlockClusterTree_T & bct;
+        const ClusterTree_T      & S;
+        const ClusterTree_T      & T;
         
         ValueContainer_T & metric_values;
         
+//        ValueContainer_T & metric_values {
+//            {"VF", Values_T()}, {"VF_diag", Values_T()},
+//            {"NF", Values_T()}, {"NF_diag", Values_T()},
+//            {"FF", Values_T()}, {"FF_diag", Values_T()}
+//        };
+
         const Real q;
         const Real p;
         const Real q_half_real;
@@ -112,18 +129,45 @@ namespace Repulsor
         
         Real Compute()
         {
+            const Int thread_count = bct.ThreadCount();
+            
             en = zero;
+            
+            DummyAllocators();
             
             if constexpr ( diff_flag )
             {
-                bct.GetS().CleanseDerivativeBuffers();
+                S.CleanseDerivativeBuffers();
                 
                 if( !is_symmetric )
                 {
-                    bct.GetT().CleanseDerivativeBuffers();
+                    T.CleanseDerivativeBuffers();
                 }
             }
-            
+            if constexpr ( metric_flag )
+            {
+                ptic("Allocate accumulators");
+
+                metric_values["VF_diag"] = Values_T (S.PrimitiveCount(), VF_block_size );
+                metric_values["NF_diag"] = Values_T (S.PrimitiveCount(), NF_block_size );
+                metric_values["FF_diag"] = Values_T (S.ClusterCount(),   FF_block_size );
+
+                S.VF_Accumulator() = Accumulator_T( thread_count, S.PrimitiveCount(), VF_block_size );
+                S.NF_Accumulator() = Accumulator_T( thread_count, S.PrimitiveCount(), NF_block_size );
+                S.FF_Accumulator() = Accumulator_T( thread_count, S.ClusterCount(),   FF_block_size );
+
+                if constexpr ( !is_symmetric )
+                {
+                    T.VF_Accumulator() = Accumulator_T( thread_count, T.PrimitiveCount(), VF_block_size );
+                    T.NF_Accumulator() = Accumulator_T( thread_count, T.PrimitiveCount(), NF_block_size );
+                    T.FF_Accumulator() = Accumulator_T( thread_count, T.ClusterCount(),   FF_block_size );
+                }
+                ptoc("Allocate accumulators");
+            }
+            else
+            {
+                DummyAllocators();
+            }
             if( q_half_is_int )
             {
                 if( p_half_is_int )
@@ -155,8 +199,34 @@ namespace Repulsor
                 }
             }
             
+            if constexpr ( metric_flag )
+            {
+                DummyAllocators();
+            }
+            
             return en;
         }
+     
+        void DummyAllocators()
+        {
+            ptic("Allocate dummy accumulators");
+
+            const Int thread_count = bct.ThreadCount();
+
+            S.VF_Accumulator() = Accumulator_T( thread_count, 1, 1 );
+            S.NF_Accumulator() = Accumulator_T( thread_count, 1, 1 );
+            S.FF_Accumulator() = Accumulator_T( thread_count, 1, 1 );
+
+            if constexpr ( !is_symmetric )
+            {
+                T.VF_Accumulator() = Accumulator_T( thread_count, 1, 1 );
+                T.NF_Accumulator() = Accumulator_T( thread_count, 1, 1 );
+                T.FF_Accumulator() = Accumulator_T( thread_count, 1, 1 );
+            }
+            ptoc("Allocate dummy accumulators");
+        }
+        
+
         
 //##############################################################################################
 //      Compute subroutines
@@ -169,13 +239,10 @@ namespace Repulsor
         {
             ptic(ClassName()+"::VF_Compute");
             
-            const Type type = Type::VF;
-            const int idx = std::__to_underlying(type);
+            auto & pattern = bct.VeryNear();
             
-            auto & pattern = bct.template GetMatrix<type>();
-        
-            Configurator_T conf ( bct.GetS(), bct.GetT(), metric_values[idx] );
-
+            Configurator_T conf ( S, T, metric_values["VF"] );
+            
             using Kernel_T = TP_Kernel_VF<
                 S_DOM_DIM, T_DOM_DIM,
                 ClusterTree_T, T1, T2,
@@ -192,34 +259,37 @@ namespace Repulsor
             {
                 if constexpr ( is_symmetric )
                 {
-                    SparseKernelMatrixCSR_gen<Kernel_NF_MultiplyMetric_T> matrix ( pattern );
+                    SparseKernelMatrixCSR_gen<Kernel_NF_Multiply_T> matrix ( pattern );
                     
-                    matrix.FillLowerTriangleFromUpperTriangle( metric_values[idx].data() );
+                    matrix.FillLowerTriangleFromUpperTriangle( metric_values["VF"].data() );
                 }
+                
+//                ptic("Reduce VF_Accumulators");
+//                // We overwrite diag_values here so that we do not have to zerofy it first.
+//                S.VF_Accumulator().AddReduce( metric_values["VF_diag"], false );
+//                ptoc("Reduce VF_Accumulators");
             }
             
             ptoc(ClassName()+"::VF_Compute");
         }
             
+        
         template< typename T1, typename T2 >
         void NF_Compute( const T1 q_half_, const T1 p_half_ )
         {
             ptic(ClassName()+"::NF_Compute");
-            
-            const Type type = Type::NF;
-            const int idx = std::__to_underlying(type);
-            
-            auto & pattern = bct.template GetMatrix<type>();
-            
-            Configurator_T conf ( bct.GetS(), bct.GetT(), metric_values[idx] );
-    
+
+            auto & pattern = bct.Near();
+
+            Configurator_T conf ( S, T, metric_values["NF"] );
+
             using Kernel_T = TP_Kernel_NF<
                 S_DOM_DIM, T_DOM_DIM,
                 ClusterTree_T, T1, T2,
                 BlockClusterTree_T::IsSymmetric(),
                 energy_flag, diff_flag, metric_flag
             >;
-            
+
             Kernel_T ker ( conf, q_half_, p_half_ );
 
             FMM_Traversor<Kernel_T> traversor ( pattern, ker );
@@ -230,26 +300,29 @@ namespace Repulsor
             {
                 if constexpr ( is_symmetric )
                 {
-                    SparseKernelMatrixCSR_gen<Kernel_NF_MultiplyMetric_T> matrix ( pattern );
+                    SparseKernelMatrixCSR_gen<Kernel_NF_Multiply_T> matrix ( pattern );
                     
-                    matrix.FillLowerTriangleFromUpperTriangle( metric_values[idx].data() );
+                    matrix.FillLowerTriangleFromUpperTriangle( metric_values["NF"].data() );
                 }
+
+                ptic("Reduce NF_Accumulators");
+                // We overwrite diag_values here so that we do not have to zerofy it first.
+                S.NF_Accumulator().AddReduce( metric_values["NF_diag"], false );
+                ptoc("Reduce NF_Accumulators");
             }
-            
+
             ptoc(ClassName()+"::NF_Compute");
         }
+        
             
         template< typename T1, typename T2 >
         void FF_Compute( const T1 q_half_, const T1 p_half_ )
         {
             ptic(ClassName()+"::FF_Compute");
             
-            const Type type = Type::FF;
-            const int idx = std::__to_underlying(type);
+            auto & pattern = bct.Far();
             
-            auto & pattern = bct.template GetMatrix<type>();
-            
-            Configurator_T conf ( bct.GetS(), bct.GetT(), metric_values[idx] );
+            Configurator_T conf ( S, T, metric_values["FF"] );
             
             using Kernel_T = TP_Kernel_FF<
                 ClusterTree_T, T1, T2,
@@ -267,10 +340,15 @@ namespace Repulsor
             {
                 if constexpr ( is_symmetric )
                 {
-                    SparseKernelMatrixCSR_gen<Kernel_NF_MultiplyMetric_T> matrix ( pattern );
+                    SparseKernelMatrixCSR_gen<Kernel_NF_Multiply_T> matrix ( pattern );
                     
-                    matrix.FillLowerTriangleFromUpperTriangle( metric_values[idx].data() );
+                    matrix.FillLowerTriangleFromUpperTriangle( metric_values["FF"].data() );
                 }
+                
+                ptic("Reduce FF_Accumulators");
+                // We overwrite diag_values here so that we do not have to zerofy it first.
+                S.FF_Accumulator().AddReduce( metric_values["FF_diag"], false );
+                ptoc("Reduce FF_Accumulators");
             }
             
             ptoc(ClassName()+"::FF_Compute");
@@ -286,29 +364,34 @@ namespace Repulsor
         {
             if constexpr ( metric_flag )
             {
-                const Int rhs_count = bct.GetS().BufferDimension() / Kernel_NF_MultiplyMetric_T::ROWS;                
+                const Int rhs_count = S.BufferDimension() / Kernel_NF_Multiply_T::ROWS;
          
                 if( NF_flag )
                 {
                     NF_MultiplyMetric(rhs_count);
+                    // TODO: Apply diagonal
                 }
                 else
                 {
-                    bct.GetS().PrimitiveOutputBuffer().SetZero();
+                    S.PrimitiveOutputBuffer().SetZero();
                 }
                 
                 if( VF_flag )
                 {
                     VF_MultiplyMetric(rhs_count);
+                    // TODO: Apply diagonal
                 }
+                
+                
                 
                 if( FF_flag )
                 {
                     FF_MultiplyMetric(rhs_count);
+                    // TODO: Apply diagonal
                 }
                 else
                 {
-                    bct.GetS().ClusterOutputBuffer().SetZero();
+                    S.ClusterOutputBuffer().SetZero();
                 }
             }
         }
@@ -321,36 +404,27 @@ namespace Repulsor
 
         void NF_MultiplyMetric( const Int rhs_count ) const
         {
-            constexpr Type type = Type::NF;
-            
-            const int idx = std::__to_underlying(type);
-            auto & pattern = bct.template GetMatrix<type>();
-            
-            SparseKernelMatrixCSR_gen<Kernel_NF_MultiplyMetric_T> matrix ( pattern );
+            SparseKernelMatrixCSR_gen<Kernel_NF_Multiply_T> matrix ( bct.Near() );
             
             matrix.Dot(
-                metric_values[idx].data(),
-                one,  bct.GetT().template GetBuffer<type,InOut::In >().data(),
-                zero, bct.GetS().template GetBuffer<type,InOut::Out>().data(),
+                metric_values["NF"].data(), metric_values["NF_diag"].data(),
+                one,  T.PrimitiveInputBuffer().data(),
+                zero, S.PrimitiveOutputBuffer().data(),
                 rhs_count
            );
         }
+        
         
         void VF_MultiplyMetric( const Int rhs_count ) const
         {
             if constexpr ( metric_flag )
             {
-                constexpr Type type = Type::VF;
-                
-                const int idx = std::__to_underlying(type);
-                auto & pattern = bct.template GetMatrix<type>();
-                
-                SparseKernelMatrixCSR_gen<Kernel_VF_MultiplyMetric_T> matrix ( pattern );
+                SparseKernelMatrixCSR_gen<Kernel_VF_Multiply_T> matrix ( bct.VeryNear() );
                 
                 matrix.Dot(
-                    metric_values[idx].data(),
-                    one,  bct.GetT().template GetBuffer<type,InOut::In >().data(),
-                    one,  bct.GetS().template GetBuffer<type,InOut::Out>().data(),
+                    metric_values["VF"].data(), metric_values["VF_diag"].data(),
+                    one,  T.PrimitiveInputBuffer().data(),
+                    one,  S.PrimitiveOutputBuffer().data(),
                     rhs_count
                 );
             }
@@ -360,17 +434,12 @@ namespace Repulsor
         {
             if constexpr ( metric_flag )
             {
-                constexpr Type type = Type::FF;
-                
-                const int idx = std::__to_underlying(type);
-                auto & pattern = bct.template GetMatrix<type>();
-                
-                SparseKernelMatrixCSR_gen<Kernel_FF_MultiplyMetric_T> matrix ( pattern );
+                SparseKernelMatrixCSR_gen<Kernel_FF_Multiply_T> matrix ( bct.Far() );
                 
                 matrix.Dot(
-                    metric_values[idx].data(),
-                    one,  bct.GetT().template GetBuffer<type,InOut::In >().data(),
-                    zero, bct.GetS().template GetBuffer<type,InOut::Out>().data(),
+                    metric_values["FF"].data(), metric_values["FF_diag"].data(),
+                    one,  T.ClusterInputBuffer().data(),
+                    zero, S.ClusterOutputBuffer().data(),
                     rhs_count
                );
             }

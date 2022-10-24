@@ -1,7 +1,8 @@
 #pragma once
 
 #define CLASS FMM_Kernel_VF
-#define BASE  FMM_Kernel_NF<S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_, metric_flag_>
+
+#define BASE  FMM_Kernel<ClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,metric_flag_>
 
 namespace Repulsor
 {
@@ -31,12 +32,13 @@ namespace Repulsor
         using BASE::diff_flag;
         using BASE::metric_flag;
         
-        using BASE::S_DOM_DIM;
-        using BASE::T_DOM_DIM;
-        using BASE::S_COORD_DIM;
-        using BASE::T_COORD_DIM;
-        using BASE::S_DATA_DIM;
-        using BASE::T_DATA_DIM;
+        static constexpr Int S_DOM_DIM = S_DOM_DIM_;
+        static constexpr Int T_DOM_DIM = T_DOM_DIM_;
+        
+        static constexpr Int S_COORD_DIM = (S_DOM_DIM+1)*AMB_DIM;
+        static constexpr Int T_COORD_DIM = (T_DOM_DIM+1)*AMB_DIM;
+        static constexpr Int S_DATA_DIM  = 1 + S_COORD_DIM + PROJ_DIM;
+        static constexpr Int T_DATA_DIM  = 1 + T_COORD_DIM + PROJ_DIM;
         
         using S_Tree_T = SimplexHierarchy<S_DOM_DIM,AMB_DIM,GJK_Real,Int,SReal>;
         using T_Tree_T = SimplexHierarchy<T_DOM_DIM,AMB_DIM,GJK_Real,Int,SReal>;
@@ -45,21 +47,37 @@ namespace Repulsor
         
     protected:
         
-        using BASE::S;
-        using BASE::S_data;
-        using BASE::S_D_data;
-        const SReal * restrict const S_ser = nullptr;
-
-        using BASE::T;
-        using BASE::T_data;
-        using BASE::T_D_data;
-        const SReal * restrict const T_ser = nullptr;
+        mutable Real sum = static_cast<Real>(0);
         
-        using BASE::DX;
-        using BASE::DY;
+        mutable Real a   = static_cast<Real>(0);
+        mutable Real b   = static_cast<Real>(0);
         
-        using BASE::a;
-        using BASE::P;
+        mutable Real x [AMB_DIM] = {};
+#ifdef NearField_S_Copy
+        mutable Real P [PROJ_DIM] = {};
+#else
+        mutable Real const * restrict P = nullptr;
+#endif
+        
+        mutable Real y [AMB_DIM] = {};
+#ifdef NearField_T_Copy
+        mutable Real Q [PROJ_DIM] = {};
+#else
+        mutable Real const * restrict Q = nullptr;
+#endif
+        
+        mutable Real DX [S_DATA_DIM] = {};
+        mutable Real DY [T_DATA_DIM] = {};
+        
+        const  Real * restrict const S_data    = nullptr;
+               Real * restrict const S_D_data  = nullptr;
+               Real * restrict const S_diag    = nullptr;
+        const SReal * restrict const S_ser     = nullptr;
+        
+        const  Real * restrict const T_data    = nullptr;
+               Real * restrict const T_D_data  = nullptr;
+               Real * restrict const T_diag    = nullptr;
+        const SReal * restrict const T_ser     = nullptr;
 
 #ifdef NearField_S_Copy
         mutable Real x_buffer [S_DATA_DIM] = {};
@@ -67,23 +85,24 @@ namespace Repulsor
         mutable Real const * restrict x_buffer  = nullptr;
 #endif
         
-        using BASE::b;
-        using BASE::Q;
-        
 #ifdef NearField_T_Copy
         mutable Real y_buffer [T_DATA_DIM] = {};
 #else
         mutable Real const * restrict y_buffer  = nullptr;
 #endif
+
+        using BASE::S;
+        using BASE::T;
         
-        using BASE::S_ID;
-        using BASE::T_ID;
+        using BASE::i_global;
+        using BASE::j_global;
+        using BASE::k_global;
         
         using BASE::tri_i;
         using BASE::tri_j;
         using BASE::lin_k;
         
-        using BASE::metric_values;
+        using BASE::metric_data;
         
         mutable S_Tree_T S_Tree;
         mutable T_Tree_T T_Tree;
@@ -117,12 +136,18 @@ namespace Repulsor
         CLASS() = default;
         
         CLASS( Configurator_T & conf, const Real theta_, const Int  max_level_ = 20 )
-        :   BASE        ( conf                           )
-        ,   S_ser       ( S.PrimitiveSerialized().data() )
-        ,   T_ser       ( T.PrimitiveSerialized().data() )
-        ,   theta       ( theta_                         )
-        ,   theta2      ( theta_ * theta_                )
-        ,   max_level   ( max_level_                     )
+        :   BASE        ( conf                                                         )
+        ,   S_data      ( S.PrimitiveNearFieldData().data()                            )
+        ,   S_D_data    ( S.ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
+        ,   S_diag      ( S.VF_Accumulator().data(               omp_get_thread_num()) )
+        ,   S_ser       ( S.PrimitiveSerialized().data()                               )
+        ,   T_data      ( T.PrimitiveNearFieldData().data()                            )
+        ,   T_D_data    ( T.ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
+        ,   T_diag      ( T.VF_Accumulator().data(               omp_get_thread_num()) )
+        ,   T_ser       ( T.PrimitiveSerialized().data()                               )
+        ,   theta       ( theta_                                                       )
+        ,   theta2      ( theta_ * theta_                                              )
+        ,   max_level   ( max_level_                                                   )
         {
             if( S.PrimitiveSerialized().Dimension(1) != S_Tree.SimplexPrototype().Size() )
             {
@@ -136,12 +161,18 @@ namespace Repulsor
         }
         
         CLASS( const CLASS & other )
-        :   BASE( other )
-        ,   S_ser       ( other.S_ser     )
-        ,   T_ser       ( other.T_ser     )
-        ,   theta       ( other.theta     )
-        ,   theta2      ( other.theta2    )
-        ,   max_level   ( other.max_level )
+        :   BASE        ( other                                                              )
+        ,   S_data      ( other.S_data                                                       )
+        ,   S_D_data    ( other.S.ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
+        ,   S_diag      ( other.S.VF_Accumulator().data(               omp_get_thread_num()) )
+        ,   S_ser       ( other.S_ser                                                        )
+        ,   T_data      ( other.T_data                                                       )
+        ,   T_D_data    ( other.T.ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
+        ,   T_diag      ( other.T.VF_Accumulator().data(               omp_get_thread_num()) )
+        ,   T_ser       ( other.T_ser                                                        )
+        ,   theta       ( other.theta                                                        )
+        ,   theta2      ( other.theta2                                                       )
+        ,   max_level   ( other.max_level                                                    )
         {}
         
         virtual ~CLASS() override
@@ -166,12 +197,12 @@ namespace Repulsor
 
     public:
         
-        virtual force_inline void LoadS( const Int i ) override
+        virtual void LoadS( const Int i_global_ ) override
         {
-            S_ID = i;
-            const Real * const X  = &S_data[S_DATA_DIM * S_ID];
+            i_global = i_global_;
+            const Real * const X  = &S_data[S_DATA_DIM * i_global];
     
-            S_Tree.RequireSimplex(S_ser, S_ID);
+            S_Tree.RequireSimplex(S_ser, i_global);
             
             a = X[0];
         
@@ -186,14 +217,16 @@ namespace Repulsor
             {
                 zerofy_buffer( &DX[0], S_DATA_DIM );
             }
+            
+            this->loadS();
         }
         
-        virtual force_inline void LoadT( const Int j ) override
+        virtual void LoadT( const Int j_global_ ) override
         {
-            T_ID = j;
-            const Real * const Y  = &T_data[T_DATA_DIM * T_ID];
+            j_global = j_global_;
+            const Real * const Y  = &T_data[T_DATA_DIM * j_global];
     
-            T_Tree.RequireSimplex(T_ser, T_ID);
+            T_Tree.RequireSimplex(T_ser, j_global);
             
             b = Y[0];
         
@@ -208,12 +241,11 @@ namespace Repulsor
             {
                 zerofy_buffer( &DY[0], T_DATA_DIM );
             }
+            
+            this->loadT();
         }
-
-//        void PrefetchS( const Int i ) const
-//        {}
         
-        virtual force_inline void PrefetchT( const Int j ) const override
+        virtual void Prefetch( const Int j ) const override
         {
             prefetch_range<T_DATA_DIM,0,0>( &T_data[T_DATA_DIM * j] );
             
@@ -225,9 +257,9 @@ namespace Repulsor
             }
         }
         
-        virtual Real Compute( const Int block_ID ) override
+        virtual Real Compute( const Int k_global_ ) override
         {
-            CleanseBlock( block_ID );
+            k_global = k_global_;
             
             Real sum = static_cast<Real>(0);
             
@@ -249,7 +281,7 @@ namespace Repulsor
                         max_level_reached = max_level;
                         block_count++;
                         bottom_count++;
-                        sum += compute( block_ID );
+                        sum += this->compute();
                         S_Tree.ToParent();
                         T_Tree.ToParent();
                         from_above = false;
@@ -267,7 +299,7 @@ namespace Repulsor
                             // We compute energy, go to parent, and prepare the next child of the parent.
                             max_level_reached = std::max( max_level_reached, S_Tree.Level() );
                             block_count++;
-                            sum += compute( block_ID );
+                            sum += this->compute();
                             S_Tree.ToParent();
                             T_Tree.ToParent();
                             from_above = false;
@@ -331,17 +363,42 @@ namespace Repulsor
             return symmetry_factor * sum;
         }
         
-        virtual void CleanseBlock(  const Int block_ID ) = 0;
+        virtual void WriteS() override
+        {
+            if constexpr (diff_flag )
+            {
+                Real * restrict const to = &S_D_data[S_DATA_DIM * i_global];
+                
+                for( Int k = 0; k < S_DATA_DIM; ++k )
+                {
+                    to[k] += symmetry_factor * DX[k];
+                }
+            }
+            
+            this->writeS();
+        }
         
-        virtual Real compute(  const Int block_ID ) override = 0;
+        virtual void WriteT() override
+        {
+            if constexpr (diff_flag )
+            {
+                Real * restrict const to = &T_D_data[T_DATA_DIM * j_global];
+                
+                for( Int k = 0; k < T_DATA_DIM; ++k )
+                {
+                    to[k] += symmetry_factor * DY[k];
+                }
+            }
+            
+            this->writeT();
+        }
         
-        virtual Int MetricNonzeroCount() const override = 0;
-        
-        virtual void CleanseDiagonalBlock() override = 0;
-        
-        virtual void WriteDiagonalBlock() const override = 0;
+    protected:
+
         
     public:
+        
+        virtual Int NonzeroCount() const override = 0;
         
         virtual void CreateLogFile() const
         {

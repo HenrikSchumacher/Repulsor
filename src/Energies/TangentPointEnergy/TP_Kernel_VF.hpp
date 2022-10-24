@@ -34,9 +34,11 @@ namespace Repulsor
         using BASE::energy_flag;
         using BASE::diff_flag;
         using BASE::metric_flag;
-
-        static constexpr Int METRIC_NNZ = 1 + 2 * AMB_DIM;
-        static constexpr Int DIAG_NNZ   = (AMB_DIM+1) * (AMB_DIM+1);
+        
+        static constexpr Int ROWS      = 1 + AMB_DIM;
+        static constexpr Int COLS      = 1 + AMB_DIM;
+        static constexpr Int BLOCK_NNZ = 1 + 2 * AMB_DIM;
+        static constexpr Int DIAG_NNZ  = ROWS * COLS;
         
         using BASE::S;
         using BASE::T;
@@ -88,6 +90,9 @@ namespace Repulsor
         using BASE::T_data;
         using BASE::T_D_data;
         
+        using BASE::S_diag;
+        using BASE::T_diag;
+        
         using BASE::DX;
         using BASE::DY;
         
@@ -101,8 +106,9 @@ namespace Repulsor
         using BASE::y_buffer;
         using BASE::Q;
         
-        using BASE::S_ID;
-        using BASE::T_ID;
+        using BASE::i_global;
+        using BASE::j_global;
+        using BASE::k_global;
         
         using BASE::tri_i;
         using BASE::tri_j;
@@ -110,8 +116,6 @@ namespace Repulsor
         
         using BASE::S_Tree;
         using BASE::T_Tree;
-        using BASE::S_scale;
-        using BASE::T_scale;
         
         using BASE::lambda;
         using BASE::mu;
@@ -125,14 +129,14 @@ namespace Repulsor
         const T2   minus_p_half;
         const T2   minus_p_half_minus_1;
         
-    public:
         
-        virtual force_inline void CleanseBlock( const Int block_ID ) override
-        {
-            zerofy_buffer( &metric_data[METRIC_NNZ * block_ID], METRIC_NNZ );
-        }
+        Real ij_block [BLOCK_NNZ];
+        Real ii_block [ROWS][COLS];
+        Real jj_block [ROWS][COLS];
         
-        virtual force_inline Real compute( const Int block_ID ) override
+    protected:
+        
+        virtual Real compute() override
         {
             Real x    [AMB_DIM]  = {};
             Real y    [AMB_DIM]  = {};
@@ -253,38 +257,80 @@ namespace Repulsor
                 
                 if constexpr ( metric_flag )
                 {
-                    Real * restrict const m_vals = &metric_data[ METRIC_NNZ * block_ID ];
-                    
-//                     The metric block looks like this for AMB_DIM == 3:
-//
-//                          /                                                                 \
-//                          |   - K_xy - K_yx     Kyx * v[0]     Kyx * v[1]     Kyx * v[2]    |
-//                          |                                                                 |
-//                          |   - K_xy * v[0]         0              0              0         |
-//                          |                                                                 |
-//                          |   - K_xy * v[1]         0              0              0         |
-//                          |                                                                 |
-//                          |   - K_xy * v[2]         0              0              0         |
-//                          \                                                                 /
-//
-//                     This are 1 + 2 * AMB_DIM nonzero values.
-//                     It is tempting to compress also this to 2 + AMB_DIM values.
-//                     BUT we have to add the local matrices from several subtriangles!
-//                     Thus this structure cannot be exploited.
-                    
-                    // CAUTION: We have to do a _weighted_ add-in here! In particular, this requires that CleanseBlock() has been called somewhen before the traversal into the pair of SimplexHierarchies starts.
-                    
                     const Real w_K_xy = w * K_xy;
                     const Real w_K_yx = w * K_yx;
+// ij_block
+//    /                                                                 \
+//    |   - K_xy - K_yx    K_yx * v[0]    K_yx * v[1]    K_yx * v[2]    |
+//    |                                                                 |
+//    |   - K_xy * v[0]         0              0              0         |
+//    |                                                                 |
+//    |   - K_xy * v[1]         0              0              0         |
+//    |                                                                 |
+//    |   - K_xy * v[2]         0              0              0         |
+//    \                                                                 /
+//
+//    This are 1 + 2 * AMB_DIM nonzero values.
+//    It is tempting to compress this into 2 + AMB_DIM values.
+//    But it did not appear to be faster
+
                     
-                    m_vals[0] -= (w_K_xy + w_K_yx);
+// ii block
+//    /                                                                                 \
+//    |     K_xy + K_yx      K_xy * v[0]         K_xy * v[1]         K_xy * v[2]        |
+//    |                                                                                 |
+//    |     K_xy * v[0]   K_xy * v[0] * v[0]  K_xy * v[0] * v[1]  K_xy * v[0] * v[2]    |
+//    |                                                                                 |
+//    |     K_xy * v[1]   K_xy * v[1] * v[0]  K_xy * v[1] * v[1]  K_xy * v[1] * v[2]    |
+//    |                                                                                 |
+//    |     K_xy * v[2]   K_xy * v[2] * v[0]  K_xy * v[2] * v[1]  K_xy * v[2] * v[2]    |
+//    \                                                                                 /
+                    
+// jj block
+//
+//    /                                                                                 \
+//    |     K_xy + K_yx     - K_yx * v[0]       - K_yx * v[1]       - K_yx * v[2]       |
+//    |                                                                                 |
+//    |   - K_yx * v[0]   K_yx * v[0] * v[0]  K_yx * v[0] * v[1]  K_yx * v[0] * v[2]    |
+//    |                                                                                 |
+//    |   - K_yx * v[1]   K_yx * v[1] * v[0]  K_yx * v[1] * v[1]  K_yx * v[1] * v[2]    |
+//    |                                                                                 |
+//    |   - K_yx * v[2]   K_yx * v[2] * v[0]  K_yx * v[2] * v[1]  K_yx * v[2] * v[2]    |
+//    \                                                                                 /
+        
+                    
+                    const Real w_K_sym = w_K_xy + w_K_yx;
+                    
+                    ij_block[0]    -= w_K_sym;
+                    ii_block[0][0] += w_K_sym;
+                    jj_block[0][0] += w_K_sym;
                     
                     for( Int l = 0; l < AMB_DIM; ++l )
                     {
-                        m_vals[1+l]         += w_K_yx * v[l];
-                        m_vals[1+AMB_DIM+l] -= w_K_xy * v[l];
+                        const Real w_K_xy_v = w_K_xy * v[l];
+                        const Real w_K_yx_v = w_K_yx * v[l];
+                        
+                        ij_block[1+l]         += w_K_yx_v;
+                        ij_block[1+AMB_DIM+l] -= w_K_xy_v;
+                        
+                        // store only upper triangle
+                        ii_block[0][1+l] +=   w_K_xy_v;
+                        jj_block[0][1+l] -=   w_K_yx_v;
+                    }
+                    
+                    // store only upper triangle
+                    for( Int i = 1; i < ROWS; ++i )
+                    {
+                        for( Int j = i; j < COLS; ++j )
+                        {
+                            const Real vv = v[i-1] * v[j-1];
+                            
+                            ii_block[i][j] += K_xy * vv;
+                            jj_block[i][j] += K_yx * vv;
+                        }
                     }
                 }
+                
             }
             
             if constexpr ( energy_flag )
@@ -297,27 +343,50 @@ namespace Repulsor
             }
         }
         
+    protected:
+    
+        
+        virtual void loadS() override
+        {
+            if constexpr ( metric_flag )
+            {
+                zerofy_buffer( &ii_block[0][0], DIAG_NNZ );
+            }
+        }
+        
+        virtual void writeS() override
+        {
+            if constexpr ( metric_flag )
+            {
+                copy_buffer( &ii_block[0][0], &S_diag[DIAG_NNZ * i_global], DIAG_NNZ );
+            }
+        }
+        
+        virtual void loadT() override
+        {
+            if constexpr ( metric_flag )
+            {
+                zerofy_buffer( &ij_block[0], BLOCK_NNZ );
+                
+                zerofy_buffer( &jj_block[0][0], DIAG_NNZ );
+            }
+        }
+        
+        virtual void writeT() override
+        {
+            if constexpr ( metric_flag )
+            {
+                copy_buffer( &ij_block[0], &metric_data[BLOCK_NNZ * k_global], BLOCK_NNZ );
+                
+                add_to_buffer( &jj_block[0][0], &T_diag[DIAG_NNZ * j_global], DIAG_NNZ );
+            }
+        }
+        
     public:
         
-        virtual force_inline void CleanseDiagonalBlock() override
+        virtual Int NonzeroCount() const override
         {
-            if constexpr ( metric_flag )
-            {
-//                zerofy_buffer(&diag_block[0][0], DIAG_NNZ );
-            }
-        }
-        
-        virtual force_inline void WriteDiagonalBlock() const override
-        {
-            if constexpr ( metric_flag )
-            {
-//                copy_buffer( &diag_block[0][0], &diag_data[DIAG_NNZ * S_ID] );
-            }
-        }
-        
-        virtual Int MetricNonzeroCount() const override
-        {
-            return METRIC_NNZ;
+            return BLOCK_NNZ;
         }
         
         virtual std::string ClassName() const override

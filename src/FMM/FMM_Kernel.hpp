@@ -23,7 +23,7 @@ namespace Repulsor
         
         using Configurator_T    = FMM_Configurator<ClusterTree_T>;
         using Values_T          = Tensor2<Real,Int>;
-        using ValueContainer_T  = std::array<Values_T,3>;
+        using ValueContainer_T  = std::unordered_map<std::string,Values_T>;
         
         static constexpr bool is_symmetric = is_symmetric_;
         static constexpr bool energy_flag = energy_flag_;
@@ -118,23 +118,28 @@ namespace Repulsor
             return T;
         }
         
-        virtual void LoadS( const Int i ) = 0;
+        virtual void LoadS( const Int i_global_ ) = 0;
         
-        virtual void LoadT( const Int j ) = 0;
-
-//        void PrefetchS( const Int i ) const
-//        {}
+        virtual void LoadT( const Int j_global_ ) = 0;
         
-        virtual void PrefetchT( const Int j ) const = 0;
-        
-        virtual Real compute( const Int block_ID ) = 0;
+        virtual void Prefetch( const Int j_next_ ) const = 0;
                                                        
-        virtual Real Compute( const Int block_ID ) = 0;
+        virtual Real Compute( const Int k_global_ ) = 0;
         
         virtual void WriteS() = 0;
         
         virtual void WriteT() = 0;
 
+        
+        virtual Real compute() = 0;
+        
+        virtual void loadS() = 0;
+        
+        virtual void writeS() = 0;
+        
+        virtual void loadT() = 0;
+        
+        virtual void writeT() = 0;
         
         
         void Allocate( const Int nnz )
@@ -144,34 +149,30 @@ namespace Repulsor
                 if(
                    metric_values.Dimension(0) != nnz
                    ||
-                   metric_values.Dimension(1) != MetricNonzeroCount()
+                   metric_values.Dimension(1) != NonzeroCount()
                    )
                 {
-                    metric_values = Values_T( nnz, MetricNonzeroCount() );
+                    metric_values = Values_T( nnz, NonzeroCount() );
                 }
             }
         }
+//
+//        bool PointersInititializedQ() const
+//        {
+//            if constexpr ( metric_flag )
+//            {
+//                if( metric_data == nullptr )
+//                {
+//                    eprint(ClassName()+"::PointersInititializedQ: Pointers for metric_values not initialized. Make sure to initialize the kernel via the copy constructor.");
+//
+//                    return false;
+//                }
+//            }
+//
+//            return true;
+//        }
         
-        bool PointersInititializedQ() const
-        {
-            if constexpr ( metric_flag )
-            {
-                if( metric_data == nullptr )
-                {
-                    eprint(ClassName()+"::PointersInititializedQ: Pointers for metric_values not initialized. Make sure to initialize the kernel via the copy constructor.");
-                    
-                    return false;
-                }
-            }
-            
-            return true;
-        }
-        
-        virtual Int MetricNonzeroCount() const = 0;
-        
-        virtual void CleanseDiagonalBlock() = 0;
-        
-        virtual void WriteDiagonalBlock() const = 0;
+        virtual Int NonzeroCount() const = 0;
         
     protected:
         
@@ -181,9 +182,10 @@ namespace Repulsor
         Values_T & metric_values;
         
         Real * restrict const metric_data = nullptr;
-        Real * restrict const diag_data   = nullptr;
-        Int S_ID = -1;
-        Int T_ID = -1;
+        
+        Int i_global = -1;
+        Int j_global = -1;
+        Int k_global = -1;
         
     public:
         

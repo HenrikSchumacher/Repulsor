@@ -22,6 +22,7 @@ namespace Repulsor
         
         // In principle, ThreadTensor3<Real,Int> should have better scaling on multiple socket machines, because I tried to encourages that the thread-local arrays are allocated on local RAM. -- On my tiny Quad Core however, it performs a bit _WORSE_ than Tensor3<Real,Int>.
         using DerivativeContainer_T = ThreadTensor3<Real,Int>;
+        using Accumulator_T         = ThreadTensor3<Real,Int>;
 
         explicit CLASS( const ClusterTreeSettings & settings_ = ClusterTreeSettings() )
         :   settings(settings_)
@@ -64,6 +65,10 @@ namespace Repulsor
         mutable BufferContainer_T     C_in;
         mutable BufferContainer_T     C_out;
         mutable DerivativeContainer_T thread_C_D_far;
+        
+        mutable Accumulator_T         VF_acc;
+        mutable Accumulator_T         NF_acc;
+        mutable Accumulator_T         FF_acc;
         
         // Integer data for the combinatorics of the tree.
         
@@ -939,6 +944,21 @@ namespace Repulsor
         DerivativeContainer_T & ThreadClusterDFarFieldData() const
         {
             return thread_C_D_far;
+        }
+        
+        Accumulator_T & VF_Accumulator() const
+        {
+            return VF_acc;
+        }
+        
+        Accumulator_T & NF_Accumulator() const
+        {
+            return NF_acc;
+        }
+        
+        Accumulator_T & FF_Accumulator() const
+        {
+            return FF_acc;
         }
         
         virtual void CollectNearFieldDerivatives( bool addto = false ) const = 0;

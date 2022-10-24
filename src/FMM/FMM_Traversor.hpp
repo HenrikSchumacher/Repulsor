@@ -21,7 +21,7 @@ namespace Repulsor
         using ExtReal = typename Kernel_T::ExtReal;
         
         using Values_T          = Tensor2<Real,Int>;
-        using ValueContainer_T  = std::array<Values_T,3>;
+        using ValueContainer_T  = std::unordered_map<std::string,Values_T>;
         
         using SparsityPattern_T = SparsityPatternCSR<Int>;
         
@@ -81,7 +81,7 @@ namespace Repulsor
             const Int thread_count = job_ptr.Size()-1;
             
             Real global_sum = static_cast<Real>(0);
-            
+
             #pragma omp parallel for num_threads( thread_count ) reduction( + : global_sum )
             for( Int thread = 0; thread < thread_count; ++thread )
             {
@@ -121,7 +121,7 @@ namespace Repulsor
 
                             ker.LoadT(j);
                             
-                            ker.PrefetchT(ci[k+1]);
+                            ker.Prefetch(ci[k+1]);
 
                             local_sum += ker.Compute(k);
                             
@@ -152,7 +152,6 @@ namespace Repulsor
                 
                 global_sum += local_sum;
             }
-            
             ptoc(ClassName()+"::Compute");
 
             return global_sum;

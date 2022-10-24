@@ -503,58 +503,6 @@ namespace Repulsor
             return 1 + AMB_DIM + (AMB_DIM*(AMB_DIM+1))/2;
         }
         
-        template<FMM::Type PC, InOut inout>
-        BufferContainer_T & GetBuffer() const
-        {
-            switch( inout )
-            {
-                case InOut::In:
-                {
-                    switch( PC )
-                    {
-                        case FMM::Type::IN:
-                        {
-                            return P_in;
-                        }
-                        case FMM::Type::VF:
-                        {
-                            return P_in;
-                        }
-                        case FMM::Type::NF:
-                        {
-                            return P_in;
-                        }
-                        case FMM::Type::FF:
-                        {
-                            return C_in;
-                        }
-                    }
-                }
-                case InOut::Out:
-                {
-                    switch( PC )
-                    {
-                        case FMM::Type::IN:
-                        {
-                            return P_out;
-                        }
-                        case FMM::Type::VF:
-                        {
-                            return P_out;
-                        }
-                        case FMM::Type::NF:
-                        {
-                            return P_out;
-                        }
-                        case FMM::Type::FF:
-                        {
-                            return C_out;
-                        }
-                    }
-                }
-            }
-        }
-        
     private:
             
         void AllocateNearFarData( const Int near_dim_, const Int far_dim_ ) // reordering and computing bounding boxes
@@ -1293,24 +1241,23 @@ namespace Repulsor
             ptic(className()+"::CollectFarFieldDerivatives");
             
             const Int far_dim         = FarDim();
-            const Int cluster_count   = ClusterCount();
             const Int primitive_count = PrimitiveCount();
             const Int thread_count    = ThreadCount();
             
             this->RequireBuffers(far_dim);
             
-            thread_C_D_far.AdditiveReduction( C_out.data(), false );
+            thread_C_D_far.AddReduce( C_out.data(), false );
             
 //            // Write first slice.
 //            copy_buffer( thread_C_D_far.data(0), C_out.data(), cluster_count * far_dim );
-//            
+//
 //            // Add the other slices.
 //            for( Int thread = 1; thread < thread_count; ++thread )
 //            {
 //                const Real * restrict const from = thread_C_D_far.data(thread);
 //                      Real * restrict const to   = C_out.data();
 //                const Int last = cluster_count * far_dim;
-//                
+//
 //                #pragma omp parallel for simd num_threads( thread_count )
 //                for( Int i = 0; i < last; ++i )
 //                {

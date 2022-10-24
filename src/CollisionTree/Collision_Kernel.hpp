@@ -140,27 +140,27 @@ namespace Repulsor
         
     public:
 
-        virtual force_inline void LoadClusterS( const Int i ) override
+        virtual void LoadClusterS( const Int i ) override
         {
             C_i = i;
         }
         
-        virtual force_inline void LoadClusterT( const Int j ) override
+        virtual void LoadClusterT( const Int j ) override
         {
             C_j = j;
         }
         
-        virtual force_inline void LoadPrimitiveS( const Int i ) override
+        virtual void LoadPrimitiveS( const Int i ) override
         {
             P_i = i;
             
         }
-        virtual force_inline void LoadPrimitiveT( const Int j ) override
+        virtual void LoadPrimitiveT( const Int j ) override
         {
             P_j = j;
         }
         
-        virtual force_inline bool IsAdmissable() override
+        virtual bool IsAdmissable() override
         {
             Compute_AABB_CollisionTimeInterval<ClusterTree_T::AMB_DIM, SReal, Int> (
                 S_C_ser.data(C_i), S_C_up_ser.data(C_i),
@@ -171,19 +171,19 @@ namespace Repulsor
             return a >= static_cast<SReal>(1);
         }
         
-        virtual force_inline SReal ClusterScoreS() override
+        virtual SReal ClusterScoreS() override
         {
             return S_C_ser(C_i,0);
         }
-        virtual force_inline SReal ClusterScoreT() override
+        virtual SReal ClusterScoreT() override
         {
             return T_C_ser(C_j,0);
         }
         
-        virtual force_inline void ComputeLeafDiagonal() override
+        virtual void ComputeLeafDiagonal() override
         {}
         
-        virtual force_inline void ComputeLeaf() override
+        virtual void ComputeLeaf() override
         {
             if( A.FindNonzeroPosition(P_i,P_j) < static_cast<int>(0) )
             {
@@ -202,7 +202,7 @@ namespace Repulsor
             }
         }
         
-        virtual force_inline void ComputeLeafSwapped() override
+        virtual void ComputeLeafSwapped() override
         {
             if( A.FindNonzeroPosition(P_i,P_j) < static_cast<int>(0) )
             {
@@ -221,10 +221,10 @@ namespace Repulsor
             }
         }
         
-        virtual force_inline void ComputeAdmissable() override
+        virtual void ComputeAdmissable() override
         {}
         
-        virtual force_inline void ComputeAdmissableSwapped() override
+        virtual void ComputeAdmissableSwapped() override
         {}
         
     public:

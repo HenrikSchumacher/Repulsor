@@ -1,7 +1,7 @@
 namespace Repulsor
 {
     template <int AMB_DIM, typename SReal, typename Int>
-    force_inline void Compute_AABB_CollisionTimeInterval(
+    void Compute_AABB_CollisionTimeInterval(
        const SReal * restrict const p_0,
        const SReal * restrict const p_1,
        const SReal * restrict const q_0,

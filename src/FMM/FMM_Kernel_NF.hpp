@@ -65,21 +65,24 @@ namespace Repulsor
         mutable Real DX [S_DATA_DIM] = {};
         mutable Real DY [T_DATA_DIM] = {};
         
-        const  Real * restrict const S_data     = nullptr;
-               Real * restrict const S_D_data   = nullptr;
+        const  Real * restrict const S_data    = nullptr;
+               Real * restrict const S_D_data  = nullptr;
+               Real * restrict const S_diag    = nullptr;
         
-        const  Real * restrict const T_data     = nullptr;
-               Real * restrict const T_D_data   = nullptr;
+        const  Real * restrict const T_data    = nullptr;
+               Real * restrict const T_D_data  = nullptr;
+               Real * restrict const T_diag    = nullptr;
 
 
         using BASE::tri_i;
         using BASE::tri_j;
         using BASE::lin_k;
 
-        using BASE::S_ID;
-        using BASE::T_ID;
+        using BASE::i_global;
+        using BASE::j_global;
+        using BASE::k_global;
         
-        using BASE::metric_values;
+        using BASE::metric_data;
         
         static const constexpr Real S_scale = static_cast<Real>(1)/static_cast<Real>(S_DOM_DIM+1);
         static const constexpr Real T_scale = static_cast<Real>(1)/static_cast<Real>(T_DOM_DIM+1);
@@ -93,8 +96,10 @@ namespace Repulsor
         :   BASE        ( conf                                                         )
         ,   S_data      ( S.PrimitiveNearFieldData().data()                            )
         ,   S_D_data    ( S.ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
+        ,   S_diag      ( S.NF_Accumulator().data(               omp_get_thread_num()) )
         ,   T_data      ( T.PrimitiveNearFieldData().data()                            )
         ,   T_D_data    ( T.ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
+        ,   T_diag      ( T.NF_Accumulator().data(               omp_get_thread_num()) )
         {
             if( S.PrimitiveNearFieldData().Dimension(1) != S_DATA_DIM )
             {
@@ -128,18 +133,20 @@ namespace Repulsor
         :   BASE        ( other                                                              )
         ,   S_data      ( other.S_data                                                       )
         ,   S_D_data    ( other.S.ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
+        ,   S_diag      ( other.S.NF_Accumulator().data(               omp_get_thread_num()) )
         ,   T_data      ( other.T_data                                                       )
         ,   T_D_data    ( other.T.ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
+        ,   T_diag      ( other.T.NF_Accumulator().data(               omp_get_thread_num()) )
         {}
         
         virtual ~CLASS() = default;
 
     public:
         
-        virtual force_inline void LoadS( const Int i ) override
+        virtual void LoadS( const Int i_global_ ) override
         {
-            S_ID = i;
-            const Real * const restrict X = &S_data[S_DATA_DIM * S_ID];
+            i_global = i_global_;
+            const Real * const restrict X = &S_data[S_DATA_DIM * i_global];
             
             a = X[0];
             
@@ -162,12 +169,14 @@ namespace Repulsor
             {
                 zerofy_buffer( &DX[0], S_DATA_DIM );
             }
+            
+            this->loadS();
         }
         
-        virtual force_inline void LoadT( const Int j ) override
+        virtual void LoadT( const Int j_global_ ) override
         {
-            T_ID = j;
-            const Real * const restrict Y = &T_data[T_DATA_DIM * T_ID];
+            j_global = j_global_;
+            const Real * const restrict Y = &T_data[T_DATA_DIM * j_global];
             
             b = Y[0];
             
@@ -190,57 +199,58 @@ namespace Repulsor
             {
                 zerofy_buffer( &DY[0], T_DATA_DIM );
             }
+            
+            this->loadT();
         }
-
-//        void PrefetchS( const Int i ) const
-//        {}
         
-        virtual force_inline void PrefetchT( const Int j ) const override
+        virtual void Prefetch( const Int j_next ) const override
         {
-            prefetch_range<T_DATA_DIM,0,0>( &T_data[T_DATA_DIM * j] );
+            prefetch_range<T_DATA_DIM,0,0>( &T_data[T_DATA_DIM * j_next] );
             
             if constexpr ( diff_flag )
             {
-                prefetch_range<T_DATA_DIM,1,0>( &T_D_data[T_DATA_DIM * j] );
+                prefetch_range<T_DATA_DIM,1,0>( &T_D_data[T_DATA_DIM * j_next] );
             }
         }
         
-        virtual force_inline Real Compute( const Int block_ID ) override
+        virtual Real Compute( const Int k_global_ ) override
         {
-            return symmetry_factor * compute( block_ID );
+            k_global = k_global_;
+            return symmetry_factor * this->compute();
         }
-        
-        virtual Real compute(  const Int block_ID  ) override = 0;
             
-        virtual force_inline void WriteS() override
+        virtual void WriteS() override
         {
             if constexpr (diff_flag )
             {
-                Real * restrict const to = &S_D_data[S_DATA_DIM * S_ID];
+                Real * restrict const to = &S_D_data[S_DATA_DIM * i_global];
                 
                 for( Int k = 0; k < S_DATA_DIM; ++k )
                 {
                     to[k] += symmetry_factor * DX[k];
                 }
             }
+            
+            this->writeS();
         }
         
-        virtual force_inline void WriteT() override
+        virtual void WriteT() override
         {
             if constexpr (diff_flag )
             {
-                Real * restrict const to = &T_D_data[T_DATA_DIM * T_ID];
+                Real * restrict const to = &T_D_data[T_DATA_DIM * j_global];
                 
                 for( Int k = 0; k < T_DATA_DIM; ++k )
                 {
                     to[k] += symmetry_factor * DY[k];
                 }
             }
+            
+            this->writeT();
         }
         
-        virtual void CleanseDiagonalBlock() override = 0;
-        
-        virtual void WriteDiagonalBlock() const override = 0;
+    protected:
+
         
     public:
         

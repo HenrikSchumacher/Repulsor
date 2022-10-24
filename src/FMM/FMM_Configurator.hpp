@@ -17,7 +17,7 @@ namespace Repulsor
         using ExtReal = typename ClusterTree_T::ExtReal;
         
         using Values_T         = Tensor2<Real,Int>;
-        using ValueContainer_T = std::array<Values_T,3>;
+        using ValueContainer_T = std::unordered_map<std::string,Values_T>;
         
         
     public:

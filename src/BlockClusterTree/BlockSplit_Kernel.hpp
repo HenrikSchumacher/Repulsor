@@ -148,49 +148,49 @@ namespace Repulsor
         
     public:
 
-        virtual force_inline void LoadClusterS( const Int i ) override
+        virtual void LoadClusterS( const Int i ) override
         {
             C_i = i;
             S_C_proto->SetPointer(S_C_serialized,i);
         }
         
-        virtual force_inline void LoadClusterT( const Int j ) override
+        virtual void LoadClusterT( const Int j ) override
         {
             C_j = j;
             T_C_proto->SetPointer(T_C_serialized,j);
         }
         
-        virtual force_inline void LoadPrimitiveS( const Int i ) override
+        virtual void LoadPrimitiveS( const Int i ) override
         {
             P_i = i;
             S_P_proto->SetPointer(S_P_serialized,i);
         }
-        virtual force_inline void LoadPrimitiveT( const Int j ) override
+        virtual void LoadPrimitiveT( const Int j ) override
         {
             P_j = j;
             T_P_proto->SetPointer(T_P_serialized,j);
         }
         
-        virtual force_inline bool IsAdmissable() override
+        virtual bool IsAdmissable() override
         {
             return G.MultipoleAcceptanceCriterion( *S_C_proto, *T_C_proto, far_theta2 );
         }
         
-        virtual force_inline SReal ClusterScoreS() override
+        virtual SReal ClusterScoreS() override
         {
             return S_C_proto-> SquaredRadius();
         }
-        virtual force_inline SReal ClusterScoreT() override
+        virtual SReal ClusterScoreT() override
         {
             return T_C_proto->SquaredRadius();
         }
         
-        virtual force_inline void ComputeLeafDiagonal() override
+        virtual void ComputeLeafDiagonal() override
         {
 //            near_idx.Push( P_i, P_i );
         }
         
-        virtual force_inline void ComputeLeaf() override
+        virtual void ComputeLeaf() override
         {
             const bool neighbor_found = A.FindNonzeroPosition(P_i,P_j) >= 0;
 
@@ -226,7 +226,7 @@ namespace Repulsor
             }
         }
         
-        virtual force_inline void ComputeLeafSwapped() override
+        virtual void ComputeLeafSwapped() override
         {
             const bool neighbor_found = A.FindNonzeroPosition(P_i,P_j) >= 0;
 
@@ -261,13 +261,13 @@ namespace Repulsor
             }
         }
         
-        virtual force_inline void ComputeAdmissable() override
+        virtual void ComputeAdmissable() override
         {
 //            far_idx.push_back(C_i);
 //            far_jdx.push_back(C_j);
             far_idx.Push( C_i, C_j );
         }
-        virtual force_inline void ComputeAdmissableSwapped() override
+        virtual void ComputeAdmissableSwapped() override
         {
 //            far_idx.push_back(C_j);
 //            far_jdx.push_back(C_i);
