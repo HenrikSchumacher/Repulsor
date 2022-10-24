@@ -42,9 +42,11 @@ namespace Repulsor
         using BASE::X;
         using BASE::Y;
         using BASE::x;
-        using BASE::z;
+        using BASE::y;
         
         using BASE::i_global;
+        using BASE::j_global;
+        using BASE::k_global;
         
     public:
         
@@ -93,7 +95,7 @@ namespace Repulsor
         
         
         
-        virtual void ApplyBlock( const Int k_global, const Int j_global ) override
+        virtual void apply_block() override
         {
             // Since we need the casted vector ROWS times, it might be a good idea to do the conversion only once.
             this->ReadX( j_global );
@@ -120,17 +122,20 @@ namespace Repulsor
             
             for( Int k = 0; k < MAX_RHS_COUNT; ++k )
             {
-                z[k][0] += a[0] * x[k][0];
+                y[k][0] += a[0] * x[k][0];
                 
                 for( Int i = 1; i < ROWS; ++i )
                 {
-                    z[k][0] += a[i] * x[k][i];
-                    z[k][i] += a[AMB_DIM+i] * x[k][0];
+                    y[k][0] += a[i] * x[k][i];
+                    y[k][i] += a[AMB_DIM+i] * x[k][0];
                 }
             }
         }
 
-        virtual void FinishRow() override
+        virtual void begin_row() override
+        {}
+        
+        virtual void end_row() override
         {
             // Multiply diagonal block
         }

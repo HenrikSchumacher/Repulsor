@@ -383,7 +383,6 @@ namespace Repulsor
                 }
                 
                 
-                
                 if( FF_flag )
                 {
                     FF_MultiplyMetric(rhs_count);

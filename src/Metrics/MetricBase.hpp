@@ -70,7 +70,6 @@ namespace Repulsor
         ) const
         {
             ptic(ClassName()+"::MultiplyMetric");
-            
             auto & S = M.GetBlockClusterTree().GetS();
             auto & T = M.GetBlockClusterTree().GetT();
 
