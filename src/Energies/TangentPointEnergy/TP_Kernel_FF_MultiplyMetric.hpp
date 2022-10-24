@@ -78,14 +78,14 @@ namespace Repulsor
                 
         virtual void TransposeBlock( const Int from, const Int to ) const override
         {
-            const Scalar * restrict const a_from = &A[ BLOCK_NNZ * from];
-                  Scalar * restrict const a_to   = &A[ BLOCK_NNZ * to  ];
+            const Scalar * restrict const a_from = &A[BLOCK_NNZ * from];
+                  Scalar * restrict const a_to   = &A[BLOCK_NNZ * to  ];
             
             a_to[0] = a_from[0];
             for( Int k = 0; k < AMB_DIM; ++k )
             {
-                a_to[1    + k] = - a_from[ROWS + k];
-                a_to[ROWS + k] = - a_from[1    + k];
+                a_to[1    + k] = a_from[ROWS + k];
+                a_to[ROWS + k] = a_from[1    + k];
             }
         }
         
