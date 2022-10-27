@@ -57,7 +57,7 @@ namespace Repulsor
         Real Compute()
         {
             ptic(ClassName()+"::Compute");
-
+            
             if( pattern.NonzeroCount() <= 0 )
             {
                 ptoc(ClassName()+"::Compute");
@@ -65,92 +65,161 @@ namespace Repulsor
             }
             
             const auto & job_ptr = COND(
-                is_symmetric,
-                pattern.UpperTriangularJobPtr(),
-                pattern.JobPtr()
-            );
+                                        is_symmetric,
+                                        pattern.UpperTriangularJobPtr(),
+                                        pattern.JobPtr()
+                                        );
             
             // Make sure that pattern.Diag() is created before the parallel region.
             if constexpr ( is_symmetric )
             {
                 (void)pattern.Diag();
             }
-
+            
             kernel.Allocate( pattern.NonzeroCount() );
             
             const Int thread_count = job_ptr.Size()-1;
             
             Real global_sum = static_cast<Real>(0);
-
-            #pragma omp parallel for num_threads( thread_count ) reduction( + : global_sum )
-            for( Int thread = 0; thread < thread_count; ++thread )
+            
+            if( thread_count > 1 )
             {
-                // Initialize local kernel and feed it all the information that is going to be constant along its life time.
-
-                Kernel_T ker ( kernel );
-                
-                Real local_sum = static_cast<Real>(0);
-                
-                const Int * restrict const diag = COND(is_symmetric,
-                    pattern.Diag().data(),
-                    nullptr
-                );
-                
-                const Int * restrict const rp = pattern.Outer().data();
-                const Int * restrict const ci = pattern.Inner().data();
-                
-                // Kernel is supposed the following rows of pattern:
-                const Int i_begin = job_ptr[thread  ];
-                const Int i_end   = job_ptr[thread+1];
-                
-                for( Int i = i_begin; i < i_end; ++i )
+#pragma omp parallel for num_threads( thread_count ) reduction( + : global_sum )
+                for( Int thread = 0; thread < thread_count; ++thread )
                 {
-                    // These are the corresponding nonzero blocks in i-th row.
-                    const Int k_begin = COND( is_symmetric, diag[i], rp[i] );
-                    const Int k_end   = rp[i+1];
+                    // Initialize local kernel and feed it all the information that is going to be constant along its life time.
                     
-                    if( k_end > k_begin )
+                    Kernel_T ker ( kernel );
+                    
+                    Real local_sum = static_cast<Real>(0);
+                    
+                    const Int * restrict const diag = COND(is_symmetric, pattern.Diag().data(), nullptr);
+                    
+                    const Int * restrict const rp = pattern.Outer().data();
+                    const Int * restrict const ci = pattern.Inner().data();
+                    
+                    // Kernel is supposed the following rows of pattern:
+                    const Int i_begin = job_ptr[thread  ];
+                    const Int i_end   = job_ptr[thread+1];
+                    
+                    for( Int i = i_begin; i < i_end; ++i )
                     {
-                        // Clear the local vector chunk of the kernel.
-                        ker.LoadS(i);
+                        // These are the corresponding nonzero blocks in i-th row.
+                        const Int k_begin = COND( is_symmetric, diag[i], rp[i] );
+                        const Int k_end   = rp[i+1];
                         
-                        // Perform all but the last calculation in row with prefetch.
-                        for( Int k = k_begin; k < k_end-1; ++k )
+                        if( k_end > k_begin )
                         {
-                            const Int j = ci[k];
-
-                            ker.LoadT(j);
+                            // Clear the local vector chunk of the kernel.
+                            ker.LoadS(i);
                             
-                            ker.Prefetch(ci[k+1]);
-
-                            local_sum += ker.Compute(k);
+                            // Perform all but the last calculation in row with prefetch.
+                            for( Int k = k_begin; k < k_end-1; ++k )
+                            {
+                                const Int j = ci[k];
+                                
+                                ker.LoadT(j);
+                                
+                                ker.Prefetch(ci[k+1]);
+                                
+                                local_sum += ker.Compute(k);
+                                
+                                ker.WriteT();
+                            }
                             
-                            ker.WriteT();
+                            // Perform last calculation in row without prefetch.
+                            {
+                                const Int k = k_end-1;
+                                
+                                const Int j = ci[k];
+                                
+                                ker.LoadT(j);
+                                
+                                local_sum += ker.Compute(k);
+                                
+                                ker.WriteT();
+                            }
+                            
+                            // Incorporate the kernel's local vector chunk into the i-th chunk if the output Y.
+                            
+                            ker.WriteS();
                         }
                         
-                        // Perform last calculation in row without prefetch.
-                        {
-                            const Int k = k_end-1;
-                            
-                            const Int j = ci[k];
-                            
-                            ker.LoadT(j);
-                            
-                            local_sum += ker.Compute(k);
-                            
-                            ker.WriteT();
-                        }
+                        // Incoporate the local vector chunk into the i-th chunk of the output.
                         
-                        // Incorporate the kernel's local vector chunk into the i-th chunk if the output Y.
-                        
-                        ker.WriteS();
                     }
                     
-                    // Incoporate the local vector chunk into the i-th chunk of the output.
-                    
+                    global_sum += local_sum;
                 }
-                
-                global_sum += local_sum;
+            }
+            else
+            {
+                for( Int thread = 0; thread < thread_count; ++thread )
+                {
+                    // Initialize local kernel and feed it all the information that is going to be constant along its life time.
+                    
+                    Kernel_T ker ( kernel );
+                    
+                    Real local_sum = static_cast<Real>(0);
+                    
+                    const Int * restrict const diag = COND(is_symmetric, pattern.Diag().data(), nullptr);
+                    
+                    const Int * restrict const rp = pattern.Outer().data();
+                    const Int * restrict const ci = pattern.Inner().data();
+                    
+                    // Kernel is supposed the following rows of pattern:
+                    const Int i_begin = job_ptr[thread  ];
+                    const Int i_end   = job_ptr[thread+1];
+                    
+                    for( Int i = i_begin; i < i_end; ++i )
+                    {
+                        // These are the corresponding nonzero blocks in i-th row.
+                        const Int k_begin = COND( is_symmetric, diag[i], rp[i] );
+                        const Int k_end   = rp[i+1];
+                        
+                        if( k_end > k_begin )
+                        {
+                            // Clear the local vector chunk of the kernel.
+                            ker.LoadS(i);
+                            
+                            // Perform all but the last calculation in row with prefetch.
+                            for( Int k = k_begin; k < k_end-1; ++k )
+                            {
+                                const Int j = ci[k];
+                                
+                                ker.LoadT(j);
+                                
+                                ker.Prefetch(ci[k+1]);
+                                
+                                local_sum += ker.Compute(k);
+                                
+                                ker.WriteT();
+                            }
+                            
+                            // Perform last calculation in row without prefetch.
+                            {
+                                const Int k = k_end-1;
+                                
+                                const Int j = ci[k];
+                                
+                                ker.LoadT(j);
+                                
+                                local_sum += ker.Compute(k);
+                                
+                                ker.WriteT();
+                            }
+                            
+                            // Incorporate the kernel's local vector chunk into the i-th chunk if the output Y.
+                            
+                            ker.WriteS();
+                        }
+                        
+                        // Incoporate the local vector chunk into the i-th chunk of the output.
+                        
+                    }
+                    
+                    global_sum += local_sum;
+                }
             }
             ptoc(ClassName()+"::Compute");
 

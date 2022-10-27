@@ -37,22 +37,34 @@ namespace Repulsor
         
         using Configurator_T    = FMM_Configurator<ClusterTree_T>;
 
-        using Kernel_VF_Multiply_T = TP_Kernel_VF_MultiplyMetric<
-            AMB_DIM,AMB_DIM,
-            Real,Int,Real,Real,
-            true,true,1,1 // Caution! We have to add-into and not to overwrite!
+        using Kernel_VF_Multiply_T = ArrowheadBlockKernel_fixed<
+            AMB_DIM+1, AMB_DIM+1, AMB_DIM, true,
+            Real, Int, Real, Real,
+            1,    1,                    // CAUTION: We use add-in instead of overwrite!
+                         true,
+            true, false, true, true,
+            true, false,
+            true
         >;
         
-        using Kernel_NF_Multiply_T = TP_Kernel_NF_MultiplyMetric<
-            AMB_DIM,AMB_DIM,
-            Real,Int,Real,Real,
-            true,true,1,0
+        using Kernel_NF_Multiply_T = ArrowheadBlockKernel_fixed<
+            AMB_DIM+1, AMB_DIM+1, AMB_DIM, true,
+            Real, Int, Real, Real,
+            1,    0,
+                         true,
+            true, false, true, true,
+            true, false,
+            true
         >;
         
-        using Kernel_FF_Multiply_T = TP_Kernel_FF_MultiplyMetric<
-            AMB_DIM,AMB_DIM,
-            Real,Int,Real,Real,
-            true,true,1,0
+        using Kernel_FF_Multiply_T = ArrowheadBlockKernel_fixed<
+            AMB_DIM+1, AMB_DIM+1, AMB_DIM, true,
+            Real, Int, Real, Real,
+            1,    0,
+                         true,
+            true, false, true, true,
+            true, false,
+            true
         >;
     
         static constexpr Int VF_block_size = Kernel_VF_Multiply_T::ROWS * Kernel_VF_Multiply_T::COLS;
@@ -259,7 +271,7 @@ namespace Repulsor
             {
                 if constexpr ( is_symmetric )
                 {
-                    SparseKernelMatrixCSR_gen<Kernel_NF_Multiply_T> matrix ( pattern );
+                    SparseKernelMatrixCSR<Kernel_NF_Multiply_T> matrix ( pattern );
                     
                     matrix.FillLowerTriangleFromUpperTriangle( metric_values["VF"].data() );
                 }
@@ -300,7 +312,7 @@ namespace Repulsor
             {
                 if constexpr ( is_symmetric )
                 {
-                    SparseKernelMatrixCSR_gen<Kernel_NF_Multiply_T> matrix ( pattern );
+                    SparseKernelMatrixCSR<Kernel_NF_Multiply_T> matrix ( pattern );
                     
                     matrix.FillLowerTriangleFromUpperTriangle( metric_values["NF"].data() );
                 }
@@ -340,7 +352,7 @@ namespace Repulsor
             {
                 if constexpr ( is_symmetric )
                 {
-                    SparseKernelMatrixCSR_gen<Kernel_NF_Multiply_T> matrix ( pattern );
+                    SparseKernelMatrixCSR<Kernel_NF_Multiply_T> matrix ( pattern );
                     
                     matrix.FillLowerTriangleFromUpperTriangle( metric_values["FF"].data() );
                 }
@@ -403,10 +415,10 @@ namespace Repulsor
 
         void NF_MultiplyMetric( const Int rhs_count ) const
         {
-            SparseKernelMatrixCSR_gen<Kernel_NF_Multiply_T> matrix ( bct.Near() );
+            SparseKernelMatrixCSR<Kernel_NF_Multiply_T> matrix ( bct.Near() );
             
             matrix.Dot(
-                metric_values["NF"].data(), metric_values["NF_diag"].data(),
+                metric_values["NF"].data(),
                 one,  T.PrimitiveInputBuffer().data(),
                 zero, S.PrimitiveOutputBuffer().data(),
                 rhs_count
@@ -418,10 +430,10 @@ namespace Repulsor
         {
             if constexpr ( metric_flag )
             {
-                SparseKernelMatrixCSR_gen<Kernel_VF_Multiply_T> matrix ( bct.VeryNear() );
+                SparseKernelMatrixCSR<Kernel_VF_Multiply_T> matrix ( bct.VeryNear() );
                 
                 matrix.Dot(
-                    metric_values["VF"].data(), metric_values["VF_diag"].data(),
+                    metric_values["VF"].data(),
                     one,  T.PrimitiveInputBuffer().data(),
                     one,  S.PrimitiveOutputBuffer().data(),
                     rhs_count
@@ -433,10 +445,10 @@ namespace Repulsor
         {
             if constexpr ( metric_flag )
             {
-                SparseKernelMatrixCSR_gen<Kernel_FF_Multiply_T> matrix ( bct.Far() );
+                SparseKernelMatrixCSR<Kernel_FF_Multiply_T> matrix ( bct.Far() );
                 
                 matrix.Dot(
-                    metric_values["FF"].data(), metric_values["FF_diag"].data(),
+                    metric_values["FF"].data(),
                     one,  T.ClusterInputBuffer().data(),
                     zero, S.ClusterOutputBuffer().data(),
                     rhs_count

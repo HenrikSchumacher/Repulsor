@@ -1,10 +1,13 @@
 #pragma once
 
 #define CLASS TP0_Kernel_FF_MultiplyMetric
-#define BASE  BlockKernel_fixed<AMB_DIM_+1,AMB_DIM_+1,MAX_RHS_COUNT_,                       \
-    Scalar_,Int_,Scalar_in_,Scalar_out_,                                                    \
-    x_RM,  y_RM,                                                                            \
-    alpha_flag, beta_flag                                                                   \
+#define BASE  BlockKernel_fixed<                            \
+    AMB_DIM_+1,AMB_DIM_+1,MAX_RHS_COUNT_,true,              \
+    Scalar_,Int_,Scalar_in_,Scalar_out_,                    \
+    alpha_flag, beta_flag,                                  \
+    x_RM, false, true, true,                                \
+    y_RM, false,                                            \
+    true                                                    \
 >
 
 namespace Repulsor
@@ -36,7 +39,6 @@ namespace Repulsor
         
         using BASE::A;
         using BASE::A_const;
-        using BASE::A_diag;
         using BASE::X;
         using BASE::Y;
         using BASE::x;
@@ -58,14 +60,13 @@ namespace Repulsor
         
         CLASS(
             const Scalar     * restrict const A_,
-            const Scalar     * restrict const A_diag_,
             const Scalar_out                  alpha_,
             const Scalar_in  * restrict const X_,
             const Scalar_out                  beta_,
                   Scalar_out * restrict const Y_,
             const Int                         rhs_count_
         )
-        :   BASE( A_, A_diag_, alpha_, X_, beta_, Y_, rhs_count_ )
+        :   BASE( A_, alpha_, X_, beta_, Y_, rhs_count_ )
         {}
         
         // Copy constructor

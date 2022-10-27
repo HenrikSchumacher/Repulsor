@@ -4,9 +4,9 @@
 #include "TangentPointEnergy/TP_Kernel_NF.hpp"
 #include "TangentPointEnergy/TP_Kernel_VF.hpp"
 
-#include "TangentPointEnergy/TP_Kernel_FF_MultiplyMetric.hpp"
-#include "TangentPointEnergy/TP_Kernel_NF_MultiplyMetric.hpp"
-#include "TangentPointEnergy/TP_Kernel_VF_MultiplyMetric.hpp"
+//#include "TangentPointEnergy/TP_Kernel_FF_MultiplyMetric.hpp"
+//#include "TangentPointEnergy/TP_Kernel_NF_MultiplyMetric.hpp"
+//#include "TangentPointEnergy/TP_Kernel_VF_MultiplyMetric.hpp"
 
 #include "TangentPointEnergy/TP_Traversor.hpp"
 

@@ -21,12 +21,12 @@
 
 #include "../Repulsor.hpp"
 
-using namespace Repulsor;
-using namespace Tensors;
-using namespace Tools;
-
 int main(int argc, const char * argv[])
 {
+    
+    using namespace Repulsor;
+    using namespace Tensors;
+    using namespace Tools;
     
     const char * homedir = getenv("HOME");
 
