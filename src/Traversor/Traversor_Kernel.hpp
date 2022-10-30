@@ -20,8 +20,6 @@ namespace Repulsor
         
         CLASS() = default;
         
-        virtual ~CLASS() = default;
-        
         CLASS(
             const ClusterTree_T & S_,
             const ClusterTree_T & T_
@@ -32,8 +30,12 @@ namespace Repulsor
         CLASS(
             const CLASS & other
         )
-        :   tree_string( other.tree_string )
+        :   tree_string ( other.tree_string                )
         {}
+        
+        virtual ~CLASS() = default;
+        
+        
         
         friend void swap(CLASS &A, CLASS &B)
         {
@@ -91,7 +93,6 @@ namespace Repulsor
         
         virtual void ComputeAdmissable() = 0;
         virtual void ComputeAdmissableSwapped() = 0;
-
         
     protected:
         

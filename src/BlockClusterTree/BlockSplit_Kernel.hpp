@@ -21,8 +21,6 @@ namespace Repulsor
         
         CLASS() = default;
         
-        virtual ~CLASS() = default;
-        
         CLASS(
             const ClusterTree_T & S,
             const ClusterTree_T & T,
@@ -114,6 +112,8 @@ namespace Repulsor
 //            }
 //            return *this;
 //        }
+        
+        virtual ~CLASS() = default;
         
     public:
         PairAggregator<Int,Int,LInt> inter_idx;

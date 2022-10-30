@@ -21,8 +21,6 @@ namespace Repulsor
 
         // In order to prevent GetS() and GetT() shooting a segfault, we have to initialize S and T here. This is the only case in which CLASS owns these raw pointers.
         
-        virtual ~CLASS() = default;
-        
         CLASS(
             const ClusterTree_T & S_,
             const ClusterTree_T & T_,
@@ -30,24 +28,22 @@ namespace Repulsor
         )
         :   kernels (kernels_)
         ,   thread_count( static_cast<Int>(kernels.size()) )
-        ,   S_C_left  ( S_.ClusterLeft().data()  )
-        ,   S_C_right ( S_.ClusterRight().data() )
-        ,   S_C_begin ( S_.ClusterBegin().data() )
-        ,   S_C_end   ( S_.ClusterEnd().data()   )
-        ,   T_C_left  ( T_.ClusterLeft().data()  )
-        ,   T_C_right ( T_.ClusterRight().data() )
-        ,   T_C_begin ( T_.ClusterBegin().data() )
-        ,   T_C_end   ( T_.ClusterEnd().data()   )
+        ,   S_C_left  ( S_.ClusterLeft().data()          )
+        ,   S_C_right ( S_.ClusterRight().data()         )
+        ,   S_C_begin ( S_.ClusterBegin().data()         )
+        ,   S_C_end   ( S_.ClusterEnd().data()           )
+        ,   T_C_left  ( T_.ClusterLeft().data()          )
+        ,   T_C_right ( T_.ClusterRight().data()         )
+        ,   T_C_begin ( T_.ClusterBegin().data()         )
+        ,   T_C_end   ( T_.ClusterEnd().data()           )
         {
-            ptic(className());
-            
             if constexpr ( is_symmetric )
             {
                 assert( std::addressof(S_) == std::addressof(T_) );
             }
-            
-            ptoc(className());
         } // Constructor
+        
+        virtual ~CLASS() = default;
         
     protected:
 

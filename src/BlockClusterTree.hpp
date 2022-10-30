@@ -278,6 +278,16 @@ namespace Repulsor
                 verynear_idx[thread] = std::move( kernels[thread].verynear_idx );
                     near_idx[thread] = std::move( kernels[thread].near_idx     );
                      far_idx[thread] = std::move( kernels[thread].far_idx      );
+                
+                
+                
+                logprint("Thread "+ToString(thread)+" aggregated this many elements: "
+                    + "\n\t intersections:   \t" + ToString(inter_idx[thread].Size())
+                    + "\n\t very near field: \t" + ToString(verynear_idx[thread].Size())
+                    + "\n\t near field:      \t" + ToString(near_idx[thread].Size())
+                    + "\n\t far field:       \t" + ToString(far_idx[thread].Size())
+                    + "\n"
+                );
             }
             ptoc(className()+"::ComputeBlocks: reduce kernels");
             
