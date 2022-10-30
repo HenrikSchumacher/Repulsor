@@ -18,6 +18,7 @@ namespace Repulsor
         using ClusterTree_T     = typename BlockClusterTree_T::ClusterTree_T;
         using Real              = typename BlockClusterTree_T::Real;
         using Int               = typename BlockClusterTree_T::Int;
+        using LInt              = typename BlockClusterTree_T::LInt;
         using SReal             = typename BlockClusterTree_T::SReal;
         using ExtReal           = typename BlockClusterTree_T::ExtReal;
         using Accumulator_T     = typename ClusterTree_T::Accumulator_T;
@@ -32,26 +33,26 @@ namespace Repulsor
         using TangentVector_T   = Tensor2<ExtReal,Int>;
         using CotangentVector_T = Tensor2<ExtReal,Int>;
         
-        using Values_T          = Tensor2<Real,Int>;
+        using Values_T          = Tensor2<Real,LInt>;
         using ValueContainer_T  = std::unordered_map<std::string,Values_T>;
         
         using Configurator_T    = FMM_Configurator<ClusterTree_T>;
 
         using Kernel_VF_Multiply_T = TP0_Kernel_VF_MultiplyMetric<
             AMB_DIM,AMB_DIM,
-            Real,Int,Real,Real,
+            Real,Real,Real,Int,LInt,
             true,true,1,1 // Caution! We have to add-into and not to overwrite!
         >;
         
         using Kernel_NF_Multiply_T = TP0_Kernel_NF_MultiplyMetric<
             AMB_DIM,AMB_DIM,
-            Real,Int,Real,Real,
+            Real,Real,Real,Int,LInt,
             true,true,1,0
         >;
         
         using Kernel_FF_Multiply_T = TP0_Kernel_FF_MultiplyMetric<
             AMB_DIM,AMB_DIM,
-            Real,Int,Real,Real,
+            Real,Real,Real,Int,LInt,
             true,true,1,0
         >;
     
@@ -100,12 +101,6 @@ namespace Repulsor
         const ClusterTree_T      & T;
         
         ValueContainer_T & metric_values;
-        
-//        ValueContainer_T & metric_values {
-//            {"VF", Values_T()}, {"VF_diag", Values_T()},
-//            {"NF", Values_T()}, {"NF_diag", Values_T()},
-//            {"FF", Values_T()}, {"FF_diag", Values_T()}
-//        };
 
         const Real q;
         const Real p;
@@ -252,7 +247,7 @@ namespace Repulsor
 
             Kernel_T ker ( conf, bct.NearFieldSeparationParameter(), 20, q_half_, p_half_ );
 
-            FMM_Traversor<Kernel_T> traversor ( pattern, ker );
+            FMM_Traversor<Kernel_T,LInt> traversor ( pattern, ker );
             en += traversor.Compute();
 
             if constexpr ( metric_flag )
@@ -292,7 +287,7 @@ namespace Repulsor
 
             Kernel_T ker ( conf, q_half_, p_half_ );
 
-            FMM_Traversor<Kernel_T> traversor ( pattern, ker );
+            FMM_Traversor<Kernel_T,LInt> traversor ( pattern, ker );
 
             en += traversor.Compute();
 
@@ -333,7 +328,7 @@ namespace Repulsor
             
             Kernel_T ker ( conf, q_half_, p_half_ );
             
-            FMM_Traversor<Kernel_T> traversor ( pattern, ker );
+            FMM_Traversor<Kernel_T,LInt> traversor ( pattern, ker );
             
             en += traversor.Compute();
             

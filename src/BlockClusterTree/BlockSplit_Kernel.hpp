@@ -5,16 +5,17 @@
 
 namespace Repulsor
 {
-    template<typename ClusterTree_T_>
+    template<typename ClusterTree_T_, typename LInt_>
     class CLASS : public BASE
     {
     public:
         
         using ClusterTree_T = typename BASE::ClusterTree_T;
         using Real    = typename BASE::Real;
-        using Int     = typename BASE::Int;
         using SReal   = typename BASE::SReal;
         using ExtReal = typename BASE::ExtReal;
+        using Int     = typename BASE::Int;
+        using LInt    = LInt_;
         
     public:
         
@@ -115,10 +116,10 @@ namespace Repulsor
 //        }
         
     public:
-        PairAggregator<Int, Int, Int> inter_idx;
-        PairAggregator<Int, Int, Int> verynear_idx;
-        PairAggregator<Int, Int, Int> near_idx;
-        PairAggregator<Int, Int, Int> far_idx;
+        PairAggregator<Int,Int,LInt> inter_idx;
+        PairAggregator<Int,Int,LInt> verynear_idx;
+        PairAggregator<Int,Int,LInt> near_idx;
+        PairAggregator<Int,Int,LInt> far_idx;
 
     protected:
         
@@ -135,7 +136,7 @@ namespace Repulsor
         SReal * restrict const S_P_serialized;
         SReal * restrict const T_P_serialized;
         
-        const SparseBinaryMatrixCSR<Int> & A;
+        const SparseBinaryMatrixCSR<Int,Int> & A;
         
         Int C_i = -1;
         Int C_j = -1;

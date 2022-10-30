@@ -10,27 +10,26 @@ namespace Repulsor
     // FMM_Traversor is a class to map kernel over all nonzero positions of a sparsity pattern (SparsityPatternCSR<Int>).
     // This can be used, for example, to compute nonlocal energies, their derivatives, and the nonzero values of hierarchical matrices.
     // Mostly intended to be used with the results of BlockClusterTree's GetMatrix<...>() routine the verynear/near/far block matrices.
-    template<typename Kernel_T>
+    template<class Pattern_T, class Kernel_T>
     class CLASS
     {
     public:
         
         using Real    = typename Kernel_T::Real;
-        using Int     = typename Kernel_T::Int;
         using SReal   = typename Kernel_T::SReal;
         using ExtReal = typename Kernel_T::ExtReal;
+        using Int     = typename Pattern_T::Int;
+        using LInt    = typename Pattern_T::LInt ;
         
-        using Values_T          = Tensor2<Real,Int>;
+        using Values_T          = Tensor2<Real,LInt>;
         using ValueContainer_T  = std::unordered_map<std::string,Values_T>;
-        
-        using SparsityPattern_T = SparsityPatternCSR<Int>;
         
         static constexpr bool is_symmetric = Kernel_T::is_symmetric;
         
         CLASS() = default;
         
         explicit CLASS(
-            const SparsityPattern_T & pattern_,
+            const Pattern_T & pattern_,
             const Kernel_T & kernel_
         )
         :   pattern ( pattern_ )
@@ -48,7 +47,7 @@ namespace Repulsor
         
     protected:
         
-        const SparsityPattern_T & pattern;
+        const Pattern_T & pattern;
         
         Kernel_T kernel;
         
@@ -65,10 +64,10 @@ namespace Repulsor
             }
             
             const auto & job_ptr = COND(
-                                        is_symmetric,
-                                        pattern.UpperTriangularJobPtr(),
-                                        pattern.JobPtr()
-                                        );
+                is_symmetric,
+                pattern.UpperTriangularJobPtr(),
+                pattern.JobPtr()
+            );
             
             // Make sure that pattern.Diag() is created before the parallel region.
             if constexpr ( is_symmetric )
@@ -84,7 +83,7 @@ namespace Repulsor
             
             if( thread_count > 1 )
             {
-#pragma omp parallel for num_threads( thread_count ) reduction( + : global_sum )
+                #pragma omp parallel for num_threads( thread_count ) reduction( + : global_sum )
                 for( Int thread = 0; thread < thread_count; ++thread )
                 {
                     // Initialize local kernel and feed it all the information that is going to be constant along its life time.
@@ -93,10 +92,10 @@ namespace Repulsor
                     
                     Real local_sum = static_cast<Real>(0);
                     
-                    const Int * restrict const diag = COND(is_symmetric, pattern.Diag().data(), nullptr);
+                    const LInt * restrict const diag = COND(is_symmetric, pattern.Diag().data(), nullptr);
                     
-                    const Int * restrict const rp = pattern.Outer().data();
-                    const Int * restrict const ci = pattern.Inner().data();
+                    const LInt * restrict const rp = pattern.Outer().data();
+                    const  Int * restrict const ci = pattern.Inner().data();
                     
                     // Kernel is supposed the following rows of pattern:
                     const Int i_begin = job_ptr[thread  ];
@@ -105,8 +104,8 @@ namespace Repulsor
                     for( Int i = i_begin; i < i_end; ++i )
                     {
                         // These are the corresponding nonzero blocks in i-th row.
-                        const Int k_begin = COND( is_symmetric, diag[i], rp[i] );
-                        const Int k_end   = rp[i+1];
+                        const LInt k_begin = COND( is_symmetric, diag[i], rp[i] );
+                        const LInt k_end   = rp[i+1];
                         
                         if( k_end > k_begin )
                         {
@@ -114,7 +113,7 @@ namespace Repulsor
                             ker.LoadS(i);
                             
                             // Perform all but the last calculation in row with prefetch.
-                            for( Int k = k_begin; k < k_end-1; ++k )
+                            for( LInt k = k_begin; k < k_end-1; ++k )
                             {
                                 const Int j = ci[k];
                                 
@@ -129,7 +128,7 @@ namespace Repulsor
                             
                             // Perform last calculation in row without prefetch.
                             {
-                                const Int k = k_end-1;
+                                const LInt k = k_end-1;
                                 
                                 const Int j = ci[k];
                                 
@@ -162,10 +161,10 @@ namespace Repulsor
                     
                     Real local_sum = static_cast<Real>(0);
                     
-                    const Int * restrict const diag = COND(is_symmetric, pattern.Diag().data(), nullptr);
+                    const LInt * restrict const diag = COND(is_symmetric, pattern.Diag().data(), nullptr);
                     
-                    const Int * restrict const rp = pattern.Outer().data();
-                    const Int * restrict const ci = pattern.Inner().data();
+                    const LInt * restrict const rp = pattern.Outer().data();
+                    const  Int * restrict const ci = pattern.Inner().data();
                     
                     // Kernel is supposed the following rows of pattern:
                     const Int i_begin = job_ptr[thread  ];
@@ -174,8 +173,8 @@ namespace Repulsor
                     for( Int i = i_begin; i < i_end; ++i )
                     {
                         // These are the corresponding nonzero blocks in i-th row.
-                        const Int k_begin = COND( is_symmetric, diag[i], rp[i] );
-                        const Int k_end   = rp[i+1];
+                        const LInt k_begin = COND( is_symmetric, diag[i], rp[i] );
+                        const LInt k_end   = rp[i+1];
                         
                         if( k_end > k_begin )
                         {
@@ -183,7 +182,7 @@ namespace Repulsor
                             ker.LoadS(i);
                             
                             // Perform all but the last calculation in row with prefetch.
-                            for( Int k = k_begin; k < k_end-1; ++k )
+                            for( LInt k = k_begin; k < k_end-1; ++k )
                             {
                                 const Int j = ci[k];
                                 
@@ -198,9 +197,9 @@ namespace Repulsor
                             
                             // Perform last calculation in row without prefetch.
                             {
-                                const Int k = k_end-1;
+                                const LInt k = k_end-1;
                                 
-                                const Int j = ci[k];
+                                const  Int j = ci[k];
                                 
                                 ker.LoadT(j);
                                 
@@ -230,7 +229,7 @@ namespace Repulsor
         
         std::string ClassName() const
         {
-            return TO_STD_STRING(CLASS)+"<"+kernel.ClassName()+">";
+            return TO_STD_STRING(CLASS)+"<"+kernel.ClassName()+TypeName<LInt>::Get()+">";
         }
         
     };

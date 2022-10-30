@@ -101,17 +101,17 @@ namespace Repulsor
         mutable bool pre_post_initialized = false;
         mutable bool mixed_pre_post_initialized = false;
         
-        mutable SparseMatrixCSR<Real,Int>  hi_pre;
-        mutable SparseMatrixCSR<Real,Int>  hi_post;
+        mutable SparseMatrixCSR<Real,Int,Int>  hi_pre;
+        mutable SparseMatrixCSR<Real,Int,Int>  hi_post;
 
-        mutable SparseMatrixCSR<Real,Int>  lo_pre;
-        mutable SparseMatrixCSR<Real,Int>  lo_post;
+        mutable SparseMatrixCSR<Real,Int,Int>  lo_pre;
+        mutable SparseMatrixCSR<Real,Int,Int>  lo_post;
         
-        mutable SparseMatrixCSR<Real,Int>  mixed_pre;
-        mutable SparseMatrixCSR<Real,Int>  mixed_post;
+        mutable SparseMatrixCSR<Real,Int,Int>  mixed_pre;
+        mutable SparseMatrixCSR<Real,Int,Int>  mixed_post;
 
-        mutable SparseBinaryMatrixCSR<Int> P_to_C;
-        mutable SparseBinaryMatrixCSR<Int> C_to_P;
+        mutable SparseBinaryMatrixCSR<Int,Int> P_to_C;
+        mutable SparseBinaryMatrixCSR<Int,Int> C_to_P;
         
         // Container for storing the serialized data of the primitives. Only meant to be accessed by primitive prototypes.
         // TODO: Make this private somehow?
@@ -127,7 +127,7 @@ namespace Repulsor
         mutable SReal update_time = static_cast<SReal>(0);
         
         mutable bool P_adjacency_matrix_initialized = false;
-        mutable SparseBinaryMatrixCSR<Int> P_adjacency_matrix;
+        mutable SparseBinaryMatrixCSR<Int,Int> P_adjacency_matrix;
         
         // Some temproray shared data that is required for the parallel construction and serialization of the tree.
         
@@ -334,45 +334,45 @@ namespace Repulsor
             return P_out;
         }
         
-        const SparseMatrixCSR<Real,Int> & LowOrderPreprocessor() const
+        const SparseMatrixCSR<Real,Int,Int> & LowOrderPreprocessor() const
         {
             return lo_pre;
         }
         
-        const SparseMatrixCSR<Real,Int> & LowOrderPostprocessor() const
+        const SparseMatrixCSR<Real,Int,Int> & LowOrderPostprocessor() const
         {
             return lo_post;
         }
         
         
-        const SparseMatrixCSR<Real,Int> & HighOrderPreprocessor() const
+        const SparseMatrixCSR<Real,Int,Int> & HighOrderPreprocessor() const
         {
             return hi_pre;
         }
         
-        const SparseMatrixCSR<Real,Int> & HighOrderPostprocessor() const
+        const SparseMatrixCSR<Real,Int,Int> & HighOrderPostprocessor() const
         {
             return hi_post;
         }
         
-        const SparseMatrixCSR<Real,Int> & MixedOrderPreprocessor() const
+        const SparseMatrixCSR<Real,Int,Int> & MixedOrderPreprocessor() const
         {
             return mixed_pre;
         }
         
-        const SparseMatrixCSR<Real,Int> & MixedOrderPostprocessor() const
+        const SparseMatrixCSR<Real,Int,Int> & MixedOrderPostprocessor() const
         {
             return mixed_post;
         }
 
         
         
-        const SparseBinaryMatrixCSR<Int> & ClusterToPrimitiveMatrix() const
+        const SparseBinaryMatrixCSR<Int,Int> & ClusterToPrimitiveMatrix() const
         {
             return C_to_P;
         }
         
-        const SparseBinaryMatrixCSR<Int> & PrimitiveToClusterMatrix() const
+        const SparseBinaryMatrixCSR<Int,Int> & PrimitiveToClusterMatrix() const
         {
             return P_to_C;
         }
@@ -775,7 +775,7 @@ namespace Repulsor
             ptic(ClassName()+"::Pre");
             if( pre_post_initialized && mixed_pre_post_initialized )
             {
-                SparseMatrixCSR<Real,Int> * pre;
+                SparseMatrixCSR<Real,Int,Int> * pre;
                 
                 switch (type)
                 {
@@ -840,7 +840,7 @@ namespace Repulsor
             
             if( pre_post_initialized )
             {
-                SparseMatrixCSR<Real,Int> * post;
+                SparseMatrixCSR<Real,Int,Int> * post;
                 
                 switch (type)
                 {
@@ -901,7 +901,7 @@ namespace Repulsor
         
     public:
         
-        const SparseBinaryMatrixCSR<Int> & PrimitiveAdjacencyMatrix() const
+        const SparseBinaryMatrixCSR<Int,Int> & PrimitiveAdjacencyMatrix() const
         {
             if( !P_adjacency_matrix_initialized )
             {

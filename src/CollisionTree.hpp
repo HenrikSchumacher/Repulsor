@@ -7,7 +7,7 @@
 
 
 #define CLASS CollisionTree
-#define BASE CollisionTreeBase<Real,Int,SReal,ExtReal,is_symmetric>
+#define BASE  CollisionTreeBase<Real,Int,SReal,ExtReal,is_symmetric>
 
 namespace Repulsor
 {
@@ -84,6 +84,7 @@ namespace Repulsor
                 ptic(ClassName()+"PrimitiveCollisionMatrix");
                 
                 using Kernel_T = Collision_Kernel<ClusterTree_T>;
+                using LInt     = typename Kernel_T::LInt;
                 
                 const Int thread_count = ThreadCount();
                 
@@ -113,7 +114,7 @@ namespace Repulsor
                     traversor.Traverse();
                 }
                 
-                std::vector<TripleAggregator<Int,Int,SReal,Int>> triples (thread_count);
+                std::vector<TripleAggregator<Int,Int,SReal,LInt>> triples (thread_count);
                 
                 ptic(ClassName()+"::PrimitiveCollisionMatrix: Reduce kernels");
 
@@ -153,6 +154,7 @@ namespace Repulsor
         ExtReal MaximumSafeStepSize( const SReal t_) const override
         {
             ptic(ClassName()+"::MaximumSafeStepSize");
+            
             using Kernel_T = MaximumSafeStepSize_Kernel<ClusterTree_T>;
             
             (void)S.PrimitiveAdjacencyMatrix();

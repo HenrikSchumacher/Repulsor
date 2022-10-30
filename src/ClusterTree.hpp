@@ -114,8 +114,8 @@ namespace Repulsor
               const Tensor1<Int ,Int>  & P_ordering_,
               const Tensor2<Real,Int>  & P_near_, // data used actual interaction computation; assumed to be of size PrimitiveCount() x NearDim(). For a triangle mesh in 3D, we want to feed each triangles i), area ii) barycenter and iii) normal as a 1 + 3 + 3 = 7 vector
               const Tensor2<Real,Int>  & P_far_, // data used actual interaction computation; assumed to be of size PrimitiveCount() x FarDim(). For a triangle mesh in 3D, we want to feed each triangles i), area ii) barycenter and iii) orthoprojector onto normal space as a 1 + 3 + 6 = 10 vector
-              const SparseMatrixCSR<Real,Int> & DiffOp,
-              const SparseMatrixCSR<Real,Int> & AvOp,
+              const SparseMatrixCSR<Real,Int,Int> & DiffOp,
+              const SparseMatrixCSR<Real,Int,Int> & AvOp,
               const ClusterTreeSettings & settings_ = ClusterTreeSettings()
               )
         :   BASE(settings_)
@@ -282,17 +282,17 @@ namespace Repulsor
                 Primitive_T & P = *P_proto[thread];
                 
                 Int split_index = C_proto[thread]->Split(
-                                                         P,                                                  // prototype for primitves
-                                                         P_serialized.data(), begin, end,                    // which primitives are in question
-                                                         P_ordering.data(),                                  // which primitives are in question
-                                                         C_thread_serialized.data(C->thread),    C->ID,      // where to get   the bounding volume info for current cluster
-                                                         C_thread_serialized.data(   thread),  left_ID,      // where to store the bounding volume info for left  child (if successful!)
-                                                         C_thread_serialized.data(   thread), right_ID,      // where to store the bounding volume info for right child (if successful!)
-                                                         P_score_buffer.data(),                              // some scratch space for storing local scores
-                                                         P_perm_buffer.data(),                               // scratch space for storing local permutations
-                                                         P_inverse_ordering.data(),                          // abusing P_inverse_ordering as scratch space for storing inverses of local permutations
-                                                         free_thread_count
-                                                         );
+                     P,                                                  // prototype for primitves
+                     P_serialized.data(), begin, end,                    // which primitives are in question
+                     P_ordering.data(),                                  // which primitives are in question
+                     C_thread_serialized.data(C->thread),    C->ID,      // where to get   the bounding volume info for current cluster
+                     C_thread_serialized.data(   thread),  left_ID,      // where to store the bounding volume info for left  child (if successful!)
+                     C_thread_serialized.data(   thread), right_ID,      // where to store the bounding volume info for right child (if successful!)
+                     P_score_buffer.data(),                              // some scratch space for storing local scores
+                     P_perm_buffer.data(),                               // scratch space for storing local permutations
+                     P_inverse_ordering.data(),                          // abusing P_inverse_ordering as scratch space for storing inverses of local permutations
+                     free_thread_count
+                 );
                 
                 
                 //                if( (begin < split_index) && (split_index < end) )
@@ -350,35 +350,35 @@ namespace Repulsor
             C_serialized  = Tensor2<SReal,Int>( root->descendant_count, C_proto[0]->Size() );
             leaf_clusters = Tensor1<Int,Int>( root->descendant_leaf_count );
             
-#pragma omp parallel
+            #pragma omp parallel
             {
-#pragma omp single nowait
+                #pragma omp single nowait
                 {
-#pragma omp task
+                    #pragma omp task
                     {
                         C_left = Tensor1<Int,Int>( ClusterCount() );
                     }
-#pragma omp task
+                    #pragma omp task
                     {
                         C_right = Tensor1<Int,Int>( ClusterCount() );
                     }
-#pragma omp task
+                    #pragma omp task
                     {
                         C_begin = Tensor1<Int,Int>( ClusterCount());
                     }
-#pragma omp task
+                    #pragma omp task
                     {
                         C_end = Tensor1<Int,Int>( ClusterCount() );
                     }
-#pragma omp task
+                    #pragma omp task
                     {
                         C_depth = Tensor1<Int,Int>( ClusterCount() );
                     }
-#pragma omp task
+                    #pragma omp task
                     {
                         C_next = Tensor1<Int,Int>( ClusterCount() );
                     }
-#pragma omp task
+                    #pragma omp task
                     {
                         leaf_cluster_lookup = Tensor1<Int,Int>( ClusterCount(), -1 );
                     }
@@ -386,13 +386,13 @@ namespace Repulsor
                     //                    {
                     //                        queue_array = Tensor1<Int,Int>( ClusterCount() );
                     //                    }
-#pragma omp taskwait
+                    #pragma omp taskwait
                 }
             }
             
-#pragma omp parallel num_threads( ThreadCount() )
+            #pragma omp parallel num_threads( ThreadCount() )
             {
-#pragma omp single nowait
+                #pragma omp single nowait
                 {
                     serialize( root, 0, 0, ThreadCount() );
                 }
@@ -405,7 +405,7 @@ namespace Repulsor
                 // It is quite certainly _NOT_ a good idea to parallelize this loop (false sharing!).
                 const Int last = PrimitiveCount();
                 const Int * restrict const ord     = P_ordering.data();
-                Int * restrict const inv_ord = P_inverse_ordering.data();
+                      Int * restrict const inv_ord = P_inverse_ordering.data();
                 
                 for( Int i = 0; i < last; ++i )
                 {
@@ -447,15 +447,25 @@ namespace Repulsor
                 C_left [ID] = ID + 1;
                 C_right[ID] = ID + 1 + C->left->descendant_count;
                 //
-#pragma omp task final(free_thread_count<1)
+                #pragma omp task final( free_thread_count < 1 )
                 {
-                    serialize( C->left, C_left[ID], leaf_before_count, free_thread_count/2 );
+                    serialize(
+                        C->left,
+                        C_left[ID],
+                        leaf_before_count,
+                        free_thread_count/2
+                    );
                 }
-#pragma omp task final(free_thread_count<1)
+                #pragma omp task final( free_thread_count < 1 )
                 {
-                    serialize( C->right, C_right[ID], leaf_before_count + C->left->descendant_leaf_count, free_thread_count - free_thread_count/2 );
+                    serialize(
+                        C->right,
+                        C_right[ID],
+                        leaf_before_count + C->left->descendant_leaf_count,
+                        free_thread_count - free_thread_count/2
+                    );
                 }
-#pragma omp taskwait
+                #pragma omp taskwait
                 
                 // Cleaning up after ourselves to prevent a destructore cascade.
                 delete C->left;
@@ -516,7 +526,7 @@ namespace Repulsor
             
             thread_P_D_near = DerivativeContainer_T( ThreadCount(), PrimitiveCount(), near_dim_ );
             
-            C_far    = DataContainer_T( ClusterCount(), far_dim_ );
+            C_far           = DataContainer_T( ClusterCount(), far_dim_ );
             thread_C_D_far  = DerivativeContainer_T( ThreadCount(), ClusterCount(), far_dim_ );
             
             ptoc(className()+"::AllocateNearFarData");
@@ -750,12 +760,12 @@ namespace Repulsor
         {
             ptic(className()+"::ComputePrimitiveToClusterMatrix");
             
-            P_to_C = SparseBinaryMatrixCSR<Int>(
+            P_to_C = SparseBinaryMatrixCSR<Int,Int>(
                 ClusterCount(), PrimitiveCount(), PrimitiveCount(), ThreadCount() );
             
             P_to_C.Outer()[0] = 0;
             
-            C_to_P = SparseBinaryMatrixCSR<Int>(
+            C_to_P = SparseBinaryMatrixCSR<Int,Int>(
                 PrimitiveCount(), ClusterCount(), PrimitiveCount(), ThreadCount() );
             
             C_to_P.Outer()[PrimitiveCount()] = PrimitiveCount();
@@ -814,8 +824,8 @@ namespace Repulsor
 
         
         void ComputePrePost(
-            const SparseMatrixCSR<Real,Int> & DiffOp,
-            const SparseMatrixCSR<Real,Int> & AvOp
+            const SparseMatrixCSR<Real,Int,Int> & DiffOp,
+            const SparseMatrixCSR<Real,Int,Int> & AvOp
         )
         {
             if( !this->pre_post_initialized )
@@ -827,7 +837,7 @@ namespace Repulsor
                 
                 ptic("hi_pre");
                 
-                hi_pre = SparseMatrixCSR<Real,Int>(
+                hi_pre = SparseMatrixCSR<Real,Int,Int>(
                     DiffOp.RowCount(),
                     DiffOp.ColCount(),
                     DiffOp.NonzeroCount(),
@@ -871,7 +881,7 @@ namespace Repulsor
                 ptoc("hi_post");
                 
                 ptic("lo_pre");
-                lo_pre = SparseMatrixCSR<Real,Int>(
+                lo_pre = SparseMatrixCSR<Real,Int,Int>(
                     AvOp.RowCount(),
                     AvOp.ColCount(),
                     AvOp.NonzeroCount(),
@@ -921,8 +931,8 @@ namespace Repulsor
         } // ComputePrePost
         
         void ComputeMixedPrePost(
-            const SparseMatrixCSR<Real,Int> & DiffOp,
-            const SparseMatrixCSR<Real,Int> & AvOp
+            const SparseMatrixCSR<Real,Int,Int> & DiffOp,
+            const SparseMatrixCSR<Real,Int,Int> & AvOp
         )
         {
             // Assemble a matrix in which the rows of lo_pre and hi_pre are interleaved in the form
@@ -937,7 +947,7 @@ namespace Repulsor
                 
                 ptic("mixed_pre");
                 
-                mixed_pre = SparseMatrixCSR<Real,Int>(
+                mixed_pre = SparseMatrixCSR<Real,Int,Int>(
                     AvOp.RowCount() + DiffOp.RowCount(),
                     AvOp.ColCount(),
                     AvOp.NonzeroCount() + DiffOp.NonzeroCount(),

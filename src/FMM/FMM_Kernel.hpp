@@ -5,7 +5,7 @@
 namespace Repulsor
 {
     template<
-        typename ClusterTree_T_,
+    typename BlockClusterTree_T_,
         bool is_symmetric_,
         bool energy_flag_, bool diff_flag_, bool metric_flag_
     >
@@ -13,17 +13,19 @@ namespace Repulsor
     {
     public:
         
-        using ClusterTree_T = ClusterTree_T_;
-        using Root_T        = CLASS;
+        using BlockClusterTree_T = BlockClusterTree_T_;
         
-        using Real    = typename ClusterTree_T::Real;
-        using Int     = typename ClusterTree_T::Int;
-        using SReal   = typename ClusterTree_T::SReal;
-        using ExtReal = typename ClusterTree_T::ExtReal;
+        using ClusterTree_T      = typename BlockClusterTree_T::ClusterTree_T;
+        using Values_T           = typename BlockClusterTree_T::Values_T;
+        using ValueContainer_T   = typename BlockClusterTree_T::ValueContainer_T;
         
-        using Configurator_T    = FMM_Configurator<ClusterTree_T>;
-        using Values_T          = Tensor2<Real,Int>;
-        using ValueContainer_T  = std::unordered_map<std::string,Values_T>;
+        using Real               = typename BlockClusterTree_T::Real;
+        using SReal              = typename BlockClusterTree_T::SReal;
+        using ExtReal            = typename BlockClusterTree_T::ExtReal;
+        using Int                = typename BlockClusterTree_T::Int;
+        using LInt               = typename BlockClusterTree_T::LInt;
+        
+        using Configurator_T     = FMM_Configurator<BlockClusterTree_T>;
         
         static constexpr bool is_symmetric = is_symmetric_;
         static constexpr bool energy_flag = energy_flag_;
@@ -88,16 +90,14 @@ namespace Repulsor
         CLASS() = delete;
         
         CLASS( Configurator_T & conf )
-        :   S             ( conf.GetS()         )
-        ,   T             ( conf.GetT()         )
-        ,   metric_values ( conf.MetricValues() )   // In configure mode, kernels needs
+        :   bct           ( conf.GetBlockClusterTree() )
+        ,   metric_values ( conf.MetricValues()        )   // In configure mode, kernels needs
         {
             Init();
         }
         
         CLASS( const CLASS & other )
-        :   S             ( other.S              )
-        ,   T             ( other.T              )
+        :   bct           ( other.bct            )
         ,   metric_values ( other.metric_values  )
         // In compute mode the pointers are needed!
         ,   metric_data   ( metric_values.data() )
@@ -110,12 +110,12 @@ namespace Repulsor
     public:
         const ClusterTree_T & GetS() const
         {
-            return S;
+            return bct.GetS();
         }
         
         const ClusterTree_T & GetT() const
         {
-            return T;
+            return bct.GetT();
         }
         
         virtual void LoadS( const Int i_global_ ) = 0;
@@ -142,7 +142,7 @@ namespace Repulsor
         virtual void writeT() = 0;
         
         
-        void Allocate( const Int nnz )
+        void Allocate( const LInt nnz )
         {
             if constexpr ( metric_flag )
             {
@@ -172,12 +172,11 @@ namespace Repulsor
 //            return true;
 //        }
         
-        virtual Int NonzeroCount() const = 0;
+        virtual LInt NonzeroCount() const = 0;
         
     protected:
         
-        const ClusterTree_T & S;
-        const ClusterTree_T & T;
+        const BlockClusterTree_T & bct;
         
         Values_T & metric_values;
         
@@ -198,7 +197,7 @@ namespace Repulsor
         
         std::string className() const
         {
-            return TO_STD_STRING(CLASS)+"<"+S.ClassName()+">";
+            return TO_STD_STRING(CLASS)+"<"+bct.ClassName()+">";
         }
 
     };

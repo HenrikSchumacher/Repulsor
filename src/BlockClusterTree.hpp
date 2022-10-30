@@ -16,9 +16,11 @@ namespace Repulsor
     public:
         
         using Real    = Real_;
-        using Int     = Int_;
         using SReal   = SReal_;
         using ExtReal = ExtReal_;
+        using Int     = Int_;
+        using LInt    = typename BASE::LInt;
+        
         
         static constexpr Int AMB_DIM = AMB_DIM_;
         
@@ -26,19 +28,19 @@ namespace Repulsor
         
         using Setting_T = typename BASE::Setting_T;
 
-        using Inter_T           = typename BASE::Inter_T;
-        using VeryNear_T        = typename BASE::VeryNear_T;
-        using Near_T            = typename BASE::Near_T;
-        using Far_T             = typename BASE::Far_T;
+        using Pattern_T         = typename BASE::Pattern_T;
         
         using ClusterTree_T     = ClusterTree<AMB_DIM,Real,Int,SReal,ExtReal>;
-        using BlockSplitter_T   = BlockSplit_Kernel<ClusterTree_T>;
+        using BlockSplitter_T   = BlockSplit_Kernel<ClusterTree_T, LInt>;
         
         using Primitive_T       = typename ClusterTree_T::Primitive_T;
         using BoundingVolume_T  = typename ClusterTree_T::BoundingVolume_T;
     
+        using Values_T          = typename BlockClusterTreeBase_T::Values_T;
+        using ValueContainer_T  = typename BlockClusterTreeBase_T::ValueContainer_T;
+        
         using GJK_T             = GJK_Algorithm<AMB_DIM,GJK_Real,Int>;
-
+    
         using BASE::AmbDim;
         using BASE::ThreadCount;
         using BASE::FarFieldSeparationParameter;
@@ -89,10 +91,10 @@ namespace Repulsor
         
         const Setting_T settings;
         
-        mutable Inter_T    inter;
-        mutable VeryNear_T verynear;
-        mutable Near_T     near;
-        mutable Far_T      far;
+        mutable Pattern_T    inter;
+        mutable Pattern_T verynear;
+        mutable Pattern_T     near;
+        mutable Pattern_T      far;
         
         const SReal near_theta2 = static_cast<SReal>(10);
         const SReal  far_theta2 = static_cast<SReal>(0.25);
@@ -147,22 +149,22 @@ namespace Repulsor
         }
 
         
-        virtual const Inter_T & PrimitiveIntersectionMatrix() const override
+        virtual const Pattern_T & PrimitiveIntersectionMatrix() const override
         {
             return inter;
         }
         
-        const VeryNear_T & VeryNear() const override
+        const Pattern_T & VeryNear() const override
         {
             return verynear;
         }
         
-        const Near_T & Near() const override
+        const Pattern_T & Near() const override
         {
             return near;
         }
         
-        const Far_T & Far() const override
+        const Pattern_T & Far() const override
         {
             return far;
         }
@@ -256,10 +258,10 @@ namespace Repulsor
             
             ptic(className()+"::ComputeBlocks: reduce kernels");
             
-            std::vector<PairAggregator<Int,Int,Int>> inter_idx    (thread_count);
-            std::vector<PairAggregator<Int,Int,Int>> verynear_idx (thread_count);
-            std::vector<PairAggregator<Int,Int,Int>> near_idx     (thread_count);
-            std::vector<PairAggregator<Int,Int,Int>> far_idx      (thread_count);
+            std::vector<PairAggregator<Int,Int,LInt>> inter_idx    (thread_count);
+            std::vector<PairAggregator<Int,Int,LInt>> verynear_idx (thread_count);
+            std::vector<PairAggregator<Int,Int,LInt>> near_idx     (thread_count);
+            std::vector<PairAggregator<Int,Int,LInt>> far_idx      (thread_count);
 
             #pragma omp parallel for num_threads(thread_count)
             for( Int thread = 0; thread < thread_count; ++thread )
@@ -287,7 +289,7 @@ namespace Repulsor
 //            inter = Inter_T( inter_idx, inter_jdx, S.PrimitiveCount(), T.PrimitiveCount(),
 //                thread_count, false, is_symmetric );
             
-            inter = Inter_T( inter_idx, S.PrimitiveCount(), T.PrimitiveCount(),
+            inter = Pattern_T( inter_idx, S.PrimitiveCount(), T.PrimitiveCount(),
                 thread_count, false, is_symmetric );
 
             pdump(inter.Stats());
@@ -297,7 +299,7 @@ namespace Repulsor
 
             ptic(className()+"  Very near field interaction data");
 
-            verynear = VeryNear_T( verynear_idx, S.PrimitiveCount(), T.PrimitiveCount(),
+            verynear = Pattern_T( verynear_idx, S.PrimitiveCount(), T.PrimitiveCount(),
                 thread_count, false, is_symmetric );
 
             pdump(verynear.Stats());
@@ -307,7 +309,7 @@ namespace Repulsor
 
             ptic(className()+"  Near field interaction data");
 
-            near = Near_T( near_idx, S.PrimitiveCount(), T.PrimitiveCount(),
+            near = Pattern_T( near_idx, S.PrimitiveCount(), T.PrimitiveCount(),
                 thread_count, false, is_symmetric );
 
             pdump(near.Stats());
@@ -317,7 +319,7 @@ namespace Repulsor
             
             ptic(className()+"  Far field interaction data");
 
-            far = Far_T( far_idx, S.ClusterCount(), T.ClusterCount(),
+            far = Pattern_T( far_idx, S.ClusterCount(), T.ClusterCount(),
                     thread_count, false, is_symmetric );
 
             pdump(far.Stats());

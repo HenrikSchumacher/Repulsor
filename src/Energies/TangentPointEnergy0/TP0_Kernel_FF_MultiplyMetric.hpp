@@ -3,7 +3,7 @@
 #define CLASS TP0_Kernel_FF_MultiplyMetric
 #define BASE  BlockKernel_fixed<                            \
     AMB_DIM_+1,AMB_DIM_+1,MAX_RHS_COUNT_,true,              \
-    Scalar_,Int_,Scalar_in_,Scalar_out_,                    \
+    Scalar_, Scalar_in_, Scalar_out_, Int_, LInt_,          \
     alpha_flag, beta_flag,                                  \
     x_RM, false, true, true,                                \
     y_RM, false,                                            \
@@ -14,7 +14,7 @@ namespace Repulsor
 {
     template<
         int AMB_DIM_, int MAX_RHS_COUNT_,
-        typename Scalar_, typename Int_, typename Scalar_in_, typename Scalar_out_,
+        typename Scalar_, typename Scalar_in_, typename Scalar_out_, typename Int_, typename LInt_,
         bool x_RM, bool y_RM,
         int alpha_flag, int beta_flag
     >
@@ -23,17 +23,18 @@ namespace Repulsor
     public:
 
         using Scalar     = Scalar_;
-        using Int        = Int_;
         using Scalar_out = Scalar_out_;
         using Scalar_in  = Scalar_in_;
-
+        using Int        = Int_;
+        using LInt       = LInt_;
+        
         static constexpr Int AMB_DIM = AMB_DIM_;
         using BASE::ROWS;
         using BASE::COLS;
         using BASE::MAX_RHS_COUNT;
         
-        static constexpr Int BLOCK_NNZ = 2;
-        static constexpr Int DIAG_NNZ  = 2;
+        static constexpr LInt BLOCK_NNZ = 2;
+        static constexpr LInt DIAG_NNZ  = 2;
         
     protected:
         
@@ -137,10 +138,8 @@ namespace Repulsor
             return TO_STD_STRING(CLASS)+"<"
                 +ToString(AMB_DIM)
             +","+ToString(MAX_RHS_COUNT)
-            +","+TypeName<Scalar>::Get()
-            +","+TypeName<Int>::Get()
-            +","+TypeName<Scalar_in>::Get()
-            +","+TypeName<Scalar_out>::Get()
+            +","+TypeName<Scalar>::Get()+","+TypeName<Scalar_in>::Get()+","+TypeName<Scalar_out>::Get()
+            +","+TypeName<Int>::Get()+","+TypeName<LInt>::Get()
             +","+ToString(x_RM)
             +","+ToString(y_RM)
             +","+ToString(alpha_flag)

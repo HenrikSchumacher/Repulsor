@@ -12,9 +12,9 @@ namespace Repulsor
         using ClusterTree_T = ClusterTree_T_;
         
         using Real    = typename ClusterTree_T::Real;
-        using Int     = typename ClusterTree_T::Int;
         using SReal   = typename ClusterTree_T::SReal;
         using ExtReal = typename ClusterTree_T::ExtReal;
+        using Int     = typename ClusterTree_T::Int;
         
     public:
         

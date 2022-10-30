@@ -3,7 +3,7 @@
 #define CLASS TP0_Kernel_NF_MultiplyMetric
 #define BASE  BlockKernel_fixed<                            \
     AMB_DIM_+1,AMB_DIM_+1,MAX_RHS_COUNT_,true,              \
-    Scalar_,Int_,Scalar_in_,Scalar_out_,                    \
+    Scalar_, Scalar_in_, Scalar_out_, Int_, LInt_,          \
     alpha_flag, beta_flag,                                  \
     x_RM, false, true, true,                                \
     y_RM, false,                                            \
@@ -14,7 +14,7 @@ namespace Repulsor
 {
     template<
         int AMB_DIM_, int MAX_RHS_COUNT_,
-        typename Scalar_, typename Int_, typename Scalar_in_, typename Scalar_out_,
+        typename Scalar_, typename Scalar_in_, typename Scalar_out_, typename Int_, typename LInt_,
         bool x_RM, bool y_RM,
         int alpha_flag, int beta_flag
     >
@@ -24,18 +24,19 @@ namespace Repulsor
     public:
 
         using Scalar     = Scalar_;
-        using Int        = Int_;
         using Scalar_out = Scalar_out_;
         using Scalar_in  = Scalar_in_;
-
+        using Int        = Int_;
+        using LInt       = LInt_;
+        
         static constexpr Int AMB_DIM = AMB_DIM_;
         
         using BASE::ROWS;
         using BASE::COLS;
         using BASE::MAX_RHS_COUNT;
         
-        static constexpr Int BLOCK_NNZ = 2;
-        static constexpr Int DIAG_NNZ  = 2;
+        static constexpr LInt BLOCK_NNZ = 2;
+        static constexpr LInt DIAG_NNZ  = 2;
         
     protected:
         
@@ -45,10 +46,6 @@ namespace Repulsor
         using BASE::Y;
         using BASE::x;
         using BASE::y;
-        
-//        using BASE::i_global;
-//        using BASE::j_global;
-//        using BASE::k_global;
         
         using BASE::ReadX;
         
@@ -78,12 +75,12 @@ namespace Repulsor
         
     public:
         
-        virtual Int NonzeroCount() const override
+        virtual LInt NonzeroCount() const override
         {
             return BLOCK_NNZ;
         }
                 
-        virtual void TransposeBlock( const Int from, const Int to ) const override
+        virtual void TransposeBlock( const LInt from, const LInt to ) const override
         {
             const Scalar * restrict const a_from = &A[ BLOCK_NNZ * from];
                   Scalar * restrict const a_to   = &A[ BLOCK_NNZ * to  ];
@@ -94,7 +91,7 @@ namespace Repulsor
         
         
         
-        virtual force_inline void apply_block( const Int k_global, const Int j_global ) override
+        virtual force_inline void apply_block( const LInt k_global, const Int j_global ) override
         {
             ReadX( j_global );
             
@@ -136,10 +133,8 @@ namespace Repulsor
             return TO_STD_STRING(CLASS)+"<"
                 +ToString(AMB_DIM)
             +","+ToString(MAX_RHS_COUNT)
-            +","+TypeName<Scalar>::Get()
-            +","+TypeName<Int>::Get()
-            +","+TypeName<Scalar_in>::Get()
-            +","+TypeName<Scalar_out>::Get()
+            +","+TypeName<Scalar>::Get()+","+TypeName<Scalar_in>::Get()+","+TypeName<Scalar_out>::Get()
+            +","+TypeName<Int>::Get()+","+TypeName<LInt>::Get()
             +","+ToString(x_RM)
             +","+ToString(y_RM)
             +","+ToString(alpha_flag)

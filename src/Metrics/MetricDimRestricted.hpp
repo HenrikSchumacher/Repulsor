@@ -10,16 +10,15 @@ namespace Repulsor
     {
     public:
         
-        using MeshBase_T        = typename BASE::MeshBase_T;
+        using MeshBase_T         = typename BASE::MeshBase_T;
 
-        using Values_T          = typename BASE::Values_T;
-        using ValueContainer_T  = typename BASE::ValueContainer_T;
-        using TangentVector_T   = typename BASE::TangentVector_T;
-        using CotangentVector_T = typename BASE::CotangentVector_T;
+        using TangentVector_T    = typename BASE::TangentVector_T;
+        using CotangentVector_T  = typename BASE::CotangentVector_T;
         
-        using Mesh_T            = SimplicialMesh<DOM_DIM,AMB_DIM,Real,Int,SReal,ExtReal>;
-
-        using BASE::MetricValues;
+        using Values_T           = typename BASE::Values_T;
+        using ValueContainer_T   = typename BASE::ValueContainer_T;
+        
+        using Mesh_T             = SimplicialMesh<DOM_DIM,AMB_DIM,Real,Int,SReal,ExtReal>;
         
         CLASS() = default;
 

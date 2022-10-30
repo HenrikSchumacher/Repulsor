@@ -7,7 +7,8 @@ namespace Repulsor
 {
     template<
         int S_DOM_DIM_, int T_DOM_DIM_,
-        typename ClusterTree_T_, typename T1, typename T2,
+        typename ClusterTree_T_,
+        typename T1, typename T2,
         bool is_symmetric_,
         bool energy_flag_, bool diff_flag_, bool metric_flag_
     >
@@ -21,7 +22,9 @@ namespace Repulsor
         using Int     = typename ClusterTree_T::Int;
         using SReal   = typename ClusterTree_T::SReal;
         using ExtReal = typename ClusterTree_T::ExtReal;
-        using typename BASE::Configurator_T;
+        
+        using Configurator_T = typename BASE::Configurator_T;
+        using LInt           = typename Configurator_T::LInt;
         
         using BASE::AMB_DIM;
         using BASE::PROJ_DIM;
@@ -35,13 +38,10 @@ namespace Repulsor
         using BASE::diff_flag;
         using BASE::metric_flag;
         
-        static constexpr Int ROWS      = 1 + AMB_DIM;
-        static constexpr Int COLS      = 1 + AMB_DIM;
-        static constexpr Int BLOCK_NNZ = 1 + 2 * AMB_DIM;
-        static constexpr Int DIAG_NNZ  = ROWS * COLS;
-        
-        using BASE::S;
-        using BASE::T;
+        static constexpr  Int ROWS      = 1 + AMB_DIM;
+        static constexpr  Int COLS      = 1 + AMB_DIM;
+        static constexpr LInt BLOCK_NNZ = 1 + 2 * AMB_DIM;
+        static constexpr LInt DIAG_NNZ  = ROWS * COLS;
         
         using BASE::zero;
         using BASE::one;
@@ -81,6 +81,8 @@ namespace Repulsor
         virtual ~CLASS() = default;
         
     protected:
+        
+        using BASE::bct;
         
         using BASE::metric_data;
         
@@ -384,7 +386,7 @@ namespace Repulsor
         
     public:
         
-        virtual Int NonzeroCount() const override
+        virtual LInt NonzeroCount() const override
         {
             return BLOCK_NNZ;
         }
@@ -401,7 +403,7 @@ namespace Repulsor
             return TO_STD_STRING(CLASS)+"<"
             + ToString(S_DOM_DIM) + ","
             + ToString(T_DOM_DIM) + ","
-            + S.ClassName() + ","
+            + bct.ClassName() + ","
             + TypeName<T1>::Get() + ","
             + TypeName<T2>::Get() + ","
             + ToString(is_symmetric) + ","

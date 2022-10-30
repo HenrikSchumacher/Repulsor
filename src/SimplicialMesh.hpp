@@ -179,7 +179,7 @@ namespace Repulsor
         Tensor2<Int,Int>  simplices;
         
         mutable bool derivative_assembler_initialized = false;
-        mutable SparseBinaryMatrixCSR<Int> derivative_assembler;
+        mutable SparseBinaryMatrixCSR<Int,Int> derivative_assembler;
         
         mutable Primitive_T P_proto;
         
@@ -354,7 +354,7 @@ namespace Repulsor
                     
                     Tensor2<SReal,Int> P_serialized ( SimplexCount(), P_proto.Size() );
                     
-                    auto DiffOp = SparseMatrixCSR<Real,Int>(
+                    auto DiffOp = SparseMatrixCSR<Real,Int,Int>(
                         SimplexCount() * AMB_DIM,
                         VertexCount(),
                         SimplexCount() * AMB_DIM * (DOM_DIM+1),
@@ -363,7 +363,7 @@ namespace Repulsor
         
                     DiffOp.Outer()[SimplexCount() * AMB_DIM] = SimplexCount() * AMB_DIM * (DOM_DIM+1);
                     
-                    auto AvOp = SparseMatrixCSR<Real,Int>(
+                    auto AvOp = SparseMatrixCSR<Real,Int,Int>(
                         SimplexCount(),
                         VertexCount(),
                         SimplexCount() * (DOM_DIM+1),
@@ -493,13 +493,13 @@ namespace Repulsor
         }
         
         
-        const SparseBinaryMatrixCSR<Int> & DerivativeAssembler() const override
+        const SparseBinaryMatrixCSR<Int,Int> & DerivativeAssembler() const override
         {
             if( !derivative_assembler_initialized )
             {
                 ptic(className()+"::DerivativeAssembler");
                 
-                auto A = SparseBinaryMatrixCSR<Int>(
+                auto A = SparseBinaryMatrixCSR<Int,Int>(
                     SimplexCount() * (DOM_DIM+1),
                     VertexCount(),
                     SimplexCount() * (DOM_DIM+1),

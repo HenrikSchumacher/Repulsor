@@ -2,13 +2,13 @@
 
 #define CLASS FMM_Kernel_VF
 
-#define BASE  FMM_Kernel<ClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,metric_flag_>
+#define BASE  FMM_Kernel<BlockClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,metric_flag_>
 
 namespace Repulsor
 {
     template<
         int S_DOM_DIM_, int T_DOM_DIM_,
-        typename ClusterTree_T_,
+        typename BlockClusterTree_T_,
         bool is_symmetric_,
         bool energy_flag_, bool diff_flag_, bool metric_flag_
     >
@@ -16,13 +16,19 @@ namespace Repulsor
     {
     public:
         
-        using ClusterTree_T = ClusterTree_T_;
+        using BlockClusterTree_T = BlockClusterTree_T_;
         
-        using Real    = typename ClusterTree_T::Real;
-        using Int     = typename ClusterTree_T::Int;
-        using SReal   = typename ClusterTree_T::SReal;
-        using ExtReal = typename ClusterTree_T::ExtReal;
-        using typename BASE::Configurator_T;
+        using ClusterTree_T      = typename BlockClusterTree_T::ClusterTree_T;
+        using Values_T           = typename BlockClusterTree_T::Values_T;
+        using ValueContainer_T   = typename BlockClusterTree_T::ValueContainer_T;
+        
+        using Real               = typename BlockClusterTree_T::Real;
+        using SReal              = typename BlockClusterTree_T::SReal;
+        using ExtReal            = typename BlockClusterTree_T::ExtReal;
+        using Int                = typename BlockClusterTree_T::Int;
+        using LInt               = typename BlockClusterTree_T::LInt;
+        
+        using Configurator_T     = FMM_Configurator<BlockClusterTree_T>;
         
         using BASE::AMB_DIM;
         using BASE::PROJ_DIM;
@@ -31,6 +37,8 @@ namespace Repulsor
         using BASE::energy_flag;
         using BASE::diff_flag;
         using BASE::metric_flag;
+        using BASE::GetS;
+        using BASE::GetT;
         
         static constexpr Int S_DOM_DIM = S_DOM_DIM_;
         static constexpr Int T_DOM_DIM = T_DOM_DIM_;
@@ -91,8 +99,7 @@ namespace Repulsor
         mutable Real const * restrict y_buffer  = nullptr;
 #endif
 
-        using BASE::S;
-        using BASE::T;
+        using BASE::bct;
         
         using BASE::i_global;
         using BASE::j_global;
@@ -142,43 +149,43 @@ namespace Repulsor
         CLASS() = default;
         
         CLASS( Configurator_T & conf, const Real theta_, const Int  max_level_ = 20 )
-        :   BASE        ( conf                                                         )
-        ,   S_data      ( S.PrimitiveNearFieldData().data()                            )
-        ,   S_D_data    ( S.ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
-        ,   S_diag      ( S.VF_Accumulator().data(               omp_get_thread_num()) )
-        ,   S_ser       ( S.PrimitiveSerialized().data()                               )
-        ,   T_data      ( T.PrimitiveNearFieldData().data()                            )
-        ,   T_D_data    ( T.ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
-        ,   T_diag      ( T.VF_Accumulator().data(               omp_get_thread_num()) )
-        ,   T_ser       ( T.PrimitiveSerialized().data()                               )
-        ,   theta       ( theta_                                                       )
-        ,   theta2      ( theta_ * theta_                                              )
-        ,   max_level   ( max_level_                                                   )
+        :   BASE        ( conf                                                              )
+        ,   S_data      ( GetS().PrimitiveNearFieldData().data()                            )
+        ,   S_D_data    ( GetS().ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
+        ,   S_diag      ( GetS().VF_Accumulator().data(               omp_get_thread_num()) )
+        ,   S_ser       ( GetS().PrimitiveSerialized().data()                               )
+        ,   T_data      ( GetT().PrimitiveNearFieldData().data()                            )
+        ,   T_D_data    ( GetT().ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
+        ,   T_diag      ( GetT().VF_Accumulator().data(               omp_get_thread_num()) )
+        ,   T_ser       ( GetT().PrimitiveSerialized().data()                               )
+        ,   theta       ( theta_                                                            )
+        ,   theta2      ( theta_ * theta_                                                   )
+        ,   max_level   ( max_level_                                                        )
         {
-            if( S.PrimitiveSerialized().Dimension(1) != S_Tree.SimplexPrototype().Size() )
+            if( GetS().PrimitiveSerialized().Dimension(1) != S_Tree.SimplexPrototype().Size() )
             {
-                eprint(className()+" Constructor: S.PrimitiveSerialized().Dimension(1) != S_Tree.SimplexPrototype().Size()");
+                eprint(className()+" Constructor: GetS().PrimitiveSerialized().Dimension(1) != S_Tree.SimplexPrototype().Size()");
             }
             
-            if( T.PrimitiveSerialized().Dimension(1) != T_Tree.SimplexPrototype().Size() )
+            if( GetT().PrimitiveSerialized().Dimension(1) != T_Tree.SimplexPrototype().Size() )
             {
-                eprint(className()+" Constructor: T.PrimitiveSerialized().Dimension(1) != T_Tree.SimplexPrototype().Size()");
+                eprint(className()+" Constructor: GetT().PrimitiveSerialized().Dimension(1) != T_Tree.SimplexPrototype().Size()");
             }
         }
         
         CLASS( const CLASS & other )
-        :   BASE        ( other                                                              )
-        ,   S_data      ( other.S_data                                                       )
-        ,   S_D_data    ( other.S.ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
-        ,   S_diag      ( other.S.VF_Accumulator().data(               omp_get_thread_num()) )
-        ,   S_ser       ( other.S_ser                                                        )
-        ,   T_data      ( other.T_data                                                       )
-        ,   T_D_data    ( other.T.ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
-        ,   T_diag      ( other.T.VF_Accumulator().data(               omp_get_thread_num()) )
-        ,   T_ser       ( other.T_ser                                                        )
-        ,   theta       ( other.theta                                                        )
-        ,   theta2      ( other.theta2                                                       )
-        ,   max_level   ( other.max_level                                                    )
+        :   BASE        ( other                                                                   )
+        ,   S_data      ( other.S_data                                                            )
+        ,   S_D_data    ( other.GetS().ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
+        ,   S_diag      ( other.GetS().VF_Accumulator().data(               omp_get_thread_num()) )
+        ,   S_ser       ( other.S_ser                                                             )
+        ,   T_data      ( other.T_data                                                            )
+        ,   T_D_data    ( other.GetT().ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
+        ,   T_diag      ( other.GetT().VF_Accumulator().data(               omp_get_thread_num()) )
+        ,   T_ser       ( other.T_ser                                                             )
+        ,   theta       ( other.theta                                                             )
+        ,   theta2      ( other.theta2                                                            )
+        ,   max_level   ( other.max_level                                                         )
         {}
         
         virtual ~CLASS() override
@@ -404,7 +411,7 @@ namespace Repulsor
         
     public:
         
-        virtual Int NonzeroCount() const override = 0;
+        virtual LInt NonzeroCount() const override = 0;
         
         virtual void CreateLogFile() const
         {
@@ -452,7 +459,7 @@ namespace Repulsor
             return TO_STD_STRING(CLASS)+"<"
             + ToString(S_DOM_DIM) + ","
             + ToString(T_DOM_DIM) + ","
-            + S.ClassName() + ","
+            + bct.ClassName() + ","
             + ToString(is_symmetric) + ","
             + ToString(energy_flag) + ","
             + ToString(diff_flag) + ","

@@ -14,12 +14,15 @@ namespace Repulsor
         
     public:
         
-        using MeshBase_T        = SimplicialMeshBase<Real,Int,SReal,ExtReal>;
-        using TangentVector_T   = typename MeshBase_T::TangentVector_T;
-        using CotangentVector_T = typename MeshBase_T::CotangentVector_T;
+        using MeshBase_T             = SimplicialMeshBase<Real,Int,SReal,ExtReal>;
         
-        using Values_T          = Tensor2<Real,Int>;
-        using ValueContainer_T  = std::unordered_map<std::string,Values_T>;
+        using TangentVector_T        = typename MeshBase_T::TangentVector_T;
+        using CotangentVector_T      = typename MeshBase_T::CotangentVector_T;
+        
+        using BlockClusterTree_T     = typename MeshBase_T::BlockClusterTree_T;
+        
+        using Values_T               = typename BlockClusterTree_T::Values_T;
+        using ValueContainer_T       = typename BlockClusterTree_T::ValueContainer_T;
         
         CLASS() = default;
 

@@ -1,13 +1,13 @@
 #pragma once
 
 #define CLASS FMM_Kernel_NF
-#define BASE  FMM_Kernel<ClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,metric_flag_>
+#define BASE  FMM_Kernel<BlockClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,metric_flag_>
 
 namespace Repulsor
 {
     template<
         int S_DOM_DIM_, int T_DOM_DIM_,
-        typename ClusterTree_T_,
+        typename BlockClusterTree_T_,
         bool is_symmetric_,
         bool energy_flag_, bool diff_flag_, bool metric_flag_
     >
@@ -15,24 +15,30 @@ namespace Repulsor
     {
     public:
         
-        using ClusterTree_T = ClusterTree_T_;
+        using BlockClusterTree_T = BlockClusterTree_T_;
         
-        using Real    = typename ClusterTree_T::Real;
-        using Int     = typename ClusterTree_T::Int;
-        using SReal   = typename ClusterTree_T::SReal;
-        using ExtReal = typename ClusterTree_T::ExtReal;
-        using typename BASE::Configurator_T;
+        using ClusterTree_T      = typename BlockClusterTree_T::ClusterTree_T;
+        using Values_T           = typename BlockClusterTree_T::Values_T;
+        using ValueContainer_T   = typename BlockClusterTree_T::ValueContainer_T;
+        
+        using Real               = typename BlockClusterTree_T::Real;
+        using SReal              = typename BlockClusterTree_T::SReal;
+        using ExtReal            = typename BlockClusterTree_T::ExtReal;
+        using Int                = typename BlockClusterTree_T::Int;
+        using LInt               = typename BlockClusterTree_T::LInt;
+        
+        using Configurator_T     = FMM_Configurator<BlockClusterTree_T>;
         
         using BASE::AMB_DIM;
         using BASE::PROJ_DIM;
-        using BASE::S;
-        using BASE::T;
         using BASE::symmetry_factor;
         using BASE::is_symmetric;
         using BASE::energy_flag;
         using BASE::diff_flag;
         using BASE::metric_flag;
-
+        using BASE::GetS;
+        using BASE::GetT;
+        
         static constexpr Int S_DOM_DIM = S_DOM_DIM_;
         static constexpr Int T_DOM_DIM = T_DOM_DIM_;
         
@@ -73,7 +79,7 @@ namespace Repulsor
                Real * restrict const T_D_data  = nullptr;
                Real * restrict const T_diag    = nullptr;
 
-
+        using BASE::bct;
         using BASE::tri_i;
         using BASE::tri_j;
         using BASE::lin_k;
@@ -100,49 +106,49 @@ namespace Repulsor
         // To be used for configuration of kernel.
         CLASS( Configurator_T & conf )
         :   BASE        ( conf                                                         )
-        ,   S_data      ( S.PrimitiveNearFieldData().data()                            )
-        ,   S_D_data    ( S.ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
-        ,   S_diag      ( S.NF_Accumulator().data(               omp_get_thread_num()) )
-        ,   T_data      ( T.PrimitiveNearFieldData().data()                            )
-        ,   T_D_data    ( T.ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
-        ,   T_diag      ( T.NF_Accumulator().data(               omp_get_thread_num()) )
+        ,   S_data      ( GetS().PrimitiveNearFieldData().data()                            )
+        ,   S_D_data    ( GetS().ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
+        ,   S_diag      ( GetS().NF_Accumulator().data(               omp_get_thread_num()) )
+        ,   T_data      ( GetT().PrimitiveNearFieldData().data()                            )
+        ,   T_D_data    ( GetT().ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
+        ,   T_diag      ( GetT().NF_Accumulator().data(               omp_get_thread_num()) )
         {
-            if( S.PrimitiveNearFieldData().Dimension(1) != S_DATA_DIM )
+            if( GetS().PrimitiveNearFieldData().Dimension(1) != S_DATA_DIM )
             {
-                eprint(className()+" Constructor: S.PrimitiveNearFieldData().Dimension(1) != S_DATA_DIM");
+                eprint(className()+" Constructor: GetS().PrimitiveNearFieldData().Dimension(1) != S_DATA_DIM");
             }
             
             if constexpr ( diff_flag )
             {
-                if( S.ThreadPrimitiveDNearFieldData().Dimension(2) != S_DATA_DIM )
+                if( GetS().ThreadPrimitiveDNearFieldData().Dimension(2) != S_DATA_DIM )
                 {
-                    eprint(className()+" Constructor: S.ThreadPrimitiveDNearFieldData().Dimension(2) != S_DATA_DIM");
+                    eprint(className()+" Constructor: GetS().ThreadPrimitiveDNearFieldData().Dimension(2) != S_DATA_DIM");
                 }
             }
             
-            if( T.PrimitiveNearFieldData().Dimension(1) != T_DATA_DIM)
+            if( GetT().PrimitiveNearFieldData().Dimension(1) != T_DATA_DIM)
             {
-               eprint(className()+" Constructor: T.PrimitiveNearFieldData().Dimension(1) != T_DATA_DIM ");
+               eprint(className()+" Constructor: GetT().PrimitiveNearFieldData().Dimension(1) != T_DATA_DIM ");
             }
             
             if constexpr ( diff_flag )
             {
-                if( T.ThreadPrimitiveDNearFieldData().Dimension(2) != T_DATA_DIM )
+                if( GetT().ThreadPrimitiveDNearFieldData().Dimension(2) != T_DATA_DIM )
                 {
-                    eprint(className()+" Constructor: T.ThreadPrimitiveDNearFieldData().Dimension(2) != T_DATA_DIM ");
+                    eprint(className()+" Constructor: GetT().ThreadPrimitiveDNearFieldData().Dimension(2) != T_DATA_DIM ");
                 }
             }
         }
         
         // Use this constructor to make a copy of a configured kernel within the local thread.
         CLASS( const CLASS & other )
-        :   BASE        ( other                                                              )
-        ,   S_data      ( other.S_data                                                       )
-        ,   S_D_data    ( other.S.ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
-        ,   S_diag      ( other.S.NF_Accumulator().data(               omp_get_thread_num()) )
-        ,   T_data      ( other.T_data                                                       )
-        ,   T_D_data    ( other.T.ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
-        ,   T_diag      ( other.T.NF_Accumulator().data(               omp_get_thread_num()) )
+        :   BASE        ( other                                                                   )
+        ,   S_data      ( other.S_data                                                            )
+        ,   S_D_data    ( other.GetS().ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
+        ,   S_diag      ( other.GetS().NF_Accumulator().data(               omp_get_thread_num()) )
+        ,   T_data      ( other.T_data                                                            )
+        ,   T_D_data    ( other.GetT().ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
+        ,   T_diag      ( other.GetT().NF_Accumulator().data(               omp_get_thread_num()) )
         {}
         
         virtual ~CLASS() = default;
@@ -272,7 +278,7 @@ namespace Repulsor
             return TO_STD_STRING(CLASS)+"<"
             + ToString(S_DOM_DIM) + ","
             + ToString(T_DOM_DIM) + ","
-            + S.ClassName() + ","
+            + bct.ClassName() + ","
             + ToString(is_symmetric) + ","
             + ToString(energy_flag) + ","
             + ToString(diff_flag) + ","

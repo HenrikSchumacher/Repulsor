@@ -25,7 +25,9 @@ namespace Repulsor
         using Int     = typename ClusterTree_T::Int;
         using SReal   = typename ClusterTree_T::SReal;
         using ExtReal = typename ClusterTree_T::ExtReal;
-        using typename BASE::Configurator_T;
+
+        using Configurator_T = typename BASE::Configurator_T;
+        using LInt           = typename Configurator_T::LInt;
         
         using BASE::AMB_DIM;
         using BASE::PROJ_DIM;
@@ -44,10 +46,7 @@ namespace Repulsor
         static constexpr Int BLOCK_NNZ = 1 + 2 * AMB_DIM;
         static constexpr Int DIAG_NNZ  = ROWS * COLS;
 
-        using BASE::S;
-        using BASE::T;
-//        using BASE::S_Tree;
-//        using BASE::T_Tree;
+        using BASE::bct;
         
         using BASE::zero;
         using BASE::one;
@@ -368,7 +367,7 @@ namespace Repulsor
         
     public:
         
-        virtual Int NonzeroCount() const override
+        virtual LInt NonzeroCount() const override
         {
             return BLOCK_NNZ;
         }
@@ -386,7 +385,7 @@ namespace Repulsor
             return TO_STD_STRING(CLASS)+"<"
             + ToString(S_DOM_DIM) + ","
             + ToString(T_DOM_DIM) + ","
-            + S.ClassName() + ","
+            + bct.ClassName() + ","
             + TypeName<T1>::Get() + ","
             + TypeName<T2>::Get() + ","
             + ToString(is_symmetric) + ","

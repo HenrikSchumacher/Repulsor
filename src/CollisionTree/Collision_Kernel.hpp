@@ -16,6 +16,8 @@ namespace Repulsor
         using SReal   = typename BASE::SReal;
         using ExtReal = typename BASE::ExtReal;
         
+        using LInt    = size_t;
+        
     public:
         
         CLASS() = default;
@@ -118,7 +120,7 @@ namespace Repulsor
         const Tensor2<SReal,Int> & T_P_ser;
         const Tensor2<SReal,Int> & T_P_v_ser;
         
-        const SparseBinaryMatrixCSR<Int> & A;
+        const SparseBinaryMatrixCSR<Int,Int> & A;
         
         CollisionFinder<ClusterTree_T::AMB_DIM,Real,Int,SReal> C;
         
@@ -136,7 +138,7 @@ namespace Repulsor
         
     public:
         
-        TripleAggregator<Int,Int,SReal,Int> triples;
+        TripleAggregator<Int,Int,SReal,LInt> triples;
         
     public:
 
