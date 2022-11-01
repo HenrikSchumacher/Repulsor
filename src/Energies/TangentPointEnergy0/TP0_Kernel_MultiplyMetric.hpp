@@ -1,6 +1,6 @@
 #pragma once
 
-#define CLASS TP0_Kernel_VF_MultiplyMetric
+#define CLASS TP0_Kernel_MultiplyMetric
 #define BASE  BlockKernel_fixed<                            \
     AMB_DIM_+1,AMB_DIM_+1,MAX_RHS_COUNT_,true,              \
     Scalar_, Scalar_in_, Scalar_out_, Int_, LInt_,          \
@@ -20,7 +20,7 @@ namespace Repulsor
     >
     class CLASS : public BASE
     {
-        
+
     public:
 
         using Scalar     = Scalar_;
@@ -46,10 +46,6 @@ namespace Repulsor
         using BASE::Y;
         using BASE::x;
         using BASE::y;
-        
-//        using BASE::i_global;
-//        using BASE::j_global;
-//        using BASE::k_global;
         
         using BASE::ReadX;
         
@@ -94,6 +90,7 @@ namespace Repulsor
         }
         
         
+        
         virtual force_inline void apply_block( const LInt k_global, const Int j_global ) override
         {
             ReadX( j_global );
@@ -110,11 +107,6 @@ namespace Repulsor
 //              |                               |
 //              |   0       0       0      a[1] |
 //              \                               /
-//
-//            This are 1 + 2 * AMB_DIM nonzero values.
-//            It is tempting to compress also this to 2 + AMB_DIM values.
-//            BUT we have to add the local matrices from several subtriangles!
-//            Thus this structure cannot be exploited.
             
             for( Int k = 0; k < MAX_RHS_COUNT; ++k )
             {
@@ -125,13 +117,13 @@ namespace Repulsor
                 }
             }
         }
-        
+
         virtual force_inline void begin_row( const Int i_global ) override
         {}
-
+        
         virtual force_inline void end_row( const Int i_global ) override
         {
-            // TODO: Multiply diagonal block
+            // Multiply diagonal block
         }
         
     public:
@@ -155,4 +147,5 @@ namespace Repulsor
 
 #undef BASE
 #undef CLASS
+
 

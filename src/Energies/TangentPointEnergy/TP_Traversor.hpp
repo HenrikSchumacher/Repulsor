@@ -256,7 +256,6 @@ namespace Repulsor
             using Kernel_T = TP_Kernel_VF<
                 S_DOM_DIM, T_DOM_DIM,
                 BlockClusterTree_T, T1, T2,
-                BlockClusterTree_T::IsSymmetric(),
                 energy_flag, diff_flag, metric_flag
             >;
 
@@ -296,7 +295,6 @@ namespace Repulsor
             using Kernel_T = TP_Kernel_NF<
                 S_DOM_DIM, T_DOM_DIM,
                 BlockClusterTree_T, T1, T2,
-                BlockClusterTree_T::IsSymmetric(),
                 energy_flag, diff_flag, metric_flag
             >;
 
@@ -336,7 +334,6 @@ namespace Repulsor
             
             using Kernel_T = TP_Kernel_FF<
                 BlockClusterTree_T, T1, T2,
-                BlockClusterTree_T::IsSymmetric(),
                 energy_flag, diff_flag, metric_flag
             >;
             
@@ -437,7 +434,6 @@ namespace Repulsor
                 );
             }
         }
-        
         
         void VF_MultiplyMetric( const Int rhs_count ) const
         {

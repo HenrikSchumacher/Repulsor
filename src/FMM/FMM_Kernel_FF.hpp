@@ -1,13 +1,12 @@
 #pragma once
 
 #define CLASS FMM_Kernel_FF
-#define BASE  FMM_Kernel<BlockClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,metric_flag_>
+#define BASE  FMM_Kernel<BlockClusterTree_T_,energy_flag_,diff_flag_,metric_flag_>
 
 namespace Repulsor
 {
     template<
         typename BlockClusterTree_T_,
-        bool is_symmetric_,
         bool energy_flag_, bool diff_flag_, bool metric_flag_
     >
     class CLASS : public BASE
@@ -252,7 +251,6 @@ namespace Repulsor
         {
             return TO_STD_STRING(CLASS)+"<"
             + bct.ClassName() + ","
-            + ToString(is_symmetric) + ","
             + ToString(energy_flag) + ","
             + ToString(diff_flag) + ","
             + ToString(metric_flag) +

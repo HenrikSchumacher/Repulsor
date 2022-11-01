@@ -2,7 +2,7 @@
 #include "Metrics/MetricDimRestricted.hpp"
 #include "Metrics/TangentPointMetric.hpp"
 
-//#include "Metrics/TangentPointMetric0.hpp"
+#include "Metrics/TangentPointMetric0.hpp"
 
 
 //#include "Metrics/Metric__NFK.hpp"

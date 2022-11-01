@@ -20,6 +20,7 @@ namespace Repulsor
         using ExtReal = ExtReal_;
         
         using LInt    = size_t;
+//        using LInt    = uint32_t;
         
         using Setting_T         = BlockClusterTreeSettings;
 

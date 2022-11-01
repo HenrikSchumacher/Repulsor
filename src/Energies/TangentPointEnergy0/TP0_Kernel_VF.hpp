@@ -1,27 +1,32 @@
 #pragma once
 
 #define CLASS TP0_Kernel_VF
-#define BASE  FMM_Kernel_VF<S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,metric_flag_>
+#define BASE  FMM_Kernel_VF<S_DOM_DIM_,T_DOM_DIM_,BlockClusterTree_T_,energy_flag_,diff_flag_,metric_flag_>
 
 namespace Repulsor
 {
     template<
         int S_DOM_DIM_, int T_DOM_DIM_,
-        typename ClusterTree_T_, typename T1, typename T2,
-        bool is_symmetric_,
+        typename BlockClusterTree_T_, typename T1, typename T2,
         bool energy_flag_, bool diff_flag_, bool metric_flag_
     >
     class CLASS : public BASE
     {
     public:
         
-        using ClusterTree_T = ClusterTree_T_;
+        using BlockClusterTree_T = typename BASE::BlockClusterTree_T;
         
-        using Real    = typename ClusterTree_T::Real;
-        using Int     = typename ClusterTree_T::Int;
-        using SReal   = typename ClusterTree_T::SReal;
-        using ExtReal = typename ClusterTree_T::ExtReal;
-        using typename BASE::Configurator_T;
+        using ClusterTree_T      = typename BASE::ClusterTree_T;
+        using Values_T           = typename BASE::Values_T;
+        using ValueContainer_T   = typename BASE::ValueContainer_T;
+        
+        using Real               = typename BASE::Real;
+        using SReal              = typename BASE::SReal;
+        using ExtReal            = typename BASE::ExtReal;
+        using Int                = typename BASE::Int;
+        using LInt               = typename BASE::LInt;
+        
+        using Configurator_T     = typename BASE::Configurator_T;
         
         using BASE::AMB_DIM;
         using BASE::PROJ_DIM;
@@ -46,8 +51,7 @@ namespace Repulsor
         using BASE::zero;
         using BASE::one;
         using BASE::two;
-        
-        static constexpr bool is_symmetric = is_symmetric_;
+        using BASE::is_symmetric;
         
     public:
         
@@ -305,13 +309,16 @@ namespace Repulsor
                     
                     const Real a_0 = w * static_cast<Real>(0.5) * (rCosPhi_2 + rCosPsi_2) / r4 * a_1;
                     
+                    const Real b_over_a   = b/a;
+                    const Real a_over_b   = a/b;
+                    
                     ij_block[0] +=   a_0;
-                    ii_block[0] -=   a_0;
-                    jj_block[0] -=   a_0;
+                    ii_block[0] -=   b_over_a * a_0;
+                    jj_block[0] -=   a_over_b * a_0;
                     
                     ij_block[1] +=   a_1;
-                    ii_block[1] -=   a_1;
-                    jj_block[1] -=   a_1;
+                    ii_block[1] -=   b_over_a * a_1;
+                    jj_block[1] -=   a_over_b * a_1;
                     
                 }
                 
@@ -330,39 +337,46 @@ namespace Repulsor
     protected:
     
         
-        virtual void loadS() override
+        virtual void loadS( const Int i_global ) override
         {
             if constexpr ( metric_flag )
             {
-                zerofy_buffer( &ii_block[0], DIAG_NNZ );
+                zerofy_buffer( &ii_block[0][0], DIAG_NNZ );
             }
         }
         
-        virtual void writeS() override
+        virtual void writeS( const Int i_global ) override
         {
             if constexpr ( metric_flag )
             {
-                add_to_buffer<DIAG_NNZ>( &ii_block[0], &S_diag[DIAG_NNZ * i_global] );
+                add_to_buffer<DIAG_NNZ>( &ii_block[0][0], &S_diag[DIAG_NNZ * i_global] );
             }
         }
         
-        virtual void loadT() override
+        virtual void loadT( const Int j_global ) override
         {
             if constexpr ( metric_flag )
             {
                 zerofy_buffer( &ij_block[0], BLOCK_NNZ );
                 
-                zerofy_buffer( &jj_block[0], DIAG_NNZ );
+                zerofy_buffer( &jj_block[0][0], DIAG_NNZ );
+            }
+        }
+
+        
+        virtual void writeT( const Int j_global ) override
+        {
+            if constexpr ( metric_flag )
+            {
+                add_to_buffer<DIAG_NNZ>( &jj_block[0][0], &T_diag[DIAG_NNZ * j_global] );
             }
         }
         
-        virtual void writeT() override
+        virtual void writeBlock( const Int k_global ) override
         {
             if constexpr ( metric_flag )
             {
                 copy_buffer( &ij_block[0], &metric_data[BLOCK_NNZ * k_global], BLOCK_NNZ );
-                
-                add_to_buffer<DIAG_NNZ>( &jj_block[0], &T_diag[DIAG_NNZ * j_global] );
             }
         }
         
@@ -388,7 +402,6 @@ namespace Repulsor
             + S.ClassName() + ","
             + TypeName<T1>::Get() + ","
             + TypeName<T2>::Get() + ","
-            + ToString(is_symmetric) + ","
             + ToString(energy_flag) + ","
             + ToString(diff_flag) + ","
             + ToString(metric_flag) +
