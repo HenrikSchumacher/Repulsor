@@ -133,9 +133,9 @@ namespace Repulsor
 
         mutable bool adaptive_subdivision_data_initialized = false;
 
-        mutable SparseMatrixCSR <Int,Int> to_subdivide;
-        mutable SparseMatrixCSR <Int,Int> no_subdivide;
-        mutable SparseMatrixCSR <Int,Int> primitive_intersection_matrix;
+        mutable SparseMatrixCSR <Int,Int,Int> to_subdivide;
+        mutable SparseMatrixCSR <Int,Int,Int> no_subdivide;
+        mutable SparseMatrixCSR <Int,Int,Int> primitive_intersection_matrix;
         
         Tensor1<Int,Int> by_4;
         Tensor1<Int,Int> by_4_remainder;
@@ -1148,7 +1148,7 @@ namespace Repulsor
                 // cppcheck-suppress [knownConditionTrueFalse]
                 if( IsSymmetric() )
                 {
-                    const SparseBinaryMatrixCSR<Int> & A = S.PrimitiveAdjacencyMatrix();
+                    const SparseBinaryMatrixCSR<Int,Int> & A = S.PrimitiveAdjacencyMatrix();
                           
                     for( Int i = i_begin; i < i_end; ++i )
                     {
@@ -1380,7 +1380,7 @@ namespace Repulsor
                 // cppcheck-suppress [knownConditionTrueFalse]
                 if( IsSymmetric() )
                 {
-                    const SparseBinaryMatrixCSR<Int> & A = S.PrimitiveAdjacencyMatrix();
+                    const SparseBinaryMatrixCSR<Int,Int> & A = S.PrimitiveAdjacencyMatrix();
                           
                     for( Int i = i_begin; i < i_end; ++i )
                     {
@@ -1491,21 +1491,21 @@ namespace Repulsor
             } // #pragma omp parallel
 
             ptic("assembling matrix no_subdivide");
-            no_subdivide     = SparseMatrixCSR <Int,Int>(
+            no_subdivide     = SparseMatrixCSR<Int,Int,Int>(
                  sep_i,  sep_j,  sep_a, near.RowCount(), near.ColCount(), near.ThreadCount(), false, 0 );
             ptoc("assembling matrix no_subdivide");
             
             DUMP(no_subdivide.NonzeroCount());
             
             ptic("assembling matrix to_subdivide");
-            to_subdivide     = SparseMatrixCSR <Int,Int>(
+            to_subdivide     = SparseMatrixCSR<Int,Int,Int>(
                 nsep_i, nsep_j, nsep_a, near.RowCount(), near.ColCount(), near.ThreadCount(), false, 0 );
             ptoc("assembling matrix to_subdivide");
             
             DUMP(to_subdivide.NonzeroCount());
             
             ptic("assembling primitive_intersection_matrix");
-            primitive_intersection_matrix = SparseMatrixCSR<Int,Int>(
+            primitive_intersection_matrix = SparseMatrixCSR<Int,Int,Int>(
                  intersec_i,  intersec_j,  intersec_a, near.RowCount(), near.ColCount(), near.ThreadCount(), false, 0 );
             ptoc("assembling primitive_intersection_matrix");
             
@@ -1545,21 +1545,21 @@ namespace Repulsor
             
         }
         
-        const SparseMatrixCSR<Int,Int> & PrimitiveIntersectionMatrix() const override
+        const SparseMatrixCSR<Int,Int,Int> & PrimitiveIntersectionMatrix() const override
         {
             RequireAdaptiveSubdivisionData();
             return primitive_intersection_matrix;
             
         }
         
-        const SparseMatrixCSR<Int,Int> & AdaptiveNoSubdivisionData() const override
+        const SparseMatrixCSR<Int,Int,Int> & AdaptiveNoSubdivisionData() const override
         {
             RequireAdaptiveSubdivisionData();
             return no_subdivide;
             
         }
         
-        const SparseMatrixCSR<Int,Int> & AdaptiveSubdivisionData() const override
+        const SparseMatrixCSR<Int,Int,Int> & AdaptiveSubdivisionData() const override
         {
             RequireAdaptiveSubdivisionData();
             return to_subdivide;

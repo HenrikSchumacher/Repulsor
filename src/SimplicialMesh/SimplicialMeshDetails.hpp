@@ -32,8 +32,8 @@ namespace Repulsor
 		      Tensor3<Real,Int> & P_hull_coords,
 		      Tensor2<Real,Int> & P_near,
 		      Tensor2<Real,Int> & P_far,
-		SparseMatrixCSR<Real,Int> & DiffOp,
-		SparseMatrixCSR<Real,Int> & AvOp 
+		SparseMatrixCSR<Real,Int,Int> & DiffOp,
+		SparseMatrixCSR<Real,Int,Int> & AvOp
 	) const
     {
         ptic(ClassName()+"::ComputeNearFarDataOps");
@@ -164,8 +164,8 @@ namespace Repulsor
 		      Tensor3<Real,Int> & P_hull_coords,
 		      Tensor2<Real,Int> & P_near,
 		      Tensor2<Real,Int> & P_far,
-		SparseMatrixCSR<Real,Int> & DiffOp,
-		SparseMatrixCSR<Real,Int> & AvOp 
+		SparseMatrixCSR<Real,Int,Int> & DiffOp,
+		SparseMatrixCSR<Real,Int,Int> & AvOp 
 	) const
     {
         ptic(ClassName()+"::ComputeNearFarDataOps");
@@ -402,8 +402,8 @@ namespace Repulsor
 		      Tensor3<Real,Int> & P_hull_coords,
 		      Tensor2<Real,Int> & P_near,
 		      Tensor2<Real,Int> & P_far,
-		SparseMatrixCSR<Real,Int> & DiffOp,
-		SparseMatrixCSR<Real,Int> & AvOp 
+		SparseMatrixCSR<Real,Int,Int> & DiffOp,
+		SparseMatrixCSR<Real,Int,Int> & AvOp
 	) const
     {
         ptic(ClassName()+"::ComputeNearFarDataOps");
@@ -655,8 +655,8 @@ namespace Repulsor
 		      Tensor3<Real,Int> & P_hull_coords,
 		      Tensor2<Real,Int> & P_near,
 		      Tensor2<Real,Int> & P_far,
-		SparseMatrixCSR<Real,Int> & DiffOp,
-		SparseMatrixCSR<Real,Int> & AvOp 
+		SparseMatrixCSR<Real,Int,Int> & DiffOp,
+		SparseMatrixCSR<Real,Int,Int> & AvOp
 	) const
     {
         ptic(ClassName()+"::ComputeNearFarDataOps");
@@ -925,8 +925,8 @@ namespace Repulsor
 		      Tensor3<Real,Int> & P_hull_coords,
 		      Tensor2<Real,Int> & P_near,
 		      Tensor2<Real,Int> & P_far,
-		SparseMatrixCSR<Real,Int> & DiffOp,
-		SparseMatrixCSR<Real,Int> & AvOp 
+		SparseMatrixCSR<Real,Int,Int> & DiffOp,
+		SparseMatrixCSR<Real,Int,Int> & AvOp
 	) const
     {
         ptic(ClassName()+"::ComputeNearFarDataOps");
@@ -1216,8 +1216,8 @@ namespace Repulsor
 		      Tensor3<Real,Int> & P_hull_coords,
 		      Tensor2<Real,Int> & P_near,
 		      Tensor2<Real,Int> & P_far,
-		SparseMatrixCSR<Real,Int> & DiffOp,
-		SparseMatrixCSR<Real,Int> & AvOp 
+		SparseMatrixCSR<Real,Int,Int> & DiffOp,
+		SparseMatrixCSR<Real,Int,Int> & AvOp
 	) const
     {
         ptic(ClassName()+"::ComputeNearFarDataOps");
@@ -1665,8 +1665,8 @@ namespace Repulsor
 		      Tensor3<Real,Int> & P_hull_coords,
 		      Tensor2<Real,Int> & P_near,
 		      Tensor2<Real,Int> & P_far,
-		SparseMatrixCSR<Real,Int> & DiffOp,
-		SparseMatrixCSR<Real,Int> & AvOp 
+		SparseMatrixCSR<Real,Int,Int> & DiffOp,
+		SparseMatrixCSR<Real,Int,Int> & AvOp
 	) const
     {
         ptic(ClassName()+"::ComputeNearFarDataOps");
@@ -2220,8 +2220,8 @@ namespace Repulsor
 		      Tensor3<Real,Int> & P_hull_coords,
 		      Tensor2<Real,Int> & P_near,
 		      Tensor2<Real,Int> & P_far,
-		SparseMatrixCSR<Real,Int> & DiffOp,
-		SparseMatrixCSR<Real,Int> & AvOp 
+		SparseMatrixCSR<Real,Int,Int> & DiffOp,
+		SparseMatrixCSR<Real,Int,Int> & AvOp
 	) const
     {
         ptic(ClassName()+"::ComputeNearFarDataOps");
@@ -2869,8 +2869,8 @@ namespace Repulsor
 		      Tensor3<Real,Int> & P_hull_coords,
 		      Tensor2<Real,Int> & P_near,
 		      Tensor2<Real,Int> & P_far,
-		SparseMatrixCSR<Real,Int> & DiffOp,
-		SparseMatrixCSR<Real,Int> & AvOp 
+		SparseMatrixCSR<Real,Int,Int> & DiffOp,
+		SparseMatrixCSR<Real,Int,Int> & AvOp
 	) const
     {
         ptic(ClassName()+"::ComputeNearFarDataOps");
@@ -3705,8 +3705,8 @@ namespace Repulsor
 		      Tensor3<Real,Int> & P_hull_coords,
 		      Tensor2<Real,Int> & P_near,
 		      Tensor2<Real,Int> & P_far,
-		SparseMatrixCSR<Real,Int> & DiffOp,
-		SparseMatrixCSR<Real,Int> & AvOp 
+		SparseMatrixCSR<Real,Int,Int> & DiffOp,
+		SparseMatrixCSR<Real,Int,Int> & AvOp
 	) const
     {
         ptic(ClassName()+"::ComputeNearFarDataOps");

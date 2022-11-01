@@ -18,7 +18,7 @@ namespace Repulsor
         using Setting_T         = BlockClusterTreeSettings;
         
         using Near_T            = SparseBinaryMatrixVBSR<Int>;
-        using  Far_T            = SparseBinaryMatrixCSR <Int>;
+        using  Far_T            = SparseBinaryMatrixCSR <Int,Int>;
     
         using ClusterTreeBase_T = ClusterTreeBase<Real,Int,SReal,ExtReal>;
 
@@ -62,11 +62,11 @@ namespace Repulsor
         
         virtual Int PrimitiveIntersectionCount() const = 0;
         
-        virtual const SparseMatrixCSR<Int,Int> & PrimitiveIntersectionMatrix() const = 0;
+        virtual const SparseMatrixCSR<Int,Int,Int> & PrimitiveIntersectionMatrix() const = 0;
         
-        virtual const SparseMatrixCSR <Int,Int> & AdaptiveNoSubdivisionData() const = 0;
+        virtual const SparseMatrixCSR<Int,Int,Int> & AdaptiveNoSubdivisionData() const = 0;
         
-        virtual const SparseMatrixCSR <Int,Int> & AdaptiveSubdivisionData()   const = 0;
+        virtual const SparseMatrixCSR<Int,Int,Int> & AdaptiveSubdivisionData()   const = 0;
 
         virtual const Setting_T & Settings() const = 0;
         

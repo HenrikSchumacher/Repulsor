@@ -80,7 +80,7 @@ namespace Repulsor
         
         virtual const CollisionTreeBase_T & GetCollisionTree() const = 0;
                 
-        virtual const SparseBinaryMatrixCSR<Int> & DerivativeAssembler() const = 0;
+        virtual const SparseBinaryMatrixCSR<Int,Int> & DerivativeAssembler() const = 0;
         
         virtual void Assemble_ClusterTree_Derivatives(
             ExtReal * output,

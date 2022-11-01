@@ -105,8 +105,8 @@ namespace Repulsor
             const Tensor1<Int ,Int>  & P_ordering_,
             const Tensor2<Real,Int>  & P_near_, // data used actual interaction computation; assumed to be of size PrimitiveCount() x NearDim(). For a triangle mesh in 3D, we want to feed each triangles i), area ii) barycenter and iii) normal as a 1 + 3 + 3 = 7 vector
             const Tensor2<Real,Int>  & P_far_, // data used actual interaction computation; assumed to be of size PrimitiveCount() x FarDim(). For a triangle mesh in 3D, we want to feed each triangles i), area ii) barycenter and iii) orthoprojector onto normal space as a 1 + 3 + 6 = 10 vector
-            const SparseMatrixCSR<Real,Int> & DiffOp,
-            const SparseMatrixCSR<Real,Int> & AvOp,
+            const SparseMatrixCSR<Real,Int,Int> & DiffOp,
+            const SparseMatrixCSR<Real,Int,Int> & AvOp,
             const ClusterTreeSettings & settings_ = ClusterTreeSettings()
         )
         :   BASE(settings_)
@@ -742,12 +742,12 @@ namespace Repulsor
         {
             ptic(className()+"::ComputePrimitiveToClusterMatrix");
             
-            P_to_C = SparseBinaryMatrixCSR<Int>(
+            P_to_C = SparseBinaryMatrixCSR<Int,Int>(
                 ClusterCount(), PrimitiveCount(), PrimitiveCount(), ThreadCount() );
             
             P_to_C.Outer()[0] = 0;
             
-            C_to_P = SparseBinaryMatrixCSR<Int>(
+            C_to_P = SparseBinaryMatrixCSR<Int,Int>(
                 PrimitiveCount(), ClusterCount(), PrimitiveCount(), ThreadCount() );
             
             C_to_P.Outer()[PrimitiveCount()] = PrimitiveCount();
@@ -806,8 +806,8 @@ namespace Repulsor
 
         
         void ComputePrePost(
-            const SparseMatrixCSR<Real,Int> & DiffOp,
-            const SparseMatrixCSR<Real,Int> & AvOp
+            const SparseMatrixCSR<Real,Int,Int> & DiffOp,
+            const SparseMatrixCSR<Real,Int,Int> & AvOp
         )
         {
             if( !this->pre_post_initialized )
@@ -819,7 +819,7 @@ namespace Repulsor
                 
                 ptic("hi_pre");
                 
-                hi_pre = SparseMatrixCSR<Real,Int>(
+                hi_pre = SparseMatrixCSR<Real,Int,Int>(
                     DiffOp.RowCount(),
                     DiffOp.ColCount(),
                     DiffOp.NonzeroCount(),
@@ -866,7 +866,7 @@ namespace Repulsor
                 ptoc("hi_post");
                 
                 ptic("lo_pre");
-                lo_pre = SparseMatrixCSR<Real,Int>(
+                lo_pre = SparseMatrixCSR<Real,Int,Int>(
                     AvOp.RowCount(),
                     AvOp.ColCount(),
                     AvOp.NonzeroCount(),
@@ -918,8 +918,8 @@ namespace Repulsor
         } // ComputePrePost
         
         void ComputeMixedPrePost(
-            const SparseMatrixCSR<Real,Int> & DiffOp,
-            const SparseMatrixCSR<Real,Int> & AvOp
+            const SparseMatrixCSR<Real,Int,Int> & DiffOp,
+            const SparseMatrixCSR<Real,Int,Int> & AvOp
         )
         {
             // Assemble a matrix in which the rows of lo_pre and hi_pre are interleaved in the form
@@ -934,7 +934,7 @@ namespace Repulsor
                 
                 ptic("mixed_pre");
                 
-                mixed_pre = SparseMatrixCSR<Real,Int>(
+                mixed_pre = SparseMatrixCSR<Real,Int,Int>(
                     AvOp.RowCount() + DiffOp.RowCount(),
                     AvOp.ColCount(),
                     AvOp.NonzeroCount() + DiffOp.NonzeroCount(),

@@ -16,7 +16,7 @@ namespace Repulsor
         
         using ClusterTreeBase_T = ClusterTreeBase<Real,Int,SReal,ExtReal>;
         
-        using CollisionMatrix_T = SparseMatrixCSR<SReal,Int>;
+        using CollisionMatrix_T = SparseMatrixCSR<SReal,Int,Int>;
         
         CLASS () {}
         

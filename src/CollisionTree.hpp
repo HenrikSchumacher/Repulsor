@@ -279,7 +279,7 @@ namespace Repulsor
                 
                 if( is_symmetric )
                 {
-                    const SparseBinaryMatrixCSR<Int> & A = S.PrimitiveAdjacencyMatrix();
+                    const SparseBinaryMatrixCSR<Int,Int> & A = S.PrimitiveAdjacencyMatrix();
                     
                     for( Int b_i = b_i_begin; b_i < b_i_end; ++b_i )
                     {
@@ -855,7 +855,7 @@ namespace Repulsor
             const Tensor2<SReal,Int> & T_P_ser    = T.PrimitiveSerializedData();
             const Tensor2<SReal,Int> & T_P_v_ser  = T.PrimitiveVelocitiesSerializedData();
 
-            const SparseBinaryMatrixCSR<Int> & A = S.PrimitiveAdjacencyMatrix();
+            const SparseBinaryMatrixCSR<Int,Int> & A = S.PrimitiveAdjacencyMatrix();
             
             PrimitiveCollisionFinder_T C ( S.MovingPrimitivePrototype(), T.MovingPrimitivePrototype() );
             
@@ -1248,7 +1248,7 @@ namespace Repulsor
             const Tensor2<SReal,Int> & T_P_ser    = T.PrimitiveSerializedData();
             const Tensor2<SReal,Int> & T_P_v_ser  = T.PrimitiveVelocitiesSerializedData();
 
-            const SparseBinaryMatrixCSR<Int> & A = S.PrimitiveAdjacencyMatrix();
+            const SparseBinaryMatrixCSR<Int,Int> & A = S.PrimitiveAdjacencyMatrix();
             
             PrimitiveCollisionFinder_T C ( S.MovingPrimitivePrototype(), T.MovingPrimitivePrototype() );
             
