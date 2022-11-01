@@ -41,8 +41,8 @@ namespace Repulsor
             AMB_DIM+1, AMB_DIM+1, AMB_DIM, true,
             Real, Real, Real, Int, LInt,
             1,    1,                    // CAUTION: We use add-in instead of overwrite!
-                         true,
-            true, false, true, true,
+                         false,
+            true, false, false, true,
             true, false,
             true
         >;
@@ -51,8 +51,8 @@ namespace Repulsor
             AMB_DIM+1, AMB_DIM+1, AMB_DIM, true,
             Real, Real, Real, Int, LInt,
             1,    0,
-                         true,
-            true, false, true, true,
+                         false,
+            true, false, false, true,
             true, false,
             true
         >;
@@ -437,17 +437,14 @@ namespace Repulsor
         
         void VF_MultiplyMetric( const Int rhs_count ) const
         {
-            if constexpr ( metric_flag )
-            {
-                SparseKernelMatrixCSR<Kernel_Arrow_MulAdd_T> matrix ( bct.VeryNear() );
-                
-                matrix.Dot(
-                    metric_values["VF"].data(),
-                    one, T.PrimitiveInputBuffer().data(),
-                    one, S.PrimitiveOutputBuffer().data(),
-                    rhs_count
-                );
-            }
+            SparseKernelMatrixCSR<Kernel_Arrow_MulAdd_T> matrix ( bct.VeryNear() );
+            
+            matrix.Dot(
+                metric_values["VF"].data(),
+                one, T.PrimitiveInputBuffer().data(),
+                one, S.PrimitiveOutputBuffer().data(),
+                rhs_count
+            );
             
             if constexpr ( is_symmetric )
             {
@@ -467,17 +464,14 @@ namespace Repulsor
         
         void FF_MultiplyMetric( const Int rhs_count ) const
         {
-            if constexpr ( metric_flag )
-            {
-                SparseKernelMatrixCSR<Kernel_Arrow_Mul_T> matrix ( bct.Far() );
-                
-                matrix.Dot(
-                    metric_values["FF"].data(),
-                    one,  T.ClusterInputBuffer().data(),
-                    zero, S.ClusterOutputBuffer().data(),
-                    rhs_count
-               );
-            }
+            SparseKernelMatrixCSR<Kernel_Arrow_Mul_T> matrix ( bct.Far() );
+            
+            matrix.Dot(
+                metric_values["FF"].data(),
+                one,  T.ClusterInputBuffer().data(),
+                zero, S.ClusterOutputBuffer().data(),
+                rhs_count
+           );
             
             if constexpr ( is_symmetric )
             {

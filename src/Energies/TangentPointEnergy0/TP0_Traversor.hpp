@@ -429,17 +429,14 @@ namespace Repulsor
         
         void VF_MultiplyMetric( const Int rhs_count ) const
         {
-            if constexpr ( metric_flag )
-            {
-                SparseKernelMatrixCSR<Kernel_Block_MulAdd_T> matrix ( bct.VeryNear() );
-                
-                matrix.Dot(
-                    metric_values["VF"].data(),
-                    one, T.PrimitiveInputBuffer().data(),
-                    one, S.PrimitiveOutputBuffer().data(),
-                    rhs_count
-                );
-            }
+            SparseKernelMatrixCSR<Kernel_Block_MulAdd_T> matrix ( bct.VeryNear() );
+            
+            matrix.Dot(
+                metric_values["VF"].data(),
+                one, T.PrimitiveInputBuffer().data(),
+                one, S.PrimitiveOutputBuffer().data(),
+                rhs_count
+            );
             
             if constexpr ( is_symmetric )
             {
@@ -459,17 +456,14 @@ namespace Repulsor
         
         void FF_MultiplyMetric( const Int rhs_count ) const
         {
-            if constexpr ( metric_flag )
-            {
-                SparseKernelMatrixCSR<Kernel_Block_Mul_T> matrix ( bct.Far() );
-                
-                matrix.Dot(
-                    metric_values["FF"].data(),
-                    one,  T.ClusterInputBuffer().data(),
-                    zero, S.ClusterOutputBuffer().data(),
-                    rhs_count
-               );
-            }
+            SparseKernelMatrixCSR<Kernel_Block_Mul_T> matrix ( bct.Far() );
+            
+            matrix.Dot(
+                metric_values["FF"].data(),
+                one,  T.ClusterInputBuffer().data(),
+                zero, S.ClusterOutputBuffer().data(),
+                rhs_count
+           );
             
             if constexpr ( is_symmetric )
             {

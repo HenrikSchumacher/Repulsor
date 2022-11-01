@@ -5,9 +5,9 @@
     AMB_DIM_+1,AMB_DIM_+1,MAX_RHS_COUNT_,true,              \
     Scalar_, Scalar_in_, Scalar_out_, Int_, LInt_,          \
     alpha_flag, beta_flag,                                  \
-    x_RM, false, true, true,                                \
+    x_RM, false, false, false,                              \
     y_RM, false,                                            \
-    true                                                    \
+    false                                                   \
 >
 
 namespace Repulsor
@@ -122,9 +122,7 @@ namespace Repulsor
         {}
         
         virtual force_inline void end_row( const Int i_global ) override
-        {
-            // Multiply diagonal block
-        }
+        {}
         
     public:
         
