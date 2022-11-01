@@ -79,16 +79,13 @@ namespace Repulsor
         using BASE::tri_i;
         using BASE::tri_j;
         using BASE::lin_k;
-
-        using BASE::i_global;
-        using BASE::j_global;
-        using BASE::k_global;
         
         using BASE::metric_data;
         
         using BASE::loadS;
         using BASE::loadT;
         using BASE::compute;
+        using BASE::writeBlock;
         using BASE::writeT;
         using BASE::writeS;
         
@@ -146,9 +143,8 @@ namespace Repulsor
 
     public:
         
-        virtual void LoadS( const Int i_global_ ) override
+        virtual void LoadS( const Int i_global ) override
         {
-            i_global = i_global_;
             const Real * const restrict X = &S_data[S_DATA_DIM * i_global];
 
             a = X[0];
@@ -165,12 +161,11 @@ namespace Repulsor
                 zerofy_buffer( &DX[0], S_DATA_DIM );
             }
             
-            loadS();
+            loadS( i_global );
         }
         
-        virtual void LoadT( const Int j_global_ ) override
+        virtual void LoadT( const Int j_global ) override
         {
-            j_global = j_global_;
             const Real * const restrict Y = &T_data[T_DATA_DIM * j_global];
             
             b = Y[0];
@@ -186,7 +181,7 @@ namespace Repulsor
                 zerofy_buffer( &DY[0], T_DATA_DIM );
             }
             
-            loadT();
+            loadT( j_global );
         }
         
         virtual void Prefetch( const Int j_next ) const override
@@ -199,13 +194,16 @@ namespace Repulsor
             }
         }
         
-        virtual force_inline Real Compute( const Int k_global_ ) override
+        virtual force_inline Real Compute( const Int k_global ) override
         {
-            k_global = k_global_;
-            return symmetry_factor * compute();
+            const Real result = symmetry_factor * compute( k_global );
+            
+            writeBlock( k_global );
+            
+            return result;
         }
             
-        virtual void WriteS() override
+        virtual void WriteS( const Int i_global ) override
         {
             if constexpr ( diff_flag )
             {
@@ -217,10 +215,10 @@ namespace Repulsor
                 }
             }
             
-            writeS();
+            writeS( i_global );
         }
         
-        virtual force_inline void WriteT() override
+        virtual force_inline void WriteT( const Int j_global ) override
         {
             if constexpr (diff_flag )
             {
@@ -232,7 +230,7 @@ namespace Repulsor
                 }
             }
             
-            writeT();
+            writeT( j_global );
         }
         
     protected:

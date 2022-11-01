@@ -101,10 +101,6 @@ namespace Repulsor
 
         using BASE::bct;
         
-        using BASE::i_global;
-        using BASE::j_global;
-        using BASE::k_global;
-        
         using BASE::tri_i;
         using BASE::tri_j;
         using BASE::lin_k;
@@ -141,6 +137,7 @@ namespace Repulsor
         using BASE::loadS;
         using BASE::loadT;
         using BASE::compute;
+        using BASE::writeBlock;
         using BASE::writeT;
         using BASE::writeS;
         
@@ -210,9 +207,8 @@ namespace Repulsor
 
     public:
         
-        virtual void LoadS( const Int i_global_ ) override
+        virtual void LoadS( const Int i_global ) override
         {
-            i_global = i_global_;
             const Real * const X  = &S_data[S_DATA_DIM * i_global];
     
             S_Tree.RequireSimplex(S_ser, i_global);
@@ -231,12 +227,11 @@ namespace Repulsor
                 zerofy_buffer( &DX[0], S_DATA_DIM );
             }
             
-            loadS();
+            loadS( i_global );
         }
         
-        virtual void LoadT( const Int j_global_ ) override
+        virtual void LoadT( const Int j_global ) override
         {
-            j_global = j_global_;
             const Real * const Y  = &T_data[T_DATA_DIM * j_global];
     
             T_Tree.RequireSimplex(T_ser, j_global);
@@ -255,7 +250,7 @@ namespace Repulsor
                 zerofy_buffer( &DY[0], T_DATA_DIM );
             }
             
-            loadT();
+            loadT( j_global );
         }
         
         virtual void Prefetch( const Int j ) const override
@@ -270,10 +265,8 @@ namespace Repulsor
             }
         }
         
-        virtual force_inline Real Compute( const Int k_global_ ) override
+        virtual force_inline Real Compute( const Int k_global ) override
         {
-            k_global = k_global_;
-            
             Real sum = static_cast<Real>(0);
             
             ++primitive_count;
@@ -294,7 +287,7 @@ namespace Repulsor
                         max_level_reached = max_level;
                         block_count++;
                         bottom_count++;
-                        sum += compute();
+                        sum += compute( k_global );
                         S_Tree.ToParent();
                         T_Tree.ToParent();
                         from_above = false;
@@ -312,7 +305,7 @@ namespace Repulsor
                             // We compute energy, go to parent, and prepare the next child of the parent.
                             max_level_reached = std::max( max_level_reached, S_Tree.Level() );
                             block_count++;
-                            sum += compute();
+                            sum += compute( k_global );
                             S_Tree.ToParent();
                             T_Tree.ToParent();
                             from_above = false;
@@ -373,10 +366,12 @@ namespace Repulsor
 
             total_sum += symmetry_factor * sum;
             
+            writeBlock( k_global );
+            
             return symmetry_factor * sum;
         }
         
-        virtual void WriteS() override
+        virtual void WriteS( const Int i_global ) override
         {
             if constexpr (diff_flag )
             {
@@ -388,10 +383,10 @@ namespace Repulsor
                 }
             }
             
-            writeS();
+            writeS( i_global );
         }
         
-        virtual void WriteT() override
+        virtual void WriteT( const Int j_global ) override
         {
             if constexpr (diff_flag )
             {
@@ -403,7 +398,7 @@ namespace Repulsor
                 }
             }
             
-            writeT();
+            writeT( j_global );
         }
         
     protected:

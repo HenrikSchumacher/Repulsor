@@ -259,10 +259,10 @@ namespace Repulsor
                     matrix.FillLowerTriangleFromUpperTriangle( metric_values["VF"].data() );
                 }
                 
-//                ptic("Reduce VF_Accumulators");
-//                // We overwrite diag_values here so that we do not have to zerofy it first.
-//                S.VF_Accumulator().AddReduce( metric_values["VF_diag"], false );
-//                ptoc("Reduce VF_Accumulators");
+                ptic("Reduce VF_Accumulators");
+                // We overwrite diag_values here so that we do not have to zerofy it first.
+                S.VF_Accumulator().AddReduce( metric_values["VF_diag"], false );
+                ptoc("Reduce VF_Accumulators");
             }
             
             ptoc(ClassName()+"::VF_Compute");

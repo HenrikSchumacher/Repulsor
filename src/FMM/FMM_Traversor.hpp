@@ -123,7 +123,7 @@ namespace Repulsor
                                 
                                 local_sum += ker.Compute(k);
                                 
-                                ker.WriteT();
+                                ker.WriteT(j);
                             }
                             
                             // Perform last calculation in row without prefetch.
@@ -136,12 +136,12 @@ namespace Repulsor
                                 
                                 local_sum += ker.Compute(k);
                                 
-                                ker.WriteT();
+                                ker.WriteT(j);
                             }
                             
                             // Incorporate the kernel's local vector chunk into the i-th chunk if the output Y.
                             
-                            ker.WriteS();
+                            ker.WriteS(i);
                         }
                         
                         // Incoporate the local vector chunk into the i-th chunk of the output.
@@ -192,7 +192,7 @@ namespace Repulsor
                                 
                                 local_sum += ker.Compute(k);
                                 
-                                ker.WriteT();
+                                ker.WriteT(j);
                             }
                             
                             // Perform last calculation in row without prefetch.
@@ -205,12 +205,12 @@ namespace Repulsor
                                 
                                 local_sum += ker.Compute(k);
                                 
-                                ker.WriteT();
+                                ker.WriteT(j);
                             }
                             
                             // Incorporate the kernel's local vector chunk into the i-th chunk if the output Y.
                             
-                            ker.WriteS();
+                            ker.WriteS(i);
                         }
                         
                         // Incoporate the local vector chunk into the i-th chunk of the output.

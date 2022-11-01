@@ -106,10 +106,6 @@ namespace Repulsor
         using BASE::y;
         using BASE::Q;
         
-        using BASE::i_global;
-        using BASE::j_global;
-        using BASE::k_global;
-        
         using BASE::tri_i;
         using BASE::tri_j;
         using BASE::lin_k;
@@ -132,7 +128,7 @@ namespace Repulsor
         
     protected:
         
-        virtual Real compute() override
+        virtual Real compute( const Int k_global ) override
         {
             Real v    [AMB_DIM ] = {};
             Real Pv   [AMB_DIM ] = {};
@@ -273,45 +269,48 @@ namespace Repulsor
                     
                     const Real K_sym = K_xy + K_yx;
                     
+                    const Real b_over_a   = b/a;
+                    const Real a_over_b   = a/b;
+                    
+                    const Real b_over_a_K_xy = b_over_a * K_xy;
+                    const Real a_over_b_K_yx = a_over_b * K_yx;
+                    
                     ij_block[0]     = - K_sym;
-                    ii_block[0][0] +=   K_sym;
-                    jj_block[0][0]  =   K_sym;
+                    ii_block[0][0] +=   b_over_a * K_sym;
+                    jj_block[0][0]  =   a_over_b * K_sym;
                     
                     for( Int i = 1; i < COLS; ++i )
                     {
-                        const Real K_xy_v = K_xy * v[i-1];
-                        const Real K_yx_v = K_yx * v[i-1];
-                        
-                        ij_block[i]         =   K_yx_v;
-                        ij_block[AMB_DIM+i] = - K_xy_v;
+                        ij_block[i]         =   K_yx * v[i-1];
+                        ij_block[AMB_DIM+i] = - K_xy * v[i-1];
                         
                         // store only upper triangle
-                        ii_block[0][i] +=   K_xy_v;
-                        jj_block[0][i]  = - K_yx_v;
+                        ii_block[0][i] +=   b_over_a_K_xy * v[i-1];
+                        jj_block[0][i]  = - a_over_b_K_yx * v[i-1];
                         
                         // store also lower triangle
-                        ii_block[i][0] +=   K_xy_v;
-                        jj_block[i][0]  = - K_yx_v;
+                        ii_block[i][0] +=   b_over_a_K_xy * v[i-1];
+                        jj_block[i][0]  = - a_over_b_K_yx * v[i-1];
                     }
                     
                     for( Int i = 1; i < ROWS; ++i )
                     {
                         {
                             const Real vv = v[i-1] * v[i-1];
-                            ii_block[i][i] += K_xy * vv;
-                            jj_block[i][i]  = K_yx * vv;
+                            ii_block[i][i] += b_over_a_K_xy * vv;
+                            jj_block[i][i]  = a_over_b_K_yx * vv;
                         }
                         for( Int j = i+1; j < COLS; ++j )
                         {
                             const Real vv = v[i-1] * v[j-1];
                             
                             // store only upper triangle
-                            ii_block[i][j] += K_xy * vv;
-                            jj_block[i][j]  = K_yx * vv;
+                            ii_block[i][j] += b_over_a_K_xy * vv;
+                            jj_block[i][j]  = a_over_b_K_yx * vv;
                             
                             // store also lower triangle
-                            ii_block[j][i] += K_xy * vv;
-                            jj_block[j][i]  = K_yx * vv;
+                            ii_block[j][i] += b_over_a_K_xy * vv;
+                            jj_block[j][i]  = a_over_b_K_yx * vv;
                         }
                     }
                 }
@@ -327,7 +326,7 @@ namespace Repulsor
             }
         }
         
-        virtual void loadS() override
+        virtual void loadS( const Int i_global ) override
         {
             if constexpr ( metric_flag )
             {
@@ -335,15 +334,15 @@ namespace Repulsor
             }
         }
         
-        virtual void writeS() override
+        virtual void writeS( const Int i_global ) override
         {
             if constexpr ( metric_flag )
             {
-                copy_buffer( &ii_block[0][0], &S_diag[DIAG_NNZ * i_global], DIAG_NNZ );
+                add_to_buffer<DIAG_NNZ>( &ii_block[0][0], &S_diag[DIAG_NNZ * i_global] );
             }
         }
         
-        virtual void loadT() override
+        virtual void loadT( const Int j_global ) override
         {
             if constexpr ( metric_flag )
             {
@@ -354,13 +353,19 @@ namespace Repulsor
 //                zerofy_buffer( &jj_block[0][0], DIAG_NNZ );
             }
         }
-        
-        virtual void writeT() override
+
+        virtual void writeBlock( const Int k_global ) override
         {
             if constexpr ( metric_flag )
             {
                 copy_buffer( &ij_block[0], &metric_data[BLOCK_NNZ * k_global], BLOCK_NNZ );
-                
+            }
+        }
+        
+        virtual void writeT( const Int j_global ) override
+        {
+            if constexpr ( metric_flag )
+            {
                 add_to_buffer<DIAG_NNZ>( &jj_block[0][0], &T_diag[DIAG_NNZ * j_global] );
             }
         }

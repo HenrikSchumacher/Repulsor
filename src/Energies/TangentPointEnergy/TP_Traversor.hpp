@@ -37,7 +37,7 @@ namespace Repulsor
         
         using Configurator_T    = FMM_Configurator<BlockClusterTree_T>;
 
-        using Kernel_MultiplyAdd_T = ArrowheadBlockKernel_fixed<
+        using Kernel_Arrow_MulAdd_T = ArrowheadBlockKernel_fixed<
             AMB_DIM+1, AMB_DIM+1, AMB_DIM, true,
             Real, Real, Real, Int, LInt,
             1,    1,                    // CAUTION: We use add-in instead of overwrite!
@@ -47,7 +47,7 @@ namespace Repulsor
             true
         >;
         
-        using Kernel_Arrow_Multiply_T = ArrowheadBlockKernel_fixed<
+        using Kernel_Arrow_Mul_T = ArrowheadBlockKernel_fixed<
             AMB_DIM+1, AMB_DIM+1, AMB_DIM, true,
             Real, Real, Real, Int, LInt,
             1,    0,
@@ -57,7 +57,7 @@ namespace Repulsor
             true
         >;
         
-        using Kernel_Diag_MultiplyAdd_T = DenseBlockKernel_fixed<
+        using Kernel_Diag_MulAdd_T = DenseBlockKernel_fixed<
             AMB_DIM+1, AMB_DIM+1, AMB_DIM, true,
             Real, Real, Real, Int, LInt,
             1,    1,
@@ -68,9 +68,9 @@ namespace Repulsor
             true
         >;
     
-        static constexpr Int VF_blk_size =    Kernel_MultiplyAdd_T::ROWS *    Kernel_MultiplyAdd_T::COLS;
-        static constexpr Int NF_blk_size = Kernel_Arrow_Multiply_T::ROWS * Kernel_Arrow_Multiply_T::COLS;
-        static constexpr Int FF_blk_size = Kernel_Arrow_Multiply_T::ROWS * Kernel_Arrow_Multiply_T::COLS;
+        static constexpr Int VF_blk_size = Kernel_Arrow_MulAdd_T::ROWS * Kernel_Arrow_MulAdd_T::COLS;
+        static constexpr Int NF_blk_size =    Kernel_Arrow_Mul_T::ROWS *    Kernel_Arrow_Mul_T::COLS;
+        static constexpr Int FF_blk_size =    Kernel_Arrow_Mul_T::ROWS *    Kernel_Arrow_Mul_T::COLS;
         
     protected:
         
@@ -249,8 +249,9 @@ namespace Repulsor
             ptic(ClassName()+"::VF_Compute");
             
             const Pattern_T & pattern = bct.VeryNear();
+                  Values_T  & values  = metric_values["VF"];
             
-            Configurator_T conf ( bct, metric_values["VF"] );
+            Configurator_T conf ( bct, values );
             
             using Kernel_T = TP_Kernel_VF<
                 S_DOM_DIM, T_DOM_DIM,
@@ -268,13 +269,13 @@ namespace Repulsor
             {
                 if constexpr ( is_symmetric )
                 {
-                    SparseKernelMatrixCSR<Kernel_Arrow_Multiply_T> matrix ( pattern );
+                    SparseKernelMatrixCSR<Kernel_Arrow_Mul_T> matrix ( pattern );
                     
-                    matrix.FillLowerTriangleFromUpperTriangle( metric_values["VF"].data() );
+                    matrix.FillLowerTriangleFromUpperTriangle( values.data() );
                 }
                 
                 ptic("Reduce VF_Accumulators");
-                metric_values["VF_diag"] = S.VF_Accumulator().template AddReduce<LInt>();
+                metric_values["VF_diag"] = S.VF_Accumulator().template AddReduce<Real,LInt>();
                 ptoc("Reduce VF_Accumulators");
             }
             
@@ -288,8 +289,9 @@ namespace Repulsor
             ptic(ClassName()+"::NF_Compute");
 
             const Pattern_T & pattern = bct.Near();
-
-            Configurator_T conf ( bct, metric_values["NF"] );
+                  Values_T  & values  = metric_values["NF"];
+            
+            Configurator_T conf ( bct, values );
 
             using Kernel_T = TP_Kernel_NF<
                 S_DOM_DIM, T_DOM_DIM,
@@ -308,13 +310,13 @@ namespace Repulsor
             {
                 if constexpr ( is_symmetric )
                 {
-                    SparseKernelMatrixCSR<Kernel_Arrow_Multiply_T> matrix ( pattern );
+                    SparseKernelMatrixCSR<Kernel_Arrow_Mul_T> matrix ( pattern );
                     
-                    matrix.FillLowerTriangleFromUpperTriangle( metric_values["NF"].data() );
+                    matrix.FillLowerTriangleFromUpperTriangle( values.data() );
                 }
 
                 ptic("Reduce NF_Accumulators");
-                metric_values["NF_diag"] = S.NF_Accumulator().template AddReduce<LInt>();
+                metric_values["NF_diag"] = S.NF_Accumulator().template AddReduce<Real,LInt>();
                 ptoc("Reduce NF_Accumulators");
             }
 
@@ -328,8 +330,9 @@ namespace Repulsor
             ptic(ClassName()+"::FF_Compute");
             
             const Pattern_T & pattern = bct.Far();
+                  Values_T  & values  = metric_values["FF"];
             
-            Configurator_T conf ( bct, metric_values["FF"] );
+            Configurator_T conf ( bct, values );
             
             using Kernel_T = TP_Kernel_FF<
                 BlockClusterTree_T, T1, T2,
@@ -347,13 +350,13 @@ namespace Repulsor
             {
                 if constexpr ( is_symmetric )
                 {
-                    SparseKernelMatrixCSR<Kernel_Arrow_Multiply_T> matrix ( pattern );
+                    SparseKernelMatrixCSR<Kernel_Arrow_Mul_T> matrix ( pattern );
                     
-                    matrix.FillLowerTriangleFromUpperTriangle( metric_values["FF"].data() );
+                    matrix.FillLowerTriangleFromUpperTriangle( values.data() );
                 }
                 
                 ptic("Reduce FF_Accumulators");
-                metric_values["FF_diag"] = S.FF_Accumulator().template AddReduce<LInt>();
+                metric_values["FF_diag"] = S.FF_Accumulator().template AddReduce<Real,LInt>();
                 ptoc("Reduce FF_Accumulators");
             }
             
@@ -366,16 +369,19 @@ namespace Repulsor
         
     public:
         
-        void MultiplyMetric(const bool VF_flag, const bool NF_flag, const bool FF_flag ) const
+        void MultiplyMetric(
+            const bool VF_flag = true,
+            const bool NF_flag = true,
+            const bool FF_flag = true
+        ) const
         {
             if constexpr ( metric_flag )
             {
-                const Int rhs_count = S.BufferDimension() / Kernel_Arrow_Multiply_T::ROWS;
+                const Int rhs_count = S.BufferDimension() / Kernel_Arrow_Mul_T::ROWS;
                 
                 if( NF_flag )
                 {
                     NF_MultiplyMetric(rhs_count);
-                    // TODO: Apply diagonal
                 }
                 else
                 {
@@ -385,14 +391,12 @@ namespace Repulsor
                 if( VF_flag )
                 {
                     VF_MultiplyMetric(rhs_count);
-                    // TODO: Apply diagonal
                 }
                 
                 
                 if( FF_flag )
                 {
                     FF_MultiplyMetric(rhs_count);
-                    // TODO: Apply diagonal
                 }
                 else
                 {
@@ -409,7 +413,7 @@ namespace Repulsor
 
         void NF_MultiplyMetric( const Int rhs_count ) const
         {
-            SparseKernelMatrixCSR<Kernel_Arrow_Multiply_T> matrix ( bct.Near() );
+            SparseKernelMatrixCSR<Kernel_Arrow_Mul_T> matrix ( bct.Near() );
             
             matrix.Dot(
                 metric_values["NF"].data(),
@@ -420,11 +424,11 @@ namespace Repulsor
             
             if constexpr ( is_symmetric )
             {
-                DiagonalKernelMatrix<Kernel_Diag_MultiplyAdd_T> diag (
+                DiagonalKernelMatrix<Kernel_Diag_MulAdd_T> diag (
                     bct.Near().RowCount(),
                     bct.Near().ThreadCount()
                 );
-                
+
                 diag.Dot(
                     metric_values["NF_diag"].data(),
                     one, T.PrimitiveInputBuffer().data(),
@@ -439,7 +443,7 @@ namespace Repulsor
         {
             if constexpr ( metric_flag )
             {
-                SparseKernelMatrixCSR<Kernel_MultiplyAdd_T> matrix ( bct.VeryNear() );
+                SparseKernelMatrixCSR<Kernel_Arrow_MulAdd_T> matrix ( bct.VeryNear() );
                 
                 matrix.Dot(
                     metric_values["VF"].data(),
@@ -451,11 +455,11 @@ namespace Repulsor
             
             if constexpr ( is_symmetric )
             {
-                DiagonalKernelMatrix<Kernel_Diag_MultiplyAdd_T> diag (
+                DiagonalKernelMatrix<Kernel_Diag_MulAdd_T> diag (
                     bct.VeryNear().RowCount(),
                     bct.VeryNear().ThreadCount()
                 );
-                
+
                 diag.Dot(
                     metric_values["VF_diag"].data(),
                     one, T.PrimitiveInputBuffer().data(),
@@ -469,7 +473,7 @@ namespace Repulsor
         {
             if constexpr ( metric_flag )
             {
-                SparseKernelMatrixCSR<Kernel_Arrow_Multiply_T> matrix ( bct.Far() );
+                SparseKernelMatrixCSR<Kernel_Arrow_Mul_T> matrix ( bct.Far() );
                 
                 matrix.Dot(
                     metric_values["FF"].data(),
@@ -481,7 +485,7 @@ namespace Repulsor
             
             if constexpr ( is_symmetric )
             {
-                DiagonalKernelMatrix<Kernel_Diag_MultiplyAdd_T> diag (
+                DiagonalKernelMatrix<Kernel_Diag_MulAdd_T> diag (
                     bct.Far().RowCount(),
                     bct.Far().ThreadCount()
                 );

@@ -118,29 +118,30 @@ namespace Repulsor
             return bct.GetT();
         }
         
-        virtual void LoadS( const Int i_global_ ) = 0;
+        virtual void LoadS( const Int i_global ) = 0;
         
-        virtual void LoadT( const Int j_global_ ) = 0;
+        virtual void LoadT( const Int j_global ) = 0;
         
-        virtual void Prefetch( const Int j_next_ ) const = 0;
+        virtual void Prefetch( const Int j_next ) const = 0;
                                                        
-        virtual Real Compute( const Int k_global_ ) = 0;
+        virtual Real Compute( const Int k_global ) = 0;
         
-        virtual void WriteS() = 0;
+        virtual void WriteS( const Int i_global ) = 0;
         
-        virtual void WriteT() = 0;
+        virtual void WriteT( const Int j_global ) = 0;
 
         
-        virtual Real compute() = 0;
+        virtual Real compute( const Int k_global ) = 0;
         
-        virtual void loadS() = 0;
+        virtual void loadS( const Int i_global ) = 0;
         
-        virtual void writeS() = 0;
+        virtual void writeS( const Int i_global ) = 0;
         
-        virtual void loadT() = 0;
+        virtual void loadT( const Int j_global ) = 0;
         
-        virtual void writeT() = 0;
+        virtual void writeT( const Int j_global ) = 0;
         
+        virtual void writeBlock( const Int k_global ) = 0;
         
         void Allocate( const LInt nnz )
         {
@@ -181,10 +182,6 @@ namespace Repulsor
         Values_T & metric_values;
         
         Real * restrict const metric_data = nullptr;
-        
-        Int i_global = -1;
-        Int j_global = -1;
-        Int k_global = -1;
         
     public:
         

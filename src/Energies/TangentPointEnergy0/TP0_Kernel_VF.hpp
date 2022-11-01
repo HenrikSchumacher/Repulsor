@@ -342,7 +342,7 @@ namespace Repulsor
         {
             if constexpr ( metric_flag )
             {
-                copy_buffer( &ii_block[0], &S_diag[DIAG_NNZ * i_global], DIAG_NNZ );
+                add_to_buffer<DIAG_NNZ>( &ii_block[0], &S_diag[DIAG_NNZ * i_global] );
             }
         }
         

@@ -69,7 +69,10 @@ namespace Repulsor
             const ExtReal * restrict const X,
             const ExtReal                  beta,
                   ExtReal * restrict const Y,
-            const Int                      rhs_count
+            const Int                      rhs_count,
+            const bool VF_flag = true,
+            const bool NF_flag = true,
+            const bool FF_flag = true
         ) const
         {
             ptic(ClassName()+"::MultiplyMetric");
@@ -80,7 +83,7 @@ namespace Repulsor
             
             S.RequireBuffers( T.BufferDimension() ); // Tell the S-side what it has to expect.
             
-            multiply_metric(M,true,true,true);
+            multiply_metric( M,VF_flag, NF_flag, FF_flag );
 
             S.Post( Y, alpha, beta, KernelType::MixedOrder );
             
@@ -93,10 +96,13 @@ namespace Repulsor
             const ExtReal alpha,
             const TangentVector_T & X,
             const ExtReal beta,
-                  CotangentVector_T & Y
+                  CotangentVector_T & Y,
+            const bool VF_flag = true,
+            const bool NF_flag = true,
+            const bool FF_flag = true
         ) const
         {
-            MultiplyMetric( M, alpha, X.data(), beta, Y.data(), X.Dimension(1) );
+            MultiplyMetric( M, alpha, X.data(), beta, Y.data(), X.Dimension(1), VF_flag, NF_flag, FF_flag );
         }
         
 //    protected:
