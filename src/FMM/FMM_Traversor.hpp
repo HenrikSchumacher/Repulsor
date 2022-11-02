@@ -53,7 +53,7 @@ namespace Repulsor
         
     public:
 
-        Real Compute()
+        __attribute__((flatten)) Real Compute()
         {
             ptic(ClassName()+"::Compute");
             

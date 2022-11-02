@@ -125,20 +125,13 @@ namespace Repulsor
         mutable Int primitive_count = 0;
         mutable Real total_sum = static_cast<Real>(0);
 
-#ifdef REPULSOR__PRINT_REPORTS_FOR_ADAPTIVE_KERNELS
-        mutable std::ofstream logfile;
-        mutable std::ofstream simplex_file;
-        mutable std::ofstream center_file;
-        mutable std::ofstream emb_simplex_file;
-        mutable std::ofstream emb_center_file;
-#endif
-        
-        using BASE::loadS;
-        using BASE::loadT;
-        using BASE::compute;
-        using BASE::writeBlock;
-        using BASE::writeT;
-        using BASE::writeS;
+//#ifdef REPULSOR__PRINT_REPORTS_FOR_ADAPTIVE_KERNELS
+//        mutable std::ofstream logfile;
+//        mutable std::ofstream simplex_file;
+//        mutable std::ofstream center_file;
+//        mutable std::ofstream emb_simplex_file;
+//        mutable std::ofstream emb_center_file;
+//#endif
         
     public:
         
@@ -160,12 +153,12 @@ namespace Repulsor
         {
             if( GetS().PrimitiveSerialized().Dimension(1) != S_Tree.SimplexPrototype().Size() )
             {
-                eprint(className()+" Constructor: GetS().PrimitiveSerialized().Dimension(1) != S_Tree.SimplexPrototype().Size()");
+                eprint(ClassName()+" Constructor: GetS().PrimitiveSerialized().Dimension(1) != S_Tree.SimplexPrototype().Size()");
             }
             
             if( GetT().PrimitiveSerialized().Dimension(1) != T_Tree.SimplexPrototype().Size() )
             {
-                eprint(className()+" Constructor: GetT().PrimitiveSerialized().Dimension(1) != T_Tree.SimplexPrototype().Size()");
+                eprint(ClassName()+" Constructor: GetT().PrimitiveSerialized().Dimension(1) != T_Tree.SimplexPrototype().Size()");
             }
         }
         
@@ -184,29 +177,43 @@ namespace Repulsor
         ,   max_level   ( other.max_level                                                         )
         {}
         
-        virtual ~CLASS() override
+        ~CLASS()
         {
-#ifdef REPULSOR__PRINT_REPORTS_FOR_ADAPTIVE_KERNELS
-            logfile
-            << "\n"
-            << "Report for class                    = " << ClassName() << "\n"
-            << "Thread ID                           = " << omp_get_thread_num() << "\n"
-            << "Number of primitive pairs processed = " << primitive_count << "\n"
-            << "Total energy accumulated            = " << total_sum << "\n"
-            << "Number of quadrature points         = " << block_count << "\n"
-            << "Subdivision level reached           = " << max_level_reached << "\n"
-            ;
-            if( bottom_count > 0 )
-            {
-                logfile << "WARNING: Maximal subdivision level = "+ToString(max_level)+" reached "+ToString(bottom_count)+" times. Expect non-sufficent repulsive behavior. Consider refining the mesh.";
-            }
-            logfile << std::endl;
-#endif
+//#ifdef REPULSOR__PRINT_REPORTS_FOR_ADAPTIVE_KERNELS
+//            logfile
+//            << "\n"
+//            << "Report for class                    = " << ClassName() << "\n"
+//            << "Thread ID                           = " << omp_get_thread_num() << "\n"
+//            << "Number of primitive pairs processed = " << primitive_count << "\n"
+//            << "Total energy accumulated            = " << total_sum << "\n"
+//            << "Number of quadrature points         = " << block_count << "\n"
+//            << "Subdivision level reached           = " << max_level_reached << "\n"
+//            ;
+//            if( bottom_count > 0 )
+//            {
+//                logfile << "WARNING: Maximal subdivision level = "+ToString(max_level)+" reached "+ToString(bottom_count)+" times. Expect non-sufficent repulsive behavior. Consider refining the mesh.";
+//            }
+//            logfile << std::endl;
+//#endif
         };
 
     public:
         
-        virtual void LoadS( const Int i_global ) override
+        force_inline void Prefetch( const Int j ) const
+        {
+            prefetch_range<T_DATA_DIM,0,0>( &T_data[T_DATA_DIM * j] );
+            
+            prefetch_range<T_Tree_T::SIZE,0,0>( &T_ser[T_Tree_T::SIZE * j] );
+            
+            if constexpr ( diff_flag )
+            {
+                prefetch_range<T_DATA_DIM,1,0>( &T_D_data[T_DATA_DIM * j] );
+            }
+        }
+        
+    protected:
+
+        force_inline void loadS( const Int i_global )
         {
             const Real * const X  = &S_data[S_DATA_DIM * i_global];
     
@@ -225,11 +232,9 @@ namespace Repulsor
             {
                 zerofy_buffer( &DX[0], S_DATA_DIM );
             }
-            
-            loadS( i_global );
         }
         
-        virtual void LoadT( const Int j_global ) override
+        force_inline void loadT( const Int j_global )
         {
             const Real * const Y  = &T_data[T_DATA_DIM * j_global];
     
@@ -248,129 +253,10 @@ namespace Repulsor
             {
                 zerofy_buffer( &DY[0], T_DATA_DIM );
             }
-            
-            loadT( j_global );
         }
         
-        virtual void Prefetch( const Int j ) const override
-        {
-            prefetch_range<T_DATA_DIM,0,0>( &T_data[T_DATA_DIM * j] );
-            
-            prefetch_range<T_Tree_T::SIZE,0,0>( &T_ser[T_Tree_T::SIZE * j] );
-            
-            if constexpr ( diff_flag )
-            {
-                prefetch_range<T_DATA_DIM,1,0>( &T_D_data[T_DATA_DIM * j] );
-            }
-        }
         
-        virtual force_inline Real Compute( const Int k_global ) override
-        {
-            Real sum = static_cast<Real>(0);
-            
-            ++primitive_count;
-            
-            bool from_above = true;
-            bool shall_continue = true;
-            
-            S_Tree.ToChild(0);
-            T_Tree.ToChild(0);
-        
-            while( shall_continue )
-            {
-                if( from_above )
-                {
-                    if( S_Tree.Level() >= max_level )
-                    {
-                        // If at lowest level and inadmissable then we just compute the energy and move up.
-                        max_level_reached = max_level;
-                        block_count++;
-                        bottom_count++;
-                        sum += compute( k_global );
-                        S_Tree.ToParent();
-                        T_Tree.ToParent();
-                        from_above = false;
-                    }
-                    else
-                    {
-                        // If not at lowest level, then we have to check for admissability.
-                        auto & P = S_Tree.SimplexPrototype();
-                        auto & Q = T_Tree.SimplexPrototype();
-                        
-                        const bool admissable = gjk.MultipoleAcceptanceCriterion(P, Q, theta2);
-                        
-                        if( admissable )
-                        {
-                            // We compute energy, go to parent, and prepare the next child of the parent.
-                            max_level_reached = std::max( max_level_reached, S_Tree.Level() );
-                            block_count++;
-                            sum += compute( k_global );
-                            S_Tree.ToParent();
-                            T_Tree.ToParent();
-                            from_above = false;
-                        }
-                        else
-                        {
-                            // If inadmissable, we go a level deeper.
-   
-                            S_Tree.ToChild(0);
-                            T_Tree.ToChild(0);
-                            from_above = true;
-                        }
-                    }
-                }
-                else
-                {
-                    // If we come from below, we have to find the next pair of simplices to visit.
-                    
-                    Int S_k = S_Tree.FormerChildID();
-                    Int T_k = T_Tree.FormerChildID();
-                    
-//                    print("Coming from "+ToString(S_k)+"-th child of S and "+ToString(T_k)+"-th child of T.");
-                    
-                    if( T_k < T_Tree.ChildCount()-1 )
-                    {
-                        S_Tree.ToChild(S_k);
-                        T_Tree.ToChild(T_k+1);
-                        from_above = true;
-                    }
-                    else
-                    {
-                        if( S_k < S_Tree.ChildCount()-1 )
-                        {
-                            S_Tree.ToChild(S_k+1);
-                            T_Tree.ToChild(0);
-                            from_above = true;
-                        }
-                        else
-                        {
-                            // No further unvisited children. Either move up or break.
-                            if( S_Tree.Level() == 0 )
-                            {
-                                shall_continue = false;
-                                from_above = true;
-                            }
-                            else
-                            {
-                                S_Tree.ToParent();
-                                T_Tree.ToParent();
-                                from_above = false;
-                            }
-                        }
-                    }
-                    
-                } // if( from_above )
-                
-            } // while( shall_continue )
-
-            total_sum += symmetry_factor * sum;
-            
-            writeBlock( k_global );
-            
-            return symmetry_factor * sum;
-        }
-        
-        virtual void WriteS( const Int i_global ) override
+        force_inline void writeS( const Int i_global )
         {
             if constexpr (diff_flag )
             {
@@ -381,11 +267,9 @@ namespace Repulsor
                     to[k] += symmetry_factor * DX[k];
                 }
             }
-            
-            writeS( i_global );
         }
         
-        virtual void WriteT( const Int j_global ) override
+        force_inline  void writeT( const Int j_global )
         {
             if constexpr (diff_flag )
             {
@@ -396,59 +280,46 @@ namespace Repulsor
                     to[k] += symmetry_factor * DY[k];
                 }
             }
-            
-            writeT( j_global );
         }
         
-    protected:
+    public:
+        
+//        void CreateLogFile() const
+//        {
+//            DUMP(ClassName());
+//            logprint("CreateLogFile");
+//
+//#ifdef REPULSOR__PRINT_REPORTS_FOR_ADAPTIVE_KERNELS
+//
+//            logprint("Really creating log file");
+//            std:: string s = "./Repulsor__"+ClassName()+"_Report_"+ToString(omp_get_thread_num())+".txt";
+//
+//            DUMP(s);
+//
+//            logfile.open(s, std::ios_base::app);
+//
+//            logfile << "Log file for " << ClassName() << std::endl;
+//
+//            s = "./Repulsor__"+ClassName()+"_Simplices_"+ToString(omp_get_thread_num())+".txt";
+//            simplex_file.open(s, std::ios_base::app);
+//
+//            s = "./Repulsor__"+ClassName()+"_Centers_"+ToString(omp_get_thread_num())+".txt";
+//            center_file.open(s, std::ios_base::app);
+//
+//            s = "./Repulsor__"+ClassName()+"_EmbSimplices_"+ToString(omp_get_thread_num())+".txt";
+//            emb_simplex_file.open(s, std::ios_base::app);
+//
+//            s = "./Repulsor__"+ClassName()+"_EmbCenters_"+ToString(omp_get_thread_num())+".txt";
+//            emb_center_file.open(s, std::ios_base::app);
+//
+////            logprint("Writing to log file "+s+".");
+//#endif
+//        }
 
         
     public:
         
-        virtual LInt NonzeroCount() const override = 0;
-        
-        virtual void CreateLogFile() const
-        {
-            DUMP(ClassName());
-            logprint("CreateLogFile");
-            
-#ifdef REPULSOR__PRINT_REPORTS_FOR_ADAPTIVE_KERNELS
-            
-            logprint("Really creating log file");
-            std:: string s = "./Repulsor__"+ClassName()+"_Report_"+ToString(omp_get_thread_num())+".txt";
-            
-            DUMP(s);
-            
-            logfile.open(s, std::ios_base::app);
-            
-            logfile << "Log file for " << ClassName() << std::endl;
-            
-            s = "./Repulsor__"+ClassName()+"_Simplices_"+ToString(omp_get_thread_num())+".txt";
-            simplex_file.open(s, std::ios_base::app);
-            
-            s = "./Repulsor__"+ClassName()+"_Centers_"+ToString(omp_get_thread_num())+".txt";
-            center_file.open(s, std::ios_base::app);
-            
-            s = "./Repulsor__"+ClassName()+"_EmbSimplices_"+ToString(omp_get_thread_num())+".txt";
-            emb_simplex_file.open(s, std::ios_base::app);
-            
-            s = "./Repulsor__"+ClassName()+"_EmbCenters_"+ToString(omp_get_thread_num())+".txt";
-            emb_center_file.open(s, std::ios_base::app);
-            
-//            logprint("Writing to log file "+s+".");
-#endif
-        }
-        
-    public:
-        
-        virtual std::string ClassName() const override
-        {
-            return className();
-        }
-        
-    private:
-        
-        std::string className() const
+        std::string ClassName() const
         {
             return TO_STD_STRING(CLASS)+"<"
             + ToString(S_DOM_DIM) + ","

@@ -80,7 +80,7 @@ namespace Repulsor
         ,   minus_p_half_minus_1 (other.minus_p_half_minus_1)
         {}
         
-        virtual ~CLASS() = default;
+        ~CLASS() = default;
         
     protected:
         
@@ -136,7 +136,7 @@ namespace Repulsor
         
     protected:
         
-        virtual Real compute( const Int k_global ) override
+        force_inline Real compute()
         {
             Real x    [AMB_DIM]  = {};
             Real y    [AMB_DIM]  = {};
@@ -390,27 +390,38 @@ namespace Repulsor
             }
         }
         
-    protected:
-    
         
-        virtual void loadS( const Int i_global ) override
+#include "../../FMM/FMM_Kernel_Common.hpp"
+        
+// Now load the actual Compute method.
+#include "../../FMM/FMM_Kernel_VF_Common.hpp"
+        
+    public:
+        
+        force_inline void LoadS( const Int i_global )
         {
+            this->loadS( i_global );
+            
             if constexpr ( metric_flag )
             {
                 zerofy_buffer( &ii_block[0][0], DIAG_NNZ );
             }
         }
         
-        virtual void writeS( const Int i_global ) override
+        force_inline void WriteS( const Int i_global )
         {
+            this->writeS( i_global );
+            
             if constexpr ( metric_flag )
             {
                 add_to_buffer<DIAG_NNZ>( &ii_block[0][0], &S_diag[DIAG_NNZ * i_global] );
             }
         }
         
-        virtual void loadT( const Int j_global ) override
+        force_inline void LoadT( const Int j_global )
         {
+            this->loadT( j_global );
+            
             if constexpr ( metric_flag )
             {
                 zerofy_buffer( &ij_block[0], BLOCK_NNZ );
@@ -420,37 +431,17 @@ namespace Repulsor
         }
 
         
-        virtual void writeT( const Int j_global ) override
+        force_inline void WriteT( const Int j_global )
         {
+            this->writeT( j_global );
+            
             if constexpr ( metric_flag )
             {
                 add_to_buffer<DIAG_NNZ>( &jj_block[0][0], &T_diag[DIAG_NNZ * j_global] );
             }
         }
         
-        virtual void writeBlock( const Int k_global ) override
-        {
-            if constexpr ( metric_flag )
-            {
-                copy_buffer( &ij_block[0], &metric_data[BLOCK_NNZ * k_global], BLOCK_NNZ );
-            }
-        }
-        
-    public:
-        
-        virtual LInt NonzeroCount() const override
-        {
-            return BLOCK_NNZ;
-        }
-        
-        virtual std::string ClassName() const override
-        {
-            return className();
-        }
-        
-    private:
-        
-        std::string className() const
+        std::string ClassName() const
         {
             return TO_STD_STRING(CLASS)+"<"
             + ToString(S_DOM_DIM) + ","

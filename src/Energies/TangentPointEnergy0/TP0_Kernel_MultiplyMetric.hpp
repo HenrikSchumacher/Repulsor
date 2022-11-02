@@ -75,12 +75,13 @@ namespace Repulsor
         
     public:
         
-        LInt NonzeroCount() const
+        static constexpr LInt NonzeroCount()
         {
             return BLOCK_NNZ;
         }
                 
-        void TransposeBlock( const LInt from, const LInt to ) const
+
+        force_inline void TransposeBlock( const LInt from, const LInt to ) const
         {
             const Scalar * restrict const a_from = &A[ BLOCK_NNZ * from];
                   Scalar * restrict const a_to   = &A[ BLOCK_NNZ * to  ];

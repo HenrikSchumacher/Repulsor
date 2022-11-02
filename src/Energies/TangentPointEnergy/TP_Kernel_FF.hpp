@@ -48,6 +48,8 @@ namespace Repulsor
         using BASE::diff_flag;
         using BASE::metric_flag;
         
+#include "../../FMM/FMM_Kernel_Common.hpp"
+        
     public:
         
         CLASS() = delete;
@@ -74,7 +76,7 @@ namespace Repulsor
         ,   minus_p_half_minus_1 (other.minus_p_half_minus_1)
         {}
         
-        virtual ~CLASS() = default;
+        ~CLASS() = default;
         
     protected:
 
@@ -117,9 +119,9 @@ namespace Repulsor
         Real ii_block [ROWS][COLS] = {{}};
         Real jj_block [ROWS][COLS] = {{}};
         
-    protected:
+    public:
         
-        virtual Real compute( const Int k_global ) override
+        force_inline Real Compute( const LInt k_global )
         {
             Real v    [AMB_DIM ] = {};
             Real Pv   [AMB_DIM ] = {};
@@ -249,8 +251,7 @@ namespace Repulsor
 //    |                                                                                 |
 //    |   - K_yx * v[2]   K_yx * v[2] * v[0]  K_yx * v[2] * v[1]  K_yx * v[2] * v[2]    |
 //    \                                                                                 /
-        
-                    
+
                     const Real K_sym = K_xy + K_yx;
                     
                     const Real b_over_a   = b/a;
@@ -297,12 +298,14 @@ namespace Repulsor
                             jj_block[j][i]  = a_over_b_K_yx * vv;
                         }
                     }
+                    
+                    copy_buffer( &ij_block[0], &metric_data[BLOCK_NNZ * k_global], BLOCK_NNZ );
                 }
             }
-            
+
             if constexpr ( energy_flag )
             {
-                return  a * E * b;
+                return  this->symmetry_factor * a * E * b;
             }
             else
             {
@@ -311,24 +314,30 @@ namespace Repulsor
         }
         
         
-        virtual void loadS( const Int i_global ) override
+        force_inline void LoadS( const Int i_global )
         {
+            this->loadS( i_global );
+            
             if constexpr ( metric_flag )
             {
                 zerofy_buffer( &ii_block[0][0], DIAG_NNZ );
             }
         }
         
-        virtual void writeS( const Int i_global ) override
+        force_inline void WriteS( const Int i_global )
         {
+            this->writeS( i_global );
+            
             if constexpr ( metric_flag )
             {
                 add_to_buffer<DIAG_NNZ>( &ii_block[0][0], &S_diag[DIAG_NNZ * i_global] );
             }
         }
         
-        virtual void loadT( const Int j_global ) override
+        force_inline void LoadT( const Int j_global )
         {
+            this->loadT( j_global );
+            
             if constexpr ( metric_flag )
             {
                 // We can do an overwrite here.
@@ -339,37 +348,26 @@ namespace Repulsor
             }
         }
         
-        virtual void writeBlock( const Int k_global ) override
+        force_inline void WriteBlock( const LInt k_global )
         {
+            
             if constexpr ( metric_flag )
             {
                 copy_buffer( &ij_block[0], &metric_data[BLOCK_NNZ * k_global], BLOCK_NNZ );
             }
         }
 
-        virtual void writeT( const Int j_global ) override
+        force_inline void WriteT( const Int j_global )
         {
+            this->writeT( j_global );
+            
             if constexpr ( metric_flag )
             {
                 add_to_buffer<DIAG_NNZ>( &jj_block[0][0], &T_diag[DIAG_NNZ * j_global] );
             }
         }
         
-    public:
-        
-        virtual LInt NonzeroCount() const override
-        {
-            return BLOCK_NNZ;
-        }
-
-        virtual std::string ClassName() const override
-        {
-            return className();
-        }
-        
-    private:
-        
-        std::string className() const
+        std::string ClassName() const
         {
             return TO_STD_STRING(CLASS)+"<"
             + bct.ClassName() + ","

@@ -80,7 +80,7 @@ namespace Repulsor
         ,   s_exp                (static_cast<Real>(-0.5) * (static_cast<Real>(2) * (s - static_cast<Real>(1)) + S_DOM_DIM))
         {}
         
-        virtual ~CLASS() = default;
+        ~CLASS() = default;
         
     protected:
 
@@ -125,10 +125,10 @@ namespace Repulsor
         Real ij_block [BLOCK_NNZ] = {};
         Real ii_block [BLOCK_NNZ] = {};
         Real jj_block [BLOCK_NNZ] = {};
+     
+    public:
         
-    protected:
-        
-        virtual Real compute( const Int k_global ) override
+        force_inline Real Compute( const LInt k_global )
         {
             Real v    [AMB_DIM ] = {};
             Real Pv   [AMB_DIM ] = {};
@@ -162,34 +162,41 @@ namespace Repulsor
                 rCosPsi_2 += v[i] * Qv[i];
             }
             
-            // |P*(y-x)|^{q-2}
-            const Real rCosPhi_q_minus_2 = MyMath::pow<Real,T1>( fabs(rCosPhi_2), q_half_minus_1);
-            // |Q*(y-x)|^{q-2}
-            const Real rCosPsi_q_minus_2 = MyMath::pow<Real,T1>( fabs(rCosPsi_2), q_half_minus_1);
-            // r^{2-p}
-            const Real r_minus_p_minus_2 = MyMath::pow<Real,T2>( r2, minus_p_half_minus_1 );
-            // |y-x|^-p
-            const Real r_minus_p = r_minus_p_minus_2 * r2;
-            // |P*(y-x)|^q
-            const Real rCosPhi_q = rCosPhi_q_minus_2 * rCosPhi_2;
-            // |Q*(y-x)|^q
-            const Real rCosPsi_q = rCosPsi_q_minus_2 * rCosPsi_2;
+            Real result = 0;
             
-            const Real Num = ( rCosPhi_q + rCosPsi_q );
-
-            const Real E = Num * r_minus_p;
-
-            if constexpr ( diff_flag || metric_flag )
+            if constexpr ( energy_flag || diff_flag )
             {
-                // Needed for both the differential and the metric.
+                // |P*(y-x)|^{q-2}
+                const Real rCosPhi_q_minus_2 = MyMath::pow<Real,T1>( fabs(rCosPhi_2), q_half_minus_1);
+                // |Q*(y-x)|^{q-2}
+                const Real rCosPsi_q_minus_2 = MyMath::pow<Real,T1>( fabs(rCosPsi_2), q_half_minus_1);
+                // r^{2-p}
+                const Real r_minus_p_minus_2 = MyMath::pow<Real,T2>( r2, minus_p_half_minus_1 );
+                // |y-x|^-p
+                const Real r_minus_p = r_minus_p_minus_2 * r2;
+                // |P*(y-x)|^q
+                const Real rCosPhi_q = rCosPhi_q_minus_2 * rCosPhi_2;
+                // |Q*(y-x)|^q
+                const Real rCosPsi_q = rCosPsi_q_minus_2 * rCosPsi_2;
                 
-                const Real factor = q_half * r_minus_p;         // = q / |y-x|^p
+                const Real Num = ( rCosPhi_q + rCosPsi_q );
                 
-                const Real K_xy = factor * rCosPhi_q_minus_2;   // = |P*(y-x)|^(q-2) / |y-x|^p
-                const Real K_yx = factor * rCosPsi_q_minus_2;   // = |Q*(y-x)|^(q-2) / |y-x|^p
-
+                const Real E = Num * r_minus_p;
+                
+                if constexpr ( energy_flag )
+                {
+                    result = this->symmetry_factor * a * E * b;
+                }
+                
                 if constexpr ( diff_flag )
                 {
+                    // Needed for both the differential and the metric.
+                    
+                    const Real factor = q_half * r_minus_p;         // = q / |y-x|^p
+                    
+                    const Real K_xy = factor * rCosPhi_q_minus_2;   // = |P*(y-x)|^(q-2) / |y-x|^p
+                    const Real K_yx = factor * rCosPsi_q_minus_2;   // = |Q*(y-x)|^(q-2) / |y-x|^p
+                    
                     const Real H = - p * r_minus_p_minus_2 * Num;
                     
                     Real dEdvx = zero;
@@ -216,10 +223,12 @@ namespace Repulsor
                         DX[1+AMB_DIM+k] +=  b_K_xy * V[k];
                         DY[1+AMB_DIM+k] +=  a_K_yx * V[k];
                     }
+                    
                 }
-                
-                if constexpr ( metric_flag )
-                {
+            }
+            
+            if constexpr ( metric_flag )
+            {
 // ij_block
 //              /                               \
 //              |  a[0]     0       0       0   |
@@ -241,7 +250,7 @@ namespace Repulsor
 //              |                               |
 //              |   0       0       0     -a[1] |
 //              \                               /
-                    
+                
 // jj_block
 //              /                               \
 //              | -a[0]     0       0       0   |
@@ -252,59 +261,58 @@ namespace Repulsor
 //              |                               |
 //              |   0       0       0     -a[1] |
 //              \                               /
-        
-                    const Real r4 = r2 * r2;
+    
+                const Real r4 = r2 * r2;
 
-                    // The following line makes up approx 2/3 of this function's runtime! This is why we avoid pow as much as possible and replace it with MyMath::pow.;
-                    // I got it down to this single call to pow. We might want to generate a lookup table for it...;
-                    // The factor of (-2.) is here, because we assemble the _metric_, not the kernel.;
-                    const Real a_1 = static_cast<Real>(-2) * MyMath::pow(r2, s_exp);
-                    
-                    const Real a_0 = static_cast<Real>(0.5) * (rCosPhi_2 + rCosPsi_2) / r4 * a_1;
-                    
-                    const Real b_over_a   = b/a;
-                    const Real a_over_b   = a/b;
-                    
-                    ij_block[0]  =   a_0;
-                    ii_block[0] -=   b_over_a * a_0;
-                    jj_block[0]  = - a_over_b * a_0;
-                    
-                    ij_block[1]  =   a_1;
-                    ii_block[1] -=   b_over_a * a_1;
-                    jj_block[1]  = - a_over_b * a_1;
-                    
-                }
+                // The following line makes up approx 2/3 of this function's runtime! This is why we avoid pow as much as possible and replace it with MyMath::pow.;
+                // I got it down to this single call to pow. We might want to generate a lookup table for it...;
+                // The factor of (-2.) is here, because we assemble the _metric_, not the kernel.;
+                const Real a_1 = static_cast<Real>(-2) * MyMath::pow(r2, s_exp);
+                
+                const Real a_0 = static_cast<Real>(0.5) * (rCosPhi_2 + rCosPsi_2) / r4 * a_1;
+                
+                const Real b_over_a = b/a;
+                const Real a_over_b = a/b;
+                
+                ij_block[0]  =   a_0;
+                ii_block[0] -=   b_over_a * a_0;
+                jj_block[0]  = - a_over_b * a_0;
+                
+                ij_block[1]  =   a_1;
+                ii_block[1] -=   b_over_a * a_1;
+                jj_block[1]  = - a_over_b * a_1;
+                
+                copy_buffer( &ij_block[0], &metric_data[BLOCK_NNZ * k_global], BLOCK_NNZ );
             }
             
-            if constexpr ( energy_flag )
-            {
-                return  a * E * b;
-            }
-            else
-            {
-                return zero;
-            }
+            return result;
         }
         
         
-        virtual void loadS( const Int i_global ) override
+        force_inline void LoadS( const Int i_global )
         {
+            this->loadS( i_global );
+            
             if constexpr ( metric_flag )
             {
                 zerofy_buffer( &ii_block[0][0], DIAG_NNZ );
             }
         }
         
-        virtual void writeS( const Int i_global ) override
+        force_inline void WriteS( const Int i_global )
         {
+            this->writeS( i_global );
+            
             if constexpr ( metric_flag )
             {
                 add_to_buffer<DIAG_NNZ>( &ii_block[0][0], &S_diag[DIAG_NNZ * i_global] );
             }
         }
         
-        virtual void loadT( const Int j_global ) override
+        force_inline void LoadT( const Int j_global )
         {
+            this->loadT( j_global );
+            
             if constexpr ( metric_flag )
             {
                 // We can do an overwrite here.
@@ -314,37 +322,15 @@ namespace Repulsor
 //                zerofy_buffer( &jj_block[0][0], DIAG_NNZ );
             }
         }
-        
-        virtual void writeBlock( const Int k_global ) override
-        {
-            if constexpr ( metric_flag )
-            {
-                copy_buffer( &ij_block[0], &metric_data[BLOCK_NNZ * k_global], BLOCK_NNZ );
-            }
-        }
 
-        virtual void writeT( const Int j_global ) override
+        force_inline void WriteT( const Int j_global )
         {
             if constexpr ( metric_flag )
             {
                 add_to_buffer<DIAG_NNZ>( &jj_block[0][0], &T_diag[DIAG_NNZ * j_global] );
             }
         }
-        
-    public:
-        
-        virtual Int NonzeroCount() const override
-        {
-            return BLOCK_NNZ;
-        }
 
-        virtual std::string ClassName() const override
-        {
-            return className();
-        }
-        
-    private:
-        
         std::string className() const
         {
             return TO_STD_STRING(CLASS)+"<"

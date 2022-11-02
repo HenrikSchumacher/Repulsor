@@ -81,13 +81,6 @@ namespace Repulsor
         
         using BASE::metric_data;
         
-        using BASE::loadS;
-        using BASE::loadT;
-        using BASE::compute;
-        using BASE::writeBlock;
-        using BASE::writeT;
-        using BASE::writeS;
-        
     public:
         
         CLASS() = default;
@@ -103,27 +96,27 @@ namespace Repulsor
         {
             if( GetS().ClusterFarFieldData().Dimension(1) != S_DATA_DIM )
             {
-                eprint(className()+" Constructor: GetS().ClusterFarFieldData().Dimension(1) != S_DATA_DIM");
+                eprint(ClassName()+" Constructor: GetS().ClusterFarFieldData().Dimension(1) != S_DATA_DIM");
             }
             
             if constexpr ( diff_flag )
             {
                 if( GetS().ThreadClusterDFarFieldData().Dimension(2) != S_DATA_DIM )
                 {
-                    eprint(className()+" Constructor: GetS().ThreadClusterDFarFieldData().Dimension(2) != S_DATA_DIM");
+                    eprint(ClassName()+" Constructor: GetS().ThreadClusterDFarFieldData().Dimension(2) != S_DATA_DIM");
                 }
             }
                
             if( GetT().ClusterFarFieldData().Dimension(1) != T_DATA_DIM)
             {
-               eprint(className()+" Constructor: GetT().ClusterFarFieldData().Dimension(1) != T_DATA_DIM ");
+               eprint(ClassName()+" Constructor: GetT().ClusterFarFieldData().Dimension(1) != T_DATA_DIM ");
             }
             
             if constexpr ( diff_flag )
             {
                 if( GetT().ThreadClusterDFarFieldData().Dimension(2) != T_DATA_DIM )
                 {
-                    eprint(className()+" Constructor: GetT().ThreadClusterDFarFieldData().Dimension(2) != T_DATA_DIM ");
+                    eprint(ClassName()+" Constructor: GetT().ThreadClusterDFarFieldData().Dimension(2) != T_DATA_DIM ");
                 }
             }
         }
@@ -138,11 +131,23 @@ namespace Repulsor
         ,   T_diag      ( other.GetT().FF_Accumulator().data(            omp_get_thread_num()) )
         {}
         
-        virtual ~CLASS() = default;
-
+        ~CLASS() = default;
+        
     public:
         
-        virtual void LoadS( const Int i_global ) override
+        force_inline void Prefetch( const Int j_next ) const
+        {
+            prefetch_range<T_DATA_DIM,0,0>( &T_data[T_DATA_DIM * j_next] );
+            
+            if constexpr ( diff_flag )
+            {
+                prefetch_range<T_DATA_DIM,1,0>( &T_D_data[T_DATA_DIM * j_next] );
+            }
+        }
+
+    protected:
+        
+        force_inline void loadS( const Int i_global )
         {
             const Real * const restrict X = &S_data[S_DATA_DIM * i_global];
 
@@ -159,11 +164,9 @@ namespace Repulsor
             {
                 zerofy_buffer( &DX[0], S_DATA_DIM );
             }
-            
-            loadS( i_global );
         }
         
-        virtual void LoadT( const Int j_global ) override
+        force_inline void loadT( const Int j_global )
         {
             const Real * const restrict Y = &T_data[T_DATA_DIM * j_global];
             
@@ -179,30 +182,9 @@ namespace Repulsor
             {
                 zerofy_buffer( &DY[0], T_DATA_DIM );
             }
-            
-            loadT( j_global );
-        }
-        
-        virtual void Prefetch( const Int j_next ) const override
-        {
-            prefetch_range<T_DATA_DIM,0,0>( &T_data[T_DATA_DIM * j_next] );
-            
-            if constexpr ( diff_flag )
-            {
-                prefetch_range<T_DATA_DIM,1,0>( &T_D_data[T_DATA_DIM * j_next] );
-            }
-        }
-        
-        virtual force_inline Real Compute( const Int k_global ) override
-        {
-            const Real result = symmetry_factor * compute( k_global );
-            
-            writeBlock( k_global );
-            
-            return result;
         }
             
-        virtual void WriteS( const Int i_global ) override
+        force_inline void writeS( const Int i_global )
         {
             if constexpr ( diff_flag )
             {
@@ -213,11 +195,9 @@ namespace Repulsor
                     to[k] += symmetry_factor * DX[k];
                 }
             }
-            
-            writeS( i_global );
         }
         
-        virtual force_inline void WriteT( const Int j_global ) override
+        force_inline void writeT( const Int j_global )
         {
             if constexpr (diff_flag )
             {
@@ -228,26 +208,12 @@ namespace Repulsor
                     to[k] += symmetry_factor * DY[k];
                 }
             }
-            
-            writeT( j_global );
         }
         
-    protected:
         
     public:
         
-        virtual LInt NonzeroCount() const override = 0;
-        
-    public:
-        
-        virtual std::string ClassName() const override
-        {
-            return className();
-        }
-        
-    private:
-        
-        std::string className() const
+        std::string ClassName() const
         {
             return TO_STD_STRING(CLASS)+"<"
             + bct.ClassName() + ","

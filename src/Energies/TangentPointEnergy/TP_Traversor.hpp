@@ -376,7 +376,7 @@ namespace Repulsor
             {
                 const Int rhs_count = S.BufferDimension() / Kernel_Block_Mul_T::ROWS;
                 
-                if( NF_flag )
+                if( NF_flag && (bct.Near().NonzeroCount() > 0) )
                 {
                     NF_MultiplyMetric(rhs_count);
                 }
@@ -385,13 +385,13 @@ namespace Repulsor
                     S.PrimitiveOutputBuffer().SetZero();
                 }
                 
-                if( VF_flag )
+                if( VF_flag && (bct.VeryNear().NonzeroCount() > 0) )
                 {
                     VF_MultiplyMetric(rhs_count);
                 }
                 
                 
-                if( FF_flag )
+                if( FF_flag && (bct.Far().NonzeroCount() > 0) )
                 {
                     FF_MultiplyMetric(rhs_count);
                 }

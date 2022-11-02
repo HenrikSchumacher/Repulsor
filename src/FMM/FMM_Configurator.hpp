@@ -40,7 +40,7 @@ namespace Repulsor
         ,   metric_values ( other.metric_values )
         {}
         
-        virtual ~CLASS() = default;
+        ~CLASS() = default;
 
     protected:
 
@@ -70,14 +70,9 @@ namespace Repulsor
             return metric_values;
         }
         
-        virtual std::string ClassName() const
-        {
-            return className();
-        }
+    public:
         
-    private:
-        
-        std::string className() const
+        std::string ClassName() const
         {
             return TO_STD_STRING(CLASS)+"<"+bct.ClassName()+">";
         }

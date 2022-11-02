@@ -515,8 +515,6 @@ namespace Repulsor
         
         void PercolateUp_Recursive() const
         {
-            dump( buffer_dim );
-            
             switch ( buffer_dim )
             {
                 case 1:

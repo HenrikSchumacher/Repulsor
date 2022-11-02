@@ -238,31 +238,34 @@ namespace Repulsor
             const Pattern_T & pattern = bct.VeryNear();
                   Values_T  & values  = metric_values["VF"];
             
-            Configurator_T conf ( bct, values );
-            
-            using Kernel_T = TP_Kernel_VF<
+            if( pattern.NonzeroCount() > 0 )
+            {
+                Configurator_T conf ( bct, values );
+                
+                using Kernel_T = TP_Kernel_VF<
                 S_DOM_DIM, T_DOM_DIM,
                 BlockClusterTree_T, T1, T2,
                 energy_flag, diff_flag, metric_flag
-            >;
-
-            Kernel_T ker ( conf, bct.NearFieldSeparationParameter(), 20, q_half_, p_half_ );
-
-            FMM_Traversor<Pattern_T,Kernel_T> traversor ( pattern, ker );
-            en += traversor.Compute();
-
-            if constexpr ( metric_flag )
-            {
-                if constexpr ( is_symmetric )
-                {
-                    SparseKernelMatrixCSR<Kernel_Block_Mul_T> matrix ( pattern );
-                    
-                    matrix.FillLowerTriangleFromUpperTriangle( values.data() );
-                }
+                >;
                 
-                ptic("Reduce VF_Accumulators");
-                metric_values["VF_diag"] = S.VF_Accumulator().template AddReduce<Real,LInt>();
-                ptoc("Reduce VF_Accumulators");
+                Kernel_T ker ( conf, bct.NearFieldSeparationParameter(), 20, q_half_, p_half_ );
+                
+                FMM_Traversor<Pattern_T,Kernel_T> traversor ( pattern, ker );
+                en += traversor.Compute();
+                
+                if constexpr ( metric_flag )
+                {
+                    if constexpr ( is_symmetric )
+                    {
+                        SparseKernelMatrixCSR<Kernel_Block_Mul_T> matrix ( pattern );
+                        
+                        matrix.FillLowerTriangleFromUpperTriangle( values.data() );
+                    }
+                    
+                    ptic("Reduce VF_Accumulators");
+                    metric_values["VF_diag"] = S.VF_Accumulator().template AddReduce<Real,LInt>();
+                    ptoc("Reduce VF_Accumulators");
+                }
             }
             
             ptoc(ClassName()+"::VF_Compute");
@@ -363,7 +366,7 @@ namespace Repulsor
             {
                 const Int rhs_count = S.BufferDimension() / Kernel_Block_Mul_T::ROWS;
                 
-                if( NF_flag )
+                if( NF_flag && (bct.Near().NonzeroCount() > 0) )
                 {
                     NF_MultiplyMetric(rhs_count);
                 }
@@ -372,13 +375,13 @@ namespace Repulsor
                     S.PrimitiveOutputBuffer().SetZero();
                 }
                 
-                if( VF_flag )
+                if( VF_flag && (bct.VeryNear().NonzeroCount() > 0) )
                 {
                     VF_MultiplyMetric(rhs_count);
                 }
                 
                 
-                if( FF_flag )
+                if( FF_flag && (bct.Far().NonzeroCount() > 0) )
                 {
                     FF_MultiplyMetric(rhs_count);
                 }

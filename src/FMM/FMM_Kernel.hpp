@@ -104,7 +104,7 @@ namespace Repulsor
             Init();
         }
         
-        virtual ~CLASS() = default;
+        ~CLASS() = default;
 
     public:
         const ClusterTree_T & GetS() const
@@ -117,63 +117,6 @@ namespace Repulsor
             return bct.GetT();
         }
         
-        virtual void LoadS( const Int i_global ) = 0;
-        
-        virtual void LoadT( const Int j_global ) = 0;
-        
-        virtual void Prefetch( const Int j_next ) const = 0;
-                                                       
-        virtual Real Compute( const Int k_global ) = 0;
-        
-        virtual void WriteS( const Int i_global ) = 0;
-        
-        virtual void WriteT( const Int j_global ) = 0;
-
-        
-        virtual Real compute( const Int k_global ) = 0;
-        
-        virtual void loadS( const Int i_global ) = 0;
-        
-        virtual void writeS( const Int i_global ) = 0;
-        
-        virtual void loadT( const Int j_global ) = 0;
-        
-        virtual void writeT( const Int j_global ) = 0;
-        
-        virtual void writeBlock( const Int k_global ) = 0;
-        
-        void Allocate( const LInt nnz )
-        {
-            if constexpr ( metric_flag )
-            {
-                if(
-                   metric_values.Dimension(0) != nnz
-                   ||
-                   metric_values.Dimension(1) != NonzeroCount()
-                   )
-                {
-                    metric_values = Values_T( nnz, NonzeroCount() );
-                }
-            }
-        }
-//
-//        bool PointersInititializedQ() const
-//        {
-//            if constexpr ( metric_flag )
-//            {
-//                if( metric_data == nullptr )
-//                {
-//                    eprint(ClassName()+"::PointersInititializedQ: Pointers for metric_values not initialized. Make sure to initialize the kernel via the copy constructor.");
-//
-//                    return false;
-//                }
-//            }
-//
-//            return true;
-//        }
-        
-        virtual LInt NonzeroCount() const = 0;
-        
     protected:
         
         const BlockClusterTree_T & bct;
@@ -184,14 +127,7 @@ namespace Repulsor
         
     public:
         
-        virtual std::string ClassName() const
-        {
-            return className();
-        }
-        
-    private:
-        
-        std::string className() const
+        std::string ClassName() const
         {
             return TO_STD_STRING(CLASS)+"<"+bct.ClassName()+">";
         }
