@@ -71,16 +71,16 @@ namespace Repulsor
         // Copy constructor
         CLASS( const CLASS & other ) : BASE(other) {}
         
-        virtual ~CLASS() override = default;
+        ~CLASS() = default;
         
     public:
         
-        virtual LInt NonzeroCount() const override
+        LInt NonzeroCount() const
         {
             return BLOCK_NNZ;
         }
                 
-        virtual void TransposeBlock( const LInt from, const LInt to ) const override
+        void TransposeBlock( const LInt from, const LInt to ) const
         {
             const Scalar * restrict const a_from = &A[ BLOCK_NNZ * from];
                   Scalar * restrict const a_to   = &A[ BLOCK_NNZ * to  ];
@@ -91,7 +91,7 @@ namespace Repulsor
         
         
         
-        virtual force_inline void apply_block( const LInt k_global, const Int j_global ) override
+        force_inline void ApplyBlock( const LInt k_global, const Int j_global )
         {
             ReadX( j_global );
             
@@ -108,25 +108,22 @@ namespace Repulsor
 //              |   0       0       0      a[1] |
 //              \                               /
             
+            #pragma unroll
             for( Int k = 0; k < MAX_RHS_COUNT; ++k )
             {
                 y[k][0] += a[0] * x[k][0];
+                
+                #pragma unroll
                 for( Int j = 1; j < COLS; ++j )
                 {
                     y[k][j] += a[1] * x[k][j];
                 }
             }
         }
-
-        virtual force_inline void begin_row( const Int i_global ) override
-        {}
-        
-        virtual force_inline void end_row( const Int i_global ) override
-        {}
         
     public:
         
-        virtual std::string ClassName() const override
+        std::string ClassName() const
         {
             return TO_STD_STRING(CLASS)+"<"
                 +ToString(AMB_DIM)

@@ -452,7 +452,7 @@ namespace Repulsor
                 }
                 case TreePercolationAlgorithm::Recursive:
                 {
-                    PercolateUp_Recursive( 0 );
+                    PercolateUp_Recursive();
                     break;
                 }
                 case TreePercolationAlgorithm::Tasks:
@@ -468,6 +468,7 @@ namespace Repulsor
                 }
                 default:
                 {
+                    print("d");
                     PercolateUp_Sequential( 0 );
                     break;
                 }
@@ -478,7 +479,8 @@ namespace Repulsor
         void PercolateDown() const
         {
             ptic(ClassName()+"::PercolateDown");
-            switch (settings.tree_perc_alg) {
+            switch (settings.tree_perc_alg)
+            {
                 case TreePercolationAlgorithm::Sequential:
                 {
                     PercolateDown_Sequential( 0 );
@@ -486,7 +488,7 @@ namespace Repulsor
                 }
                 case TreePercolationAlgorithm::Recursive:
                 {
-                    PercolateDown_Recursive( 0 );
+                    PercolateDown_Recursive();
                     break;
                 }
                 case TreePercolationAlgorithm::Tasks :
@@ -509,11 +511,123 @@ namespace Repulsor
         }; // PercolateUp
         
         
+    protected:
         
+        void PercolateUp_Recursive() const
+        {
+            dump( buffer_dim );
+            
+            switch ( buffer_dim )
+            {
+                case 1:
+                {
+                    percolateUp_Recursive<1>(0);
+                    break;
+                }
+                case 2:
+                {
+                    percolateUp_Recursive<2>(0);
+                    break;
+                }
+                case 3:
+                {
+                    percolateUp_Recursive<3>(0);
+                    break;
+                }
+                case 4:
+                {
+                    percolateUp_Recursive<4>(0);
+                    break;
+                }
+                case 5:
+                {
+                    percolateUp_Recursive<5>(0);
+                    break;
+                }
+                case 6:
+                {
+                    percolateUp_Recursive<6>(0);
+                    break;
+                }
+                case 7:
+                {
+                    percolateUp_Recursive<7>(0);
+                    break;
+                }
+                case 8:
+                {
+                    percolateUp_Recursive<8>(0);
+                    break;
+                }
+                case 9:
+                {
+                    percolateUp_Recursive<9>(0);
+                    break;
+                }
+                case 10:
+                {
+                    percolateUp_Recursive<10>(0);
+                    break;
+                }
+                case 11:
+                {
+                    percolateUp_Recursive<11>(0);
+                    break;
+                }
+                case 12:
+                {
+                    percolateUp_Recursive<12>(0);
+                    break;
+                }
+                case 13:
+                {
+                    percolateUp_Recursive<13>(0);
+                    break;
+                }
+                case 14:
+                {
+                    percolateUp_Recursive<14>(0);
+                    break;
+                }
+                case 15:
+                {
+                    percolateUp_Recursive<15>(0);
+                    break;
+                }
+                case 16:
+                {
+                    percolateUp_Recursive<16>(0);
+                    break;
+                }
+                case 17:
+                {
+                    percolateUp_Recursive<17>(0);
+                    break;
+                }
+                case 18:
+                {
+                    percolateUp_Recursive<18>(0);
+                    break;
+                }
+                case 19:
+                {
+                    percolateUp_Recursive<19>(0);
+                    break;
+                }
+                case 20:
+                {
+                    percolateUp_Recursive<20>(0);
+                    break;
+                }
+                default:
+                {
+                    percolateUp_Recursive_gen(0);
+                }
+            }
+        }
         
-        
-        
-        void PercolateUp_Recursive( const Int C ) const
+        template<Int BUFFER_DIM>
+        void percolateUp_Recursive( const Int C ) const
         {
             // C = cluster index
             
@@ -523,8 +637,38 @@ namespace Repulsor
             if( (L >= 0) && (R >= 0) )
             {
                 // If not a leaf, compute the values of the children first.
-                PercolateUp_Recursive(L);
-                PercolateUp_Recursive(R);
+                percolateUp_Recursive<BUFFER_DIM>(L);
+                percolateUp_Recursive<BUFFER_DIM>(R);
+                
+                // Aftwards, compute the sum of the two children.
+                
+                      Real * restrict const p   = &C_in.data()[BUFFER_DIM * C];
+                const Real * restrict const c_L = &C_in.data()[BUFFER_DIM * L];
+                const Real * restrict const c_R = &C_in.data()[BUFFER_DIM * R];
+                
+                #pragma unroll
+                for( Int k = 0; k < BUFFER_DIM; ++k )
+                {
+                    // Overwrite, not add-into. Thus cleansing is not required.
+                    p[k] = c_L[k] + c_R[k];
+                }
+            }
+            
+        }; // percolateUp_Recursive
+
+        
+        void percolateUp_Recursive_gen( const Int C ) const
+        {
+            // C = cluster index
+            
+            const Int L = C_left [C];
+            const Int R = C_right[C];
+            
+            if( (L >= 0) && (R >= 0) )
+            {
+                // If not a leaf, compute the values of the children first.
+                percolateUp_Recursive_gen(L);
+                percolateUp_Recursive_gen(R);
                 
                 // Aftwards, compute the sum of the two children.
                 
@@ -537,9 +681,149 @@ namespace Repulsor
                 }
             }
             
-        }; // PercolateUp_Recursive
+        }; // percolateUp_Recursive_gen
 
-        void PercolateDown_Recursive(const Int C)  const
+    protected:
+        
+        void PercolateDown_Recursive() const
+        {
+            switch ( buffer_dim )
+            {
+                case 1:
+                {
+                    percolateDown_Recursive<1>(0);
+                    break;
+                }
+                case 2:
+                {
+                    percolateDown_Recursive<2>(0);
+                    break;
+                }
+                case 3:
+                {
+                    percolateDown_Recursive<3>(0);
+                    break;
+                }
+                case 4:
+                {
+                    percolateDown_Recursive<4>(0);
+                    break;
+                }
+                case 5:
+                {
+                    percolateDown_Recursive<5>(0);
+                    break;
+                }
+                case 6:
+                {
+                    percolateDown_Recursive<6>(0);
+                    break;
+                }
+                case 7:
+                {
+                    percolateDown_Recursive<7>(0);
+                    break;
+                }
+                case 8:
+                {
+                    percolateDown_Recursive<8>(0);
+                    break;
+                }
+                case 9:
+                {
+                    percolateDown_Recursive<9>(0);
+                    break;
+                }
+                case 10:
+                {
+                    percolateDown_Recursive<10>(0);
+                    break;
+                }
+                case 11:
+                {
+                    percolateDown_Recursive<11>(0);
+                    break;
+                }
+                case 12:
+                {
+                    percolateDown_Recursive<12>(0);
+                    break;
+                }
+                case 13:
+                {
+                    percolateDown_Recursive<13>(0);
+                    break;
+                }
+                case 14:
+                {
+                    percolateDown_Recursive<14>(0);
+                    break;
+                }
+                case 15:
+                {
+                    percolateDown_Recursive<15>(0);
+                    break;
+                }
+                case 16:
+                {
+                    percolateDown_Recursive<16>(0);
+                    break;
+                }
+                case 17:
+                {
+                    percolateDown_Recursive<17>(0);
+                    break;
+                }
+                case 18:
+                {
+                    percolateDown_Recursive<18>(0);
+                    break;
+                }
+                case 19:
+                {
+                    percolateDown_Recursive<19>(0);
+                    break;
+                }
+                case 20:
+                {
+                    percolateDown_Recursive<20>(0);
+                    break;
+                }
+                default:
+                {
+                    percolateDown_Recursive_gen(0);
+                }
+            }
+        }
+        
+        template<Int BUFFER_DIM>
+        void percolateDown_Recursive( const Int C )  const
+        {
+            // C = cluster index
+            
+            const Int L = C_left [C];
+            const Int R = C_right[C];
+            
+            if( ( L >= 0 ) && ( R >= 0 ) )
+            {
+                const Real * restrict const p   = &C_out.data()[BUFFER_DIM * C];
+                      Real * restrict const c_L = &C_out.data()[BUFFER_DIM * L];
+                      Real * restrict const c_R = &C_out.data()[BUFFER_DIM * R];
+                
+                #pragma unroll
+                for( Int k = 0; k < BUFFER_DIM; ++k )
+                {
+                    const Real buffer = p[k];
+                    c_L[k] += buffer;
+                    c_R[k] += buffer;
+                }
+                
+                percolateDown_Recursive<BUFFER_DIM>(L);
+                percolateDown_Recursive<BUFFER_DIM>(R);
+            }
+        }; // percolateDown_Recursive
+        
+        void percolateDown_Recursive_gen( const Int C )  const
         {
             // C = cluster index
             
@@ -557,12 +841,13 @@ namespace Repulsor
                     c[ buffer_dim * L + k ] += buffer;
                     c[ buffer_dim * R + k ] += buffer;
                 }
-                PercolateDown_Recursive(L);
-                PercolateDown_Recursive(R);
+                percolateDown_Recursive_gen(L);
+                percolateDown_Recursive_gen(R);
             }
-        }; // PercolateDown_Recursive
+        }; // percolateDown_Recursive_gen
         
 
+    public:
         
         // Sequential variant that uses a stack instead of recursion.
         void PercolateUp_Sequential( const Int C_root ) const

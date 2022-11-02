@@ -37,22 +37,22 @@ namespace Repulsor
         
         using Configurator_T    = FMM_Configurator<BlockClusterTree_T>;
 
-        using Kernel_Arrow_MulAdd_T = ArrowheadBlockKernel_fixed<
+        using Kernel_Block_MulAdd_T = ArrowheadBlockKernel_fixed<
             AMB_DIM+1, AMB_DIM+1, AMB_DIM, true,
             Real, Real, Real, Int, LInt,
             1,    1,                    // CAUTION: We use add-in instead of overwrite!
-                         false,
-            true, false, false, true,
+                         true,
+            true, false, true, true,
             true, false,
             true
         >;
         
-        using Kernel_Arrow_Mul_T = ArrowheadBlockKernel_fixed<
+        using Kernel_Block_Mul_T = ArrowheadBlockKernel_fixed<
             AMB_DIM+1, AMB_DIM+1, AMB_DIM, true,
             Real, Real, Real, Int, LInt,
             1,    0,
-                         false,
-            true, false, false, true,
+                         true,
+            true, false, true, true,
             true, false,
             true
         >;
@@ -68,9 +68,9 @@ namespace Repulsor
             true
         >;
     
-        static constexpr Int VF_blk_size = Kernel_Arrow_MulAdd_T::ROWS * Kernel_Arrow_MulAdd_T::COLS;
-        static constexpr Int NF_blk_size =    Kernel_Arrow_Mul_T::ROWS *    Kernel_Arrow_Mul_T::COLS;
-        static constexpr Int FF_blk_size =    Kernel_Arrow_Mul_T::ROWS *    Kernel_Arrow_Mul_T::COLS;
+        static constexpr Int VF_blk_size = Kernel_Block_MulAdd_T::ROWS * Kernel_Block_MulAdd_T::COLS;
+        static constexpr Int NF_blk_size =    Kernel_Block_Mul_T::ROWS *    Kernel_Block_Mul_T::COLS;
+        static constexpr Int FF_blk_size =    Kernel_Block_Mul_T::ROWS *    Kernel_Block_Mul_T::COLS;
         
     protected:
         
@@ -268,7 +268,7 @@ namespace Repulsor
             {
                 if constexpr ( is_symmetric )
                 {
-                    SparseKernelMatrixCSR<Kernel_Arrow_Mul_T> matrix ( pattern );
+                    SparseKernelMatrixCSR<Kernel_Block_Mul_T> matrix ( pattern );
                     
                     matrix.FillLowerTriangleFromUpperTriangle( values.data() );
                 }
@@ -308,7 +308,7 @@ namespace Repulsor
             {
                 if constexpr ( is_symmetric )
                 {
-                    SparseKernelMatrixCSR<Kernel_Arrow_Mul_T> matrix ( pattern );
+                    SparseKernelMatrixCSR<Kernel_Block_Mul_T> matrix ( pattern );
                     
                     matrix.FillLowerTriangleFromUpperTriangle( values.data() );
                 }
@@ -347,7 +347,7 @@ namespace Repulsor
             {
                 if constexpr ( is_symmetric )
                 {
-                    SparseKernelMatrixCSR<Kernel_Arrow_Mul_T> matrix ( pattern );
+                    SparseKernelMatrixCSR<Kernel_Block_Mul_T> matrix ( pattern );
                     
                     matrix.FillLowerTriangleFromUpperTriangle( values.data() );
                 }
@@ -374,7 +374,7 @@ namespace Repulsor
         {
             if constexpr ( metric_flag )
             {
-                const Int rhs_count = S.BufferDimension() / Kernel_Arrow_Mul_T::ROWS;
+                const Int rhs_count = S.BufferDimension() / Kernel_Block_Mul_T::ROWS;
                 
                 if( NF_flag )
                 {
@@ -410,7 +410,7 @@ namespace Repulsor
 
         void NF_MultiplyMetric( const Int rhs_count ) const
         {
-            SparseKernelMatrixCSR<Kernel_Arrow_Mul_T> matrix ( bct.Near() );
+            SparseKernelMatrixCSR<Kernel_Block_Mul_T> matrix ( bct.Near() );
             
             matrix.Dot(
                 metric_values["NF"].data(),
@@ -437,7 +437,7 @@ namespace Repulsor
         
         void VF_MultiplyMetric( const Int rhs_count ) const
         {
-            SparseKernelMatrixCSR<Kernel_Arrow_MulAdd_T> matrix ( bct.VeryNear() );
+            SparseKernelMatrixCSR<Kernel_Block_MulAdd_T> matrix ( bct.VeryNear() );
             
             matrix.Dot(
                 metric_values["VF"].data(),
@@ -464,7 +464,7 @@ namespace Repulsor
         
         void FF_MultiplyMetric( const Int rhs_count ) const
         {
-            SparseKernelMatrixCSR<Kernel_Arrow_Mul_T> matrix ( bct.Far() );
+            SparseKernelMatrixCSR<Kernel_Block_Mul_T> matrix ( bct.Far() );
             
             matrix.Dot(
                 metric_values["FF"].data(),
