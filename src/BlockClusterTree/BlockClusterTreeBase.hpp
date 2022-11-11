@@ -22,14 +22,14 @@ namespace Repulsor
         using LInt    = size_t;
 //        using LInt    = uint32_t;
         
-        using Setting_T         = BlockClusterTreeSettings;
+        using Setting_T          = BlockClusterTreeSettings;
 
-        using Pattern_T         = SparseBinaryMatrixCSR<Int,LInt>;
+        using Inter_Pattern_T    = SparseBinaryMatrixCSR<Int,LInt>;
+        using VeryNear_Pattern_T = SparseBinaryMatrixCSR<Int,LInt>;
+        using Near_Pattern_T     = SparseBinaryMatrixCSR<Int,LInt>;
+        using Far_Pattern_T      = SparseBinaryMatrixCSR<Int,LInt>;
         
-        using Values_T          = Tensor2<Real,LInt>;
-        using ValueContainer_T  = std::unordered_map<std::string,Values_T>;
-        
-        using ClusterTreeBase_T = ClusterTreeBase<Real,Int,SReal,ExtReal>;
+        using ClusterTreeBase_T  = ClusterTreeBase<Real,Int,SReal,ExtReal>;
 
     protected:
 
@@ -58,13 +58,13 @@ namespace Repulsor
 
         virtual Int FarFieldInteractionCount() const = 0;
         
-        virtual const Pattern_T & PrimitiveIntersectionMatrix() const = 0;
+        virtual const Inter_Pattern_T & PrimitiveIntersectionMatrix() const = 0;
 
-        virtual const Pattern_T & VeryNear() const = 0;
+        virtual const VeryNear_Pattern_T & VeryNear() const = 0;
         
-        virtual const Pattern_T & Near() const = 0;
+        virtual const Near_Pattern_T & Near() const = 0;
         
-        virtual const Pattern_T & Far() const = 0;
+        virtual const Far_Pattern_T & Far() const = 0;
         
         virtual const ClusterTreeBase_T & GetS() const = 0;
         

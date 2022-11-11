@@ -39,7 +39,8 @@ int main(int argc, const char * argv[])
     Profiler::Clear( path );
 
     
-    int thread_count = 8;
+//    int thread_count = 8;
+    int thread_count = 1;
     omp_set_num_threads(thread_count);
     
     
@@ -143,7 +144,17 @@ int main(int argc, const char * argv[])
     diff = tpe.Differential(M);
     toc("tpe.Differential(M)");
 
-   
+    std::unique_ptr<EnergyBase<REAL,INT,REAL,REAL>>
+        tpe_slow_ptr = Make_TangentPointEnergy_AllPairs<REAL,INT,REAL,REAL> (dom_dim,amb_dim,q,p);
+    
+    auto & tpe_slow = *tpe_slow_ptr;
+    
+    tic("tpe_slow.Energy(M)");
+    en = tpe_slow.Value(M);
+    toc("tpe_slow.Energy(M)");
+    
+    dump(en);
+    
     // Mesh_T::TangentVector_T and Mesh_T::CotangentVector_T are both Tensor2<REAL,INT> in this example.
     Mesh_T::TangentVector_T   X ( M.VertexCount(), M.AmbDim() );
     Mesh_T::CotangentVector_T Y ( M.VertexCount(), M.AmbDim() );

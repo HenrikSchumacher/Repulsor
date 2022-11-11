@@ -10,17 +10,18 @@ namespace Repulsor
     // FMM_Traversor is a class to map kernel over all nonzero positions of a sparsity pattern (SparsityPatternCSR<Int>).
     // This can be used, for example, to compute nonlocal energies, their derivatives, and the nonzero values of hierarchical matrices.
     // Mostly intended to be used with the results of BlockClusterTree's GetMatrix<...>() routine the verynear/near/far block matrices.
+    
     template<class Pattern_T, class Kernel_T>
     class CLASS
     {
     public:
         
-        using Real    = typename Kernel_T::Real;
-        using SReal   = typename Kernel_T::SReal;
-        using ExtReal = typename Kernel_T::ExtReal;
-        using Int     = typename Pattern_T::Int;
-        using LInt    = typename Pattern_T::LInt ;
-        
+        using Real     = typename Kernel_T::Real;
+        using SReal    = typename Kernel_T::SReal;
+        using ExtReal  = typename Kernel_T::ExtReal;
+        using Int      = typename Kernel_T::Int;
+        using LInt     = typename Kernel_T::LInt ;
+                
         using Values_T          = Tensor2<Real,LInt>;
         using ValueContainer_T  = std::unordered_map<std::string,Values_T>;
         
@@ -28,26 +29,23 @@ namespace Repulsor
         
         CLASS() = default;
         
-        explicit CLASS(
-            const Pattern_T & pattern_,
-            const Kernel_T & kernel_
-        )
-        :   pattern ( pattern_ )
-        ,   kernel  ( kernel_  )
+        CLASS( const Pattern_T & pattern_, const Kernel_T & kernel_ )
+        :   pattern ( pattern_  )
+        ,   kernel  ( kernel_   )
         {
         }
         
         // Copy constructor
         CLASS( const CLASS & other )
         :   pattern ( other.pattern )
-        ,   kernel  ( other.kernel )
+        ,   kernel  ( other.kernel  )
         {}
 
         ~CLASS() = default;
         
     protected:
-        
-        const Pattern_T & pattern;
+    
+        Pattern_T pattern;
         
         Kernel_T kernel;
         
@@ -77,10 +75,11 @@ namespace Repulsor
             
             kernel.Allocate( pattern.NonzeroCount() );
             
+            
             const Int thread_count = job_ptr.Size()-1;
             
             Real global_sum = static_cast<Real>(0);
-            
+
             if( thread_count > 1 )
             {
                 #pragma omp parallel for num_threads( thread_count ) reduction( + : global_sum )
@@ -89,6 +88,7 @@ namespace Repulsor
                     // Initialize local kernel and feed it all the information that is going to be constant along its life time.
                     
                     Kernel_T ker ( kernel );
+
                     
                     Real local_sum = static_cast<Real>(0);
                     
@@ -100,7 +100,7 @@ namespace Repulsor
                     // Kernel is supposed the following rows of pattern:
                     const Int i_begin = job_ptr[thread  ];
                     const Int i_end   = job_ptr[thread+1];
-                    
+
                     for( Int i = i_begin; i < i_end; ++i )
                     {
                         // These are the corresponding nonzero blocks in i-th row.
@@ -120,9 +120,9 @@ namespace Repulsor
                                 ker.LoadT(j);
                                 
                                 ker.Prefetch(ci[k+1]);
-                                
+
                                 local_sum += ker.Compute(k);
-                                
+
                                 ker.WriteT(j);
                             }
                             
@@ -185,13 +185,13 @@ namespace Repulsor
                             for( LInt k = k_begin; k < k_end-1; ++k )
                             {
                                 const Int j = ci[k];
-                                
+
                                 ker.LoadT(j);
-                                
+
                                 ker.Prefetch(ci[k+1]);
-                                
+
                                 local_sum += ker.Compute(k);
-                                
+
                                 ker.WriteT(j);
                             }
                             
@@ -220,6 +220,7 @@ namespace Repulsor
                     global_sum += local_sum;
                 }
             }
+
             ptoc(ClassName()+"::Compute");
 
             return global_sum;

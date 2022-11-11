@@ -5,28 +5,27 @@
 namespace Repulsor
 {
     template<
-        typename BlockClusterTree_T_,
+        typename ClusterTree_T_,
+        bool is_symmetric_,
         bool energy_flag_, bool diff_flag_, bool metric_flag_
     >
     class alignas( OBJECT_ALIGNMENT ) CLASS
     {
     public:
         
-        using BlockClusterTree_T = BlockClusterTree_T_;
+        using ClusterTree_T      = ClusterTree_T_;
         
-        using ClusterTree_T      = typename BlockClusterTree_T::ClusterTree_T;
-        using Values_T           = typename BlockClusterTree_T::Values_T;
-        using ValueContainer_T   = typename BlockClusterTree_T::ValueContainer_T;
+        using Real               = typename ClusterTree_T::Real;
+        using SReal              = typename ClusterTree_T::SReal;
+        using ExtReal            = typename ClusterTree_T::ExtReal;
+        using Int                = typename ClusterTree_T::Int;
+        using LInt               = size_t;
+
+        using Configurator_T     = FMM_Configurator<ClusterTree_T>;
+        using Values_T           = typename Configurator_T::Values_T;
+        using ValueContainer_T   = typename Configurator_T::ValueContainer_T;
         
-        using Real               = typename BlockClusterTree_T::Real;
-        using SReal              = typename BlockClusterTree_T::SReal;
-        using ExtReal            = typename BlockClusterTree_T::ExtReal;
-        using Int                = typename BlockClusterTree_T::Int;
-        using LInt               = typename BlockClusterTree_T::LInt;
-        
-        using Configurator_T     = FMM_Configurator<BlockClusterTree_T>;
-        
-        static constexpr bool is_symmetric = BlockClusterTree_T::IsSymmetric();
+        static constexpr bool is_symmetric = is_symmetric_;
         static constexpr bool energy_flag  = energy_flag_;
         static constexpr bool diff_flag    = diff_flag_;
         static constexpr bool metric_flag  = metric_flag_;
@@ -89,17 +88,17 @@ namespace Repulsor
         CLASS() = delete;
         
         CLASS( Configurator_T & conf )
-        :   bct           ( conf.GetBlockClusterTree() )
+        :   S             ( conf.GetS() )
+        ,   T             ( conf.GetT() )
         ,   metric_values ( conf.MetricValues()        )   // In configure mode, kernels needs
         {
             Init();
         }
         
         CLASS( const CLASS & other )
-        :   bct           ( other.bct            )
+        :   S             ( other.S              )
+        ,   T             ( other.T              )
         ,   metric_values ( other.metric_values  )
-        // In compute mode the pointers are needed!
-        ,   metric_data   ( metric_values.data() )
         {
             Init();
         }
@@ -107,29 +106,34 @@ namespace Repulsor
         ~CLASS() = default;
 
     public:
+        
         const ClusterTree_T & GetS() const
         {
-            return bct.GetS();
+            return S;
         }
         
         const ClusterTree_T & GetT() const
         {
-            return bct.GetT();
+            return T;
+        }
+        
+        Int ThreadCount() const
+        {
+            return std::min( S.ThreadCount(), T.ThreadCount() );
         }
         
     protected:
         
-        const BlockClusterTree_T & bct;
+        const ClusterTree_T & S;
+        const ClusterTree_T & T;
         
-        Values_T & metric_values;
-        
-        Real * restrict const metric_data = nullptr;
+        ValueContainer_T & metric_values;
         
     public:
         
         std::string ClassName() const
         {
-            return TO_STD_STRING(CLASS)+"<"+bct.ClassName()+">";
+            return TO_STD_STRING(CLASS)+"<"+S.ClassName()+">";
         }
 
     };

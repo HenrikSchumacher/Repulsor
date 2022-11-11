@@ -1,25 +1,22 @@
 #pragma once
 
 #define CLASS TP_Kernel_VF
-#define BASE  FMM_Kernel_VF<S_DOM_DIM_,T_DOM_DIM_,BlockClusterTree_T_,energy_flag_,diff_flag_,metric_flag_>
+#define BASE  FMM_Kernel_VF<S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,metric_flag_>
 
 namespace Repulsor
 {
     template<
         int S_DOM_DIM_, int T_DOM_DIM_,
-        typename BlockClusterTree_T_,
+        typename ClusterTree_T_,
         typename T1, typename T2,
+        bool is_symmetric_,
         bool energy_flag_, bool diff_flag_, bool metric_flag_
     >
     class CLASS : public BASE
     {
     public:
         
-        using BlockClusterTree_T = typename BASE::BlockClusterTree_T;
-        
-        using ClusterTree_T      = typename BASE::ClusterTree_T;
-        using Values_T           = typename BASE::Values_T;
-        using ValueContainer_T   = typename BASE::ValueContainer_T;
+        using ClusterTree_T      = ClusterTree_T_;
         
         using Real               = typename BASE::Real;
         using SReal              = typename BASE::SReal;
@@ -28,6 +25,8 @@ namespace Repulsor
         using LInt               = typename BASE::LInt;
         
         using Configurator_T     = typename BASE::Configurator_T;
+        using Values_T           = typename BASE::Values_T;
+        using ValueContainer_T   = typename BASE::ValueContainer_T;
         
         using BASE::AMB_DIM;
         using BASE::PROJ_DIM;
@@ -83,8 +82,6 @@ namespace Repulsor
         ~CLASS() = default;
         
     protected:
-        
-        using BASE::bct;
         
         using BASE::metric_data;
         
@@ -446,7 +443,7 @@ namespace Repulsor
             return TO_STD_STRING(CLASS)+"<"
             + ToString(S_DOM_DIM) + ","
             + ToString(T_DOM_DIM) + ","
-            + bct.ClassName() + ","
+            + this->S.ClassName() + ","
             + TypeName<T1>::Get() + ","
             + TypeName<T2>::Get() + ","
             + ToString(energy_flag) + ","

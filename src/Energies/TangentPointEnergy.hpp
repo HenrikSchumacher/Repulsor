@@ -19,6 +19,7 @@ namespace Repulsor
         
         using Mesh_T                  = typename BASE::Mesh_T;
         using BlockClusterTree_T      = typename Mesh_T::BlockClusterTree_T;
+        using ClusterTree_T           = typename BlockClusterTree_T::ClusterTree_T;
         
         using Values_T                = typename BASE::Values_T;
         using ValueContainer_T        = typename BASE::ValueContainer_T;

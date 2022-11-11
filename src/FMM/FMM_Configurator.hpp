@@ -4,39 +4,37 @@
 
 namespace Repulsor
 {
-    template< typename BlockClusterTree_T_ >
+    template<typename ClusterTree_T_>
     class alignas( OBJECT_ALIGNMENT ) CLASS
     {
     public:
         
-        using BlockClusterTree_T  = BlockClusterTree_T_;
+        using ClusterTree_T       = ClusterTree_T_;
         
-        using ClusterTree_T       = typename BlockClusterTree_T::ClusterTree_T;
-        using Values_T            = typename BlockClusterTree_T::Values_T;
-        using ValueContainer_T    = typename BlockClusterTree_T::ValueContainer_T;
+        using Real                = typename ClusterTree_T::Real;
+        using SReal               = typename ClusterTree_T::SReal;
+        using ExtReal             = typename ClusterTree_T::ExtReal;
+        using Int                 = typename ClusterTree_T::Int;
+        using LInt                = size_t;
         
-        using Real                = typename BlockClusterTree_T::Real;
-        using SReal               = typename BlockClusterTree_T::SReal;
-        using ExtReal             = typename BlockClusterTree_T::ExtReal;
-        using Int                 = typename BlockClusterTree_T::Int;
-        using LInt                = typename BlockClusterTree_T::LInt;
-        
+        using Values_T           = Tensor2<Real,LInt>;
+        using ValueContainer_T   = std::unordered_map<std::string,Values_T>;
+
         
     public:
 
         CLASS() = delete;
         
-        CLASS(
-            const BlockClusterTree_T & bct_,
-            Values_T & metric_values_
-        )
-        :   bct           ( bct_                )
-        ,   metric_values ( metric_values_      )
+        CLASS( const ClusterTree_T & S_, const ClusterTree_T & T_, ValueContainer_T & metric_values_ )
+        :   S             ( S_             )
+        ,   T             ( T_             )
+        ,   metric_values ( metric_values_ )
         {}
         
         // Copy constructor
         CLASS( const CLASS & other )
-        :   bct           ( other.bct           )
+        :   S             ( other.S             )
+        ,   T             ( other.T             )
         ,   metric_values ( other.metric_values )
         {}
         
@@ -44,28 +42,24 @@ namespace Repulsor
 
     protected:
 
-        const BlockClusterTree_T & bct;
+        const ClusterTree_T & S;
+        const ClusterTree_T & T;
         
-        Values_T & metric_values;
+        ValueContainer_T & metric_values;
 
     public:
-
-        const BlockClusterTree_T & GetBlockClusterTree() const
-        {
-            return bct;
-        }
         
         const ClusterTree_T & GetS() const
         {
-            return bct.GetS();
+            return S;
         }
         
         const ClusterTree_T & GetT() const
         {
-            return bct.GetT();
+            return T;
         }
         
-        Values_T & MetricValues() const
+        ValueContainer_T & MetricValues()
         {
             return metric_values;
         }
@@ -74,7 +68,7 @@ namespace Repulsor
         
         std::string ClassName() const
         {
-            return TO_STD_STRING(CLASS)+"<"+bct.ClassName()+">";
+            return TO_STD_STRING(CLASS)+"<"+S.ClassName()+">";
         }
 
     };

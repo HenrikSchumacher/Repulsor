@@ -17,12 +17,12 @@ namespace Repulsor
         
         using MeshBase_T         = SimplicialMeshBase<Real,Int,SReal,ExtReal>;
         using BlockClusterTree_T = typename MeshBase_T::BlockClusterTree_T;
-        using LInt               = typename BlockClusterTree_T::LInt;
+        using LInt               = size_t;
         using TangentVector_T    = typename MeshBase_T::TangentVector_T;
         using CotangentVector_T  = typename MeshBase_T::CotangentVector_T;
         
-        using Values_T           = typename BlockClusterTree_T::Values_T;
-        using ValueContainer_T   = typename BlockClusterTree_T::ValueContainer_T;
+        using Values_T           = Tensor2<Real,LInt>;
+        using ValueContainer_T   = std::unordered_map<std::string,Values_T>;
         
         CLASS() = default;
 

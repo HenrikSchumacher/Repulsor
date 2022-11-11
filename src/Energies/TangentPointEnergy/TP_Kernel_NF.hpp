@@ -1,27 +1,25 @@
 #pragma once
 
 #define CLASS TP_Kernel_NF
-#define BASE FMM_Kernel_NF<                         \
-    S_DOM_DIM_,T_DOM_DIM_,BlockClusterTree_T_,      \
-    energy_flag_,diff_flag_,metric_flag_            \
+#define BASE FMM_Kernel_NF<                                  \
+    S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,is_symmetric_,      \
+    energy_flag_,diff_flag_,metric_flag_                     \
 >
 
 namespace Repulsor
 {
     template<
         int S_DOM_DIM_, int T_DOM_DIM_,
-        typename BlockClusterTree_T_, typename T1, typename T2,
+        typename ClusterTree_T_,
+        typename T1, typename T2,
+        bool is_symmetric_,
         bool energy_flag_, bool diff_flag_, bool metric_flag_
     >
     class CLASS : public BASE
     {
     public:
         
-        using BlockClusterTree_T = typename BASE::BlockClusterTree_T;
-        
-        using ClusterTree_T      = typename BASE::ClusterTree_T;
-        using Values_T           = typename BASE::Values_T;
-        using ValueContainer_T   = typename BASE::ValueContainer_T;
+        using ClusterTree_T      = ClusterTree_T_;
         
         using Real               = typename BASE::Real;
         using SReal              = typename BASE::SReal;
@@ -30,6 +28,9 @@ namespace Repulsor
         using LInt               = typename BASE::LInt;
         
         using Configurator_T     = typename BASE::Configurator_T;
+        using Values_T           = typename BASE::Values_T;
+        using ValueContainer_T   = typename BASE::ValueContainer_T;
+
         
         using BASE::AMB_DIM;
         using BASE::PROJ_DIM;
@@ -47,8 +48,6 @@ namespace Repulsor
         static constexpr Int COLS      = 1 + AMB_DIM;
         static constexpr Int BLOCK_NNZ = 1 + 2 * AMB_DIM;
         static constexpr Int DIAG_NNZ  = ROWS * COLS;
-
-        using BASE::bct;
         
         using BASE::zero;
         using BASE::one;
@@ -165,7 +164,7 @@ namespace Repulsor
                 rCosPhi_2 += v[i] * Pv[i];
                 rCosPsi_2 += v[i] * Qv[i];
             }
-            
+
             // |P*(y-x)|^{q-2}
             const Real rCosPhi_q_minus_2 = MyMath::pow<Real,T1>( fabs(rCosPhi_2), q_half_minus_1);
             // |Q*(y-x)|^{q-2}
@@ -228,7 +227,7 @@ namespace Repulsor
                         DY[1+T_COORD_DIM+k] +=  a_K_yx * V[k];
                     }
                 }
-                
+
                 if constexpr ( metric_flag )
                 {
 // ij_block
@@ -270,7 +269,6 @@ namespace Repulsor
 //    |   - K_yx * v[2]   K_yx * v[2] * v[0]  K_yx * v[2] * v[1]  K_yx * v[2] * v[2]    |
 //    \                                                                                 /
         
-                    
                     const Real K_sym = K_xy + K_yx;
                     
                     const Real b_over_a   = b/a;
@@ -296,7 +294,7 @@ namespace Repulsor
                         ii_block[i][0] +=   b_over_a_K_xy * v[i-1];
                         jj_block[i][0]  = - a_over_b_K_yx * v[i-1];
                     }
-                    
+
                     for( Int i = 1; i < ROWS; ++i )
                     {
                         {
@@ -317,7 +315,6 @@ namespace Repulsor
                             jj_block[j][i]  = a_over_b_K_yx * vv;
                         }
                     }
-                    
                     copy_buffer( &ij_block[0], &metric_data[BLOCK_NNZ * k_global], BLOCK_NNZ );
                 }
             }
@@ -381,7 +378,7 @@ namespace Repulsor
             return TO_STD_STRING(CLASS)+"<"
             + ToString(S_DOM_DIM) + ","
             + ToString(T_DOM_DIM) + ","
-            + bct.ClassName() + ","
+            + this->S.ClassName() + ","
             + TypeName<T1>::Get() + ","
             + TypeName<T2>::Get() + ","
             + ToString(energy_flag) + ","

@@ -1,24 +1,22 @@
 #pragma once
 
 #define CLASS TP0_Kernel_VF
-#define BASE  FMM_Kernel_VF<S_DOM_DIM_,T_DOM_DIM_,BlockClusterTree_T_,energy_flag_,diff_flag_,metric_flag_>
+#define BASE  FMM_Kernel_VF<S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,metric_flag_>
 
 namespace Repulsor
 {
     template<
         int S_DOM_DIM_, int T_DOM_DIM_,
-        typename BlockClusterTree_T_, typename T1, typename T2,
+        typename ClusterTree_T_,
+        typename T1, typename T2,
+        bool is_symmetric_,
         bool energy_flag_, bool diff_flag_, bool metric_flag_
     >
     class CLASS : public BASE
     {
     public:
         
-        using BlockClusterTree_T = typename BASE::BlockClusterTree_T;
-        
-        using ClusterTree_T      = typename BASE::ClusterTree_T;
-        using Values_T           = typename BASE::Values_T;
-        using ValueContainer_T   = typename BASE::ValueContainer_T;
+        using ClusterTree_T      = ClusterTree_T_;
         
         using Real               = typename BASE::Real;
         using SReal              = typename BASE::SReal;
@@ -27,7 +25,9 @@ namespace Repulsor
         using LInt               = typename BASE::LInt;
         
         using Configurator_T     = typename BASE::Configurator_T;
-        
+        using Values_T           = typename BASE::Values_T;
+        using ValueContainer_T   = typename BASE::ValueContainer_T;
+
         using BASE::AMB_DIM;
         using BASE::PROJ_DIM;
         using BASE::S_DOM_DIM;
@@ -141,7 +141,6 @@ namespace Repulsor
         Real jj_block [BLOCK_NNZ] = {};
         
 #include "../../FMM/FMM_Kernel_Common.hpp"
-        
 // Now load the actual Compute method.
 #include "../../FMM/FMM_Kernel_VF_Common.hpp"
         
@@ -338,8 +337,8 @@ namespace Repulsor
             return result;
         }
         
-    protected:
-    
+        
+    public:
         
         force_inline void LoadS( const Int i_global )
         {
@@ -347,7 +346,7 @@ namespace Repulsor
             
             if constexpr ( metric_flag )
             {
-                zerofy_buffer( &ii_block[0][0], DIAG_NNZ );
+                zerofy_buffer( &ii_block[0], DIAG_NNZ );
             }
         }
         
@@ -357,7 +356,7 @@ namespace Repulsor
             
             if constexpr ( metric_flag )
             {
-                add_to_buffer<DIAG_NNZ>( &ii_block[0][0], &S_diag[DIAG_NNZ * i_global] );
+                add_to_buffer<DIAG_NNZ>( &ii_block[0], &S_diag[DIAG_NNZ * i_global] );
             }
         }
         
@@ -369,7 +368,7 @@ namespace Repulsor
             {
                 zerofy_buffer( &ij_block[0], BLOCK_NNZ );
                 
-                zerofy_buffer( &jj_block[0][0], DIAG_NNZ );
+                zerofy_buffer( &jj_block[0], DIAG_NNZ );
             }
         }
 
@@ -380,9 +379,10 @@ namespace Repulsor
             
             if constexpr ( metric_flag )
             {
-                add_to_buffer<DIAG_NNZ>( &jj_block[0][0], &T_diag[DIAG_NNZ * j_global] );
+                add_to_buffer<DIAG_NNZ>( &jj_block[0], &T_diag[DIAG_NNZ * j_global] );
             }
         }
+        
         
         std::string ClassName() const
         {

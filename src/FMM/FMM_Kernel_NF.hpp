@@ -1,32 +1,31 @@
 #pragma once
 
 #define CLASS FMM_Kernel_NF
-#define BASE  FMM_Kernel<BlockClusterTree_T_,energy_flag_,diff_flag_,metric_flag_>
+#define BASE  FMM_Kernel<ClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,metric_flag_>
 
 namespace Repulsor
 {
     template<
         int S_DOM_DIM_, int T_DOM_DIM_,
-        typename BlockClusterTree_T_,
+        typename ClusterTree_T_,
+        bool is_symmetric_,
         bool energy_flag_, bool diff_flag_, bool metric_flag_
     >
     class CLASS : public BASE
     {
     public:
         
-        using BlockClusterTree_T = BlockClusterTree_T_;
+        using ClusterTree_T      = ClusterTree_T_;
         
-        using ClusterTree_T      = typename BlockClusterTree_T::ClusterTree_T;
-        using Values_T           = typename BlockClusterTree_T::Values_T;
-        using ValueContainer_T   = typename BlockClusterTree_T::ValueContainer_T;
+        using Real               = typename BASE::Real;
+        using SReal              = typename BASE::SReal;
+        using ExtReal            = typename BASE::ExtReal;
+        using Int                = typename BASE::Int;
+        using LInt               = typename BASE::LInt;
         
-        using Real               = typename BlockClusterTree_T::Real;
-        using SReal              = typename BlockClusterTree_T::SReal;
-        using ExtReal            = typename BlockClusterTree_T::ExtReal;
-        using Int                = typename BlockClusterTree_T::Int;
-        using LInt               = typename BlockClusterTree_T::LInt;
-        
-        using Configurator_T     = FMM_Configurator<BlockClusterTree_T>;
+        using Configurator_T     = typename BASE::Configurator_T;
+        using Values_T           = typename BASE::Values_T;
+        using ValueContainer_T   = typename BASE::ValueContainer_T;
         
         using BASE::AMB_DIM;
         using BASE::PROJ_DIM;
@@ -47,6 +46,8 @@ namespace Repulsor
         static constexpr Int T_DATA_DIM  = 1 + T_COORD_DIM + PROJ_DIM;
         
     protected:
+        
+        Real * restrict const metric_data = nullptr;
         
         mutable Real sum = static_cast<Real>(0);
         
@@ -77,14 +78,11 @@ namespace Repulsor
         const  Real * restrict const T_data    = nullptr;
                Real * restrict const T_D_data  = nullptr;
                Real * restrict const T_diag    = nullptr;
-
-        using BASE::bct;
+        
         using BASE::tri_i;
         using BASE::tri_j;
         using BASE::lin_k;
-        
-        using BASE::metric_data;
-        
+    
         static const constexpr Real S_scale = static_cast<Real>(1)/static_cast<Real>(S_DOM_DIM+1);
         static const constexpr Real T_scale = static_cast<Real>(1)/static_cast<Real>(T_DOM_DIM+1);
         
@@ -114,7 +112,7 @@ namespace Repulsor
                     eprint(ClassName()+" Constructor: GetS().ThreadPrimitiveDNearFieldData().Dimension(2) != S_DATA_DIM");
                 }
             }
-            
+               
             if( GetT().PrimitiveNearFieldData().Dimension(1) != T_DATA_DIM)
             {
                eprint(ClassName()+" Constructor: GetT().PrimitiveNearFieldData().Dimension(1) != T_DATA_DIM ");
@@ -129,15 +127,15 @@ namespace Repulsor
             }
         }
         
-        // Use this constructor to make a copy of a configured kernel within the local thread.
         CLASS( const CLASS & other )
-        :   BASE        ( other                                                                   )
-        ,   S_data      ( other.S_data                                                            )
+        :   BASE        ( other                                                                 )
+        ,   metric_data ( other.OffDiag().data()                                                )
+        ,   S_data      ( other.S_data                                                          )
         ,   S_D_data    ( other.GetS().ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
-        ,   S_diag      ( other.GetS().NF_Accumulator().data(               omp_get_thread_num()) )
-        ,   T_data      ( other.T_data                                                            )
+        ,   S_diag      ( other.GetS().NF_Accumulator().data(            omp_get_thread_num())  )
+        ,   T_data      ( other.T_data                                                          )
         ,   T_D_data    ( other.GetT().ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
-        ,   T_diag      ( other.GetT().NF_Accumulator().data(               omp_get_thread_num()) )
+        ,   T_diag      ( other.GetT().NF_Accumulator().data(             omp_get_thread_num()) )
         {}
         
         ~CLASS() = default;
@@ -239,12 +237,23 @@ namespace Repulsor
         
     public:
         
+        Values_T & OffDiag() const
+        {
+            return this->metric_values["NF"];
+        }
+        
+        Values_T & Diag() const
+        {
+            return this->metric_values["NF_diag"];
+        }
+
+        
         std::string ClassName() const
         {
             return TO_STD_STRING(CLASS)+"<"
             + ToString(S_DOM_DIM) + ","
             + ToString(T_DOM_DIM) + ","
-            + bct.ClassName() + ","
+            + GetS().ClassName() + ","
             + ToString(energy_flag) + ","
             + ToString(diff_flag) + ","
             + ToString(metric_flag) + ","

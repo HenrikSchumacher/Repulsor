@@ -1,21 +1,21 @@
 #pragma once
 
 #define CLASS TP_Kernel_FF
-#define BASE  FMM_Kernel_FF<BlockClusterTree_T_,energy_flag_,diff_flag_,metric_flag_>
+#define BASE  FMM_Kernel_FF<ClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,metric_flag_>
 
 namespace Repulsor
 {
     template<
-        typename BlockClusterTree_T_, typename T1, typename T2,
+        typename ClusterTree_T_,
+        typename T1, typename T2,
+        bool is_symmetric_,
         bool energy_flag_, bool diff_flag_, bool metric_flag_
     >
     class CLASS : public BASE
     {
     public:
         
-        using BlockClusterTree_T = typename BASE::BlockClusterTree_T;
-        
-        using ClusterTree_T      = typename BASE::ClusterTree_T;
+        using ClusterTree_T      = ClusterTree_T_;
         using Values_T           = typename BASE::Values_T;
         using ValueContainer_T   = typename BASE::ValueContainer_T;
         
@@ -36,9 +36,6 @@ namespace Repulsor
         static constexpr  Int COLS      = 1 + AMB_DIM;
         static constexpr LInt BLOCK_NNZ = 1 + 2 * AMB_DIM;
         static constexpr LInt DIAG_NNZ  = ROWS * COLS;
-
-
-        using BASE::bct;
         
         using BASE::zero;
         using BASE::one;
@@ -347,15 +344,6 @@ namespace Repulsor
 //                zerofy_buffer( &jj_block[0][0], DIAG_NNZ );
             }
         }
-        
-        force_inline void WriteBlock( const LInt k_global )
-        {
-            
-            if constexpr ( metric_flag )
-            {
-                copy_buffer( &ij_block[0], &metric_data[BLOCK_NNZ * k_global], BLOCK_NNZ );
-            }
-        }
 
         force_inline void WriteT( const Int j_global )
         {
@@ -370,7 +358,7 @@ namespace Repulsor
         std::string ClassName() const
         {
             return TO_STD_STRING(CLASS)+"<"
-            + bct.ClassName() + ","
+            + this->S.ClassName() + ","
             + TypeName<T1>::Get() + ","
             + TypeName<T2>::Get() + ","
             + ToString(energy_flag) + ","

@@ -2,32 +2,32 @@
 
 #define CLASS FMM_Kernel_VF
 
-#define BASE  FMM_Kernel<BlockClusterTree_T_,energy_flag_,diff_flag_,metric_flag_>
+#define BASE  FMM_Kernel<ClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,metric_flag_>
 
 namespace Repulsor
 {
     template<
         int S_DOM_DIM_, int T_DOM_DIM_,
-        typename BlockClusterTree_T_,
+        typename ClusterTree_T_,
+        bool is_symmetric_,
         bool energy_flag_, bool diff_flag_, bool metric_flag_
     >
     class CLASS : public BASE
     {
     public:
         
-        using BlockClusterTree_T = BlockClusterTree_T_;
+        using ClusterTree_T      = ClusterTree_T_;
+        using Real               = typename BASE::Real;
+        using SReal              = typename BASE::SReal;
+        using ExtReal            = typename BASE::ExtReal;
+        using Int                = typename BASE::Int;
+        using LInt               = typename BASE::LInt;
         
-        using ClusterTree_T      = typename BlockClusterTree_T::ClusterTree_T;
-        using Values_T           = typename BlockClusterTree_T::Values_T;
-        using ValueContainer_T   = typename BlockClusterTree_T::ValueContainer_T;
+        using Configurator_T     = typename BASE::Configurator_T;
+        using Values_T           = typename BASE::Values_T;
+        using ValueContainer_T   = typename BASE::ValueContainer_T;
         
-        using Real               = typename BlockClusterTree_T::Real;
-        using SReal              = typename BlockClusterTree_T::SReal;
-        using ExtReal            = typename BlockClusterTree_T::ExtReal;
-        using Int                = typename BlockClusterTree_T::Int;
-        using LInt               = typename BlockClusterTree_T::LInt;
         
-        using Configurator_T     = FMM_Configurator<BlockClusterTree_T>;
         
         using BASE::AMB_DIM;
         using BASE::PROJ_DIM;
@@ -53,6 +53,8 @@ namespace Repulsor
         using GJK_T    = GJK_Algorithm<AMB_DIM,GJK_Real,Int>;
         
     protected:
+        
+        Real * restrict const metric_data = nullptr;
         
         mutable Real sum = static_cast<Real>(0);
         
@@ -97,14 +99,11 @@ namespace Repulsor
 #else
         mutable Real const * restrict y_buffer  = nullptr;
 #endif
-
-        using BASE::bct;
         
         using BASE::tri_i;
         using BASE::tri_j;
         using BASE::lin_k;
-        
-        using BASE::metric_data;
+
         
         mutable S_Tree_T S_Tree;
         mutable T_Tree_T T_Tree;
@@ -164,6 +163,7 @@ namespace Repulsor
         
         CLASS( const CLASS & other )
         :   BASE        ( other                                                                   )
+        ,   metric_data ( other.OffDiag().data()                                                  )
         ,   S_data      ( other.S_data                                                            )
         ,   S_D_data    ( other.GetS().ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
         ,   S_diag      ( other.GetS().VF_Accumulator().data(               omp_get_thread_num()) )
@@ -269,7 +269,7 @@ namespace Repulsor
             }
         }
         
-        force_inline  void writeT( const Int j_global )
+        force_inline void writeT( const Int j_global )
         {
             if constexpr (diff_flag )
             {
@@ -283,6 +283,16 @@ namespace Repulsor
         }
         
     public:
+        
+        Values_T & OffDiag() const
+        {
+            return this->metric_values["VF"];
+        }
+        
+        Values_T & Diag() const
+        {
+            return this->metric_values["VF_diag"];
+        }
         
 //        void CreateLogFile() const
 //        {
@@ -324,7 +334,7 @@ namespace Repulsor
             return TO_STD_STRING(CLASS)+"<"
             + ToString(S_DOM_DIM) + ","
             + ToString(T_DOM_DIM) + ","
-            + bct.ClassName() + ","
+            + GetS().ClassName() + ","
             + ToString(energy_flag) + ","
             + ToString(diff_flag) + ","
             + ToString(metric_flag) + ","

@@ -21,8 +21,8 @@ namespace Repulsor
         
         using BlockClusterTree_T     = typename MeshBase_T::BlockClusterTree_T;
         
-        using Values_T               = typename BlockClusterTree_T::Values_T;
-        using ValueContainer_T       = typename BlockClusterTree_T::ValueContainer_T;
+        using Values_T           = Tensor2<Real,size_t>;
+        using ValueContainer_T   = std::unordered_map<std::string,Values_T>;
         
         CLASS() = default;
 
@@ -38,20 +38,19 @@ namespace Repulsor
         ValueContainer_T & MetricValues( const MeshBase_T & M ) const
         {
             ptic(ClassName()+"::MetricValues");
-            
             if( !M.IsCached(ClassName()+"::MetricValues"))
             {
                 std::any thing ( std::move(compute_metric(M)) );
                 
                 M.SetCache( ClassName()+"::MetricValues", thing );
             }
-            
+
             ptoc(ClassName()+"::MetricValues");
 
             auto & result = std::any_cast<ValueContainer_T &>(
                   M.GetCache(ClassName()+"::MetricValues")
             );
-                                                              
+            
             return result;
         }
        

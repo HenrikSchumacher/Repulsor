@@ -1,8 +1,12 @@
 #pragma once
 
-#define CLASS TangentPointMetric
-#define BASE  MetricDimRestricted<DOM_DIM,AMB_DIM,Real,Int,SReal,ExtReal>
-#define ROOT  MetricBase<Real,Int,SReal,ExtReal>
+#include "TangentPointEnergy/TP_Kernel_NF.hpp"
+
+#include "TangentPointEnergy/TP_AllPairs_Traversor.hpp"
+
+#define CLASS TangentPointEnergy_AllPairs
+#define BASE  EnergyDimRestricted<DOM_DIM,AMB_DIM,Real,Int,SReal,ExtReal>
+#define ROOT  EnergyBase<Real,Int,SReal,ExtReal>
 
 namespace Repulsor
 {
@@ -13,13 +17,12 @@ namespace Repulsor
         
         using Mesh_T                  = typename BASE::Mesh_T;
         using BlockClusterTree_T      = typename Mesh_T::BlockClusterTree_T;
+        using ClusterTree_T           = typename BlockClusterTree_T::ClusterTree_T;
         
         using Values_T                = typename BASE::Values_T;
         using ValueContainer_T        = typename BASE::ValueContainer_T;
         using TangentVector_T         = typename BASE::TangentVector_T;
         using CotangentVector_T       = typename BASE::CotangentVector_T;
-        
-        using BASE::MetricValues;
         
         CLASS( const Real q_, const Real p_ )
         :   BASE ()
@@ -36,27 +39,26 @@ namespace Repulsor
         
     public:
         
-        virtual ValueContainer_T compute_metric( const Mesh_T & M ) const override
+        virtual ExtReal value( const Mesh_T & M ) const override
         {
+            // Create some dummies.
             ValueContainer_T metric_values;
-         
-            TP_Traversor<DOM_DIM,DOM_DIM,BlockClusterTree_T,false,false,true>
-                traversor( M.GetBlockClusterTree(), metric_values, q, p );
-
-            (void)traversor.Compute();
-
-            return metric_values;
+            
+            TP_AllPairs_Traversor<DOM_DIM,DOM_DIM,ClusterTree_T,true,true,false,false>
+            traversor( M.GetClusterTree(), M.GetClusterTree(), metric_values, q, p );
+            
+            return traversor.Compute();
         }
         
-        virtual void multiply_metric(
-            const Mesh_T & M,
-            const bool VF_flag, const bool NF_flag, const bool FF_flag
-        ) const override
+        virtual void differential( const Mesh_T & M ) const override
         {
-            TP_Traversor<DOM_DIM,DOM_DIM,BlockClusterTree_T,false,false,true>
-                traversor( M.GetBlockClusterTree(), MetricValues(M), q, p );
+            // Create some dummies.
+            ValueContainer_T metric_values;
             
-            (void)traversor.MultiplyMetric(VF_flag,NF_flag,FF_flag);
+            TP_AllPairs_Traversor<DOM_DIM,DOM_DIM,ClusterTree_T,true,false,true,false>
+                traversor( M.GetClusterTree(), M.GetClusterTree(), metric_values, q, p );
+            
+            (void)traversor.Compute();
         }
         
     public:
@@ -76,7 +78,7 @@ namespace Repulsor
 } // namespace Repulsor
 
 
-#include "TangentPointMetric/Make_TangentPointMetric.hpp"
+#include "TangentPointEnergy/Make_TangentPointEnergy.hpp"
 
 #undef ROOT
 #undef BASE
