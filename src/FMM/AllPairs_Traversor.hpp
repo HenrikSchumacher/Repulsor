@@ -82,8 +82,6 @@ namespace Repulsor
                 job_ptr = JobPointers<LInt>( m, thread_count );
             }
             
-            print(job_ptr.ToString());
-            
             kernel.Allocate( m * n );
 
             Real global_sum = static_cast<Real>(0);
