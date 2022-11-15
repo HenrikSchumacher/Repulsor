@@ -7,18 +7,18 @@
 #include "TangentPointEnergy/TP_Traversor.hpp"
 
 #define CLASS TangentPointObstacleEnergy
-#define BASE  EnergyDimRestricted<DOM_DIM,AMB_DIM,Real,Int,SReal,ExtReal>
+#define BASE  EnergyDimRestricted<DOM_DIM_S,AMB_DIM,Real,Int,SReal,ExtReal>
 #define ROOT  EnergyBase<Real,Int,SReal,ExtReal>
 
 namespace Repulsor
 {
-    template<int DOM_DIM, int AMB_DIM, typename Real, typename Int, typename SReal, typename ExtReal>
+    template<int DOM_DIM_S, int DOM_DIM_T, int AMB_DIM, typename Real, typename Int, typename SReal, typename ExtReal>
     class CLASS : public BASE
     {
     public:
         
         using Mesh_T                  = typename BASE::Mesh_T;
-        using BlockClusterTree_T      = typename Mesh_T::BlockClusterTree_T;
+        using BlockClusterTree_T      = typename Mesh_T::ObstacleBlockClusterTree_T;
         using ClusterTree_T           = typename BlockClusterTree_T::ClusterTree_T;
         
         using Values_T                = typename BASE::Values_T;
@@ -46,7 +46,7 @@ namespace Repulsor
             // Create some dummies.
             ValueContainer_T metric_values;
             
-            TP_Traversor<DOM_DIM,DOM_DIM,BlockClusterTree_T,true,false,false>
+            TP_Traversor<DOM_DIM_S,DOM_DIM_T,BlockClusterTree_T,true,false,false>
                 traversor( M.GetObstacleBlockClusterTree(), metric_values, q, p );
             
             return traversor.Compute();
@@ -57,7 +57,7 @@ namespace Repulsor
             // Create some dummies.
             ValueContainer_T metric_values;
             
-            TP_Traversor<DOM_DIM,DOM_DIM,BlockClusterTree_T,false,true,false>
+            TP_Traversor<DOM_DIM_S,DOM_DIM_T,BlockClusterTree_T,false,true,false>
                 traversor( M.GetObstacleBlockClusterTree(), metric_values, q, p );
             
             (void)traversor.Compute();
@@ -68,7 +68,7 @@ namespace Repulsor
         
         std::string className() const
         {
-            return TO_STD_STRING(CLASS)+"<"+ToString(DOM_DIM)+","+ToString(AMB_DIM)+","+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+"("+ToString(q)+","+ToString(p)+")";
+            return TO_STD_STRING(CLASS)+"<"+ToString(DOM_DIM_S)+","+ToString(DOM_DIM_T)+","+ToString(AMB_DIM)+","+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+"("+ToString(q)+","+ToString(p)+")";
         }
         
         virtual std::string ClassName() const override
@@ -80,7 +80,7 @@ namespace Repulsor
 } // namespace Repulsor
 
 
-#include "TangentPointEnergy/Make_TangentPointEnergy.hpp"
+#include "TangentPointEnergy/Make_TangentPointObstacleEnergy.hpp"
 
 #undef ROOT
 #undef BASE

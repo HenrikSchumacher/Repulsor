@@ -144,6 +144,8 @@ int main(int argc, const char * argv[])
     diff = tpe.Differential(M);
     toc("tpe.Differential(M)");
 
+    print("");
+    
     std::unique_ptr<EnergyBase<REAL,INT,REAL,REAL>>
         tpe_slow_ptr = Make_TangentPointEnergy_AllPairs<REAL,INT,REAL,REAL> (dom_dim,amb_dim,q,p);
     
@@ -154,6 +156,7 @@ int main(int argc, const char * argv[])
     toc("tpe_slow.Energy(M)");
     
     dump(en);
+    print("");
     
     // Mesh_T::TangentVector_T and Mesh_T::CotangentVector_T are both Tensor2<REAL,INT> in this example.
     Mesh_T::TangentVector_T   X ( M.VertexCount(), M.AmbDim() );
@@ -212,66 +215,26 @@ int main(int argc, const char * argv[])
 
 //    print(M.GetObstacleBlockClusterTree().Stats() );
 
-//    //Compute tangent-point energy between mesh and obstacle.
+    // Compute tangent-point energy between mesh and obstacle.
+
+    std::unique_ptr<EnergyBase<REAL,INT,REAL,REAL>>
+        tpo_ptr = Make_TangentPointObstacleEnergy<REAL,INT,REAL,REAL> (dom_dim,dom_dim,amb_dim,q,p);
+    
+    auto & tpo = *tpo_ptr;
+    
+    tic("Compute tangent-point energy between mesh and obstacle");
+    en = tpo.Value(M);
+    toc("Compute tangent-point energy between mesh and obstacle");
+    dump(en);
+    print("");
 //
-//    tic("Compute tangent-point energy between mesh and obstacle");
-//    double tpo = M.TangentPointObstacleEnergy();
-//    toc("Compute tangent-point energy between mesh and obstacle");
-//    print("");
-//
-//    valprint("tangent-point obstacle energy", tpo);
-//    print("");
-//
-//    //Compute derivative also of this energy.
-//
-//    add_to = true;
-//
-//    tic("Compute derivative of obstacle energy");
-//    M.TangentPointObstacleEnergy_Differential(diff,add_to);        // Add into diff.
-//    toc("Compute derivative of obstacle energy");
-//    print("");
-//    // Some vector-valued functions on vertices, represented by matrices.
-//
-//    const INT cols = M.AmbDim();
-//
-//    // Tensor2 is a simple container class for matrices.
-//    Tensor2<REAL,INT> U ( M.VertexCount(), cols );
-//    Tensor2<REAL,INT> V ( M.VertexCount(), cols );
-//
-//    // Load some random data into U.
-//    U.Random();
-//
-//    const REAL a = 1.0;
-//    const REAL b = 0.0;
-//
-//    print("");
-//    print("");
-//
-//    valprint("M.ThreadCount()",M.ThreadCount());
-//
-//    //Performs generalized matrix-matrix product V = a * A * U + b * Y, where A is the tangent-point metric. Passing matrices by pointers (U.data() and V.data() are of type double*).
-//    tic("Matrix multiplication");
-//    M.TangentPointMetric_Multiply( a, U.data(), b, V.data(), cols, KernelType::LowOrder       );
-//    M.TangentPointMetric_Multiply( a, U.data(), b, V.data(), cols, KernelType::HighOrder      );
-//    M.TangentPointMetric_Multiply( a, U.data(), b, V.data(), cols, KernelType::FractionalOnly );
-//        // This performs multiplication with high order _and low order term and returns the sum.
-//    M.TangentPointMetric_Multiply( a, U.data(), b, V.data(), cols );
-//    toc("Matrix multiplication");
-//
-//
-//    print("");
-//    print("Btw.: M.TangentPointMetric_Multiply has some overhead when you call it the first time. So next time it will be faster.");
-//
-//    print("");
-//    tic("Matrix multiplication");
-//    // You can also pass Tensor1 and Tensor2 objects directly.
-//    M.TangentPointMetric_Multiply( a, U, b, V, KernelType::LowOrder       );
-//    M.TangentPointMetric_Multiply( a, U, b, V, KernelType::HighOrder      );
-//    M.TangentPointMetric_Multiply( a, U, b, V, KernelType::FractionalOnly );
-//
-//    // This performs multiplication with high order _and low order term and returns the sum.
-//    M.TangentPointMetric_Multiply( a, U, b, V );
-//    toc("Matrix multiplication");
+    //Compute derivative also of this energy.
+
+    bool add_to = true;
+
+    tic("Compute derivative of obstacle energy");
+    diff = tpo.Differential(M);
+    toc("Compute derivative of obstacle energy");
 
     print("");
     print("");
