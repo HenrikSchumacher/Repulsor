@@ -98,9 +98,9 @@ namespace Repulsor
     public:
         
         CLASS()
-        : P_proto (1)
-        , C_proto (1)
-        , P_moving(1)
+        :   P_proto (1)
+        ,   C_proto (1)
+        ,   P_moving(1)
         {
             ptic(className()+" default constructor");
             ptoc(className()+" default constructor");
@@ -108,24 +108,24 @@ namespace Repulsor
         
         // To allow polymorphism, we require the user to create instances of the desired types for the primitives and the bounding volumes, so that we can Clone() them.
         CLASS(
-              const Primitive_T        & P_proto_,
-              const Tensor2<SReal,Int> & P_serialized_,
-              const BoundingVolume_T   & C_proto_,
-              const Tensor1<Int ,Int>  & P_ordering_,
-              const Tensor2<Real,Int>  & P_near_, // data used actual interaction computation; assumed to be of size PrimitiveCount() x NearDim(). For a triangle mesh in 3D, we want to feed each triangles i), area ii) barycenter and iii) normal as a 1 + 3 + 3 = 7 vector
-              const Tensor2<Real,Int>  & P_far_, // data used actual interaction computation; assumed to be of size PrimitiveCount() x FarDim(). For a triangle mesh in 3D, we want to feed each triangles i), area ii) barycenter and iii) orthoprojector onto normal space as a 1 + 3 + 6 = 10 vector
+              const Primitive_T        &  P_proto_,
+              const Tensor2<SReal,Int> &  P_serialized_,
+              const BoundingVolume_T   &  C_proto_,
+              const Tensor1<Int ,Int>  &  P_ordering_,
+              const Tensor2<Real,Int>  &  P_near_, // data used actual interaction computation; assumed to be of size PrimitiveCount() x NearDim(). For a triangle mesh in 3D, we want to feed each triangles i), area ii) barycenter and iii) normal as a 1 + 3 + 3 = 7 vector
+              const Tensor2<Real,Int>  &  P_far_, // data used actual interaction computation; assumed to be of size PrimitiveCount() x FarDim(). For a triangle mesh in 3D, we want to feed each triangles i), area ii) barycenter and iii) orthoprojector onto normal space as a 1 + 3 + 6 = 10 vector
               const SparseMatrixCSR<Real,Int,Int> & DiffOp,
               const SparseMatrixCSR<Real,Int,Int> & AvOp,
               const ClusterTreeSettings & settings_ = ClusterTreeSettings()
               )
-        :   BASE(settings_)
-        ,   P_proto ( ThreadCount() )
-        ,   C_proto ( ThreadCount() )
-        ,   P_moving( ThreadCount() )
+        :   BASE( settings_ )
+        ,   P_proto      ( ThreadCount() )
+        ,   C_proto      ( ThreadCount() )
+        ,   P_moving     ( ThreadCount() )
         {
             ptic(className()+"()");
             
-            P_serialized = P_serialized_;
+            P_serialized = P_serialized_;   // It's a unneccessary copy, but not too expensive.
             
             if( P_ordering_.Dimension(0) == P_serialized.Dimension(0) )
             {
@@ -136,7 +136,7 @@ namespace Repulsor
                 P_ordering = iota<Int,Int>( P_serialized.Dimension(0) );
             }
             
-#pragma omp parallel for num_threads( ThreadCount() )
+            #pragma omp parallel for num_threads( ThreadCount() )
             for( Int thread = 0; thread < ThreadCount(); ++thread )
             {
                 P_proto[thread] = P_proto_.Clone();
@@ -552,7 +552,7 @@ namespace Repulsor
 
                 copy_buffer( &P_near_[near_dim * j], &P_near__[near_dim * i], near_dim );
 
-                copy_buffer( &P_far_[far_dim * j],   &P_far__[far_dim * i],   far_dim  );
+                copy_buffer( &P_far_  [far_dim * j], &P_far__  [far_dim * i], far_dim  );
             }
             
             ptoc(className()+"::ComputePrimitiveData");
@@ -583,7 +583,8 @@ namespace Repulsor
             
             Real * restrict const C_C = C_far.data(C);
             
-            if( L >= 0 && R >= 0 ){
+            if( L >= 0 && R >= 0 )
+            {
                 //C points to interior node.
                 #pragma omp task final(free_thread_count<1)  shared( L )
                 {

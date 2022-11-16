@@ -23,10 +23,40 @@ namespace Repulsor
         // In principle, ThreadTensor3<Real,Int> should have better scaling on multiple socket machines, because I tried to encourages that the thread-local arrays are allocated on local RAM. -- On my tiny Quad Core however, it performs a bit _WORSE_ than Tensor3<Real,Int>.
         using DerivativeContainer_T = ThreadTensor3<Real,Int>;
         using Accumulator_T         = ThreadTensor3<Real,Int>;
-
-        explicit CLASS( const ClusterTreeSettings & settings_ = ClusterTreeSettings() )
-        :   settings(settings_)
-        {}
+        
+        explicit CLASS(
+            const ClusterTreeSettings & settings_ = ClusterTreeSettings()
+        )
+        :   settings     ( settings_     )
+        {
+            switch( settings.tree_perc_alg )
+            {
+                case TreePercolationAlgorithm::Sequential:
+                {
+                       print(className()+" using sequential percolation algorithm.");
+                    logprint(className()+" using sequential percolation algorithm.");
+                    break;
+                }
+                case TreePercolationAlgorithm::Recursive:
+                {
+                       print(className()+" using recursive percolation algorithm.");
+                    logprint(className()+" using recursive percolation algorithm.");
+                    break;
+                }
+                case TreePercolationAlgorithm::Tasks:
+                {
+                       print(className()+" using task-based percolation algorithm.");
+                    logprint(className()+" using task-based percolation algorithm.");
+                    break;
+                }
+                default:
+                {
+                       print(className()+" using sequential percolation algorithm.");
+                    logprint(className()+" using sequential percolation algorithm.");
+                }
+            }
+            
+        }
         
 //        CLASS( const CLASS & other )
 //        :   settings ( other.settings)
@@ -442,17 +472,17 @@ namespace Repulsor
         
         void PercolateUp() const
         {
-            ptic(ClassName()+"::PercolateUp");
+//            ptic(ClassName()+"::PercolateUp");
             switch (settings.tree_perc_alg)
             {
                 case TreePercolationAlgorithm::Sequential:
                 {
-                    PercolateUp_Sequential( 0 );
+                    PercolateUp_DFS( 0 );
                     break;
                 }
                 case TreePercolationAlgorithm::Recursive:
                 {
-                    PercolateUp_Recursive();
+                    PercolateUp_Recursive( 0 );
                     break;
                 }
                 case TreePercolationAlgorithm::Tasks:
@@ -461,34 +491,33 @@ namespace Repulsor
                     {
                         #pragma omp single nowait
                         {
-                            PercolateUp_Tasks( 0, ThreadCount() );
+                            PercolateUp_Tasks( 0 );
                         }
                     }
                     break;
                 }
                 default:
                 {
-                    print("d");
-                    PercolateUp_Sequential( 0 );
+                    PercolateUp_DFS( 0 );
                     break;
                 }
             }
-            ptoc(ClassName()+"::PercolateUp");
+//            ptoc(ClassName()+"::PercolateUp");
         }; // PercolateUp
         
         void PercolateDown() const
         {
-            ptic(ClassName()+"::PercolateDown");
+//            ptic(ClassName()+"::PercolateDown");
             switch (settings.tree_perc_alg)
             {
                 case TreePercolationAlgorithm::Sequential:
                 {
-                    PercolateDown_Sequential( 0 );
+                    PercolateDown_DFS( 0 );
                     break;
                 }
                 case TreePercolationAlgorithm::Recursive:
                 {
-                    PercolateDown_Recursive();
+                    PercolateDown_Recursive( 0 );
                     break;
                 }
                 case TreePercolationAlgorithm::Tasks :
@@ -497,509 +526,23 @@ namespace Repulsor
                     {
                         #pragma omp single nowait
                         {
-                            PercolateDown_Tasks( 0, ThreadCount() );
+                            PercolateDown_Tasks( 0 );
                         }
                     }
                     break;
                 }
                 default:
                 {
-                    PercolateDown_Sequential( 0 );
+                    PercolateDown_DFS( 0 );
                 }
             }
-            ptoc(ClassName()+"::PercolateDown");
+//            ptoc(ClassName()+"::PercolateDown");
         }; // PercolateUp
         
-        
-    protected:
-        
-        void PercolateUp_Recursive() const
-        {
-            switch ( buffer_dim )
-            {
-                case 1:
-                {
-                    percolateUp_Recursive<1>(0);
-                    break;
-                }
-                case 2:
-                {
-                    percolateUp_Recursive<2>(0);
-                    break;
-                }
-                case 3:
-                {
-                    percolateUp_Recursive<3>(0);
-                    break;
-                }
-                case 4:
-                {
-                    percolateUp_Recursive<4>(0);
-                    break;
-                }
-                case 5:
-                {
-                    percolateUp_Recursive<5>(0);
-                    break;
-                }
-                case 6:
-                {
-                    percolateUp_Recursive<6>(0);
-                    break;
-                }
-                case 7:
-                {
-                    percolateUp_Recursive<7>(0);
-                    break;
-                }
-                case 8:
-                {
-                    percolateUp_Recursive<8>(0);
-                    break;
-                }
-                case 9:
-                {
-                    percolateUp_Recursive<9>(0);
-                    break;
-                }
-                case 10:
-                {
-                    percolateUp_Recursive<10>(0);
-                    break;
-                }
-                case 11:
-                {
-                    percolateUp_Recursive<11>(0);
-                    break;
-                }
-                case 12:
-                {
-                    percolateUp_Recursive<12>(0);
-                    break;
-                }
-                case 13:
-                {
-                    percolateUp_Recursive<13>(0);
-                    break;
-                }
-                case 14:
-                {
-                    percolateUp_Recursive<14>(0);
-                    break;
-                }
-                case 15:
-                {
-                    percolateUp_Recursive<15>(0);
-                    break;
-                }
-                case 16:
-                {
-                    percolateUp_Recursive<16>(0);
-                    break;
-                }
-                case 17:
-                {
-                    percolateUp_Recursive<17>(0);
-                    break;
-                }
-                case 18:
-                {
-                    percolateUp_Recursive<18>(0);
-                    break;
-                }
-                case 19:
-                {
-                    percolateUp_Recursive<19>(0);
-                    break;
-                }
-                case 20:
-                {
-                    percolateUp_Recursive<20>(0);
-                    break;
-                }
-                default:
-                {
-                    percolateUp_Recursive_gen(0);
-                }
-            }
-        }
-        
-        template<Int BUFFER_DIM>
-        void percolateUp_Recursive( const Int C ) const
-        {
-            // C = cluster index
-            
-            const Int L = C_left [C];
-            const Int R = C_right[C];
-            
-            if( (L >= 0) && (R >= 0) )
-            {
-                // If not a leaf, compute the values of the children first.
-                percolateUp_Recursive<BUFFER_DIM>(L);
-                percolateUp_Recursive<BUFFER_DIM>(R);
-                
-                // Aftwards, compute the sum of the two children.
-                
-                      Real * restrict const p   = &C_in.data()[BUFFER_DIM * C];
-                const Real * restrict const c_L = &C_in.data()[BUFFER_DIM * L];
-                const Real * restrict const c_R = &C_in.data()[BUFFER_DIM * R];
-                
-                #pragma unroll
-                for( Int k = 0; k < BUFFER_DIM; ++k )
-                {
-                    // Overwrite, not add-into. Thus cleansing is not required.
-                    p[k] = c_L[k] + c_R[k];
-                }
-            }
-            
-        }; // percolateUp_Recursive
 
-        
-        void percolateUp_Recursive_gen( const Int C ) const
-        {
-            // C = cluster index
-            
-            const Int L = C_left [C];
-            const Int R = C_right[C];
-            
-            if( (L >= 0) && (R >= 0) )
-            {
-                // If not a leaf, compute the values of the children first.
-                percolateUp_Recursive_gen(L);
-                percolateUp_Recursive_gen(R);
-                
-                // Aftwards, compute the sum of the two children.
-                
-                Real * restrict const c = C_in.data();
-                #pragma omp simd aligned( c : ALIGNMENT )
-                for( Int k = 0; k < buffer_dim; ++k )
-                {
-                    // Overwrite, not add-into. Thus cleansing is not required.
-                    c[ buffer_dim * C + k ] = c[ buffer_dim * L + k ] + c[ buffer_dim * R + k ];
-                }
-            }
-            
-        }; // percolateUp_Recursive_gen
-
-    protected:
-        
-        void PercolateDown_Recursive() const
-        {
-            switch ( buffer_dim )
-            {
-                case 1:
-                {
-                    percolateDown_Recursive<1>(0);
-                    break;
-                }
-                case 2:
-                {
-                    percolateDown_Recursive<2>(0);
-                    break;
-                }
-                case 3:
-                {
-                    percolateDown_Recursive<3>(0);
-                    break;
-                }
-                case 4:
-                {
-                    percolateDown_Recursive<4>(0);
-                    break;
-                }
-                case 5:
-                {
-                    percolateDown_Recursive<5>(0);
-                    break;
-                }
-                case 6:
-                {
-                    percolateDown_Recursive<6>(0);
-                    break;
-                }
-                case 7:
-                {
-                    percolateDown_Recursive<7>(0);
-                    break;
-                }
-                case 8:
-                {
-                    percolateDown_Recursive<8>(0);
-                    break;
-                }
-                case 9:
-                {
-                    percolateDown_Recursive<9>(0);
-                    break;
-                }
-                case 10:
-                {
-                    percolateDown_Recursive<10>(0);
-                    break;
-                }
-                case 11:
-                {
-                    percolateDown_Recursive<11>(0);
-                    break;
-                }
-                case 12:
-                {
-                    percolateDown_Recursive<12>(0);
-                    break;
-                }
-                case 13:
-                {
-                    percolateDown_Recursive<13>(0);
-                    break;
-                }
-                case 14:
-                {
-                    percolateDown_Recursive<14>(0);
-                    break;
-                }
-                case 15:
-                {
-                    percolateDown_Recursive<15>(0);
-                    break;
-                }
-                case 16:
-                {
-                    percolateDown_Recursive<16>(0);
-                    break;
-                }
-                case 17:
-                {
-                    percolateDown_Recursive<17>(0);
-                    break;
-                }
-                case 18:
-                {
-                    percolateDown_Recursive<18>(0);
-                    break;
-                }
-                case 19:
-                {
-                    percolateDown_Recursive<19>(0);
-                    break;
-                }
-                case 20:
-                {
-                    percolateDown_Recursive<20>(0);
-                    break;
-                }
-                default:
-                {
-                    percolateDown_Recursive_gen(0);
-                }
-            }
-        }
-        
-        template<Int BUFFER_DIM>
-        void percolateDown_Recursive( const Int C )  const
-        {
-            // C = cluster index
-            
-            const Int L = C_left [C];
-            const Int R = C_right[C];
-            
-            if( ( L >= 0 ) && ( R >= 0 ) )
-            {
-                const Real * restrict const p   = &C_out.data()[BUFFER_DIM * C];
-                      Real * restrict const c_L = &C_out.data()[BUFFER_DIM * L];
-                      Real * restrict const c_R = &C_out.data()[BUFFER_DIM * R];
-                
-                #pragma unroll
-                for( Int k = 0; k < BUFFER_DIM; ++k )
-                {
-                    const Real buffer = p[k];
-                    c_L[k] += buffer;
-                    c_R[k] += buffer;
-                }
-                
-                percolateDown_Recursive<BUFFER_DIM>(L);
-                percolateDown_Recursive<BUFFER_DIM>(R);
-            }
-        }; // percolateDown_Recursive
-        
-        void percolateDown_Recursive_gen( const Int C )  const
-        {
-            // C = cluster index
-            
-            const Int L = C_left [C];
-            const Int R = C_right[C];
-            
-            Real * restrict const c = C_out.data();
-            
-            if( ( L >= 0 ) && ( R >= 0 ) )
-            {
-                #pragma omp simd aligned( c : ALIGNMENT )
-                for( Int k = 0; k < buffer_dim; ++k )
-                {
-                    const Real buffer = c[ buffer_dim * C + k ];
-                    c[ buffer_dim * L + k ] += buffer;
-                    c[ buffer_dim * R + k ] += buffer;
-                }
-                percolateDown_Recursive_gen(L);
-                percolateDown_Recursive_gen(R);
-            }
-        }; // percolateDown_Recursive_gen
-        
-
-    public:
-        
-        // Sequential variant that uses a stack instead of recursion.
-        void PercolateUp_Sequential( const Int C_root ) const
-        {
-//            ptic("PercolateUp_Sequential");
-            
-            Int stack   [128] = {};
-            Int visited [128] = {false};
-            
-            Int stack_ptr          = static_cast<Int>(0);
-            stack[stack_ptr] = C_root;
-            
-            const Int  * restrict const left  = C_left.data();
-            const Int  * restrict const right = C_right.data();
-                  Real * restrict const c_in  = C_in.data();
-            
-            while( (stack_ptr >= 0) && ( stack_ptr < 126 ) )
-            {
-                // We are at cluster C.
-                const Int C = stack[stack_ptr];
-                const Int L = left [C];
-                const Int R = right[C];
-                
-                if( !visited[stack_ptr] )
-                {
-                    visited[stack_ptr] = true;
-                    
-                    if( (L >= 0) && (R >= 0) )
-                    {
-                        // If not a leaf, compute the values of the children first.
-                        stack[++stack_ptr] = R; // push
-                        stack[++stack_ptr] = L; // push
-                    }
-                }
-                else
-                {
-                    #pragma omp simd aligned( c_in : ALIGNMENT )
-                    for( Int k = 0; k < buffer_dim; ++k )
-                    {
-                        // Overwrite, not add-into. Thus cleansing is not required.
-                        c_in[ buffer_dim * C + k ] = c_in[ buffer_dim * L + k ] + c_in[ buffer_dim * R + k ];
-                    }
-                    visited[stack_ptr] = false;
-                    stack_ptr--;  // pop
-                }
-            }
-            
-            if( stack_ptr >= 128 )
-            {
-                eprint(ClassName()+"::PercolateUp_Sequential: stack overflow detected.");
-            }
-//            ptoc("PercolateUp_Sequential");
-        }; // PercolateUp_Sequential
-        
-        // Sequential variant that uses a stack instead of recursion.
-        void PercolateDown_Sequential( const Int C_root ) const
-        {
-//            ptic("PercolateDown_Sequential");
-            
-            Int stack [128] = {};
-
-            Int stack_ptr = static_cast<Int>(0);
-            stack[stack_ptr] = C_root;
-            
-            const Int  * restrict const left  = C_left.data();
-            const Int  * restrict const right = C_right.data();
-                  Real * restrict const c_out = C_out.data();
-            
-            while( (stack_ptr >= 0) && ( stack_ptr < 126 ) )
-            {
-                // We are at cluster C.
-                const Int C = stack[stack_ptr--]; //pop
-                const Int L = left [C];
-                const Int R = right[C];
-                
-                if( (L >= 0) && (R >= 0) )
-                {
-                    // If not a leaf, compute the values of the children first.
-                    #pragma omp simd aligned( c_out : ALIGNMENT )
-                    for( Int k = 0; k < buffer_dim; ++k )
-                    {
-                        const Real buffer = c_out[ buffer_dim * C + k ];
-                        c_out[ buffer_dim * L + k ] += buffer;
-                        c_out[ buffer_dim * R + k ] += buffer;
-                    }
-                    
-                    stack[++stack_ptr] = R; // push
-                    stack[++stack_ptr] = L; // push
-                }
-            }
-            
-            if( stack_ptr >= 128 )
-            {
-                eprint(ClassName()+"::PercolateDown_Sequential: stack overflow detected.");
-            }
-//            ptoc("PercolateDown_Sequential");
-        }; // PercolateDown_Sequential
-    
-        
-        void PercolateUp_Tasks( const Int C, const Int free_thread_count ) const
-        {
-            // C = cluster index
-            
-            const Int L = C_left [C];
-            const Int R = C_right[C];
-            
-            if( (L >= 0) && (R >= 0) )
-            {
-                // If not a leaf, compute the values of the children first.
-                #pragma omp task final(free_thread_count<1)  shared( L )
-                    PercolateUp_Tasks( L, free_thread_count/2 );
-                #pragma omp task final(free_thread_count<1)  shared( R )
-                    PercolateUp_Tasks( R, free_thread_count-free_thread_count/2 );
-                #pragma omp taskwait
-                
-                // Aftwards, compute the sum of the two children.
-                
-                Real * restrict const c = C_in.data();
-                #pragma omp simd aligned( c : ALIGNMENT )
-                for( Int k = 0; k < buffer_dim; ++k )
-                {
-                    // Overwrite, not add-into. Thus cleansing is not needed.
-                    c[ buffer_dim * C + k ] = c[ buffer_dim * L + k ] + c[ buffer_dim * R + k ];
-                }
-            }
-            
-        }; // PercolateUp_Tasks
-        
-        void PercolateDown_Tasks(const Int C, const Int free_thread_count ) const
-        {
-            // C = cluster index
-            
-            const Int L = C_left [C];
-            const Int R = C_right[C];
-            
-            Real * restrict const  c = C_out.data();
-            
-            if( ( L >= 0 ) && ( R >= 0 ) )
-            {
-                #pragma omp simd aligned( c : ALIGNMENT )
-                for( Int k = 0; k < buffer_dim; ++k )
-                {
-                    const Real buffer = c[ buffer_dim * C + k ];
-                    c[ buffer_dim * L + k ] += buffer;
-                    c[ buffer_dim * R + k ] += buffer;
-                }
-                
-                #pragma omp task final(free_thread_count<1)  shared( L )
-                    PercolateDown_Tasks( L, free_thread_count/2 );
-                #pragma omp task final(free_thread_count<1)  shared( R )
-                    PercolateDown_Tasks( R, free_thread_count-free_thread_count/2 );
-                #pragma omp taskwait
-            }
-        }; // PercolateDown_Tasks
+#include "Percolate_DFS.hpp"
+#include "Percolate_Recursive.hpp"
+#include "Percolate_Tasks.hpp"
 
         
         //        void PercolateDown_Parallel( const Int max_leaves ) const
@@ -1051,7 +594,7 @@ namespace Repulsor
         
         
         
-        
+    public:
         
         void Pre( const ExtReal * input, const Int cols, const KernelType type ) const
         {
@@ -1460,9 +1003,17 @@ namespace Repulsor
         
         virtual std::string Stats() const = 0;
         
-        virtual std::string ClassName() const
+    private:
+        std::string className() const
         {
             return TO_STD_STRING(CLASS) + "<"+TypeName<ExtReal>::Get()+">";
+        }
+        
+    public:
+        
+        virtual std::string ClassName() const
+        {
+            return className();
         }
 
     };

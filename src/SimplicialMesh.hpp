@@ -466,7 +466,8 @@ namespace Repulsor
                 block_cluster_tree_settings.near_field_intersection_parameter  = adaptivity_settings.intersection_theta;
                 
                 block_cluster_tree = std::make_unique<BlockClusterTree_T>(
-                    GetClusterTree(), GetClusterTree(),
+                    GetClusterTree(),
+                    GetClusterTree(),
                     block_cluster_tree_settings
                 );
                 

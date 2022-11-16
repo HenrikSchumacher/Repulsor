@@ -45,7 +45,7 @@ namespace Repulsor
         
     protected:
     
-        Pattern_T pattern;
+        const Pattern_T & pattern;
         
         Kernel_T kernel;
         

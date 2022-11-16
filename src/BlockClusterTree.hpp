@@ -312,7 +312,7 @@ namespace Repulsor
 
             verynear = VeryNear_Pattern_T( verynear_idx, S.PrimitiveCount(), T.PrimitiveCount(),
                 thread_count, false, is_symmetric );
-
+            
             pdump(verynear.Stats());
 
             ptoc(className()+"  Very near field interaction data");

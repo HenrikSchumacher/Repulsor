@@ -39,8 +39,8 @@ int main(int argc, const char * argv[])
     Profiler::Clear( path );
 
     
-//    int thread_count = 8;
-    int thread_count = 1;
+    int thread_count = 8;
+//    int thread_count = 1;
     omp_set_num_threads(thread_count);
     
     
@@ -229,8 +229,6 @@ int main(int argc, const char * argv[])
     print("");
 //
     //Compute derivative also of this energy.
-
-    bool add_to = true;
 
     tic("Compute derivative of obstacle energy");
     diff = tpo.Differential(M);
