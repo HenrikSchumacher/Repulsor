@@ -201,9 +201,6 @@ namespace Repulsor
             
             if( admissable )
             {
-//                near_idx.push_back(P_i);
-//                near_jdx.push_back(P_j);
-                
                 near_idx.Push( P_i, P_j );
             }
             else
@@ -214,14 +211,10 @@ namespace Repulsor
                 
                 if( intersecting )
                 {
-//                    inter_idx.push_back(P_i);
-//                    inter_jdx.push_back(P_j);
                     inter_idx.Push( P_i, P_j );
                 }
                 else
                 {
-//                    verynear_idx.push_back(P_i);
-//                    verynear_jdx.push_back(P_j);
                     verynear_idx.Push( P_i, P_j );
                 }
             }
@@ -237,8 +230,6 @@ namespace Repulsor
             
             if( admissable )
             {
-//                near_idx.push_back(P_j);
-//                near_jdx.push_back(P_i);
                 near_idx.Push( P_j, P_i );
             }
             else
@@ -249,14 +240,10 @@ namespace Repulsor
                 
                 if( intersecting )
                 {
-//                    inter_idx.push_back(P_j);
-//                    inter_jdx.push_back(P_i);
                     inter_idx.Push( P_j, P_i );
                 }
                 else
                 {
-//                    verynear_idx.push_back(P_j);
-//                    verynear_jdx.push_back(P_i);
                     verynear_idx.Push( P_j, P_i );
                 }
             }
@@ -264,14 +251,10 @@ namespace Repulsor
         
         virtual void ComputeAdmissable() override
         {
-//            far_idx.push_back(C_i);
-//            far_jdx.push_back(C_j);
             far_idx.Push( C_i, C_j );
         }
         virtual void ComputeAdmissableSwapped() override
         {
-//            far_idx.push_back(C_j);
-//            far_jdx.push_back(C_i);
             far_idx.Push( C_j, C_i );
         }
 
