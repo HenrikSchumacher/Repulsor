@@ -26,10 +26,10 @@ namespace Repulsor
     
     enum class TreePercolationAlgorithm
     {
-        Tasks,
         Sequential,
         Recursive,
-        BruteForce
+        Tasks,
+        Parallel
     };
 
     enum class InteractionKernels

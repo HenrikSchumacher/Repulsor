@@ -121,7 +121,7 @@ protected:
         const Int L = C_left [C];
         const Int R = C_right[C];
         
-        if( (L >= 0) && (R >= 0) )
+        if( (L >= zero) && (R >= zero) )
         {
             // If not a leaf, compute the values of the children first.
             percolateUp_Recursive<BUFFER_DIM>(L);
@@ -152,7 +152,7 @@ protected:
         const Int L = C_left [C];
         const Int R = C_right[C];
         
-        if( (L >= 0) && (R >= 0) )
+        if( (L >= zero) && (R >= zero) )
         {
             // If not a leaf, compute the values of the children first.
             percolateUp_Recursive_gen(L);
@@ -299,7 +299,7 @@ protected:
         const Int L = C_left [C];
         const Int R = C_right[C];
         
-        if( ( L >= 0 ) && ( R >= 0 ) )
+        if( ( L >= zero ) && ( R >= zero ) )
         {
             Real * restrict const c = C_out.data();
             
@@ -329,7 +329,7 @@ protected:
         
         Real * restrict const c = C_out.data();
         
-        if( ( L >= 0 ) && ( R >= 0 ) )
+        if( ( L >= zero ) && ( R >= zero ) )
         {
             const Int C_offset = buffer_dim * C;
             const Int L_offset = buffer_dim * L;

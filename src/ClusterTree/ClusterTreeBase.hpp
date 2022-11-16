@@ -27,35 +27,40 @@ namespace Repulsor
         explicit CLASS(
             const ClusterTreeSettings & settings_ = ClusterTreeSettings()
         )
-        :   settings     ( settings_     )
+        :   settings ( settings_ )
         {
-            switch( settings.tree_perc_alg )
-            {
-                case TreePercolationAlgorithm::Sequential:
-                {
-                       print(className()+" using sequential percolation algorithm.");
-                    logprint(className()+" using sequential percolation algorithm.");
-                    break;
-                }
-                case TreePercolationAlgorithm::Recursive:
-                {
-                       print(className()+" using recursive percolation algorithm.");
-                    logprint(className()+" using recursive percolation algorithm.");
-                    break;
-                }
-                case TreePercolationAlgorithm::Tasks:
-                {
-                       print(className()+" using task-based percolation algorithm.");
-                    logprint(className()+" using task-based percolation algorithm.");
-                    break;
-                }
-                default:
-                {
-                       print(className()+" using sequential percolation algorithm.");
-                    logprint(className()+" using sequential percolation algorithm.");
-                }
-            }
-            
+//            switch( settings.tree_perc_alg )
+//            {
+//                case TreePercolationAlgorithm::Sequential:
+//                {
+//                       print(className()+" using sequential percolation algorithm.");
+//                    logprint(className()+" using sequential percolation algorithm.");
+//                    break;
+//                }
+//                case TreePercolationAlgorithm::Recursive:
+//                {
+//                       print(className()+" using recursive percolation algorithm.");
+//                    logprint(className()+" using recursive percolation algorithm.");
+//                    break;
+//                }
+//                case TreePercolationAlgorithm::Tasks:
+//                {
+//                       print(className()+" using task-based percolation algorithm.");
+//                    logprint(className()+" using task-based percolation algorithm.");
+//                    break;
+//                }
+//                case TreePercolationAlgorithm::Parallel:
+//                {
+//                       print(className()+" using parallel percolation algorithm.");
+//                    logprint(className()+" using parallel percolation algorithm.");
+//                    break;
+//                }
+//                default:
+//                {
+//                       print(className()+" using sequential percolation algorithm.");
+//                    logprint(className()+" using sequential percolation algorithm.");
+//                }
+//            }
         }
         
 //        CLASS( const CLASS & other )
@@ -71,6 +76,8 @@ namespace Repulsor
         virtual ~CLASS() = default;
         
     protected:
+        
+        static constexpr Int zero = static_cast<Int>(0);
         
         const ClusterTreeSettings   settings;
 
@@ -119,6 +126,7 @@ namespace Repulsor
         Tensor1<SReal,Int> P_score_buffer;
         Tensor1<Int,Int>   P_perm_buffer;
 
+        
 //        mutable Tensor1<Int,Int> stack_array;
 //        mutable Tensor1<Int,Int> queue_array;
         
@@ -164,6 +172,9 @@ namespace Repulsor
         Tensor3<SReal,Int> C_thread_serialized;          // False sharing is unlikely as each thread's slice should already be quite large...
         
         Tensor2<Int,Int> thread_cluster_counter;                          // TODO: Avoid false sharing!
+        
+        mutable bool parallel_perc_roots_initialized = false;
+        mutable std::vector<Int> parallel_perc_roots;
         
     public:
 
@@ -364,33 +375,33 @@ namespace Repulsor
             return P_out;
         }
         
-        const SparseMatrixCSR<Real,Int,Int> & LowOrderPreprocessor() const
+        const SparseMatrixCSR<Real,Int,Int> & LowOrderPreProcessor() const
         {
             return lo_pre;
         }
         
-        const SparseMatrixCSR<Real,Int,Int> & LowOrderPostprocessor() const
+        const SparseMatrixCSR<Real,Int,Int> & LowOrderPostProcessor() const
         {
             return lo_post;
         }
         
         
-        const SparseMatrixCSR<Real,Int,Int> & HighOrderPreprocessor() const
+        const SparseMatrixCSR<Real,Int,Int> & HighOrderPreProcessor() const
         {
             return hi_pre;
         }
         
-        const SparseMatrixCSR<Real,Int,Int> & HighOrderPostprocessor() const
+        const SparseMatrixCSR<Real,Int,Int> & HighOrderPostProcessor() const
         {
             return hi_post;
         }
         
-        const SparseMatrixCSR<Real,Int,Int> & MixedOrderPreprocessor() const
+        const SparseMatrixCSR<Real,Int,Int> & MixedOrderPreProcessor() const
         {
             return mixed_pre;
         }
         
-        const SparseMatrixCSR<Real,Int,Int> & MixedOrderPostprocessor() const
+        const SparseMatrixCSR<Real,Int,Int> & MixedOrderPostProcessor() const
         {
             return mixed_post;
         }
@@ -473,11 +484,15 @@ namespace Repulsor
         void PercolateUp() const
         {
 //            ptic(ClassName()+"::PercolateUp");
+            RequireParallelPercolationRoots();
+            
             switch (settings.tree_perc_alg)
             {
                 case TreePercolationAlgorithm::Sequential:
                 {
+                    ptic(ClassName()+"::PercolateUp_DFS");
                     PercolateUp_DFS( 0 );
+                    ptoc(ClassName()+"::PercolateUp_DFS");
                     break;
                 }
                 case TreePercolationAlgorithm::Recursive:
@@ -496,6 +511,11 @@ namespace Repulsor
                     }
                     break;
                 }
+                case TreePercolationAlgorithm::Parallel:
+                {
+                    PercolateUp_Parallel();
+                    break;
+                }
                 default:
                 {
                     PercolateUp_DFS( 0 );
@@ -512,7 +532,9 @@ namespace Repulsor
             {
                 case TreePercolationAlgorithm::Sequential:
                 {
+                    ptic(ClassName()+"::PercolateDown_DFS");
                     PercolateDown_DFS( 0 );
+                    ptoc(ClassName()+"::PercolateDown_DFS");
                     break;
                 }
                 case TreePercolationAlgorithm::Recursive:
@@ -531,6 +553,11 @@ namespace Repulsor
                     }
                     break;
                 }
+                case TreePercolationAlgorithm::Parallel:
+                {
+                    PercolateDown_Parallel();
+                    break;
+                }
                 default:
                 {
                     PercolateDown_DFS( 0 );
@@ -543,6 +570,7 @@ namespace Repulsor
 #include "Percolate_DFS.hpp"
 #include "Percolate_Recursive.hpp"
 #include "Percolate_Tasks.hpp"
+#include "Percolate_Parallel.hpp"
 
         
         //        void PercolateDown_Parallel( const Int max_leaves ) const

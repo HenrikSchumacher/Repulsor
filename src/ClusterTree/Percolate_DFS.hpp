@@ -1,149 +1,162 @@
 protected:
     
     // Sequential variant that uses a stack instead of recursion.
-    void PercolateUp_DFS( const Int C ) const
+    void PercolateUp_DFS( const Int C, const Int max_depth = 64 ) const
     {
-        ptic(ClassName()+"::PercolateUp_DFS");
         switch ( buffer_dim )
         {
             case 1:
             {
-                percolateUp_DFS<1>(C);
+                percolateUp_DFS<1>(C,max_depth);
                 break;
             }
             case 2:
             {
-                percolateUp_DFS<2>(C);
+                percolateUp_DFS<2>(C,max_depth);
                 break;
             }
             case 3:
             {
-                percolateUp_DFS<3>(C);
+                percolateUp_DFS<3>(C,max_depth);
                 break;
             }
             case 4:
             {
-                percolateUp_DFS<4>(C);
+                percolateUp_DFS<4>(C,max_depth);
                 break;
             }
             case 5:
             {
-                percolateUp_DFS<5>(C);
+                percolateUp_DFS<5>(C,max_depth);
                 break;
             }
             case 6:
             {
-                percolateUp_DFS<6>(C);
+                percolateUp_DFS<6>(C,max_depth);
                 break;
             }
             case 7:
             {
-                percolateUp_DFS<7>(C);
+                percolateUp_DFS<7>(C,max_depth);
                 break;
             }
             case 8:
             {
-                percolateUp_DFS<8>(C);
+                percolateUp_DFS<8>(C,max_depth);
                 break;
             }
             case 9:
             {
-                percolateUp_DFS<9>(C);
+                percolateUp_DFS<9>(C,max_depth);
                 break;
             }
             case 10:
             {
-                percolateUp_DFS<10>(C);
+                percolateUp_DFS<10>(C,max_depth);
                 break;
             }
             case 11:
             {
-                percolateUp_DFS<11>(C);
+                percolateUp_DFS<11>(C,max_depth);
                 break;
             }
             case 12:
             {
-                percolateUp_DFS<12>(C);
+                percolateUp_DFS<12>(C,max_depth);
                 break;
             }
             case 13:
             {
-                percolateUp_DFS<13>(C);
+                percolateUp_DFS<13>(C,max_depth);
                 break;
             }
             case 14:
             {
-                percolateUp_DFS<14>(C);
+                percolateUp_DFS<14>(C,max_depth);
                 break;
             }
             case 15:
             {
-                percolateUp_DFS<15>(C);
+                percolateUp_DFS<15>(C,max_depth);
                 break;
             }
             case 16:
             {
-                percolateUp_DFS<16>(C);
+                percolateUp_DFS<16>(C,max_depth);
                 break;
             }
             case 17:
             {
-                percolateUp_DFS<17>(C);
+                percolateUp_DFS<17>(C,max_depth);
                 break;
             }
             case 18:
             {
-                percolateUp_DFS<18>(C);
+                percolateUp_DFS<18>(C,max_depth);
                 break;
             }
             case 19:
             {
-                percolateUp_DFS<19>(C);
+                percolateUp_DFS<19>(C,max_depth);
                 break;
             }
             case 20:
             {
-                percolateUp_DFS<20>(C);
+                percolateUp_DFS<20>(C,max_depth);
                 break;
             }
             default:
             {
-                percolateUp_DFS_gen(C);
+                percolateUp_DFS_gen(C,max_depth);
             }
         }
-        ptoc(ClassName()+"::PercolateUp_DFS");
     }
 
 
     template<Int BUFFER_DIM>
-    void percolateUp_DFS( const Int C_root ) const
+    void percolateUp_DFS( const Int C_root, const Int max_depth ) const
     {
         Int stack   [128] = {};
         Int visited [128] = {false};
+        Int depth   [128] = {};
         
-        Int stack_ptr          = static_cast<Int>(0);
+        Int stack_ptr    = zero;
         stack[stack_ptr] = C_root;
         
         const Int  * restrict const left  = C_left.data();
         const Int  * restrict const right = C_right.data();
               Real * restrict const c     = C_in.data();
         
-        while( (stack_ptr >= 0) && ( stack_ptr < 126 ) )
+        while( (stack_ptr >= zero) && ( stack_ptr < 126 ) )
         {
             // We are at cluster C.
+            const Int d = depth[stack_ptr];
             const Int C = stack[stack_ptr];
             const Int L = left [C];
             const Int R = right[C];
             
             if( !visited[stack_ptr] )
             {
-                visited[stack_ptr] = true;
-                
-                if( (L >= 0) && (R >= 0) )
+                if( (d < max_depth) && (L >= zero) && (R >= zero) )
                 {
+                    visited[stack_ptr] = true;
+                    
                     // If not a leaf, compute the values of the children first.
-                    stack[++stack_ptr] = R; // push
-                    stack[++stack_ptr] = L; // push
+                    
+                    // push
+                    ++stack_ptr;
+                    stack[stack_ptr] = R;
+                    depth[stack_ptr] = d+1;
+                    
+                    // push
+                    ++stack_ptr;
+                    stack[stack_ptr] = L;
+                    depth[stack_ptr] = d+1;
+                }
+                else
+                {
+                    // If in leaf node, then backtrack.
+                    --stack_ptr;
                 }
             }
             else
@@ -171,34 +184,49 @@ protected:
     } // percolateUp_DFS_gen
 
 
-    void percolateUp_DFS_gen( const Int C_root ) const
+    void percolateUp_DFS_gen( const Int C_root, const Int max_depth ) const
     {
         Int stack   [128] = {};
         Int visited [128] = {false};
+        Int depth   [128] = {};
         
-        Int stack_ptr          = static_cast<Int>(0);
+        Int stack_ptr    = zero;
         stack[stack_ptr] = C_root;
         
         const Int  * restrict const left  = C_left.data();
         const Int  * restrict const right = C_right.data();
               Real * restrict const c     = C_in.data();
         
-        while( (stack_ptr >= 0) && ( stack_ptr < 126 ) )
+        while( (stack_ptr >= zero) && ( stack_ptr < 126 ) )
         {
             // We are at cluster C.
+            const Int d = depth[stack_ptr];
             const Int C = stack[stack_ptr];
             const Int L = left [C];
             const Int R = right[C];
             
             if( !visited[stack_ptr] )
             {
-                visited[stack_ptr] = true;
-                
-                if( (L >= 0) && (R >= 0) )
+                if( (d < max_depth) && (L >= zero) && (R >= zero) )
                 {
+                    visited[stack_ptr] = true;
+
                     // If not a leaf, compute the values of the children first.
-                    stack[++stack_ptr] = R; // push
-                    stack[++stack_ptr] = L; // push
+                    
+                    // push
+                    ++stack_ptr;
+                    stack[stack_ptr] = R;
+                    depth[stack_ptr] = d+1;
+                    
+                    // push
+                    ++stack_ptr;
+                    stack[stack_ptr] = L;
+                    depth[stack_ptr] = d+1;
+                }
+                else
+                {
+                    // If in leaf node, then backtrack.
+                    --stack_ptr;
                 }
             }
             else
@@ -232,139 +260,142 @@ protected:
 
     
     // Sequential variant that uses a stack instead of recursion.
-    void PercolateDown_DFS( const Int C ) const
+    void PercolateDown_DFS( const Int C, const Int max_depth = 64 ) const
     {
-        ptic(ClassName()+"::PercolateDown_DFS");
+//        ptic(ClassName()+"::PercolateDown_DFS");
         switch ( buffer_dim )
         {
             case 1:
             {
-                percolateDown_DFS<1>(C);
+                percolateDown_DFS<1>(C,max_depth);
                 break;
             }
             case 2:
             {
-                percolateDown_DFS<2>(C);
+                percolateDown_DFS<2>(C,max_depth);
                 break;
             }
             case 3:
             {
-                percolateDown_DFS<3>(C);
+                percolateDown_DFS<3>(C,max_depth);
                 break;
             }
             case 4:
             {
-                percolateDown_DFS<4>(C);
+                percolateDown_DFS<4>(C,max_depth);
                 break;
             }
             case 5:
             {
-                percolateDown_DFS<5>(C);
+                percolateDown_DFS<5>(C,max_depth);
                 break;
             }
             case 6:
             {
-                percolateDown_DFS<6>(C);
+                percolateDown_DFS<6>(C,max_depth);
                 break;
             }
             case 7:
             {
-                percolateDown_DFS<7>(C);
+                percolateDown_DFS<7>(C,max_depth);
                 break;
             }
             case 8:
             {
-                percolateDown_DFS<8>(C);
+                percolateDown_DFS<8>(C,max_depth);
                 break;
             }
             case 9:
             {
-                percolateDown_DFS<9>(C);
+                percolateDown_DFS<9>(C,max_depth);
                 break;
             }
             case 10:
             {
-                percolateDown_DFS<10>(C);
+                percolateDown_DFS<10>(C,max_depth);
                 break;
             }
             case 11:
             {
-                percolateDown_DFS<11>(C);
+                percolateDown_DFS<11>(C,max_depth);
                 break;
             }
             case 12:
             {
-                percolateDown_DFS<12>(C);
+                percolateDown_DFS<12>(C,max_depth);
                 break;
             }
             case 13:
             {
-                percolateDown_DFS<13>(C);
+                percolateDown_DFS<13>(C,max_depth);
                 break;
             }
             case 14:
             {
-                percolateDown_DFS<14>(C);
+                percolateDown_DFS<14>(C,max_depth);
                 break;
             }
             case 15:
             {
-                percolateDown_DFS<15>(C);
+                percolateDown_DFS<15>(C,max_depth);
                 break;
             }
             case 16:
             {
-                percolateDown_DFS<16>(C);
+                percolateDown_DFS<16>(C,max_depth);
                 break;
             }
             case 17:
             {
-                percolateDown_DFS<17>(C);
+                percolateDown_DFS<17>(C,max_depth);
                 break;
             }
             case 18:
             {
-                percolateDown_DFS<18>(C);
+                percolateDown_DFS<18>(C,max_depth);
                 break;
             }
             case 19:
             {
-                percolateDown_DFS<19>(C);
+                percolateDown_DFS<19>(C,max_depth);
                 break;
             }
             case 20:
             {
-                percolateDown_DFS<20>(C);
+                percolateDown_DFS<20>(C,max_depth);
                 break;
             }
             default:
             {
-                percolateDown_DFS_gen(C);
+                percolateDown_DFS_gen(C,max_depth);
             }
         }
-        ptoc(ClassName()+"::PercolateDown_DFS");
+//        ptoc(ClassName()+"::PercolateDown_DFS");
     }
 
     template<Int BUFFER_DIM>
-    void percolateDown_DFS( const Int C_root ) const
+    void percolateDown_DFS( const Int C_root, const Int max_depth ) const
     {
         Int stack [128] = {};
+        Int depth [128] = {};
 
-        Int stack_ptr = static_cast<Int>(0);
+        Int stack_ptr    = zero;
         stack[stack_ptr] = C_root;
         
         const Int  * restrict const left  = C_left.data();
         const Int  * restrict const right = C_right.data();
               Real * restrict const c     = C_out.data();
         
-        while( (stack_ptr >= 0) && ( stack_ptr < 126 ) )
+        while( (stack_ptr >= zero) && ( stack_ptr < 126 ) )
         {
             // We are at cluster C.
-            const Int C = stack[stack_ptr--]; //pop
+            const Int d = depth[stack_ptr];
+            const Int C = stack[stack_ptr];
             const Int L = left [C];
             const Int R = right[C];
+            --stack_ptr; // pop
             
-            if( (L >= 0) && (R >= 0) )
+            if( (d < max_depth) && (L >= zero) && (R >= zero) )
             {
                 const Int C_offset = BUFFER_DIM * C;
                 const Int L_offset = BUFFER_DIM * L;
@@ -380,8 +411,15 @@ protected:
                     c[R_offset + k] += buffer;
                 }
                 
-                stack[++stack_ptr] = R; // push
-                stack[++stack_ptr] = L; // push
+                // push
+                ++stack_ptr;
+                stack[stack_ptr] = R;
+                depth[stack_ptr] = d+1;
+                
+                // push
+                ++stack_ptr;
+                stack[stack_ptr] = L;
+                depth[stack_ptr] = d+1;
             }
         }
         
@@ -392,25 +430,28 @@ protected:
     }; // PercolateDown_DFS
 
 
-    void percolateDown_DFS_gen( const Int C_root ) const
+    void percolateDown_DFS_gen( const Int C_root, const Int max_depth  ) const
     {
         Int stack [128] = {};
+        Int depth [128] = {};
 
-        Int stack_ptr = static_cast<Int>(0);
+        Int stack_ptr = zero;
         stack[stack_ptr] = C_root;
         
         const Int  * restrict const left  = C_left.data();
         const Int  * restrict const right = C_right.data();
               Real * restrict const c     = C_out.data();
         
-        while( (stack_ptr >= 0) && ( stack_ptr < 126 ) )
+        while( (stack_ptr >= zero) && ( stack_ptr < 126 ) )
         {
             // We are at cluster C.
-            const Int C = stack[stack_ptr--]; //pop
+            const Int d = depth[stack_ptr];
+            const Int C = stack[stack_ptr];
             const Int L = left [C];
             const Int R = right[C];
+            --stack_ptr; //pop
             
-            if( (L >= 0) && (R >= 0) )
+            if( (d < max_depth) && (L >= zero) && (R >= zero) )
             {
                 const Int C_offset = buffer_dim * C;
                 const Int L_offset = buffer_dim * L;
@@ -425,9 +466,16 @@ protected:
                     c[L_offset + k] += buffer;
                     c[R_offset + k] += buffer;
                 }
+
+                // push
+                ++stack_ptr;
+                stack[stack_ptr] = R;
+                depth[stack_ptr] = d+1;
                 
-                stack[++stack_ptr] = R; // push
-                stack[++stack_ptr] = L; // push
+                // push
+                ++stack_ptr;
+                stack[stack_ptr] = L;
+                depth[stack_ptr] = d+1;
             }
         }
         
