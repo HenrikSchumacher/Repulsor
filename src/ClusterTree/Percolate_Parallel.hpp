@@ -11,14 +11,14 @@ public:
             Tensor1<Int,Int> stack ( 2*max_depth+2 );
             Tensor1<Int,Int> depth ( 2*max_depth+2 );
             
-            Int stack_ptr    = zero;
-            stack[stack_ptr] = zero;
-            depth[stack_ptr] = zero;
+            Int stack_ptr    = null;
+            stack[stack_ptr] = null;
+            depth[stack_ptr] = null;
             
             const Int * restrict const left  = C_left.data();
             const Int * restrict const right = C_right.data();
             
-            while( stack_ptr >= zero )
+            while( stack_ptr >= null )
             {
                 // We are at cluster C.
                 const Int d = depth[stack_ptr];
@@ -26,7 +26,7 @@ public:
                 const Int L = left [C];
                 const Int R = right[C];
                 
-                if( ( d < max_depth ) && (L >= zero) && (R >= zero) )
+                if( ( d < max_depth ) && (L >= null) && (R >= null) )
                 {
                     // push
                     ++stack_ptr;
@@ -62,7 +62,7 @@ public:
             PercolateUp_DFS(parallel_perc_roots[i]);
         }
         
-        PercolateUp_DFS( zero, static_cast<Int>(settings.parallel_perc_depth) );
+        PercolateUp_DFS( null, static_cast<Int>(settings.parallel_perc_depth) );
 
         ptoc(ClassName()+"::PercolateUp_Parallel");
     } // PercolateUp_Parallel
@@ -73,7 +73,7 @@ public:
         
         Int n_roots = parallel_perc_roots.size();
         
-        PercolateDown_DFS( zero, static_cast<Int>(settings.parallel_perc_depth) );
+        PercolateDown_DFS( null, static_cast<Int>(settings.parallel_perc_depth) );
         
         #pragma omp parallel for num_threads( ThreadCount() )
         for( Int i = 0; i < n_roots; ++i )

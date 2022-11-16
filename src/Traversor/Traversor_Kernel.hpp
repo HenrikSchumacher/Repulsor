@@ -33,7 +33,9 @@ namespace Repulsor
         :   tree_string ( other.tree_string                )
         {}
         
-        virtual ~CLASS() = default;
+        ~CLASS() = default;
+        
+//        virtual ~CLASS() = default;
         
         
         
@@ -76,34 +78,34 @@ namespace Repulsor
         
     public:
 
-        virtual void LoadClusterS( const Int i ) = 0;
-        virtual void LoadClusterT( const Int j ) = 0;
+//        virtual void LoadClusterS( const Int i ) = 0;
+//        virtual void LoadClusterT( const Int j ) = 0;
+//
+//        virtual void LoadPrimitiveS( const Int i ) = 0;
+//        virtual void LoadPrimitiveT( const Int j ) = 0;
+//
+//        virtual bool IsAdmissable() = 0;
+//
+//        virtual SReal ClusterScoreS() = 0;
+//        virtual SReal ClusterScoreT() = 0;
+//
+//        virtual void ComputeLeafDiagonal() = 0;
+//        virtual void ComputeLeaf() = 0;
+//        virtual void ComputeLeafSwapped() = 0;
+//
+//        virtual void ComputeAdmissable() = 0;
+//        virtual void ComputeAdmissableSwapped() = 0;
         
-        virtual void LoadPrimitiveS( const Int i ) = 0;
-        virtual void LoadPrimitiveT( const Int j ) = 0;
-        
-        virtual bool IsAdmissable() = 0;
-        
-        virtual SReal ClusterScoreS() = 0;
-        virtual SReal ClusterScoreT() = 0;
-        
-        virtual void ComputeLeafDiagonal() = 0;
-        virtual void ComputeLeaf() = 0;
-        virtual void ComputeLeafSwapped() = 0;
-        
-        virtual void ComputeAdmissable() = 0;
-        virtual void ComputeAdmissableSwapped() = 0;
-        
-    protected:
-        
-        virtual std::string ClassName() const
-        {
-            return className();
-        }
+//    protected:
+//
+//        virtual std::string ClassName() const
+//        {
+//            return className();
+//        }
         
     private:
         
-        std::string className() const
+        std::string ClassName() const
         {
             return TO_STD_STRING(CLASS) + "<"+tree_string+">";
         }

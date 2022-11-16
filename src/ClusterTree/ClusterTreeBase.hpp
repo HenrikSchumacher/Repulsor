@@ -77,7 +77,7 @@ namespace Repulsor
         
     protected:
         
-        static constexpr Int zero = static_cast<Int>(0);
+        static constexpr Int null = static_cast<Int>(0);
         
         const ClusterTreeSettings   settings;
 

@@ -22,7 +22,7 @@ namespace Repulsor
         
         CLASS() = default;
         
-        virtual ~CLASS() = default;
+        ~CLASS() = default;
         
         CLASS(
             const ClusterTree_T & S,
@@ -142,27 +142,27 @@ namespace Repulsor
         
     public:
 
-        virtual void LoadClusterS( const Int i ) override
+        force_inline void LoadClusterS( const Int i )
         {
             C_i = i;
         }
         
-        virtual void LoadClusterT( const Int j ) override
+        force_inline void LoadClusterT( const Int j )
         {
             C_j = j;
         }
         
-        virtual void LoadPrimitiveS( const Int i ) override
+        force_inline void LoadPrimitiveS( const Int i )
         {
             P_i = i;
             
         }
-        virtual void LoadPrimitiveT( const Int j ) override
+        force_inline void LoadPrimitiveT( const Int j )
         {
             P_j = j;
         }
         
-        virtual bool IsAdmissable() override
+        force_inline bool IsAdmissable()
         {
             Compute_AABB_CollisionTimeInterval<ClusterTree_T::AMB_DIM, SReal, Int> (
                 S_C_ser.data(C_i), S_C_up_ser.data(C_i),
@@ -173,19 +173,19 @@ namespace Repulsor
             return a >= static_cast<SReal>(1);
         }
         
-        virtual SReal ClusterScoreS() override
+        force_inline SReal ClusterScoreS()
         {
             return S_C_ser(C_i,0);
         }
-        virtual SReal ClusterScoreT() override
+        force_inline SReal ClusterScoreT()
         {
             return T_C_ser(C_j,0);
         }
         
-        virtual void ComputeLeafDiagonal() override
+        force_inline void ComputeLeafDiagonal()
         {}
         
-        virtual void ComputeLeaf() override
+        force_inline void ComputeLeaf()
         {
             if( A.FindNonzeroPosition(P_i,P_j) < static_cast<int>(0) )
             {
@@ -204,7 +204,7 @@ namespace Repulsor
             }
         }
         
-        virtual void ComputeLeafSwapped() override
+        force_inline void ComputeLeafSwapped()
         {
             if( A.FindNonzeroPosition(P_i,P_j) < static_cast<int>(0) )
             {
@@ -223,22 +223,16 @@ namespace Repulsor
             }
         }
         
-        virtual void ComputeAdmissable() override
+        force_inline void ComputeAdmissable()
         {}
         
-        virtual void ComputeAdmissableSwapped() override
+        force_inline void ComputeAdmissableSwapped()
         {}
         
+
     public:
-        
-        virtual std::string ClassName() const override
-        {
-            return className();
-        }
-        
-    private:
       
-        std::string className() const
+        std::string ClassName() const
         {
             return TO_STD_STRING(CLASS) + "<"+this->tree_string+">";
         }

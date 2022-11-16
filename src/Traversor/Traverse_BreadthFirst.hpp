@@ -1,6 +1,6 @@
 public:
 
-    void Traverse_BreadthFirst( const Int i0, const Int j0, const Int max_leaves )
+    __attribute__((flatten)) void Traverse_BreadthFirst( const Int i0, const Int j0, const Int max_leaves )
     {
         const Int thread = omp_get_thread_num();
         

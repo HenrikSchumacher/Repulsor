@@ -120,14 +120,14 @@ protected:
         Int visited [128] = {false};
         Int depth   [128] = {};
         
-        Int stack_ptr    = zero;
+        Int stack_ptr    = null;
         stack[stack_ptr] = C_root;
         
         const Int  * restrict const left  = C_left.data();
         const Int  * restrict const right = C_right.data();
               Real * restrict const c     = C_in.data();
         
-        while( (stack_ptr >= zero) && ( stack_ptr < 126 ) )
+        while( (stack_ptr >= null) && ( stack_ptr < 126 ) )
         {
             // We are at cluster C.
             const Int d = depth[stack_ptr];
@@ -137,7 +137,7 @@ protected:
             
             if( !visited[stack_ptr] )
             {
-                if( (d < max_depth) && (L >= zero) && (R >= zero) )
+                if( (d < max_depth) && (L >= null) && (R >= null) )
                 {
                     visited[stack_ptr] = true;
                     
@@ -190,14 +190,14 @@ protected:
         Int visited [128] = {false};
         Int depth   [128] = {};
         
-        Int stack_ptr    = zero;
+        Int stack_ptr    = null;
         stack[stack_ptr] = C_root;
         
         const Int  * restrict const left  = C_left.data();
         const Int  * restrict const right = C_right.data();
               Real * restrict const c     = C_in.data();
         
-        while( (stack_ptr >= zero) && ( stack_ptr < 126 ) )
+        while( (stack_ptr >= null) && ( stack_ptr < 126 ) )
         {
             // We are at cluster C.
             const Int d = depth[stack_ptr];
@@ -207,7 +207,7 @@ protected:
             
             if( !visited[stack_ptr] )
             {
-                if( (d < max_depth) && (L >= zero) && (R >= zero) )
+                if( (d < max_depth) && (L >= null) && (R >= null) )
                 {
                     visited[stack_ptr] = true;
 
@@ -379,14 +379,14 @@ protected:
         Int stack [128] = {};
         Int depth [128] = {};
 
-        Int stack_ptr    = zero;
+        Int stack_ptr    = null;
         stack[stack_ptr] = C_root;
         
         const Int  * restrict const left  = C_left.data();
         const Int  * restrict const right = C_right.data();
               Real * restrict const c     = C_out.data();
         
-        while( (stack_ptr >= zero) && ( stack_ptr < 126 ) )
+        while( (stack_ptr >= null) && ( stack_ptr < 126 ) )
         {
             // We are at cluster C.
             const Int d = depth[stack_ptr];
@@ -395,7 +395,7 @@ protected:
             const Int R = right[C];
             --stack_ptr; // pop
             
-            if( (d < max_depth) && (L >= zero) && (R >= zero) )
+            if( (d < max_depth) && (L >= null) && (R >= null) )
             {
                 const Int C_offset = BUFFER_DIM * C;
                 const Int L_offset = BUFFER_DIM * L;
@@ -435,14 +435,14 @@ protected:
         Int stack [128] = {};
         Int depth [128] = {};
 
-        Int stack_ptr = zero;
+        Int stack_ptr = null;
         stack[stack_ptr] = C_root;
         
         const Int  * restrict const left  = C_left.data();
         const Int  * restrict const right = C_right.data();
               Real * restrict const c     = C_out.data();
         
-        while( (stack_ptr >= zero) && ( stack_ptr < 126 ) )
+        while( (stack_ptr >= null) && ( stack_ptr < 126 ) )
         {
             // We are at cluster C.
             const Int d = depth[stack_ptr];
@@ -451,7 +451,7 @@ protected:
             const Int R = right[C];
             --stack_ptr; //pop
             
-            if( (d < max_depth) && (L >= zero) && (R >= zero) )
+            if( (d < max_depth) && (L >= null) && (R >= null) )
             {
                 const Int C_offset = buffer_dim * C;
                 const Int L_offset = buffer_dim * L;
