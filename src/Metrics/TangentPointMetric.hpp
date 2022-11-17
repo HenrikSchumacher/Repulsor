@@ -39,7 +39,7 @@ namespace Repulsor
         virtual ValueContainer_T compute_metric( const Mesh_T & M ) const override
         {
             ValueContainer_T metric_values;
-         
+            
             TP_Traversor<DOM_DIM,DOM_DIM,BlockClusterTree_T,false,false,true>
                 traversor( M.GetBlockClusterTree(), metric_values, q, p );
 
@@ -54,7 +54,7 @@ namespace Repulsor
         ) const override
         {
             TP_Traversor<DOM_DIM,DOM_DIM,BlockClusterTree_T,false,false,true>
-                traversor( M.GetBlockClusterTree(), MetricValues(M), q, p );
+                traversor ( M.GetBlockClusterTree(), MetricValues(M), q, p );
             
             (void)traversor.MultiplyMetric(VF_flag,NF_flag,FF_flag);
         }

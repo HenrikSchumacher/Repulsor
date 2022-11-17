@@ -188,8 +188,8 @@ namespace Repulsor
                 
                 const Real factor = q_half * r_minus_p;         // = q / |y-x|^p
                 
-                const Real K_xy = factor * rCosPhi_q_minus_2;   // = |P*(y-x)|^(q-2) / |y-x|^p
-                const Real K_yx = factor * rCosPsi_q_minus_2;   // = |Q*(y-x)|^(q-2) / |y-x|^p
+                const Real K_xy = factor * rCosPhi_q_minus_2;   // = q/2 * |P*(y-x)|^(q-2) / |y-x|^p
+                const Real K_yx = factor * rCosPsi_q_minus_2;   // = q/2 * |Q*(y-x)|^(q-2) / |y-x|^p
                 
                 if constexpr ( diff_flag )
                 {
