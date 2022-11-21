@@ -10,15 +10,6 @@
 
 #define TOOLS_ENABLE_PROFILER // enable profiler
 
-#define ENABLE_POINTCLOUDS  0
-#define ENABLE_CURVES       0
-#define ENABLE_SURFACES     1
-
-#define ENABLE_1D           0
-#define ENABLE_2D           0
-#define ENABLE_3D           1
-#define ENABLE_4D           0
-
 #include "../Repulsor.hpp"
 
 int main(int argc, const char * argv[])
@@ -30,7 +21,7 @@ int main(int argc, const char * argv[])
     
     const char * homedir = getenv("HOME");
 
-    if( homedir == NULL)
+    if( homedir == nullptr)
     {
         homedir = getpwuid(getuid())->pw_dir;
     }
@@ -48,7 +39,7 @@ int main(int argc, const char * argv[])
     
     // Meaning of template parameters:
     
-    // Make_SimplicialMesh<Real, Int, SReal, ExtReal, ExtInt>;
+    // SimplicialMeshBase<Real, Int, SReal, ExtReal>;
     //
     // Real    = floating point type used for computations regarding energy and metric
     // Int     = signed integer type used internally, in particular as indices for sparse arrays.
@@ -56,45 +47,33 @@ int main(int argc, const char * argv[])
     //           Int = long long corresponds to MKL's ILP64 mode
     // SReal   = ("short real") floating point type for storage of clustering information
     // ExtReal = ("external real") floating point type that is used by the outer world, e.g. for submitting the mesh's vertex coordinates and vectors to multiply against the metric.
-    // ExtInt = ("external real") integer type that is used by the outer world, e.g. for submitting the mesh's vertex coordinates and vectors to multiply against the metric.
     
     
     using Mesh_T = SimplicialMeshBase<REAL,INT,REAL,REAL>;
     
-    // Initialize mesh by the factory Make_SimplicialMesh to allow runtime polymorphism.
+    // Create a factory that can make instances of SimplicialMesh with domain dimension in the range 2,...,2 and ambient dimension in the range 3,...,3.
+    SimplicialMesh_Factory<Mesh_T,2,2,3,3> mesh_factory;
+    
+    // This factory allows run-time polymorphism. But know that all specializations of SimplicialMesh in theses ranges have to be compiled! That may lead to horrific compile times, thus the ability to restrict the ranges in the factory.
+    
+    // Initialize mesh by the mesh_factory to allow runtime polymorphism.
     tic("Initializing mesh");
-    std::unique_ptr<Mesh_T> M_ptr = Make_SimplicialMesh<REAL,INT,REAL,REAL>(
-        &vertex_coordinates[0][0],  vertex_count, amb_dim,
-        &simplices[0][0],          simplex_count, dom_dim+1,
+    std::unique_ptr<Mesh_T> M_ptr = mesh_factory.Make(
+        &vertex_coordinates[0][0],  vertex_count, amb_dim,   false,
+        &simplices[0][0],          simplex_count, dom_dim+1, false,
         thread_count
     );
     
-    auto & M = *M_ptr;
+    auto & M = *M_ptr;  // I don't like pointers. Give me a reference.
     
     dump(M.ThreadCount());
-    
-//    tic("Initializing mesh");
-//    SimplicialMesh<dom_dim,amb_dim,REAL,INT,REAL,REAL> M (
-//        &vertex_coordinates[0][0],  vertex_count,
-//        &simplices[0][0],          simplex_count,
-//        thread_count
-//    );
 
     toc("Initializing mesh");
     
-//    // Alternatively, you can do this, independent on which dimensions are enabled for Make_SimplicialMesh. However, dom_dim, and amb_dim have to be known at compile time:
-//
-//    auto M = std::make_unique<SimplicialMesh<dom_dim,amb_dim,REAL,INT,REAL,REAL>>(
-//        &vertex_coordinates[0][0], vertex_count,
-//        &simplices[0][0],          simplex_count,
-//        thread_pool.ThreadCount()
-//    );
-    
     // Some quite decent settings for 2-dimensional surfaces.
-    
     M.cluster_tree_settings.split_threshold                        =  2;
     M.cluster_tree_settings.thread_count                           =  0; // take as many threads as there are used by SimplicialMesh M
-    M.block_cluster_tree_settings.far_field_separation_parameter   =  0.5;
+    M.block_cluster_tree_settings.far_field_separation_parameter   =  0.25;
     M.adaptivity_settings.theta                                    = 10.0;
 
     tic("Creating ClusterTree");
@@ -105,28 +84,28 @@ int main(int argc, const char * argv[])
     M.GetBlockClusterTree();
     toc("Creating BlockClusterTree");
 
-//    print(M.GetBlockClusterTree().Stats());
-    
     valprint("M.GetClusterTree().ThreadCount()",M.GetClusterTree().ThreadCount());
 
     valprint("M.GetClusterTree().NearDim()",M.GetClusterTree().NearDim());
-//    print(M.GetBlockClusterTree().Stats());
 
     valprint("number of detected intersections",M.GetBlockClusterTree().PrimitiveIntersectionCount());
 
     print("");
 
-    const double q = 6;
-    const double p = 12;
-//    const double weight = 1;
+    const REAL q = 6;
+    const REAL p = 12;
     
-    std::unique_ptr<EnergyBase<REAL,INT,REAL,REAL>>
-        tpe_ptr = Make_TangentPointEnergy<REAL,INT,REAL,REAL> (dom_dim,amb_dim,q,p);
+    using Energy_T = EnergyBase<REAL,INT,REAL,REAL>;
+    using Metric_T = MetricBase<REAL,INT,REAL,REAL>;
+    
+    TangentPointEnergy_Factory<Mesh_T,2,2,3,3> TPE_factory;
+    TangentPointMetric_Factory<Mesh_T,2,2,3,3> TPM_factory;
+    
+    std::unique_ptr<Energy_T> tpe_ptr = TPE_factory.Make( dom_dim, amb_dim, q, p );
     
     auto & tpe = *tpe_ptr;
     
-    std::unique_ptr<MetricBase<REAL,INT,REAL,REAL>>
-        tpm_ptr = Make_TangentPointMetric<REAL,INT,REAL,REAL> (dom_dim,amb_dim,q,p);
+    std::unique_ptr<Metric_T> tpm_ptr = TPM_factory.Make( dom_dim, amb_dim, q, p );
 
     auto & tpm = *tpm_ptr;
     
@@ -146,8 +125,9 @@ int main(int argc, const char * argv[])
 
     print("");
     
-    std::unique_ptr<EnergyBase<REAL,INT,REAL,REAL>>
-        tpe_slow_ptr = Make_TangentPointEnergy_AllPairs<REAL,INT,REAL,REAL> (dom_dim,amb_dim,q,p);
+    TangentPointEnergy_AllPairs_Factory<Mesh_T,2,2,3,3> TPE_AllPairs_factory;
+    
+    std::unique_ptr<Energy_T> tpe_slow_ptr = TPE_AllPairs_factory.Make( dom_dim, amb_dim, q, p );
     
     auto & tpe_slow = *tpe_slow_ptr;
     
@@ -183,28 +163,19 @@ int main(int argc, const char * argv[])
    
 
 
-    // Initialize mesh by the factory Make_SimplicialMesh to allow runtime polymorphism.
+    // Initialize mesh by the factory to allow runtime polymorphism.
     tic("Initialize obstacle mesh");
-    std::unique_ptr<Mesh_T> Q = Make_SimplicialMesh<REAL,INT,REAL,REAL>(
-        &obstacle_vertex_coordinates[0][0],  obstacle_vertex_count, amb_dim,
-        &obstacle_simplices[0][0],          obstacle_simplex_count, dom_dim+1,
+    std::unique_ptr<Mesh_T> Q_ptr = mesh_factory.Make(
+        &obstacle_vertex_coordinates[0][0], obstacle_vertex_count,  amb_dim,   false,
+        &obstacle_simplices[0][0],          obstacle_simplex_count, dom_dim+1, false,
         thread_count
-      );
+    );
     toc("Initialize obstacle mesh");
     print("");
 
-//    // Alternatively, you can do this, independent on which dimensions are enabled for Make_SimplicialMesh. However, dom_dim, and amb_dim have to be known at compile time:
-////    Q = std::unique_ptr<SimplicialMeshBase<double,int,double,double>>(
-////        new SimplicialMesh<dom_dim,amb_dim,double,int,double,double>(
-////            &obstacle_vertex_coordinates[0][0],  obstacle_vertex_count,
-////            &obstacle_simplices[0][0],          obstacle_simplex_count,
-////            thread_pool.ThreadCount()
-////        )
-////    );
-
     // Load obstacle into mesh.
     tic("Load obstacle");
-    M.LoadObstacle( std::move(Q) );
+    M.LoadObstacle( std::move(Q_ptr) );
     toc("Load obstacle");
     print("");
 
@@ -213,12 +184,11 @@ int main(int argc, const char * argv[])
     toc("Create obstacle trees");
     print("");
 
-//    print(M.GetObstacleBlockClusterTree().Stats() );
-
     // Compute tangent-point energy between mesh and obstacle.
 
-    std::unique_ptr<EnergyBase<REAL,INT,REAL,REAL>>
-        tpo_ptr = Make_TangentPointObstacleEnergy<REAL,INT,REAL,REAL> (dom_dim,dom_dim,amb_dim,q,p);
+    TangentPointObstacleEnergy_Factory<Mesh_T,2,2,2,2,3,3> TPOE_factory;
+    
+    std::unique_ptr<Energy_T> tpo_ptr = TPOE_factory.Make( dom_dim, dom_dim, amb_dim, q, p );
     
     auto & tpo = *tpo_ptr;
     

@@ -80,7 +80,8 @@ namespace Repulsor
 } // namespace Repulsor
 
 
-#include "TangentPointEnergy/Make_TangentPointObstacleEnergy.hpp"
+//#include "TangentPointEnergy/Make_TangentPointObstacleEnergy.hpp"
+#include "TangentPointEnergy/TPO_Factory.hpp"
 
 #undef ROOT
 #undef BASE

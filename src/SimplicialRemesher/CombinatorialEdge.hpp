@@ -178,7 +178,7 @@ namespace Repulsor
 //        {
 //            if( E == nullptr )
 //            {
-//                return std::string( "NULL" );
+//                return std::string( "nullptr" );
 //            }
 //            {
 //                if( E->DeletedQ() )

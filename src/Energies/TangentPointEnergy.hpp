@@ -7,15 +7,20 @@
 #include "TangentPointEnergy/TP_Traversor.hpp"
 
 #define CLASS TangentPointEnergy
-#define BASE  EnergyDimRestricted<DOM_DIM,AMB_DIM,Real,Int,SReal,ExtReal>
-#define ROOT  EnergyBase<Real,Int,SReal,ExtReal>
+#define BASE  EnergyDimRestricted<DOM_DIM,AMB_DIM,Real_,Int_,SReal_,ExtReal_>
+#define ROOT  EnergyBase<Real_,Int_,SReal_,ExtReal_>
 
 namespace Repulsor
 {
-    template<int DOM_DIM, int AMB_DIM, typename Real, typename Int, typename SReal, typename ExtReal>
+    template<int DOM_DIM, int AMB_DIM, typename Real_, typename Int_, typename SReal_, typename ExtReal_>
     class CLASS : public BASE
     {
     public:
+        
+        using Real    = Real_;
+        using Int     = Int_;
+        using SReal   = SReal_;
+        using ExtReal = ExtReal_;
         
         using Mesh_T                  = typename BASE::Mesh_T;
         using BlockClusterTree_T      = typename Mesh_T::BlockClusterTree_T;
@@ -28,8 +33,8 @@ namespace Repulsor
         
         CLASS( const Real q_, const Real p_ )
         :   BASE ()
-        ,   q    ( static_cast<Real>(q_) )
-        ,   p    ( static_cast<Real>(p_) )
+        ,   q ( q_ )
+        ,   p ( p_ )
         {}
         
         virtual ~CLASS() = default;
@@ -80,7 +85,7 @@ namespace Repulsor
 } // namespace Repulsor
 
 
-#include "TangentPointEnergy/Make_TangentPointEnergy.hpp"
+#include "TangentPointEnergy/TP_Factory.hpp"
 
 #undef ROOT  
 #undef BASE

@@ -2,7 +2,7 @@
 
 #include "SimplicialMesh/SimplicialMeshBase.hpp"
 
-#define BASE  SimplicialMeshBase<Real,Int,SReal,ExtReal>
+#define BASE  SimplicialMeshBase<Real_,Int_,SReal_,ExtReal_>
 #define CLASS SimplicialMesh
 
 namespace Repulsor
@@ -10,16 +10,21 @@ namespace Repulsor
 //    template<int DOM_DIM, int AMB_DIM, typename Real, typename Int, typename SReal, typename ExtReal>
 //    class TangentPoint;
     
-    template<typename Real, typename Int, typename SReal, typename ExtReal>
+    template<typename Real_, typename Int_, typename SReal_, typename ExtReal_>
     class SimplicialRemesherBase;
     
-    template<int DOM_DIM, int AMB_DIM, typename Real, typename Int, typename SReal, typename ExtReal>
+    template<int DOM_DIM, int AMB_DIM, typename Real_, typename Int_, typename SReal_, typename ExtReal_>
     class SimplicialRemesher;
     
-    template<int DOM_DIM, int AMB_DIM, typename Real, typename Int, typename SReal, typename ExtReal>
+    template<int DOM_DIM, int AMB_DIM, typename Real_, typename Int_, typename SReal_, typename ExtReal_>
     class CLASS : public BASE
     {
     public :
+        
+        using Real    = Real_;
+        using Int     = Int_;
+        using SReal   = SReal_;
+        using ExtReal = ExtReal_;
         
         using TangentVector_T    = typename BASE::TangentVector_T;
         using CotangentVector_T  = typename BASE::CotangentVector_T;
@@ -186,7 +191,7 @@ namespace Repulsor
         mutable Tensor1<Int,Int> simplex_row_pointers;
         mutable Tensor1<Int,Int> simplex_column_indices;
         
-        SimplicialMeshDetails<DOM_DIM,AMB_DIM,Real,Int> details;
+        SimplicialMeshDetails<DOM_DIM,AMB_DIM,Real_,Int_> details;
 
         
     public:
@@ -804,7 +809,7 @@ namespace Repulsor
 } // namespace Repulsor
 
 
-#include "SimplicialMesh/Make_SimplicialMesh.hpp"
+#include "SimplicialMesh/SimplicialMesh_Factory.hpp"
 
 #undef BASE
 #undef CLASS

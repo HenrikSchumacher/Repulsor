@@ -166,7 +166,7 @@ namespace Repulsor
 //        {
 //            if( S == nullptr )
 //            {
-//                return std::string( "NULL" );
+//                return std::string( "nullptr" );
 //            }
 //            {
 //                if( S->DeletedQ() )

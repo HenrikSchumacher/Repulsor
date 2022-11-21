@@ -17,6 +17,7 @@
         using namespace Tools;
         using namespace Tensors;
         using namespace GJK;
+        
     }
 
     #include "src/Enums.hpp"

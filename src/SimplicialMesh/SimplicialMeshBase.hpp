@@ -4,18 +4,24 @@
 
 namespace Repulsor
 {
-    template<typename Real, typename Int, typename SReal, typename ExtReal>
+    template<typename Real_, typename Int_, typename SReal_, typename ExtReal_>
     class SimplicialRemesherBase;
     
-    template<typename Real, typename Int, typename SReal, typename ExtReal>
+    template<typename Real_, typename Int_, typename SReal_, typename ExtReal_>
     class CLASS
     {
-        ASSERT_FLOAT(Real);
-        ASSERT_INT(Int);
-        ASSERT_FLOAT(SReal);
-        ASSERT_FLOAT(ExtReal);
+        
+        ASSERT_FLOAT(Real_);
+        ASSERT_INT(Int_);
+        ASSERT_FLOAT(SReal_);
+        ASSERT_FLOAT(ExtReal_);
         
     public:
+        
+        using Real    = Real_;
+        using Int     = Int_;
+        using SReal   = SReal_;
+        using ExtReal = ExtReal_;
         
         using ClusterTree_T              =        ClusterTreeBase<Real,Int,SReal,ExtReal>;
         using BlockClusterTree_T         =   BlockClusterTreeBase<Real,Int,SReal,ExtReal,true>;

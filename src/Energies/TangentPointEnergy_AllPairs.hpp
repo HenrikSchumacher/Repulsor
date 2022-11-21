@@ -78,7 +78,7 @@ namespace Repulsor
 } // namespace Repulsor
 
 
-#include "TangentPointEnergy/Make_TangentPointEnergy.hpp"
+#include "TangentPointEnergy/TP_Factory.hpp"
 
 #undef ROOT
 #undef BASE
