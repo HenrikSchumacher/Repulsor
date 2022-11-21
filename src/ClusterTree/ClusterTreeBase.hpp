@@ -624,34 +624,34 @@ namespace Repulsor
         
     public:
         
-        void Pre( const ExtReal * input, const Int cols, const KernelType type ) const
+        void Pre( const ExtReal * input, const Int cols, const OperatorType op_type ) const
         {
             ptic(ClassName()+"::Pre");
             if( pre_post_initialized && mixed_pre_post_initialized )
             {
                 SparseMatrixCSR<Real,Int,Int> * pre;
                 
-                switch (type)
+                switch( op_type )
                 {
-                    case KernelType::FractionalOnly:
+                    case OperatorType::FractionalOnly:
                     {
                         pre  = &lo_pre ;
                         RequireBuffers( cols );
                         break;
                     }
-                    case KernelType::HighOrder:
+                    case OperatorType::HighOrder:
                     {
                         pre  = &hi_pre ;
                         RequireBuffers( AmbDim() * cols ); // Beware: The derivative operator increases the number of columns!
                         break;
                     }
-                    case KernelType::LowOrder:
+                    case OperatorType::LowOrder:
                     {
                         pre  = &lo_pre ;
                         RequireBuffers( cols );
                         break;
                     }
-                    case KernelType::MixedOrder:
+                    case OperatorType::MixedOrder:
                     {
                         pre  = &mixed_pre ;
                         RequireBuffers( (AmbDim()+1) *cols ); // Beware: The mixed preprocessor operator increases the number of columns!
@@ -688,7 +688,7 @@ namespace Repulsor
         }; // Pre
 
 
-        void Post( ExtReal * output, const ExtReal alpha, const ExtReal beta, const KernelType type ) const
+        void Post( ExtReal * output, const ExtReal alpha, const ExtReal beta, const OperatorType op_type ) const
         {
             ptic(ClassName()+"::Post");
             
@@ -696,24 +696,24 @@ namespace Repulsor
             {
                 SparseMatrixCSR<Real,Int,Int> * post;
                 
-                switch (type)
+                switch( op_type )
                 {
-                    case KernelType::FractionalOnly:
+                    case OperatorType::FractionalOnly:
                     {
                         post  = &lo_post;
                         break;
                     }
-                    case KernelType::HighOrder:
+                    case OperatorType::HighOrder:
                     {
                         post  = &hi_post;
                         break;
                     }
-                    case KernelType::LowOrder:
+                    case OperatorType::LowOrder:
                     {
                         post  = &lo_post;
                         break;
                     }
-                    case KernelType::MixedOrder:
+                    case OperatorType::MixedOrder:
                     {
                         post  = &mixed_post;
                         break;

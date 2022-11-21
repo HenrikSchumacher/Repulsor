@@ -1,7 +1,7 @@
 #pragma once
 
 #define CLASS TangentPointMetric
-#define BASE  MetricDimRestricted<DOM_DIM,AMB_DIM,Real,Int,SReal,ExtReal>
+#define BASE  MetricDimRestricted<DOM_DIM,AMB_DIM,Real,Int,SReal,ExtReal,OperatorType::MixedOrder>
 #define ROOT  MetricBase<Real,Int,SReal,ExtReal>
 
 namespace Repulsor

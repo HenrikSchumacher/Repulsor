@@ -5,7 +5,11 @@
 
 namespace Repulsor
 {
-    template<int DOM_DIM, int AMB_DIM, typename Real, typename Int, typename SReal, typename ExtReal>
+    template<
+        int DOM_DIM, int AMB_DIM,
+        typename Real, typename Int, typename SReal, typename ExtReal,
+        OperatorType op_type
+    >
     class CLASS : public BASE
     {
     public:
@@ -24,9 +28,31 @@ namespace Repulsor
 
         virtual ~CLASS() override = default;
         
-        // Do a down cast and delegate implementation further to descendant class.
-        ValueContainer_T compute_metric( const MeshBase_T & M ) const override
+        ValueContainer_T & MetricValues( const MeshBase_T & M ) const override
         {
+            ptic(ClassName()+"::MetricValues");
+            if( !M.IsCached(ClassName()+"::MetricValues"))
+            {
+                std::any thing ( std::move(compute_metric(M)) );
+                
+                M.SetCache( ClassName()+"::MetricValues", thing );
+            }
+
+            ptoc(ClassName()+"::MetricValues");
+
+            auto & result = std::any_cast<ValueContainer_T &>(
+                  M.GetCache(ClassName()+"::MetricValues")
+            );
+            
+            return result;
+        }
+    
+    protected:
+        
+        
+        ValueContainer_T compute_metric( const MeshBase_T & M ) const
+        {
+            // Do a down cast and delegate implementation further to descendant class.
             const Mesh_T * Q = dynamic_cast<const Mesh_T *>(&M);
                         
             if( Q != nullptr )
@@ -41,15 +67,34 @@ namespace Repulsor
             }
         }
         
+    public:
+        
         // Actual implementation to be specified by descendants.
         virtual ValueContainer_T compute_metric( const Mesh_T & M ) const = 0;
-
-        // Actual implementation to be specified by descendants.
-        virtual void multiply_metric(
-            const MeshBase_T & M,
-            const bool VF_flag, const bool NF_flag, const bool FF_flag
+        
+    public:
+        
+        void MultiplyMetric(
+            const MeshBase_T &             M,
+            const ExtReal                  alpha,
+            const ExtReal * restrict const X,
+            const ExtReal                  beta,
+                  ExtReal * restrict const Y,
+            const Int                      rhs_count,
+            const bool VF_flag = true,
+            const bool NF_flag = true,
+            const bool FF_flag = true
         ) const override
         {
+            ptic(ClassName()+"::MultiplyMetric");
+            auto & S = M.GetBlockClusterTree().GetS();
+            auto & T = M.GetBlockClusterTree().GetT();
+
+            T.Pre( X, rhs_count, op_type );
+            
+            S.RequireBuffers( T.BufferDimension() ); // Tell the S-side what it has to expect.
+            
+            // Do a down cast and delegate implementation further to descendant class.
             const Mesh_T * Q = dynamic_cast<const Mesh_T *>(&M);
                         
             if( Q != nullptr )
@@ -60,6 +105,10 @@ namespace Repulsor
             {
                 eprint(ClassName()+"::multiply_metric: Input could not be downcast to compatible type. Doing nothing.");
             }
+
+            S.Post( Y, alpha, beta, op_type );
+            
+            ptoc(ClassName()+"::MultiplyMetric");
         }
         
         // Actual implementation to be specified by descendants.

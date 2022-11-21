@@ -39,7 +39,7 @@ namespace Repulsor
         Degenerate
     };
     
-    enum class KernelType
+    enum class OperatorType
     {
         FractionalOnly,
         HighOrder,
@@ -73,13 +73,13 @@ namespace Repulsor
 //        static constexpr int FF =  2;
 //    };
     
-    static std::map<KernelType, std::string> KernelTypeName
+    static std::map<OperatorType, std::string> OperatorTypeName
     {
-        {KernelType::FractionalOnly, "FractionalOnly"},
-        {KernelType::HighOrder, "HighOrder"},
-        {KernelType::MixedOrder, "MixedOrder"},
-        {KernelType::LowOrder, "LowOrder"},
-        {KernelType::SquaredDistance, "SquaredDistance"}
+        {OperatorType::FractionalOnly, "FractionalOnly"},
+        {OperatorType::HighOrder, "HighOrder"},
+        {OperatorType::MixedOrder, "MixedOrder"},
+        {OperatorType::LowOrder, "LowOrder"},
+        {OperatorType::SquaredDistance, "SquaredDistance"}
     };
     
 } // namespace Repulsor

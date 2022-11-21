@@ -1140,7 +1140,6 @@ namespace Repulsor
                         
                         C_bv.SetPointer( C_up_ser, C );
                         C_bv.FromPrimitives( P_, P_up_ser, C_begin[C], C_end[C], 1 );
-                        
                     }
                 }
             }
@@ -1199,46 +1198,31 @@ namespace Repulsor
             const Int near_dim = NearDim();
             const Int primitive_count = PrimitiveCount();
             
-            if( !addto )
-            {
-                // Write first slice.
-                const Real * restrict const from = thread_P_D_near.data(0);
-                      Real * restrict const to   =        P_D_near.data();
-                
-                #pragma omp parallel for num_threads( ThreadCount() ) schedule( static )
-                for( Int i = 0; i < primitive_count; ++i )
-                {
-                    const Int j = P_inverse_ordering[i];
+                  Real * restrict const to      = P_D_near.data();
+            const Int  * restrict const inv_ord = P_inverse_ordering.data();
 
-                    copy_buffer( &from[near_dim * j], &to[near_dim * i], near_dim );
-                }
-            }
-            
             // Add the other slices. (Start with the first slice if we were asked to add into.)
-            for( Int thread = 1-addto; thread < ThreadCount(); ++thread )
+            for( Int thread = 0; thread < ThreadCount(); ++thread )
             {
                 const Real * restrict const from = thread_P_D_near.data(thread);
-                      Real * restrict const to   =        P_D_near.data();
-                
-                const Int  * restrict const inv_ord = P_inverse_ordering.data();
-                
-                #pragma omp parallel for num_threads( ThreadCount() ) schedule( static )
-                for( Int i = 0; i < primitive_count; ++i )
-                {
-                    const Int j = inv_ord[i];
-                    
-                    #pragma omp simd
-                    for( Int k = 0; k < near_dim; ++k )
-                    {
-                        to[ near_dim * i + k ] += from[ near_dim * j + k ];
-                    }
 
-                    // THIS WAS WRONG!!!
-//                    copy_buffer( &from[near_dim * j], &to[near_dim * i], near_dim );
+                if( thread == 0 && !addto )
+                {
+                    #pragma omp parallel for num_threads( ThreadCount() ) schedule( static )
+                    for( Int i = 0; i < primitive_count; ++i )
+                    {
+                        copy_buffer( &from[near_dim * inv_ord[i]], &to[near_dim * i], near_dim );
+                    }
+                }
+                else
+                {
+                    #pragma omp parallel for num_threads( ThreadCount() ) schedule( static )
+                    for( Int i = 0; i < primitive_count; ++i )
+                    {
+                        add_to_buffer( &from[near_dim * inv_ord[i]], &to[near_dim * i], near_dim );
+                    }
                 }
             }
-            
-
             
             ptoc(className()+"::CollectNearFieldDerivatives");
             
@@ -1259,60 +1243,30 @@ namespace Repulsor
             
             thread_C_D_far.AddReduce( C_out.data(), false );
             
-//            // Write first slice.
-//            copy_buffer( thread_C_D_far.data(0), C_out.data(), cluster_count * far_dim );
-//
-//            // Add the other slices.
-//            for( Int thread = 1; thread < thread_count; ++thread )
-//            {
-//                const Real * restrict const from = thread_C_D_far.data(thread);
-//                      Real * restrict const to   = C_out.data();
-//                const Int last = cluster_count * far_dim;
-//
-//                #pragma omp parallel for simd num_threads( thread_count )
-//                for( Int i = 0; i < last; ++i )
-//                {
-//                    to[i] += from[i];
-//                }
-//            }
-            
             this->PercolateDown();
             
             this->ClustersToPrimitives(false);
 
+            const Real * restrict const from    = P_out.data();
+                  Real * restrict const to      = P_D_far.data();
+            const Int  * restrict const inv_ord = P_inverse_ordering.data();
+            
             // Finally, permute data for the outside world.
-            if(addto)
+            if( addto )
             {
-                const Real * restrict const from = P_out.data();
-                      Real * restrict const to   = P_D_far.data();
-                const Int  * restrict const inv_ord = P_inverse_ordering.data();
-                
                 #pragma omp parallel for num_threads( thread_count ) schedule( static )
                 for( Int i = 0; i < primitive_count; ++i )
                 {
-                    const Int j = inv_ord[i];
-                    
-                    #pragma omp simd
-                    for( Int k = 0; k < far_dim; ++k )
-                    {
-                        to[ far_dim * i + k ] += from[ far_dim * j + k ];
-                    }
+                    add_to_buffer( &from[far_dim * inv_ord[i]], &to[far_dim * i], far_dim );
                 }
             }
             else
             {
-                const Real * restrict const from = P_out.data();
-                      Real * restrict const to   = P_D_far.data();
-                const Int  * restrict const inv_ord = P_inverse_ordering.data();
-                
                 #pragma omp parallel for num_threads( thread_count ) schedule( static )
                 for( Int i = 0; i < primitive_count; ++i )
                 {
-                    const Int j = inv_ord[i];
-                    
-                    copy_buffer( &from[far_dim * j], &to[far_dim * i], far_dim );
+                    copy_buffer( &from[far_dim * inv_ord[i]], &to[far_dim * i], far_dim );
                 }
-                
             }
             
             ptoc(className()+"::CollectFarFieldDerivatives");

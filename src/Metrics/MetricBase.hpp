@@ -14,12 +14,12 @@ namespace Repulsor
         
     public:
         
-        using MeshBase_T             = SimplicialMeshBase<Real,Int,SReal,ExtReal>;
+        using MeshBase_T         = SimplicialMeshBase<Real,Int,SReal,ExtReal>;
         
-        using TangentVector_T        = typename MeshBase_T::TangentVector_T;
-        using CotangentVector_T      = typename MeshBase_T::CotangentVector_T;
+        using TangentVector_T    = typename MeshBase_T::TangentVector_T;
+        using CotangentVector_T  = typename MeshBase_T::CotangentVector_T;
         
-        using BlockClusterTree_T     = typename MeshBase_T::BlockClusterTree_T;
+        using BlockClusterTree_T = typename MeshBase_T::BlockClusterTree_T;
         
         using Values_T           = Tensor2<Real,size_t>;
         using ValueContainer_T   = std::unordered_map<std::string,Values_T>;
@@ -34,35 +34,9 @@ namespace Repulsor
         
     public:
         
-        // Return the differential of the energy; use caching.
-        ValueContainer_T & MetricValues( const MeshBase_T & M ) const
-        {
-            ptic(ClassName()+"::MetricValues");
-            if( !M.IsCached(ClassName()+"::MetricValues"))
-            {
-                std::any thing ( std::move(compute_metric(M)) );
-                
-                M.SetCache( ClassName()+"::MetricValues", thing );
-            }
+        virtual ValueContainer_T & MetricValues( const MeshBase_T & M ) const = 0;
 
-            ptoc(ClassName()+"::MetricValues");
-
-            auto & result = std::any_cast<ValueContainer_T &>(
-                  M.GetCache(ClassName()+"::MetricValues")
-            );
-            
-            return result;
-        }
-       
-    protected:
-        
-        // Actual implementation to be specified by descendants.
-        virtual ValueContainer_T compute_metric( const MeshBase_T & M ) const = 0;
-        
-    public:
-
-        // Return the differential of the energy; use caching.
-        void MultiplyMetric(
+        virtual void MultiplyMetric(
             const MeshBase_T &             M,
             const ExtReal                  alpha,
             const ExtReal * restrict const X,
@@ -72,22 +46,7 @@ namespace Repulsor
             const bool VF_flag = true,
             const bool NF_flag = true,
             const bool FF_flag = true
-        ) const
-        {
-            ptic(ClassName()+"::MultiplyMetric");
-            auto & S = M.GetBlockClusterTree().GetS();
-            auto & T = M.GetBlockClusterTree().GetT();
-
-            T.Pre( X, rhs_count, KernelType::MixedOrder );
-            
-            S.RequireBuffers( T.BufferDimension() ); // Tell the S-side what it has to expect.
-            
-            multiply_metric( M,VF_flag, NF_flag, FF_flag );
-
-            S.Post( Y, alpha, beta, KernelType::MixedOrder );
-            
-            ptoc(ClassName()+"::MultiplyMetric");
-        }
+        ) const = 0;
         
         // Return the differential of the energy; use caching.
         void MultiplyMetric(
@@ -101,17 +60,8 @@ namespace Repulsor
             const bool FF_flag = true
         ) const
         {
-            MultiplyMetric( M, alpha, X.data(), beta, Y.data(), X.Dimension(1), VF_flag, NF_flag, FF_flag );
+            this->MultiplyMetric( M, alpha, X.data(), beta, Y.data(), X.Dimension(1), VF_flag, NF_flag, FF_flag );
         }
-        
-//    protected:
-//
-//        virtual void multiply_metric( const MeshBase_T & M) = 0
-        
-    public:
-        
-        // Actual implementation to be specified by descendants.
-        virtual void multiply_metric( const MeshBase_T & M, bool VF_flag, bool NF_flag, bool FF_flag ) const = 0;
 
         
     public:

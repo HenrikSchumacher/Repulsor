@@ -1,7 +1,7 @@
 #pragma once
 
 #define CLASS TangentPointMetric0
-#define BASE  MetricDimRestricted<DOM_DIM,AMB_DIM,Real,Int,SReal,ExtReal>
+#define BASE  MetricDimRestricted<DOM_DIM,AMB_DIM,Real,Int,SReal,ExtReal,OperatorType::MixedOrder>
 #define ROOT  MetricBase<Real,Int,SReal,ExtReal>
 
 namespace Repulsor
@@ -22,7 +22,7 @@ namespace Repulsor
         using BASE::MetricValues;
         
         CLASS( const Real q_, const Real p_ )
-        :   BASE ()
+        :   BASE (                       )
         ,   q    ( static_cast<Real>(q_) )
         ,   p    ( static_cast<Real>(p_) )
         {}
