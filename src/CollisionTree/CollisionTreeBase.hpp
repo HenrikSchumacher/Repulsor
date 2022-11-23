@@ -46,7 +46,7 @@ namespace Repulsor
         
         virtual const ClusterTreeBase_T & GetT() const = 0;
 
-        virtual SReal MaximumSafeStepSize( const SReal t_) const = 0;
+        virtual ExtReal MaximumSafeStepSize( const SReal t_) const = 0;
         
 //        virtual Int CollisionCount() const = 0;
         

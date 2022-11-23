@@ -919,7 +919,7 @@ namespace Repulsor
             
         } // CollectPrimitiveEnergies
         
-        void CollectPrimitiveEnergies( ExtReal * output, const ExtReal weight, bool addTo = false ) const
+        void CollectPrimitiveEnergies( ExtReal * restrict const output, const ExtReal weight, bool addTo = false ) const
         {
             ptic(ClassName()+"::CollectPrimitiveEnergies");
             
@@ -930,15 +930,14 @@ namespace Repulsor
             
             // Copy the values to output. We must not forget reorder!
             {
-                const Int  * restrict const o    = P_inverse_ordering.data();
-                const Real * restrict const from = P_out.data();
-                      Real * restrict const to   = output;
+                const    Int  * restrict const o    = P_inverse_ordering.data();
+                const    Real * restrict const from = P_out.data();
             
                 #pragma omp parallel for num_threads( ThreadCount() ) schedule( static )
                 for( Int i = 0; i < primitive_count; ++i )
                 {
                     const Int j = o[i];
-                    to[i] = from[j];
+                    output[i] = static_cast<ExtReal>(from[j]);
                 }
             }
             
@@ -946,7 +945,7 @@ namespace Repulsor
        
         } // CollectPrimitiveEnergies
             
-        void CollectDensity( ExtReal * output, const ExtReal weight, bool addTo = false ) const
+        void CollectDensity( ExtReal * restrict const output, const ExtReal weight, bool addTo = false ) const
         {
             ptic(ClassName()+"::CollectDensity");
             
@@ -995,8 +994,8 @@ namespace Repulsor
 
             // Finally, we divide by the dual volumes to obtain the vertex densities.
             {
-                const Real * restrict const a = dual_volumes.data();
-                      Real * restrict const e = output;
+                const ExtReal * restrict const a = dual_volumes.data();
+                      ExtReal * restrict const e = output;
                 
                 #pragma omp parallel for simd num_threads(ThreadCount()) aligned( a, e : ALIGNMENT ) schedule( static )
                 for( Int i = 0; i < vertex_count; ++i )

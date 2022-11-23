@@ -5,8 +5,10 @@
 
 // We have to toggle which domain dimensions and ambient dimensions shall be supported by runtime polymorphism before we load Repulsor.hpp
 // You can activate everything you want, but compile times might increase substatially.
-#define INT long long
-#define REAL double
+#define INT     int32_t
+#define EXTINT  int64_t
+#define REAL    float
+#define EXTREAL double
 
 #define TOOLS_ENABLE_PROFILER // enable profiler
 
@@ -49,7 +51,7 @@ int main(int argc, const char * argv[])
     // ExtReal = ("external real") floating point type that is used by the outer world, e.g. for submitting the mesh's vertex coordinates and vectors to multiply against the metric.
     
     
-    using Mesh_T = SimplicialMeshBase<REAL,INT,REAL,REAL>;
+    using Mesh_T = SimplicialMeshBase<REAL,INT,REAL,EXTREAL>;
     
     // Create a factory that can make instances of SimplicialMesh with domain dimension in the range 2,...,2 and ambient dimension in the range 3,...,3.
     SimplicialMesh_Factory<Mesh_T,2,2,3,3> mesh_factory;
@@ -95,8 +97,8 @@ int main(int argc, const char * argv[])
     const REAL q = 6;
     const REAL p = 12;
     
-    using Energy_T = EnergyBase<REAL,INT,REAL,REAL>;
-    using Metric_T = MetricBase<REAL,INT,REAL,REAL>;
+    using Energy_T = EnergyBase<REAL,INT,REAL,EXTREAL>;
+    using Metric_T = MetricBase<REAL,INT,REAL,EXTREAL>;
     
     TangentPointEnergy_Factory<Mesh_T,2,2,3,3> TPE_factory;
     TangentPointMetric_Factory<Mesh_T,2,2,3,3> TPM_factory;

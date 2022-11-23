@@ -47,7 +47,7 @@ namespace Repulsor
         CLASS() = default;
 
         CLASS(
-            const Tensor2<ExtReal,Int> & V_coords_,
+            const Tensor2<Real,Int> & V_coords_,
             // vertex coordinates; assumed to be of size vertex_count_ x AMB_DIM
             const Tensor2<Int,Int> & simplices_,
             // simplices; assumed to be of size simplex_count_ x (DOM_DIM+1)
@@ -112,9 +112,9 @@ namespace Repulsor
         
 #endif
 
-        template<typename ExtInt>
+        template<typename ExtReal_2, typename ExtInt>
         CLASS(
-            const ExtReal * V_coords_, // vertex coordinates; assumed to be of size vertex_count_ x AMB_DIM
+            const ExtReal_2 * V_coords_, // vertex coordinates; assumed to be of size vertex_count_ x AMB_DIM
             const long long vertex_count_,
             const ExtInt * simplices_, // simplices; assumed to be of size simplex_count_ x (DOM_DIM+1)
             const long long simplex_count_,
@@ -123,9 +123,9 @@ namespace Repulsor
         :   CLASS( V_coords_, vertex_count_, false, simplices_, simplex_count_, false, thread_count_)
         {}
         
-        template<typename ExtInt>
+        template<typename ExtReal_2, typename ExtInt>
         CLASS(
-            const ExtReal * vertex_coords_, // vertex coordinates; assumed to be of size vertex_count_ x AMB_DIM
+            const ExtReal_2 * vertex_coords_, // vertex coordinates; assumed to be of size vertex_count_ x AMB_DIM
             const long long vertex_count_,
             const bool vertex_coords_transpose,
             const ExtInt * simplices_, // simplices; assumed to be of size simplex_count_ x (DOM_DIM+1)
