@@ -6,7 +6,7 @@ public:
         {
             ptic(ClassName()+"::RequireParallelPercolationRoots");
 
-            const Int max_depth = settings.parallel_perc_depth;
+            const Int max_depth = static_cast<Int>(settings.parallel_perc_depth);
             
             Tensor1<Int,Int> stack ( 2*max_depth+2 );
             Tensor1<Int,Int> depth ( 2*max_depth+2 );
@@ -54,7 +54,7 @@ public:
     {
         ptic(ClassName()+"::PercolateUp_Parallel");
         
-        Int n_roots = parallel_perc_roots.size();
+        Int n_roots = static_cast<Int>(parallel_perc_roots.size());
         
         #pragma omp parallel for num_threads( ThreadCount() )
         for( Int i = 0; i < n_roots; ++i )
@@ -71,7 +71,7 @@ public:
     {
         ptic(ClassName()+"::PercolateDown_Parallel");
         
-        Int n_roots = parallel_perc_roots.size();
+        Int n_roots = static_cast<Int>(parallel_perc_roots.size());
         
         PercolateDown_DFS( null, static_cast<Int>(settings.parallel_perc_depth) );
         

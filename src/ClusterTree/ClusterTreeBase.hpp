@@ -190,12 +190,12 @@ namespace Repulsor
         
         Int ThreadCount() const
         {
-            return settings.thread_count;
+            return static_cast<Int>(settings.thread_count);
         }
         
         Int SplitThreshold() const
         {
-            return settings.split_threshold;
+            return static_cast<Int>(settings.split_threshold);
         }
 
         Int Depth() const

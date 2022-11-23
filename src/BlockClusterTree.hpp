@@ -129,22 +129,22 @@ namespace Repulsor
             return sqrt(near_theta2);
         }
         
-        Int PrimitiveIntersectionCount() const override
+        LInt PrimitiveIntersectionCount() const override
         {
             return inter.NonzeroCount();
         }
         
-        Int VeryNearFieldInteractionCount() const override
+        LInt VeryNearFieldInteractionCount() const override
         {
             return verynear.NonzeroCount();
         }
         
-        Int NearFieldInteractionCount() const override
+        LInt NearFieldInteractionCount() const override
         {
             return near.NonzeroCount();
         }
         
-        Int FarFieldInteractionCount() const override
+        LInt FarFieldInteractionCount() const override
         {
             return far.NonzeroCount();
         }

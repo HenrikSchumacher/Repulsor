@@ -50,8 +50,8 @@ namespace Repulsor
         
     protected:
     
-        const LInt m = 0;
-        const LInt n = 0;
+        const Int m = 0;
+        const Int n = 0;
         
         Kernel_T kernel;
         
@@ -64,22 +64,22 @@ namespace Repulsor
             const Int thread_count = kernel.ThreadCount();
             
             // TODO: Symmetrization
-            JobPointers<LInt> job_ptr;
+            JobPointers<Int> job_ptr;
             
             if constexpr ( is_symmetric )
             {
-                Tensor1<LInt, LInt> costs (m+1);
+                Tensor1<LInt, Int> costs (m+1);
                 costs[0] = 0;
-                for( LInt i = 0; i < m; ++i )
+                for( Int i = 0; i < m; ++i )
                 {
                     costs[i+1] = costs[i] + m-1-i;
                 }
             
-                job_ptr = JobPointers<LInt>( m, costs.data(), thread_count, false );
+                job_ptr = JobPointers<Int>( m, costs.data(), thread_count, false );
             }
             else
             {
-                job_ptr = JobPointers<LInt>( m, thread_count );
+                job_ptr = JobPointers<Int>( m, thread_count );
             }
             
             kernel.Allocate( m * n );
@@ -99,15 +99,15 @@ namespace Repulsor
                     Real local_sum = static_cast<Real>(0);
                     
                     // Kernel is supposed the following rows of pattern:
-                    const LInt i_begin = job_ptr[thread  ];
-                    const LInt i_end   = job_ptr[thread+1];
+                    const Int i_begin = job_ptr[thread  ];
+                    const Int i_end   = job_ptr[thread+1];
 
                     #pragma clang loop unroll_count(4)
-                    for( LInt i = i_begin; i < i_end; ++i )
+                    for( Int i = i_begin; i < i_end; ++i )
                     {
                         // These are the corresponding nonzero blocks in i-th row.
-                        const LInt j_begin = COND( is_symmetric, i+1, 0 );
-                        const LInt j_end   = n;
+                        const Int j_begin = COND( is_symmetric, i+1, 0 );
+                        const Int j_end   = n;
                         
                         // Clear the local vector chunk of the kernel.
                         ker.LoadS(i);
@@ -115,7 +115,7 @@ namespace Repulsor
                         const LInt offset = n*i;
                         
                         #pragma clang loop unroll_count(4)
-                        for( LInt j = j_begin; j < j_end; ++j )
+                        for( Int j = j_begin; j < j_end; ++j )
                         {
                             ker.LoadT(j);
                             
@@ -146,20 +146,20 @@ namespace Repulsor
                     Real local_sum = static_cast<Real>(0);
 
                     #pragma clang loop unroll_count(4)
-                    for( LInt i = 0; i < m; ++i )
+                    for( Int i = 0; i < m; ++i )
                     {
                         // These are the corresponding nonzero blocks in i-th row.
-                        const LInt j_begin = COND( is_symmetric, i+1, 0 );
-                        const LInt j_end   = n;
+                        const Int j_begin = COND( is_symmetric, i+1, 0 );
+                        const Int j_end   = n;
                         
                         // Clear the local vector chunk of the kernel.
                         ker.LoadS(i);
                         
-                        const LInt offset = n*i;
+                        const Int offset = n*i;
                         
                         // Perform all but the last calculation in row with prefetch.
                         #pragma clang loop unroll_count(4)
-                        for( LInt j = j_begin; j < j_end; ++j )
+                        for( Int j = j_begin; j < j_end; ++j )
                         {
                             ker.LoadT(j);
                             

@@ -50,13 +50,13 @@ namespace Repulsor
             return is_symmetric;
         }
         
-        virtual Int PrimitiveIntersectionCount() const = 0;
+        virtual LInt PrimitiveIntersectionCount() const = 0;
         
-        virtual Int VeryNearFieldInteractionCount() const = 0;
+        virtual LInt VeryNearFieldInteractionCount() const = 0;
         
-        virtual Int NearFieldInteractionCount() const = 0;
+        virtual LInt NearFieldInteractionCount() const = 0;
 
-        virtual Int FarFieldInteractionCount() const = 0;
+        virtual LInt FarFieldInteractionCount() const = 0;
         
         virtual const Inter_Pattern_T & PrimitiveIntersectionMatrix() const = 0;
 
