@@ -189,7 +189,6 @@ public:
                                         K.LoadPrimitiveT(jj);
                                         
                                         // No primitive can be member in more than one leaf cluster.
-                                        assert( ii != jj );
                                         
                                         if( ii < jj )
                                         {

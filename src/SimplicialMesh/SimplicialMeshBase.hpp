@@ -156,18 +156,30 @@ namespace Repulsor
         
         bool IsCached( const std::string & s ) const
         {
+            // For some reason gcc-12 does not allow me to return static_cast<bool>( cache.count(s) ) directly.
+            
+            bool result = false;
+            
             #pragma omp critical (cache)
             {
-                return static_cast<bool>( cache.count(s) );
+                result = static_cast<bool>( cache.count(s) );
             }
+            
+            return result;
         }
         
         std::any & GetCache( const std::string & s ) const
         {
+            // For some reason gcc-12 does not allow me to return cache.at(s) directly. =/
+            // Maybe because that might throw an exception.
+            
+            std::any * thing;
+            
             #pragma omp critical (cache)
             {
-                try{
-                  return cache.at(s);
+                try
+                {
+                    thing = &cache.at(s);
                 }
                 catch( const std::out_of_range & e )
                 {
@@ -175,6 +187,8 @@ namespace Repulsor
                     throw; //an internal catch block forwards the exception to its external level
                 }
             }
+            
+            return *thing;
         }
         
         // Caution! This function is destructive.

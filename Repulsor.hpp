@@ -10,7 +10,6 @@
 
     #include "Tensors/Tensors.hpp"
     #include "GJK/GJK.hpp"
-    //#include "Collision.hpp"
 
     namespace Repulsor {
         

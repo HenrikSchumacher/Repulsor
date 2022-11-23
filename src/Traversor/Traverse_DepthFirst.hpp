@@ -175,8 +175,6 @@ public:
                                 K.LoadPrimitiveS( ii );
                                 K.LoadPrimitiveT( jj );
                                 
-//                                assert( ii != jj );
-                                
                                 if( ii < jj )
                                 {
                                     K.ComputeLeaf();
@@ -250,9 +248,7 @@ public:
             else // admissable
             {
                 if constexpr ( is_symmetric )
-                {
-//                    assert( i != j );
-                    
+                {                    
                     if( i <= j )
                     {
                         K.ComputeAdmissable();

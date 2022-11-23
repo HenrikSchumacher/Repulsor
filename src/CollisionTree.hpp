@@ -38,10 +38,12 @@ namespace Repulsor
         ,   thread_count( std::min(S_.ThreadCount(), T_.ThreadCount()) )
         {
             ptic(className()+"()");
-            
-            if constexpr ( is_symmetric)
+            if constexpr ( is_symmetric )
             {
-                assert( std::addressof(S_) == std::addressof(T_) );
+                if( std::addressof(S_) != std::addressof(T_) )
+                {
+                    eprint(className()+": is_symmetric == true, bu S != T.");
+                }
             }
             ptoc(className()+"()");
         }
@@ -90,8 +92,6 @@ namespace Repulsor
                 
                 ptic(ClassName()+"::PrimitiveCollisionMatrix: Prepare kernels");
                 std::vector<Kernel_T> kernels;
-                
-                assert( S.UpdateTime() == T.UpdateTime() );
                 
                 SReal t = std::min( S.UpdateTime(), T.UpdateTime() );
                 

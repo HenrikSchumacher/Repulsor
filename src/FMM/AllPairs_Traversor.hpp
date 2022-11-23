@@ -102,7 +102,7 @@ namespace Repulsor
                     const Int i_begin = job_ptr[thread  ];
                     const Int i_end   = job_ptr[thread+1];
 
-                    #pragma clang loop unroll_count(4)
+                    LOOP_UNROLL(4)
                     for( Int i = i_begin; i < i_end; ++i )
                     {
                         // These are the corresponding nonzero blocks in i-th row.
@@ -114,7 +114,7 @@ namespace Repulsor
                         
                         const LInt offset = n*i;
                         
-                        #pragma clang loop unroll_count(4)
+                        LOOP_UNROLL(4)
                         for( Int j = j_begin; j < j_end; ++j )
                         {
                             ker.LoadT(j);
@@ -145,7 +145,7 @@ namespace Repulsor
 
                     Real local_sum = static_cast<Real>(0);
 
-                    #pragma clang loop unroll_count(4)
+                    LOOP_UNROLL(4)
                     for( Int i = 0; i < m; ++i )
                     {
                         // These are the corresponding nonzero blocks in i-th row.
@@ -158,7 +158,7 @@ namespace Repulsor
                         const Int offset = n*i;
                         
                         // Perform all but the last calculation in row with prefetch.
-                        #pragma clang loop unroll_count(4)
+                        LOOP_UNROLL(4)
                         for( Int j = j_begin; j < j_end; ++j )
                         {
                             ker.LoadT(j);

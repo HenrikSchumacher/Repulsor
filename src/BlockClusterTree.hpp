@@ -71,7 +71,10 @@ namespace Repulsor
             
             if constexpr ( is_symmetric )
             {
-                assert( std::addressof(S_) == std::addressof(T_) );
+                if( std::addressof(S_) != std::addressof(T_) )
+                {
+                    eprint(className()+": is_symmetric == true, bu S != T.");
+                }
             }
 
             if( std::min( S.PrimitiveCount(), T.PrimitiveCount()) > 0 )

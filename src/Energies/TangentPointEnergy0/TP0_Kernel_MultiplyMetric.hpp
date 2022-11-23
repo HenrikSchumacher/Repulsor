@@ -97,7 +97,8 @@ namespace Repulsor
             ReadX( j_global );
             
             const Scalar * restrict const a = &A_const[BLOCK_NNZ * k_global];
-//            The metric block looks like this for AMB_DIM == 3:
+
+/*            The metric block looks like this for AMB_DIM == 3:
 //
 //              /                               \
 //              |  a[0]     0       0       0   |
@@ -108,13 +109,14 @@ namespace Repulsor
 //              |                               |
 //              |   0       0       0      a[1] |
 //              \                               /
+*/
             
-            #pragma unroll
+            LOOP_UNROLL_FULL
             for( Int k = 0; k < MAX_RHS_COUNT; ++k )
             {
                 y[k][0] += a[0] * x[k][0];
                 
-                #pragma unroll
+                LOOP_UNROLL_FULL
                 for( Int j = 1; j < COLS; ++j )
                 {
                     y[k][j] += a[1] * x[k][j];

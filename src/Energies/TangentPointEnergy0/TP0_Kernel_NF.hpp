@@ -250,6 +250,7 @@ namespace Repulsor
             
             if constexpr ( metric_flag )
             {
+/*
 // ij_block
 //              /                               \
 //              |  a[0]     0       0       0   |
@@ -260,7 +261,7 @@ namespace Repulsor
 //              |                               |
 //              |   0       0       0      a[1] |
 //              \                               /
-
+//
 // ii_block
 //              /                               \
 //              | -a[0]     0       0       0   |
@@ -271,7 +272,7 @@ namespace Repulsor
 //              |                               |
 //              |   0       0       0     -a[1] |
 //              \                               /
-                
+//
 // jj_block
 //              /                               \
 //              | -a[0]     0       0       0   |
@@ -282,7 +283,8 @@ namespace Repulsor
 //              |                               |
 //              |   0       0       0     -a[1] |
 //              \                               /
-    
+*/
+                
                 const Real r4 = r2 * r2;
 
                 // The following line makes up approx 2/3 of this function's runtime! This is why we avoid pow as much as possible and replace it with MyMath::pow.;

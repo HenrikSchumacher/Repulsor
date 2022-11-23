@@ -165,7 +165,7 @@ protected:
                 const Int L_offset = BUFFER_DIM * L;
                 const Int R_offset = BUFFER_DIM * R;
                 
-                #pragma clang loop unroll(enable)
+                LOOP_UNROLL_FULL
                 for( Int k = 0; k < BUFFER_DIM; ++k )
                 {
                     // Overwrite, not add-into. Thus cleansing is not required.
@@ -235,7 +235,7 @@ protected:
                 const Int L_offset = buffer_dim * L;
                 const Int R_offset = buffer_dim * R;
                 
-                #pragma clang loop unroll_count(4)
+                LOOP_UNROLL(4)
                 for( Int k = 0; k < buffer_dim; ++k )
                 {
                     // Overwrite, not add-into. Thus cleansing is not required.
@@ -402,7 +402,7 @@ protected:
                 const Int R_offset = BUFFER_DIM * R;
                 
                 // If not a leaf, compute the values of the children first.
-                #pragma clang loop unroll(enable)
+                LOOP_UNROLL_FULL
                 for( Int k = 0; k < BUFFER_DIM; ++k )
                 {
                     const Real buffer = c[C_offset + k];
@@ -458,7 +458,7 @@ protected:
                 const Int R_offset = buffer_dim * R;
                 
                 // If not a leaf, compute the values of the children first.
-                #pragma clang loop unroll_count(4)
+                LOOP_UNROLL(4)
                 for( Int k = 0; k < buffer_dim; ++k )
                 {
                     const Real buffer = c[C_offset + k];

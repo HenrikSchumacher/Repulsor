@@ -256,6 +256,8 @@ namespace Repulsor
                 {
                     const Real w_K_xy = w * K_xy;
                     const Real w_K_yx = w * K_yx;
+                    
+/*
 // ij_block
 //    /                                                                 \
 //    |   - K_xy - K_yx    K_yx * v[0]    K_yx * v[1]    K_yx * v[2]    |
@@ -269,9 +271,9 @@ namespace Repulsor
 //
 //    This are 1 + 2 * AMB_DIM nonzero values.
 //    It is tempting to compress this into 2 + AMB_DIM values.
-//    But it did not appear to be faster
-
-                    
+//    But it did not appear to be faster...
+//
+//
 // ii block
 //    /                                                                                 \
 //    |     K_xy + K_yx      K_xy * v[0]         K_xy * v[1]         K_xy * v[2]        |
@@ -282,7 +284,7 @@ namespace Repulsor
 //    |                                                                                 |
 //    |     K_xy * v[2]   K_xy * v[2] * v[0]  K_xy * v[2] * v[1]  K_xy * v[2] * v[2]    |
 //    \                                                                                 /
-                    
+//
 // jj block
 //
 //    /                                                                                 \
@@ -294,8 +296,8 @@ namespace Repulsor
 //    |                                                                                 |
 //    |   - K_yx * v[2]   K_yx * v[2] * v[0]  K_yx * v[2] * v[1]  K_yx * v[2] * v[2]    |
 //    \                                                                                 /
-        
-                    
+//
+//
 //                    const Real w_K_sym = w_K_xy + w_K_yx;
 //
 //                    ij_block[0]    -= w_K_sym;
@@ -326,6 +328,7 @@ namespace Repulsor
 //                            jj_block[i][j] += w_K_yx * vv;
 //                        }
 //                    }
+*/
                     
                     const Real w_K_sym = w_K_xy + w_K_yx;
                     

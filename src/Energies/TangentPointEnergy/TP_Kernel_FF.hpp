@@ -210,6 +210,7 @@ namespace Repulsor
                 
                 if constexpr ( metric_flag )
                 {
+/*
 // ij_block
 //    /                                                                 \
 //    |   - K_xy - K_yx    K_yx * v[0]    K_yx * v[1]    K_yx * v[2]    |
@@ -223,9 +224,9 @@ namespace Repulsor
 //
 //    This are 1 + 2 * AMB_DIM nonzero values.
 //    It is tempting to compress this into 2 + AMB_DIM values.
-//    But it did not appear to be faster
-
-                    
+//    But it did not appear to be faster...
+//
+//
 // ii block
 //    /                                                                                 \
 //    |     K_xy + K_yx      K_xy * v[0]         K_xy * v[1]         K_xy * v[2]        |
@@ -236,7 +237,7 @@ namespace Repulsor
 //    |                                                                                 |
 //    |     K_xy * v[2]   K_xy * v[2] * v[0]  K_xy * v[2] * v[1]  K_xy * v[2] * v[2]    |
 //    \                                                                                 /
-                    
+//
 // jj block
 //
 //    /                                                                                 \
@@ -248,7 +249,8 @@ namespace Repulsor
 //    |                                                                                 |
 //    |   - K_yx * v[2]   K_yx * v[2] * v[0]  K_yx * v[2] * v[1]  K_yx * v[2] * v[2]    |
 //    \                                                                                 /
-
+*/
+                    
                     const Real K_sym = K_xy + K_yx;
                     
                     const Real b_over_a   = b/a;
