@@ -17,7 +17,7 @@ public:
         {
             const Int i = i_stack[stack_ptr];
             const Int j = j_stack[stack_ptr];
-            stack_ptr--;
+            --stack_ptr;
             
             K.LoadClusterS(i);
             K.LoadClusterT(j);

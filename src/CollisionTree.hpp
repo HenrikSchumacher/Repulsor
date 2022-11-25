@@ -88,8 +88,6 @@ namespace Repulsor
                 using Kernel_T = Collision_Kernel<ClusterTree_T>;
                 using LInt     = typename Kernel_T::LInt;
                 
-                const Int thread_count = ThreadCount();
-                
                 ptic(ClassName()+"::PrimitiveCollisionMatrix: Prepare kernels");
                 std::vector<Kernel_T> kernels;
                 
@@ -159,8 +157,6 @@ namespace Repulsor
             
             (void)S.PrimitiveAdjacencyMatrix();
             (void)T.PrimitiveAdjacencyMatrix();
-            
-            const Int thread_count = ThreadCount();
             
             std::vector<Kernel_T> kernels;
             

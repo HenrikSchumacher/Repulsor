@@ -1168,7 +1168,7 @@ namespace Repulsor
                             C_bv.SetPointer ( C_up_ser, C );
                             C_bv.Read       ( C_up_ser, L );
                             C_bv.Merge      ( C_up_ser, R );
-                            stack_ptr--;
+                            --stack_ptr;
                         }
                         else
                         {
@@ -1179,7 +1179,7 @@ namespace Repulsor
                     }
                     else
                     {
-                        stack_ptr--;
+                        --stack_ptr;
                     }
                 }
             }

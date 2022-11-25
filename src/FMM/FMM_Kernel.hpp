@@ -87,7 +87,7 @@ namespace Repulsor
 
         CLASS() = delete;
         
-        CLASS( Configurator_T & conf )
+        explicit CLASS( Configurator_T & conf )
         :   S             ( conf.GetS() )
         ,   T             ( conf.GetT() )
         ,   metric_values ( conf.MetricValues()        )   // In configure mode, kernels needs

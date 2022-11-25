@@ -118,7 +118,7 @@ protected:
     {
         Int stack   [128] = {};
         Int visited [128] = {false};
-        Int depth   [128] = {};
+        Int depths  [128] = {};
         
         Int stack_ptr    = null;
         stack[stack_ptr] = C_root;
@@ -130,10 +130,10 @@ protected:
         while( (stack_ptr >= null) && ( stack_ptr < 126 ) )
         {
             // We are at cluster C.
-            const Int d = depth[stack_ptr];
-            const Int C = stack[stack_ptr];
-            const Int L = left [C];
-            const Int R = right[C];
+            const Int d = depths[stack_ptr];
+            const Int C = stack [stack_ptr];
+            const Int L = left  [C];
+            const Int R = right [C];
             
             if( !visited[stack_ptr] )
             {
@@ -145,13 +145,13 @@ protected:
                     
                     // push
                     ++stack_ptr;
-                    stack[stack_ptr] = R;
-                    depth[stack_ptr] = d+1;
+                    stack [stack_ptr] = R;
+                    depths[stack_ptr] = d+1;
                     
                     // push
                     ++stack_ptr;
-                    stack[stack_ptr] = L;
-                    depth[stack_ptr] = d+1;
+                    stack [stack_ptr] = L;
+                    depths[stack_ptr] = d+1;
                 }
                 else
                 {
@@ -172,7 +172,7 @@ protected:
                     c[C_offset + k] = c[L_offset + k] + c[R_offset + k];
                 }
                 visited[stack_ptr] = false;
-                stack_ptr--;  // pop
+                --stack_ptr;  // pop
             }
         }
         
@@ -188,7 +188,7 @@ protected:
     {
         Int stack   [128] = {};
         Int visited [128] = {false};
-        Int depth   [128] = {};
+        Int depths  [128] = {};
         
         Int stack_ptr    = null;
         stack[stack_ptr] = C_root;
@@ -200,7 +200,7 @@ protected:
         while( (stack_ptr >= null) && ( stack_ptr < 126 ) )
         {
             // We are at cluster C.
-            const Int d = depth[stack_ptr];
+            const Int d = depths[stack_ptr];
             const Int C = stack[stack_ptr];
             const Int L = left [C];
             const Int R = right[C];
@@ -216,12 +216,12 @@ protected:
                     // push
                     ++stack_ptr;
                     stack[stack_ptr] = R;
-                    depth[stack_ptr] = d+1;
+                    depths[stack_ptr] = d+1;
                     
                     // push
                     ++stack_ptr;
                     stack[stack_ptr] = L;
-                    depth[stack_ptr] = d+1;
+                    depths[stack_ptr] = d+1;
                 }
                 else
                 {
@@ -242,7 +242,7 @@ protected:
                     c[C_offset + k] = c[L_offset + k] + c[R_offset + k];
                 }
                 visited[stack_ptr] = false;
-                stack_ptr--;  // pop
+                --stack_ptr;  // pop
             }
         }
         
@@ -376,8 +376,8 @@ protected:
     template<Int BUFFER_DIM>
     void percolateDown_DFS( const Int C_root, const Int max_depth ) const
     {
-        Int stack [128] = {};
-        Int depth [128] = {};
+        Int stack  [128] = {};
+        Int depths [128] = {};
 
         Int stack_ptr    = null;
         stack[stack_ptr] = C_root;
@@ -389,10 +389,10 @@ protected:
         while( (stack_ptr >= null) && ( stack_ptr < 126 ) )
         {
             // We are at cluster C.
-            const Int d = depth[stack_ptr];
-            const Int C = stack[stack_ptr];
-            const Int L = left [C];
-            const Int R = right[C];
+            const Int d = depths[stack_ptr];
+            const Int C = stack [stack_ptr];
+            const Int L = left  [C];
+            const Int R = right [C];
             --stack_ptr; // pop
             
             if( (d < max_depth) && (L >= null) && (R >= null) )
@@ -413,13 +413,13 @@ protected:
                 
                 // push
                 ++stack_ptr;
-                stack[stack_ptr] = R;
-                depth[stack_ptr] = d+1;
+                stack [stack_ptr] = R;
+                depths[stack_ptr] = d+1;
                 
                 // push
                 ++stack_ptr;
-                stack[stack_ptr] = L;
-                depth[stack_ptr] = d+1;
+                stack [stack_ptr] = L;
+                depths[stack_ptr] = d+1;
             }
         }
         
@@ -432,8 +432,8 @@ protected:
 
     void percolateDown_DFS_gen( const Int C_root, const Int max_depth  ) const
     {
-        Int stack [128] = {};
-        Int depth [128] = {};
+        Int stack  [128] = {};
+        Int depths [128] = {};
 
         Int stack_ptr = null;
         stack[stack_ptr] = C_root;
@@ -445,10 +445,10 @@ protected:
         while( (stack_ptr >= null) && ( stack_ptr < 126 ) )
         {
             // We are at cluster C.
-            const Int d = depth[stack_ptr];
-            const Int C = stack[stack_ptr];
-            const Int L = left [C];
-            const Int R = right[C];
+            const Int d = depths[stack_ptr];
+            const Int C = stack [stack_ptr];
+            const Int L = left  [C];
+            const Int R = right [C];
             --stack_ptr; //pop
             
             if( (d < max_depth) && (L >= null) && (R >= null) )
@@ -469,13 +469,13 @@ protected:
 
                 // push
                 ++stack_ptr;
-                stack[stack_ptr] = R;
-                depth[stack_ptr] = d+1;
+                stack [stack_ptr] = R;
+                depths[stack_ptr] = d+1;
                 
                 // push
                 ++stack_ptr;
                 stack[stack_ptr] = L;
-                depth[stack_ptr] = d+1;
+                depths[stack_ptr] = d+1;
             }
         }
         

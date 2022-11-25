@@ -27,7 +27,7 @@ namespace Repulsor
         
         static constexpr bool is_symmetric = Kernel_T::is_symmetric;
         
-        CLASS() = default;
+        CLASS() = delete;
         
         CLASS( const Pattern_T & pattern_, const Kernel_T & kernel_ )
         :   pattern ( pattern_  )

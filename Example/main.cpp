@@ -105,11 +105,11 @@ int main(int argc, const char * argv[])
     
     std::unique_ptr<Energy_T> tpe_ptr = TPE_factory.Make( dom_dim, amb_dim, q, p );
     
-    auto & tpe = *tpe_ptr;
+    const auto & tpe = *tpe_ptr;
     
     std::unique_ptr<Metric_T> tpm_ptr = TPM_factory.Make( dom_dim, amb_dim, q, p );
 
-    auto & tpm = *tpm_ptr;
+    const auto & tpm = *tpm_ptr;
     
     double en;
     // Mesh_T::CotangentVector_T is Tensor2<REAL,INT> in this case. It is a simple container class for heap-allocated matrices.
@@ -131,7 +131,7 @@ int main(int argc, const char * argv[])
     
     std::unique_ptr<Energy_T> tpe_slow_ptr = TPE_AllPairs_factory.Make( dom_dim, amb_dim, q, p );
     
-    auto & tpe_slow = *tpe_slow_ptr;
+    const auto & tpe_slow = *tpe_slow_ptr;
     
     tic("tpe_slow.Energy(M)");
     en = tpe_slow.Value(M);
@@ -192,7 +192,7 @@ int main(int argc, const char * argv[])
     
     std::unique_ptr<Energy_T> tpo_ptr = TPOE_factory.Make( dom_dim, dom_dim, amb_dim, q, p );
     
-    auto & tpo = *tpo_ptr;
+    const auto & tpo = *tpo_ptr;
     
     tic("Compute tangent-point energy between mesh and obstacle");
     en = tpo.Value(M);

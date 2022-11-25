@@ -84,7 +84,7 @@ namespace Repulsor
         
         CLASS() = default;
         
-        CLASS( Configurator_T & conf )
+        explicit CLASS( Configurator_T & conf )
         :   BASE        ( conf                                                           )
         ,   S_data      ( GetS().ClusterFarFieldData().data()                            )
         ,   S_D_data    ( GetS().ThreadClusterDFarFieldData().data(omp_get_thread_num()) )

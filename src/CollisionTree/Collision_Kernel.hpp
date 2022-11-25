@@ -20,7 +20,7 @@ namespace Repulsor
         
     public:
         
-        CLASS() = default;
+        CLASS() = delete;
         
         ~CLASS() = default;
         

@@ -236,44 +236,41 @@ namespace Repulsor
                     const Real K_xy = factor * rCosPhi_q_minus_2;   // = |P*(y-x)|^(q-2) / |y-x|^p
                     const Real K_yx = factor * rCosPsi_q_minus_2;   // = |Q*(y-x)|^(q-2) / |y-x|^p
                     
-                    if constexpr ( diff_flag )
+                    const Real H = - p * r_minus_p_minus_2 * Num;
+                    
+                    Real dEdvx = zero;
+                    Real dEdvy = zero;
+                    
+                    const Real wa = w * a;
+                    const Real wb = w * b;
+                    
+                    for( Int i = 0; i < AMB_DIM; ++i )
                     {
-                        const Real H = - p * r_minus_p_minus_2 * Num;
+                        dEdv[i] = two * ( K_xy * Pv[i] + K_yx * Qv[i] ) + H * v[i];
+                        dEdvx  += dEdv[i] * x[i];
+                        dEdvy  += dEdv[i] * y[i];
                         
-                        Real dEdvx = zero;
-                        Real dEdvy = zero;
-                        
-                        const Real wa = w * a;
-                        const Real wb = w * b;
-                        
-                        for( Int i = 0; i < AMB_DIM; ++i )
+                        for( Int ii = 0; ii < S_DOM_DIM+1; ++ii )
                         {
-                            dEdv[i] = two * ( K_xy * Pv[i] + K_yx * Qv[i] ) + H * v[i];
-                            dEdvx  += dEdv[i] * x[i];
-                            dEdvy  += dEdv[i] * y[i];
-                            
-                            for( Int ii = 0; ii < S_DOM_DIM+1; ++ii )
-                            {
-                                DX[1+AMB_DIM*ii+i] -= lambda[ii] * wb * dEdv[i];
-                            }
-                            
-                            for( Int ii = 0; ii < T_DOM_DIM+1; ++ii )
-                            {
-                                DY[1+AMB_DIM*ii+i] +=     mu[ii] * wa * dEdv[i];
-                            }
+                            DX[1+AMB_DIM*ii+i] -= lambda[ii] * wb * dEdv[i];
                         }
                         
-                        DX[0] += wb * ( E - factor * rCosPhi_q + dEdvx );
-                        DY[0] += wa * ( E - factor * rCosPsi_q - dEdvy );
-                        
-                        const Real w_b_K_xy = wb * K_xy;
-                        const Real w_a_K_yx = wa * K_yx;
-                        
-                        for( Int k = 0; k < PROJ_DIM; ++k )
+                        for( Int ii = 0; ii < T_DOM_DIM+1; ++ii )
                         {
-                            DX[1+S_COORD_DIM+k] += w_b_K_xy * V[k];
-                            DY[1+T_COORD_DIM+k] += w_a_K_yx * V[k];
+                            DY[1+AMB_DIM*ii+i] +=     mu[ii] * wa * dEdv[i];
                         }
+                    }
+                    
+                    DX[0] += wb * ( E - factor * rCosPhi_q + dEdvx );
+                    DY[0] += wa * ( E - factor * rCosPsi_q - dEdvy );
+                    
+                    const Real w_b_K_xy = wb * K_xy;
+                    const Real w_a_K_yx = wa * K_yx;
+                    
+                    for( Int k = 0; k < PROJ_DIM; ++k )
+                    {
+                        DX[1+S_COORD_DIM+k] += w_b_K_xy * V[k];
+                        DY[1+T_COORD_DIM+k] += w_a_K_yx * V[k];
                     }
                 }
             }

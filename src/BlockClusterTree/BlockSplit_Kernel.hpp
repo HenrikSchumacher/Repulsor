@@ -19,7 +19,7 @@ namespace Repulsor
         
     public:
         
-        CLASS() = default;
+//        CLASS() = default;
         
         CLASS(
             const ClusterTree_T & S,
@@ -130,11 +130,11 @@ namespace Repulsor
         
         GJK_Algorithm<ClusterTree_T::AMB_DIM,GJK_Real,Int> G;
         
-        SReal * restrict const S_C_serialized;
-        SReal * restrict const T_C_serialized;
+        SReal * restrict const S_C_serialized = nullptr;
+        SReal * restrict const T_C_serialized = nullptr;
 
-        SReal * restrict const S_P_serialized;
-        SReal * restrict const T_P_serialized;
+        SReal * restrict const S_P_serialized = nullptr;
+        SReal * restrict const T_P_serialized = nullptr;
         
         const SparseBinaryMatrixCSR<Int,Int> & A;
         

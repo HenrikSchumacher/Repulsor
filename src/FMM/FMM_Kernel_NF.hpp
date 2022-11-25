@@ -91,7 +91,7 @@ namespace Repulsor
         CLASS() = default;
         
         // To be used for configuration of kernel.
-        CLASS( Configurator_T & conf )
+        explicit CLASS( Configurator_T & conf )
         :   BASE        ( conf                                                              )
         ,   S_data      ( GetS().PrimitiveNearFieldData().data()                            )
         ,   S_D_data    ( GetS().ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
