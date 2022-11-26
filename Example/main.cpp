@@ -51,10 +51,13 @@ int main(int argc, const char * argv[])
     // ExtReal = ("external real") floating point type that is used by the outer world, e.g. for submitting the mesh's vertex coordinates and vectors to multiply against the metric.
     
     
-    using Mesh_T = SimplicialMeshBase<REAL,INT,REAL,EXTREAL>;
+    using Mesh_T   = SimplicialMeshBase<REAL,INT,REAL,EXTREAL>;
+    using Energy_T = EnergyBase<REAL,INT,REAL,EXTREAL>;
+    using Metric_T = MetricBase<REAL,INT,REAL,EXTREAL>;
     
     // Create a factory that can make instances of SimplicialMesh with domain dimension in the range 2,...,2 and ambient dimension in the range 3,...,3.
     SimplicialMesh_Factory<Mesh_T,2,2,3,3> mesh_factory;
+    
     
     // This factory allows run-time polymorphism. But know that all specializations of SimplicialMesh in theses ranges have to be compiled! That may lead to horrific compile times, thus the ability to restrict the ranges in the factory.
     
@@ -96,9 +99,6 @@ int main(int argc, const char * argv[])
 
     const REAL q = 6;
     const REAL p = 12;
-    
-    using Energy_T = EnergyBase<REAL,INT,REAL,EXTREAL>;
-    using Metric_T = MetricBase<REAL,INT,REAL,EXTREAL>;
     
     TangentPointEnergy_Factory<Mesh_T,2,2,3,3> TPE_factory;
     TangentPointMetric_Factory<Mesh_T,2,2,3,3> TPM_factory;

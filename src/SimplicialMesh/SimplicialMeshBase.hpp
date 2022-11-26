@@ -33,14 +33,14 @@ namespace Repulsor
         using TangentVector_T            = Tensor2<ExtReal,Int>;
         using CotangentVector_T          = Tensor2<ExtReal,Int>;
         
-        CLASS () {}
+        CLASS() = default;
+
+        virtual ~CLASS() = default;
         
         explicit CLASS( const Int thread_count_ )
         :   thread_count( std::max( static_cast<Int>(1), thread_count_) )
         {};
         
-        virtual ~CLASS() = default;
-
         mutable      ClusterTreeSettings       cluster_tree_settings;
         mutable BlockClusterTreeSettings block_cluster_tree_settings;
         mutable       AdaptivitySettings         adaptivity_settings;
