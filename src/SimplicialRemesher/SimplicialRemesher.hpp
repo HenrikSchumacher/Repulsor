@@ -9,7 +9,8 @@
 namespace Repulsor
 {
     // A hash function used to hash a pair of any kind
-    struct PairHasher {
+    struct PairHasher
+    {
         template <class T1, class T2>
         size_t operator()( const std::pair<T1, T2> & p ) const
         {
