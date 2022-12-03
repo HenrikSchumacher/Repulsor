@@ -219,7 +219,7 @@ int main(int argc, const char * argv[])
     edges[1]=2;
     edges[2]=3;
     
-   
+    R->LoadMesh(M);
     
     R->CollapseEdges(edges.data(), edges.Size());
    

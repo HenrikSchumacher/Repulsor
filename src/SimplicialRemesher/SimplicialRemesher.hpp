@@ -69,7 +69,7 @@ namespace Repulsor
         
         Tensor2<Real,Int> V_coords; // vertex coordinates
         Tensor2<Real,Int> V_data;   // extra data per vertex which we will be transformed
-        Tensor1<Int,Int>  V_lookup;
+        Tensor1<Int, Int> V_lookup;
         std::vector<SimplexList_T> V_parent_simplices;
         BoolContainer_T V_active;
         BoolContainer_T V_modified;
@@ -86,7 +86,7 @@ namespace Repulsor
         VertexList_T E_neighbors;
         VertexList_T E_opp_vertices;
         
-        std::unordered_map<Pair_T, Int, PairHasher> edge_lookup;
+        std::unordered_map<Pair_T,Int,PairHasher> edge_lookup;
         
         Vertex_T opp_buffer     [DOM_DIM+1];
         Vertex_T simplex_buffer [DOM_DIM+1];
@@ -116,14 +116,14 @@ namespace Repulsor
         {
             Init();
             
-            LoadFromMesh(M);
+            LoadMesh(M);
         }
         
         explicit SimplicialRemesher( const Mesh_T & M, const Tensor2<Real,Int> & u )
         {
             Init();
             
-            LoadFromMesh(M,u);
+            LoadMesh(M,u);
         }
         
         
@@ -183,11 +183,11 @@ namespace Repulsor
             return simplex_count;
         }
         
-        virtual void LoadFromMesh( const MeshBase_T & M ) override
+        virtual void LoadMesh( const MeshBase_T & M ) override
         {
             Real * null = nullptr;
             
-            LoadFromPointers(
+            LoadMeshFromPointers(
                 M.VertexCoordinates().data(),  M.VertexCount(),
                 M.Simplices().data(),          M.SimplexCount(),
                 null,                          zero,
@@ -195,34 +195,54 @@ namespace Repulsor
             );
         }
         
-        virtual void LoadFromMesh( const MeshBase_T & M, const Tensor2<Real,Int> & u ) override
+        virtual void LoadMesh( const MeshBase_T & M, const Tensor2<Real,Int> & V_data_ ) override
         {
-            LoadFromPointers(
+            LoadMeshFromPointers(
                 M.VertexCoordinates().data(),  M.VertexCount(),
                 M.Simplices().data(),          M.SimplexCount(),
-                u.data(),                      u.Dimension(1),
+                V_data_.data(),                V_data_.Dimension(1),
+                M.ThreadCount()
+            );
+        }
+        
+        virtual void LoadMesh( const MeshBase_T & M, const Real * V_data_, const Int V_data_dim_ ) override
+        {
+            LoadMeshFromPointers(
+                M.VertexCoordinates().data(),  M.VertexCount(),
+                M.Simplices().data(),          M.SimplexCount(),
+                V_data_,                       V_data_dim_,
+                M.ThreadCount()
+            );
+        }
+        
+        virtual void LoadMesh_External( const MeshBase_T & M, const ExtReal * V_data_, const Int V_data_dim_ ) override
+        {
+            LoadMeshFromPointers(
+                M.VertexCoordinates().data(),  M.VertexCount(),
+                M.Simplices().data(),          M.SimplexCount(),
+                V_data_,                       V_data_dim_,
                 M.ThreadCount()
             );
         }
     
     public:
         
-        template<typename Real_2, typename Int_2, typename I>
-        void LoadFromPointers(
-            const Real_2 * restrict const V_coords_ ,  const I vertex_count_,
-            const Int_2  * restrict const simplices_,  const I simplex_count_,
-            const Real_2 * restrict const V_data_,     const I data_dim_,
+        template<typename Real_1, typename Int_1, typename Real_2>
+        void LoadMeshFromPointers(
+            const Real_1 * restrict const V_coords_ ,  const Int vertex_count_,
+            const Int_1  * restrict const simplices_,  const Int simplex_count_,
+            const Real_2 * restrict const V_data_,     const Int V_data_dim_,
             const Int thread_count_ = 1
         )
         {
-            ptic(className()+"::LoadFromPointers");
+            ptic(className()+"::LoadMeshFromPointers");
 
             vertex_count  = vertex_count_;
             edge_count    = 0;
             simplex_count = simplex_count_;
             thread_count  = thread_count_;
             
-            with_data = ( V_data_ != nullptr ) && ( data_dim_ > zero );
+            with_data = ( V_data_ != nullptr ) && ( V_data_dim_ > zero );
             
             ptic("Allocations");
 //            max_vertex_count  = vertex_count + S_vertex_count * simplex_count;
@@ -242,7 +262,7 @@ namespace Repulsor
             
             if( with_data )
             {
-                V_data = Tensor2<Real,Int>  ( max_vertex_count, data_dim_ );
+                V_data = Tensor2<Real,Int>  ( max_vertex_count, V_data_dim_ );
             }
             
             E_parent_simplices = std::vector<SimplexList_T> ( max_edge_count );
@@ -263,7 +283,7 @@ namespace Repulsor
             
             if( with_data )
             {
-               copy_cast_buffer( V_data_,  V_data.data(), vertex_count * data_dim_ );
+               copy_cast_buffer( V_data_,  V_data.data(), vertex_count * V_data_dim_ );
             }
             ptoc("Copy");
 
@@ -276,9 +296,9 @@ namespace Repulsor
             ptoc("ComputeConnectivity");
             compressed = true;
 
-            ptoc(className()+"::LoadFromPointers");
+            ptoc(className()+"::LoadMeshFromPointers");
             
-        } // LoadFromPointers
+        } // LoadMeshFromPointers
         
     public:
         
@@ -390,10 +410,10 @@ namespace Repulsor
             );
         } //CreateMesh
         
-        virtual Tensor2<Real,Int> & VertexData() override
+        virtual Tensor2<Real,Int> VertexData() override
         {
             Compress();
-            return V_data;
+            return Tensor2<Real,Int>( V_data.data(), vertex_count, V_data.Dimension(1) );
         } //CreateMesh
 
 #include "Vertices.hpp"

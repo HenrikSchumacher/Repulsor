@@ -41,13 +41,17 @@ namespace Repulsor
         
         virtual void Compress() = 0;
 
-        virtual void LoadFromMesh( const MeshBase_T & M ) = 0;
+        virtual void LoadMesh( const MeshBase_T & M ) = 0;
         
-        virtual void LoadFromMesh( const MeshBase_T & M, const Tensor2<Real,Int> & u ) = 0;
+        virtual void LoadMesh( const MeshBase_T & M, const Tensor2<Real,Int> & V_data_ ) = 0;
+
+        virtual void LoadMesh( const MeshBase_T & M, const Real * V_data_, const Int data_dim ) = 0;
+        
+        virtual void LoadMesh_External( const MeshBase_T & M, const ExtReal * V_data_, const Int data_dim ) = 0;
         
         virtual std::unique_ptr<MeshBase_T> CreateMesh() = 0;
 
-        virtual Tensor2<Real,Int> & VertexData() = 0;
+        virtual Tensor2<Real,Int> VertexData() = 0;
         
 //        virtual Int CollapseEdge( const Vertex_T v_0, const Vertex_T v_1 ) = 0;
 //
