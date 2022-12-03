@@ -116,14 +116,14 @@ namespace Repulsor
         {
             Init();
             
-            LoadMesh(M);
+            this->LoadMesh(M);
         }
         
         explicit SimplicialRemesher( const Mesh_T & M, const Tensor2<Real,Int> & u )
         {
             Init();
             
-            LoadMesh(M,u);
+            this->LoadMesh(M,u);
         }
         
         
@@ -335,7 +335,7 @@ namespace Repulsor
                     V_modified[v_count] = false;
                     
                     V_lookup[v] = v_count;
-                    v_count++;
+                    ++v_count;
                 }
             }
             
@@ -359,7 +359,7 @@ namespace Repulsor
                     E_active[e]         = false;
                     E_active[e_count]   = true;
                     
-                    e_count++;
+                    ++e_count;
                 }
             }
             
@@ -369,7 +369,7 @@ namespace Repulsor
             {
                 if( S_active[s] )
                 {
-                    for( Int i = 0; i < S_vertex_count; ++ i )
+                    for( Int i = 0; i < S_vertex_count; ++i )
                     {
                         const Vertex_T v = V_lookup[simplices(s,i)];
                         
@@ -384,7 +384,7 @@ namespace Repulsor
                     S_active[s]         = false;
                     S_active[s_count]   = true;
                     
-                    s_count++;
+                    ++s_count;
                 }
             }
             
@@ -474,7 +474,7 @@ namespace Repulsor
                             {
                                 eprint(className()+"::SelfCheck: Vertex "+ToString(v)+" has deleted parent simplex "+ToString(s)+".");
                             }
-                            deleted_parent_simplex_found_in_vertex++;
+                            ++deleted_parent_simplex_found_in_vertex;
                         }
                         else
                         {
@@ -499,7 +499,7 @@ namespace Repulsor
                                           "V_parent_simplices[v] = " + V_parent_simplices[v].ToString()
                                     );
                                 }
-                                simplices_agnostic_of_their_child_vertices++;
+                                ++simplices_agnostic_of_their_child_vertices;
                             }
                         }
                     }
@@ -529,7 +529,7 @@ namespace Repulsor
                             {
                                 eprint(className()+"::SelfCheck: Edge "+ToString(e)+" contains deleted vertex "+ToString(v)+".");
                             }
-                            deleted_vertices_found_in_edges++;
+                            ++deleted_vertices_found_in_edges;
                         }
                     }
                     
@@ -541,7 +541,7 @@ namespace Repulsor
                             {
                                 eprint(className()+"::SelfCheck: Edge "+ToString(e)+" has deleted parent simplex "+ToString(s)+".");
                             }
-                            deleted_parent_simplices_found_in_edges++;
+                            ++deleted_parent_simplices_found_in_edges;
                         }
                         else
                         {
@@ -561,7 +561,7 @@ namespace Repulsor
                                 {
                                     eprint(className()+"::SelfCheck: Simplex "+ToString(s)+" cannot find its child edge "+ToString(e)+" = { "+ToString(edges(e,0))+", "+ToString(edges(e,0))+" }.");
                                 }
-                                simplices_agnostic_of_their_child_edges++;
+                                ++simplices_agnostic_of_their_child_edges;
                             }
                             
                         }
@@ -586,7 +586,7 @@ namespace Repulsor
                             {
                                 eprint(className()+"::SelfCheck: Deleted vertex "+ToString(v)+" found in simplex "+ToString(s)+".");
                             }
-                            deleted_vertices_found_in_simplices++;
+                            ++deleted_vertices_found_in_simplices;
                         }
                         else
                         {
@@ -598,7 +598,7 @@ namespace Repulsor
                                 {
                                     eprint(className()+"::SelfCheck: vertex "+ToString(v)+" does not know about its parent simplex "+ToString(s));
                                 }
-                                vertices_agnostic_of_their_parent_simplices++;
+                                ++vertices_agnostic_of_their_parent_simplices;
                             }
                         }
                     }
@@ -614,7 +614,7 @@ namespace Repulsor
                             {
                                 eprint(className()+"::SelfCheck: Invalid edge "+ToString(e)+" found in simplex "+ToString(s)+".");
                             }
-                            invalid_edges_found_in_simplices++;
+                            ++invalid_edges_found_in_simplices;
                         }
                         else if( !E_active[e] )
                         {
@@ -622,7 +622,7 @@ namespace Repulsor
                             {
                                 eprint(className()+"::SelfCheck: Deleted edge "+ToString(e)+" found in simplex "+ToString(s)+".");
                             }
-                            deleted_edges_found_in_simplices++;
+                            ++deleted_edges_found_in_simplices;
                     
                         }
                         else
@@ -635,7 +635,7 @@ namespace Repulsor
                                 {
                                     eprint(className()+"::SelfCheck: edge "+ToString(e)+" does not know about its parent simplex "+ToString(s)+".");
                                 }
-                                edges_agnostic_of_their_parent_simplices++;
+                                ++edges_agnostic_of_their_parent_simplices;
                             }
                         }
                     }
