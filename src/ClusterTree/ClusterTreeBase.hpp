@@ -1,21 +1,22 @@
-//TODO: sequential computeClusterData?
-
 #pragma once
-
-#define CLASS ClusterTreeBase
 
 namespace Repulsor
 {
-    template<typename Real, typename Int, typename SReal, typename ExtReal>
-    class CLASS
+    template<typename Real_, typename Int_, typename SReal_, typename ExtReal_>
+    class ClusterTreeBase
     {
-        ASSERT_FLOAT(Real   );
-        ASSERT_INT  (Int    );
-        ASSERT_FLOAT(SReal  );
-        ASSERT_FLOAT(ExtReal);
+        ASSERT_FLOAT(Real_   );
+        ASSERT_INT  (Int_    );
+        ASSERT_FLOAT(SReal_  );
+        ASSERT_FLOAT(ExtReal_);
  
         
     public:
+        
+        using Real              = Real_;
+        using Int               = Int_;
+        using SReal             = SReal_;
+        using ExtReal           = ExtReal_;
         
         using DataContainer_T   = Tensor2<Real,Int>;
         using BufferContainer_T = Tensor1<Real,Int>;
@@ -24,7 +25,7 @@ namespace Repulsor
         using DerivativeContainer_T = ThreadTensor3<Real,Int>;
         using Accumulator_T         = ThreadTensor3<Real,Int>;
         
-        explicit CLASS(
+        explicit ClusterTreeBase(
             const ClusterTreeSettings & settings_ = ClusterTreeSettings()
         )
         :   settings ( settings_ )
@@ -63,7 +64,7 @@ namespace Repulsor
 //            }
         }
         
-//        CLASS( const CLASS & other )
+//        ClusterTreeBase( const ClusterTreeBase & other )
 //        :   settings ( other.settings)
 //        ,   P_near   ( other.P_near)
 //        ,   P_D_near   ( other.P_D_near)
@@ -73,7 +74,7 @@ namespace Repulsor
 //        ,   P_in   ( other.P_in)
 //        {}
         
-        virtual ~CLASS() = default;
+        virtual ~ClusterTreeBase() = default;
         
     protected:
         
@@ -1033,7 +1034,7 @@ namespace Repulsor
     private:
         std::string className() const
         {
-            return TO_STD_STRING(CLASS) + "<"+TypeName<ExtReal>::Get()+">";
+            return "ClusterTreeBase<"+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+">";
         }
         
     public:
@@ -1043,8 +1044,6 @@ namespace Repulsor
             return className();
         }
 
-    };
+    }; // class ClusterTreeBase
     
 } // namespace Repulsor
-
-#undef CLASS

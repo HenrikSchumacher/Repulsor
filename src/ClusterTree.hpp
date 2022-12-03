@@ -3,13 +3,10 @@
 #include "ClusterTree/Cluster.hpp"
 #include "ClusterTree/ClusterTreeBase.hpp"
 
-#define CLASS ClusterTree
-#define BASE  ClusterTreeBase<Real_,Int_,SReal_,ExtReal_>
-
 namespace Repulsor
 {
     template<int AMB_DIM_, typename Real_, typename Int_, typename SReal_, typename ExtReal_>
-    class CLASS : public BASE
+    class ClusterTree : public ClusterTreeBase<Real_,Int_,SReal_,ExtReal_>
     {
     public:
         
@@ -25,79 +22,79 @@ namespace Repulsor
         
         using BoundingVolume_T  = AABB<AMB_DIM,GJK_Real,Int,SReal>;
         
-        using ClusterTreeBase_T = BASE;
+        using ClusterTreeBase_T = ClusterTreeBase<Real,Int,SReal,ExtReal>;
         
-        using DataContainer_T   = typename BASE::DataContainer_T;
-        using BufferContainer_T = typename BASE::BufferContainer_T;
+        using DataContainer_T   = typename ClusterTreeBase_T::DataContainer_T;
+        using BufferContainer_T = typename ClusterTreeBase_T::BufferContainer_T;
         
         // In principle, ThreadTensor3<Real,Int> should have better scaling on multiple socket machines, because I tried to encourages that the thread-local arrays are allocated on local RAM. -- On my tiny Quad Core however, it performs a bit _WORSE_ than Tensor3<Real,Int>.
-        using DerivativeContainer_T = typename BASE::DerivativeContainer_T;
+        using DerivativeContainer_T = typename ClusterTreeBase_T::DerivativeContainer_T;
         
     public:
         
-        using BASE::SplitThreshold;
-        using BASE::ThreadCount;
-        using BASE::PrimitiveCount;
-        using BASE::ClusterCount;
-        using BASE::LeafClusterCount;
-        //        using BASE::RequireClusterMoments;
+        using ClusterTreeBase_T::SplitThreshold;
+        using ClusterTreeBase_T::ThreadCount;
+        using ClusterTreeBase_T::PrimitiveCount;
+        using ClusterTreeBase_T::ClusterCount;
+        using ClusterTreeBase_T::LeafClusterCount;
+        //        using ClusterTreeBase_T::RequireClusterMoments;
         
     protected:
         
-        using BASE::P_ordering;
-        using BASE::P_inverse_ordering;
-        using BASE::P_score_buffer;
-        using BASE::P_perm_buffer;
-        using BASE::P_serialized;
-        using BASE::P_updated_serialized;
-        using BASE::P_velocities_serialized;
-        using BASE::P_near;
-        using BASE::P_D_near;
-        using BASE::P_far;
-        using BASE::P_D_far;
-        using BASE::thread_P_D_near;
-        using BASE::P_moments;
-        using BASE::P_in;
-        using BASE::P_out;
+        using ClusterTreeBase_T::P_ordering;
+        using ClusterTreeBase_T::P_inverse_ordering;
+        using ClusterTreeBase_T::P_score_buffer;
+        using ClusterTreeBase_T::P_perm_buffer;
+        using ClusterTreeBase_T::P_serialized;
+        using ClusterTreeBase_T::P_updated_serialized;
+        using ClusterTreeBase_T::P_velocities_serialized;
+        using ClusterTreeBase_T::P_near;
+        using ClusterTreeBase_T::P_D_near;
+        using ClusterTreeBase_T::P_far;
+        using ClusterTreeBase_T::P_D_far;
+        using ClusterTreeBase_T::thread_P_D_near;
+        using ClusterTreeBase_T::P_moments;
+        using ClusterTreeBase_T::P_in;
+        using ClusterTreeBase_T::P_out;
         
-        using BASE::C_begin;
-        using BASE::C_end;
-        using BASE::C_depth;
-        using BASE::C_right;
-        using BASE::C_left;
-        using BASE::C_next;
-        using BASE::C_serialized;
-        using BASE::C_updated_serialized;
-        using BASE::C_thread_serialized;
-        using BASE::C_far;
-        using BASE::thread_C_D_far;
-        using BASE::C_moments;
-        using BASE::C_in;
-        using BASE::C_out;
+        using ClusterTreeBase_T::C_begin;
+        using ClusterTreeBase_T::C_end;
+        using ClusterTreeBase_T::C_depth;
+        using ClusterTreeBase_T::C_right;
+        using ClusterTreeBase_T::C_left;
+        using ClusterTreeBase_T::C_next;
+        using ClusterTreeBase_T::C_serialized;
+        using ClusterTreeBase_T::C_updated_serialized;
+        using ClusterTreeBase_T::C_thread_serialized;
+        using ClusterTreeBase_T::C_far;
+        using ClusterTreeBase_T::thread_C_D_far;
+        using ClusterTreeBase_T::C_moments;
+        using ClusterTreeBase_T::C_in;
+        using ClusterTreeBase_T::C_out;
         
-        using BASE::leaf_clusters;
-        using BASE::leaf_cluster_ptr;
-        using BASE::leaf_cluster_lookup;
-        using BASE::thread_cluster_counter;
+        using ClusterTreeBase_T::leaf_clusters;
+        using ClusterTreeBase_T::leaf_cluster_ptr;
+        using ClusterTreeBase_T::leaf_cluster_lookup;
+        using ClusterTreeBase_T::thread_cluster_counter;
         
-        using BASE::depth;
-        using BASE::settings;
+        using ClusterTreeBase_T::depth;
+        using ClusterTreeBase_T::settings;
         
-        //        using BASE::stack_array;
-        //        using BASE::queue_array;
+        //        using ClusterTreeBase_T::stack_array;
+        //        using ClusterTreeBase_T::queue_array;
         
-        using BASE::C_to_P;
-        using BASE::P_to_C;
-        using BASE::hi_pre;
-        using BASE::lo_pre;
-        using BASE::mixed_pre;
-        using BASE::hi_post;
-        using BASE::lo_post;
-        using BASE::mixed_post;
+        using ClusterTreeBase_T::C_to_P;
+        using ClusterTreeBase_T::P_to_C;
+        using ClusterTreeBase_T::hi_pre;
+        using ClusterTreeBase_T::lo_pre;
+        using ClusterTreeBase_T::mixed_pre;
+        using ClusterTreeBase_T::hi_post;
+        using ClusterTreeBase_T::lo_post;
+        using ClusterTreeBase_T::mixed_post;
         
     public:
         
-        CLASS()
+        ClusterTree()
         :   P_proto (1)
         ,   C_proto (1)
         ,   P_moving(1)
@@ -107,7 +104,7 @@ namespace Repulsor
         }
         
         // To allow polymorphism, we require the user to create instances of the desired types for the primitives and the bounding volumes, so that we can Clone() them.
-        CLASS(
+        ClusterTree(
               const Primitive_T        &  P_proto_,
               const Tensor2<SReal,Int> &  P_serialized_,
               const BoundingVolume_T   &  C_proto_,
@@ -118,7 +115,7 @@ namespace Repulsor
               const SparseMatrixCSR<Real,Int,Int> & AvOp,
               const ClusterTreeSettings & settings_ = ClusterTreeSettings()
               )
-        :   BASE( settings_ )
+        :   ClusterTreeBase_T( settings_ )
         ,   P_proto      ( ThreadCount() )
         ,   C_proto      ( ThreadCount() )
         ,   P_moving     ( ThreadCount() )
@@ -172,7 +169,7 @@ namespace Repulsor
             ptoc(className()+"()");
         }
         
-        virtual ~CLASS() override = default;
+        virtual ~ClusterTree() override = default;
         
         
     protected:
@@ -1317,12 +1314,9 @@ namespace Repulsor
         
         static std::string className()
         {
-            return TO_STD_STRING(CLASS) + "<"+ToString(AMB_DIM)+","+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+">";
+            return  "ClusterTree<"+ToString(AMB_DIM)+","+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+">";
         }
 
-    }; // CLASS
+    }; // class ClusterTree
     
 } // namespace Repulsor
-
-#undef BASE
-#undef CLASS

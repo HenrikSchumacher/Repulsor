@@ -1,28 +1,33 @@
 #pragma once
 
-#define CLASS CollisionTreeBase
-
 namespace Repulsor
 {
-    template<typename Real, typename Int, typename SReal, typename ExtReal, bool is_symmetric>
-    class CLASS
+    template<typename Real_, typename Int_, typename SReal_, typename ExtReal_, bool is_symmetric_>
+    class CollisionTreeBase
     {
-        ASSERT_FLOAT(Real   );
-        ASSERT_INT  (Int    );
-        ASSERT_FLOAT(SReal  );
-        ASSERT_FLOAT(ExtReal);        
+        ASSERT_FLOAT(Real_   );
+        ASSERT_INT  (Int_    );
+        ASSERT_FLOAT(SReal_  );
+        ASSERT_FLOAT(ExtReal_);
         
     public:
+        
+        using Real              = Real_;
+        using Int               = Int_;
+        using SReal             = SReal_;
+        using ExtReal           = ExtReal_;
+        
+        static constexpr bool is_symmetric = is_symmetric_;
         
         using ClusterTreeBase_T = ClusterTreeBase<Real,Int,SReal,ExtReal>;
         
         using CollisionMatrix_T = SparseMatrixCSR<SReal,Int,size_t>;
         
-        CLASS () = default;
+        CollisionTreeBase () = default;
         
-        virtual ~CLASS() = default;
+        virtual ~CollisionTreeBase() = default;
         
-        CLASS ( const ClusterTreeBase_T & S, const ClusterTreeBase_T & T )
+        CollisionTreeBase ( const ClusterTreeBase_T & S, const ClusterTreeBase_T & T )
         {}
 
         
@@ -56,11 +61,9 @@ namespace Repulsor
         
         virtual std::string ClassName() const
         {
-            return TO_STD_STRING(CLASS) + "<"+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+">";
+            return  "CollisionTreeBase<"+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+">";
         }
 
-    }; // CLASS
+    }; // class CollisionTreeBase
     
 } // namespace Repulsor
-
-#undef CLASS

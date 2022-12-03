@@ -3,36 +3,36 @@
 #include "BlockClusterTree/BlockClusterTreeBase.hpp"
 #include "BlockClusterTree/BlockSplit_Kernel.hpp"
 
-#define CLASS BlockClusterTree
-#define BASE  BlockClusterTreeBase<Real_,Int_,SReal_,ExtReal_,is_symmetric_>
-
 namespace Repulsor
 {
     
     
     template<int AMB_DIM_, typename Real_, typename Int_, typename SReal_, typename ExtReal_, bool is_symmetric_>
-    class CLASS : public BASE
+    class BlockClusterTree : public BlockClusterTreeBase<Real_,Int_,SReal_,ExtReal_,is_symmetric_>
     {
     public:
+        
+        
         
         using Real    = Real_;
         using SReal   = SReal_;
         using ExtReal = ExtReal_;
         using Int     = Int_;
-        using LInt    = typename BASE::LInt;
+        
+        using BlockClusterTreeBase_T = BlockClusterTreeBase<Real,Int,SReal,ExtReal,is_symmetric_>;
+        
+        using LInt    = typename BlockClusterTreeBase_T::LInt;
         
 
         static constexpr Int  AMB_DIM      = AMB_DIM_;
         static constexpr bool is_symmetric = is_symmetric_;
         
-        using BlockClusterTreeBase_T = BASE;
-        
-        using Setting_T = typename BASE::Setting_T;
+        using Setting_T = typename BlockClusterTreeBase_T::Setting_T;
 
-        using Inter_Pattern_T     = typename BASE::VeryNear_Pattern_T;
-        using VeryNear_Pattern_T  = typename BASE::VeryNear_Pattern_T;
-        using Near_Pattern_T      = typename BASE::Near_Pattern_T;
-        using Far_Pattern_T       = typename BASE::Far_Pattern_T;
+        using Inter_Pattern_T     = typename BlockClusterTreeBase_T::VeryNear_Pattern_T;
+        using VeryNear_Pattern_T  = typename BlockClusterTreeBase_T::VeryNear_Pattern_T;
+        using Near_Pattern_T      = typename BlockClusterTreeBase_T::Near_Pattern_T;
+        using Far_Pattern_T       = typename BlockClusterTreeBase_T::Far_Pattern_T;
         
         using ClusterTree_T     = ClusterTree<AMB_DIM,Real,Int,SReal,ExtReal>;
         using BlockSplitter_T   = BlockSplit_Kernel<ClusterTree_T, LInt>;
@@ -42,19 +42,19 @@ namespace Repulsor
         
         using GJK_T             = GJK_Algorithm<AMB_DIM,GJK_Real,Int>;
     
-        using BASE::AmbDim;
-        using BASE::ThreadCount;
-        using BASE::FarFieldSeparationParameter;
-        using BASE::NearFieldSeparationParameter;
-        using BASE::Settings;
+        using BlockClusterTreeBase_T::AmbDim;
+        using BlockClusterTreeBase_T::ThreadCount;
+        using BlockClusterTreeBase_T::FarFieldSeparationParameter;
+        using BlockClusterTreeBase_T::NearFieldSeparationParameter;
+        using BlockClusterTreeBase_T::Settings;
         
     public:
 
-        // In order to prevent GetS() and GetT() shooting a segfault, we have to initialize S and T here. This is the only case in which CLASS owns these raw pointers.
+        // In order to prevent GetS() and GetT() shooting a segfault, we have to initialize S and T here. This is the only case in which BlockClusterTree owns these raw pointers.
         
-        virtual ~CLASS() = default;
+        virtual ~BlockClusterTree() = default;
         
-        CLASS(
+        BlockClusterTree(
             const ClusterTree_T & S_,
             const ClusterTree_T & T_,
             Setting_T settings_ = Setting_T()
@@ -349,7 +349,7 @@ namespace Repulsor
         
         static std::string className()
         {
-            return TO_STD_STRING(CLASS) + "<"+ToString(AMB_DIM)+","+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+","+ToString(is_symmetric)+">";
+            return  "BlockClusterTree<"+ToString(AMB_DIM)+","+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+","+ToString(is_symmetric)+">";
         }
       
     public:
@@ -359,9 +359,6 @@ namespace Repulsor
             return className();
         }
     
-    };
+    }; // class BlockClusterTree
     
 } //namespace Repulsor
-
-#undef BASE
-#undef CLASS

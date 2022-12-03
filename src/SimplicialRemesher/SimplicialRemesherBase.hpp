@@ -1,11 +1,9 @@
 #pragma once
 
-#define CLASS SimplicialRemesherBase
-
 namespace Repulsor
 {
     template<typename Real_, typename Int_, typename SReal_, typename ExtReal_>
-    class CLASS
+    class SimplicialRemesherBase
     {
         
     public:
@@ -21,17 +19,9 @@ namespace Repulsor
         
         using MeshBase_T = SimplicialMeshBase<Real,Int,SReal,ExtReal>;
 
-        CLASS() = default;
+        SimplicialRemesherBase() = default;
 
-        virtual ~CLASS() = default;
-
-//        virtual void CleanseVertices() = 0;
-
-//        virtual void CleanseEdges() = 0;
-
-//        virtual void CleanseSimplices() = 0;
-
-//        virtual void CleanseAll() = 0;
+        virtual ~SimplicialRemesherBase() = default;
         
         virtual Int VertexCount() const = 0;
 
@@ -52,15 +42,6 @@ namespace Repulsor
         virtual std::unique_ptr<MeshBase_T> CreateMesh() = 0;
 
         virtual Tensor2<Real,Int> VertexData() = 0;
-        
-//        virtual Int CollapseEdge( const Vertex_T v_0, const Vertex_T v_1 ) = 0;
-//
-//        virtual Int CollapseEdge( const Edge_T e ) = 0;
-//
-//        virtual Int SplitEdge( const Vertex_T v_0, const Vertex_T v_1 ) = 0;
-//
-//        virtual Int SplitEdge( const Edge_T e ) = 0;
-
 
         virtual Int SplitEdges( const Edge_T * const e_list, const Int n ) = 0;
         
@@ -83,10 +64,9 @@ namespace Repulsor
         
         virtual std::string ClassName() const
         {
-            return TO_STD_STRING(CLASS)+"<"+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+">";
+            return "SimplicialRemesherBase<"+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+">";
         }
-    };
+        
+    }; // class SimplicialRemesherBase
     
 } // namespace Repulsor
-
-#undef CLASS

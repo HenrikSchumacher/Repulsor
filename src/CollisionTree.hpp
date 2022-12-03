@@ -5,24 +5,26 @@
 #include "CollisionTree/MaximumSafeStepSize_Kernel.hpp"
 #include "CollisionTree/Collision_Kernel.hpp"
 
-
-#define CLASS CollisionTree
-#define BASE  CollisionTreeBase<Real,Int,SReal,ExtReal,is_symmetric>
-
 namespace Repulsor
 {
-    template<int AMB_DIM, typename Real, typename Int, typename SReal, typename ExtReal, bool is_symmetric>
-    class CLASS : public BASE
+    template<int AMB_DIM, typename Real_, typename Int_, typename SReal_, typename ExtReal_, bool is_symmetric>
+    class CollisionTree : public CollisionTreeBase<Real_,Int_,SReal_,ExtReal_,is_symmetric>
     {
-        ASSERT_FLOAT(Real   );
-        ASSERT_INT  (Int    );
-        ASSERT_FLOAT(SReal  );
-        ASSERT_FLOAT(ExtReal);        
+        ASSERT_FLOAT(Real_   );
+        ASSERT_INT  (Int_    );
+        ASSERT_FLOAT(SReal_  );
+        ASSERT_FLOAT(ExtReal_);
         
     public:
         
+        using Real              = Real_;
+        using Int               = Int_;
+        using SReal             = SReal_;
+        using ExtReal           = ExtReal_;
+        
+        using Base_T            = CollisionTreeBase<Real,Int,SReal,ExtReal,is_symmetric>;
         using ClusterTree_T     = ClusterTree<AMB_DIM,Real,Int,SReal,ExtReal>;
-        using CollisionMatrix_T = typename BASE::CollisionMatrix_T;
+        using CollisionMatrix_T = typename Base_T::CollisionMatrix_T;
         
         using Primitive_T       = typename ClusterTree_T::Primitive_T;
         using MovingPrimitive_T = typename ClusterTree_T::MovingPrimitive_T;
@@ -31,8 +33,8 @@ namespace Repulsor
         using PrimitiveCollisionFinder_T = CollisionFinder<AMB_DIM,Real,Int,SReal>;
         
         
-        CLASS( const ClusterTree_T & S_, const ClusterTree_T & T_ )
-        :   BASE( S_,T_ )
+        CollisionTree( const ClusterTree_T & S_, const ClusterTree_T & T_ )
+        :   Base_T( S_,T_ )
         ,   S( S_ )
         ,   T( T_ )
         ,   thread_count( std::min(S_.ThreadCount(), T_.ThreadCount()) )
@@ -49,14 +51,14 @@ namespace Repulsor
         }
         
 //        // Copy constructor
-//        CLASS( const CLASS & other )
+//        CollisionTree( const CollisionTree & other )
 //        :   S( other.S_ )
 //        ,   T( other.T_ )
 //        ,   thread_count( other.thread_count )
 //        {}
         
         
-        virtual ~CLASS() = default;
+        virtual ~CollisionTree() = default;
         
     protected:
         
@@ -231,12 +233,9 @@ namespace Repulsor
         
         static std::string className()
         {
-            return TO_STD_STRING(CLASS) + "<"+ToString(AMB_DIM)+","+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+","+ToString(is_symmetric)+">";
+            return  "CollisionTree<"+ToString(AMB_DIM)+","+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+","+ToString(is_symmetric)+">";
         }
 
-    }; // CLASS
+    }; // class CollisionTree
     
 } // namespace Repulsor
-
-#undef BASE
-#undef CLASS

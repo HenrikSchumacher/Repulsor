@@ -1,14 +1,12 @@
 #pragma once
 
-#define CLASS SimplicialMeshBase
-
 namespace Repulsor
 {
     template<typename Real_, typename Int_, typename SReal_, typename ExtReal_>
     class SimplicialRemesherBase;
     
     template<typename Real_, typename Int_, typename SReal_, typename ExtReal_>
-    class CLASS
+    class SimplicialMeshBase
     {
         
         ASSERT_FLOAT(Real_);
@@ -33,11 +31,11 @@ namespace Repulsor
         using TangentVector_T            = Tensor2<ExtReal,Int>;
         using CotangentVector_T          = Tensor2<ExtReal,Int>;
         
-        CLASS() = default;
+        SimplicialMeshBase() = default;
 
-        virtual ~CLASS() = default;
+        virtual ~SimplicialMeshBase() = default;
         
-        explicit CLASS( const Int thread_count_ )
+        explicit SimplicialMeshBase( const Int thread_count_ )
         :   thread_count( std::max( static_cast<Int>(1), thread_count_) )
         {};
         
@@ -119,9 +117,9 @@ namespace Repulsor
         
     public:
         
-        virtual void  LoadObstacle( std::unique_ptr<CLASS> obstacle_ ) = 0;
+        virtual void  LoadObstacle( std::unique_ptr<SimplicialMeshBase> obstacle_ ) = 0;
 
-        virtual const CLASS & GetObstacle() const = 0;
+        virtual const SimplicialMeshBase & GetObstacle() const = 0;
         
         virtual bool  ObstacleInitialized() const = 0;
         
@@ -207,10 +205,9 @@ namespace Repulsor
         
         virtual std::string ClassName() const
         {
-            return TO_STD_STRING(CLASS)+"<"+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+">";
+            return "SimplicialMeshBase<"+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+">";
         }
-    };
+        
+    }; // class SimplicialMeshBase
     
 } // namespace Repulsor
-
-#undef CLASS

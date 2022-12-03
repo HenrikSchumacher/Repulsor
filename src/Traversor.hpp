@@ -2,12 +2,10 @@
 
 #include "Traversor/Traversor_Kernel.hpp"
 
-#define CLASS Traversor
-
 namespace Repulsor
 {
     template<typename Kernel_T, bool is_symmetric, bool leaves_are_singletons >
-    class CLASS
+    class Traversor
     {
     public:
         
@@ -19,9 +17,9 @@ namespace Repulsor
         
     public:
 
-        // In order to prevent GetS() and GetT() shooting a segfault, we have to initialize S and T here. This is the only case in which CLASS owns these raw pointers.
+        // In order to prevent GetS() and GetT() shooting a segfault, we have to initialize S and T here. This is the only case in which Traversor owns these raw pointers.
         
-        CLASS(
+        Traversor(
             const ClusterTree_T & S_,
             const ClusterTree_T & T_,
             std::vector<Kernel_T> & kernels_
@@ -46,7 +44,7 @@ namespace Repulsor
             }
         } // Constructor
         
-        virtual ~CLASS() = default;
+        virtual ~Traversor() = default;
         
     protected:
 
@@ -146,13 +144,10 @@ namespace Repulsor
         
         std::string className() const
         {
-            return TO_STD_STRING(CLASS) + "<"+kernels[0].ClassName()+">";
+            return "Traversor<"+kernels[0].ClassName()+">";
         }
       
         
-    };
+    }; // class Traversor
     
 } //namespace Repulsor
-
-#undef BASE
-#undef CLASS

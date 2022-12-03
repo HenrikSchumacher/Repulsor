@@ -1,12 +1,10 @@
 #pragma once
 
-#define CLASS BlockClusterTreeBase
-
 namespace Repulsor
 {
     
     template<typename Real_, typename Int_, typename SReal_, typename ExtReal_, bool is_symmetric>
-    class CLASS
+    class BlockClusterTreeBase
     {
         ASSERT_FLOAT(Real_   );
         ASSERT_INT  (Int_    );
@@ -35,7 +33,7 @@ namespace Repulsor
 
     public:
         
-        virtual ~CLASS() = default;
+        virtual ~BlockClusterTreeBase() = default;
         
         virtual Int AmbDim() const = 0;
 
@@ -78,11 +76,9 @@ namespace Repulsor
         
         virtual std::string ClassName() const
         {
-            return TO_STD_STRING(CLASS) + "<"+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+","+ToString(is_symmetric)+">";
+            return  "BlockClusterTreeBase<"+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+","+ToString(is_symmetric)+">";
         }
         
-    };
+    }; // class BlockClusterTreeBase
     
 } //namespace Repulsor
-
-#undef CLASS
