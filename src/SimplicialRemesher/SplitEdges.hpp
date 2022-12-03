@@ -28,7 +28,7 @@ protected:
 
     Int SplitEdge( const Vertex_T v_0, const Vertex_T v_1 )
     {
-        return SplitEdge( FindEdge(v_0, v_1) );
+        return SplitEdge( FindEdge(v_0,v_1) );
     }
 
     Int SplitEdge( const Edge_T e_0 )
@@ -147,7 +147,15 @@ protected:
             // Redefine old edge. Caution: Must be done _after_ all calls to OppositeVertices.
             LookupErase(e_0);
             
-            edges(e_0,1) = w;
+            if( v_0 <= w )
+            {
+                edges(e_0,1) = w;
+            }
+            else
+            {
+                edges(e_0,0) = w;
+                edges(e_0,1) = v_0;
+            }
             
             LookupInsert(e_0);
             

@@ -6,7 +6,7 @@ protected:
 
     Edge_T CreateEdge( const Vertex_T v_0, const Vertex_T v_1 )
     {
-        Pair_T p = std::minmax(v_0,v_1);
+        Pair_T p ( std::minmax(v_0,v_1) );
         
         Edge_T e = edge_count++;
         
@@ -64,7 +64,7 @@ protected:
     //DONE.
     Edge_T FindEdge( const Vertex_T v_0, const Vertex_T v_1 )
     {
-        const Pair_T p = std::minmax(v_0,v_1);
+        const Pair_T p ( std::minmax(v_0,v_1) );
         return ( edge_lookup.count(p) > 0) ? edge_lookup[p] : -1;
     }
     
@@ -125,7 +125,7 @@ protected:
         
         for( Int k = 0; k < AMB_DIM; ++k )
         {
-            Real delta = V[k] -  W[k];
+            Real delta = V[k] - W[k];
             L2 += delta * delta;
         }
         

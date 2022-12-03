@@ -354,11 +354,19 @@ namespace Repulsor
                         eprint(className()+"::Compress: invalid vertex found in edge "+ToString(e)+".");
                     }
                     
-                    edges(e_count,0) = v_0;
-                    edges(e_count,1) = v_1;
-                    
-                    E_active[e]         = false;
-                    E_active[e_count]   = true;
+                    if( v_0 <= v_1 )
+                    {
+                        edges(e_count,0) = v_0;
+                        edges(e_count,1) = v_1;
+                    }
+                    else
+                    {
+                        edges(e_count,0) = v_1;
+                        edges(e_count,1) = v_0;
+                    }
+
+                    E_active[e]       = false;
+                    E_active[e_count] = true;
                     
                     ++e_count;
                 }

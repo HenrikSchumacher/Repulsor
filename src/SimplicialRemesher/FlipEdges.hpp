@@ -288,8 +288,16 @@ Int FlipEdge( const Edge_T e, const bool check_Delaunay = false )
     {
         LookupErase(e);
         
-        edges(e,0) = std::min(w_0,w_1);
-        edges(e,1) = std::max(w_0,w_1);
+        if( w_0 <= w_1 )
+        {
+            edges(e,0) = w_0;
+            edges(e,1) = w_1;
+        }
+        else
+        {
+            edges(e,0) = w_1;
+            edges(e,1) = w_0;
+        }
         
         // replace v_0 by w_0
         simplices(s_1,p_1) = w_0;
