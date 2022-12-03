@@ -880,7 +880,7 @@ namespace Repulsor
         {
             ptic(ClassName()+"::CreateRemesher");
             
-            Remesher_T * R = new Remesher_T(*this);
+            Remesher_T * R = new Remesher_T();
             
             ptoc(ClassName()+"::CreateRemesher");
             
