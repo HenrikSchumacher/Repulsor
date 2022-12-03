@@ -2,7 +2,7 @@
 
 namespace Repulsor
 {
-    template<typename Real_, typename Int_, typename SReal_, typename ExtReal_, bool is_symmetric_>
+    template<typename Real_, typename Int_, typename SReal_, typename ExtReal_, bool is_symmetric>
     class CollisionTreeBase
     {
         ASSERT_FLOAT(Real_   );
@@ -16,8 +16,6 @@ namespace Repulsor
         using Int               = Int_;
         using SReal             = SReal_;
         using ExtReal           = ExtReal_;
-        
-        static constexpr bool is_symmetric = is_symmetric_;
         
         using ClusterTreeBase_T = ClusterTreeBase<Real,Int,SReal,ExtReal>;
         
@@ -52,12 +50,6 @@ namespace Repulsor
         virtual const ClusterTreeBase_T & GetT() const = 0;
 
         virtual ExtReal MaximumSafeStepSize( const SReal t_) const = 0;
-        
-//        virtual Int CollisionCount() const = 0;
-        
-//        virtual std::string Stats() const = 0;
-        
-
         
         virtual std::string ClassName() const
         {
