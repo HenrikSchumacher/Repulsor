@@ -10,6 +10,8 @@
 #define REAL    float
 #define EXTREAL double
 
+//#define REMESHER_VERBATIM
+
 #define TOOLS_ENABLE_PROFILER // enable profiler
 
 #include "../Repulsor.hpp"
@@ -208,6 +210,22 @@ int main(int argc, const char * argv[])
 
     print("");
     print("");
+    
+    
+    std::unique_ptr<Mesh_T::Remesher_T> R = M_ptr->CreateRemesher();
+    
+    Tensor1<INT,INT> edges (3);
+    edges[0]=1;
+    edges[1]=2;
+    edges[2]=3;
+    
+   
+    
+    R->CollapseEdges(edges.data(), edges.Size());
+   
+    R->SplitEdges(edges.data(), edges.Size());
+    
+//    R->UnifyEdgeLengths(<#const Real collapse_threshold#>, <#const Real split_threshold#>)
 
     return 0;
 }

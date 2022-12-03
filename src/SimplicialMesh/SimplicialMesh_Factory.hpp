@@ -13,7 +13,7 @@ namespace Repulsor
         int MinAmbDim_, int MaxAmbDim_,
         typename Real_, typename Int_, typename SReal_, typename ExtReal_
     >
-    class SimplicialMesh_Factory< BASE, MinDomDim_, MaxDomDim_, MinAmbDim_, MaxAmbDim_ >
+    class SimplicialMesh_Factory< SimplicialMeshBase<Real_,Int_,SReal_,ExtReal_>, MinDomDim_, MaxDomDim_, MinAmbDim_, MaxAmbDim_ >
     {
     public:
         
@@ -21,6 +21,8 @@ namespace Repulsor
         using Int     = Int_;
         using SReal   = SReal_;
         using ExtReal = ExtReal_;
+        
+        using Base_T  = SimplicialMeshBase<Real,Int,SReal,ExtReal>;
         
         static constexpr Int MinAmbDim = std::max( Int(1), Int(MinAmbDim_) );
         static constexpr Int MaxAmbDim = std::max( Int(1), Int(MaxAmbDim_) );
@@ -33,7 +35,7 @@ namespace Repulsor
         ~SimplicialMesh_Factory() = default;
 
         template<typename ExtInt>
-        std::unique_ptr<BASE> Make(
+        std::unique_ptr<Base_T> Make(
             const ExtReal * const vertex_coords, // vertex coordinates; size = vertex_count_ x amb_dim
             const Int             vertex_count,
             const Int             amb_dim,
@@ -74,7 +76,7 @@ namespace Repulsor
     private:
         
         template<Int AmbDim, typename ExtInt>
-        std::unique_ptr<BASE> make_1(
+        std::unique_ptr<Base_T> make_1(
             const ExtReal * const v,
             const Int             v_cnt,
             const Int             amb_dim,
@@ -106,7 +108,7 @@ namespace Repulsor
         }
         
         template<Int DomDim, Int AmbDim, typename ExtInt>
-        std::unique_ptr<BASE> make_2(
+        std::unique_ptr<Base_T> make_2(
             const ExtReal * const v,
             const Int             v_cnt,
             const Int             amb_dim,
@@ -120,8 +122,8 @@ namespace Repulsor
         {
             if( dom_dim == DomDim )
             {
-                return std::unique_ptr<BASE>(
-                    new CLASS<DomDim,AmbDim,Real,Int,SReal,ExtReal>(
+                return std::unique_ptr<Base_T>(
+                    new SimplicialMesh<DomDim,AmbDim,Real,Int,SReal,ExtReal>(
                         v, v_cnt, v_transp, s, s_cnt, s_transp, thread_count
                     )
                 );
@@ -139,17 +141,17 @@ namespace Repulsor
             }
         }
             
-        std::unique_ptr<BASE> Error( const Int dom_dim, const Int amb_dim )
+        std::unique_ptr<Base_T> Error( const Int dom_dim, const Int amb_dim )
         {
             eprint(ClassName()+" cannot create SimplicialMesh with domain dimension "+ToString(dom_dim)+" and  ambient dimension "+ToString(amb_dim)+".");
             
-            return std::unique_ptr<BASE>( nullptr );
+            return std::unique_ptr<Base_T>( nullptr );
         }
         
     public:
         
         template<typename Real, typename Int, typename SReal, typename ExtReal>
-        std::unique_ptr<BASE> Make_FromFile( const std::string & file_name, const Int thread_count )
+        std::unique_ptr<Base_T> Make_FromFile( const std::string & file_name, const Int thread_count )
         {
             ptic(ClassName()+"Make_FromFile");
             
@@ -163,36 +165,16 @@ namespace Repulsor
             Int vertex_count;
             Int simplex_count;
             s >> str;
-            
-            //        print(str);
-            
             s >> dom_dim;
-            
             valprint("dom_dim",dom_dim);
-            
             s >> str;
-            
-            //        print(str);
-            
             s >> amb_dim;
-            
             valprint("amb_dim",amb_dim);
-            
-            
             s >> str;
-            
-            //        print(str);
-            
             s >> vertex_count;
-            
             valprint("vertex_count",vertex_count);
-            
             s >> str;
-            
-            //        print(str);
-            
             s >> simplex_count;
-            
             valprint("simplex_count",simplex_count);
             
             const Int simplex_size = dom_dim+1;
@@ -223,7 +205,7 @@ namespace Repulsor
             }
             
             
-            std::unique_ptr<BASE> M = Make(
+            std::unique_ptr<Base_T> M = Make(
                 V, vertex_count,  amb_dim,      false,
                 S, simplex_count, simplex_size, false,
                 thread_count

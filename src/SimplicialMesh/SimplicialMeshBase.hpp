@@ -205,11 +205,6 @@ namespace Repulsor
             cache = std::unordered_map<std::string,std::any>();
         }
         
-                                                          
-        virtual CLASS & DownCast() = 0;
-
-        virtual const CLASS & DownCast() const = 0;
-        
         virtual std::string ClassName() const
         {
             return TO_STD_STRING(CLASS)+"<"+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+">";

@@ -2,9 +2,6 @@
 
 #include "SimplicialMesh/SimplicialMeshBase.hpp"
 
-#define BASE  SimplicialMeshBase<Real_,Int_,SReal_,ExtReal_>
-#define CLASS SimplicialMesh
-
 namespace Repulsor
 {
 //    template<int DOM_DIM, int AMB_DIM, typename Real, typename Int, typename SReal, typename ExtReal>
@@ -17,7 +14,7 @@ namespace Repulsor
     class SimplicialRemesher;
     
     template<int DOM_DIM, int AMB_DIM, typename Real_, typename Int_, typename SReal_, typename ExtReal_>
-    class CLASS : public BASE
+    class SimplicialMesh : public SimplicialMeshBase<Real_,Int_,SReal_,ExtReal_>
     {
     public :
         
@@ -26,8 +23,10 @@ namespace Repulsor
         using SReal   = SReal_;
         using ExtReal = ExtReal_;
         
-        using TangentVector_T    = typename BASE::TangentVector_T;
-        using CotangentVector_T  = typename BASE::CotangentVector_T;
+        using Base_T  = SimplicialMeshBase<Real,Int,SReal,ExtReal>;
+        
+        using TangentVector_T    = typename Base_T::TangentVector_T;
+        using CotangentVector_T  = typename Base_T::CotangentVector_T;
         
         using       Primitive_T  =        Polytope<DOM_DIM+1,AMB_DIM,GJK_Real,Int,SReal,Real,Int>;
         using MovingPrimitive_T  =  MovingPolytope<DOM_DIM+1,AMB_DIM,GJK_Real,Int,SReal,Real,Int>;
@@ -42,18 +41,18 @@ namespace Repulsor
 
         using Remesher_T         =     SimplicialRemesher<DOM_DIM,AMB_DIM,Real,Int,SReal,ExtReal>;
         using RemesherBase_T     = SimplicialRemesherBase<                Real,Int,SReal,ExtReal>;
-        using Obstacle_T         = BASE;
+        using Obstacle_T         = Base_T;
         
-        CLASS() = default;
+        SimplicialMesh() = default;
 
-        CLASS(
+        SimplicialMesh(
             const Tensor2<Real,Int> & V_coords_,
             // vertex coordinates; assumed to be of size vertex_count_ x AMB_DIM
             const Tensor2<Int,Int> & simplices_,
             // simplices; assumed to be of size simplex_count_ x (DOM_DIM+1)
             const long long thread_count_ = 1
         )
-        :   CLASS(
+        :   SimplicialMesh(
                   V_coords_.data(),
                   V_coords_.Dimension(0),
                   false,
@@ -81,12 +80,12 @@ namespace Repulsor
         
 #ifdef LTEMPLATE_H
         
-        CLASS(
+        SimplicialMesh(
             const mma::TensorRef<ExtReal> & V_coords_,   // vertex coordinates; assumed to be of size vertex_count_ x AMB_DIM
             const mma::TensorRef<long long> & simplices_,   // simplices; assumed to be of size simplex_count_ x (DOM_DIM+1)
             const long long thread_count_ = 1
         )
-        :   CLASS(
+        :   SimplicialMesh(
                 V_coords_.data(),
                 static_cast<Int>(V_coords_.dimensions()[0]),
                 simplices_.data(),
@@ -113,18 +112,18 @@ namespace Repulsor
 #endif
 
         template<typename ExtReal_2, typename ExtInt>
-        CLASS(
+        SimplicialMesh(
             const ExtReal_2 * V_coords_, // vertex coordinates; assumed to be of size vertex_count_ x AMB_DIM
             const long long vertex_count_,
             const ExtInt * simplices_, // simplices; assumed to be of size simplex_count_ x (DOM_DIM+1)
             const long long simplex_count_,
             const long long thread_count_ = 1
         )
-        :   CLASS( V_coords_, vertex_count_, false, simplices_, simplex_count_, false, thread_count_)
+        :   SimplicialMesh( V_coords_, vertex_count_, false, simplices_, simplex_count_, false, thread_count_)
         {}
         
         template<typename ExtReal_2, typename ExtInt>
-        CLASS(
+        SimplicialMesh(
             const ExtReal_2 * vertex_coords_, // vertex coordinates; assumed to be of size vertex_count_ x AMB_DIM
             const long long vertex_count_,
             const bool vertex_coords_transpose,
@@ -133,7 +132,7 @@ namespace Repulsor
             const bool simplices_transpose,
             const long long thread_count_ = 1
         )
-        :   BASE      ( static_cast<Int>(thread_count_) )
+        :   Base_T    ( static_cast<Int>(thread_count_) )
         ,   V_coords  ( ToTensor2<Real,Int>(
                             vertex_coords_,
                             static_cast<Int>(vertex_count_),
@@ -155,14 +154,14 @@ namespace Repulsor
         }
 
         
-        virtual ~CLASS() override = default;
+        virtual ~SimplicialMesh() override = default;
         
     public:
         
-        using BASE::block_cluster_tree_settings;
-        using BASE::cluster_tree_settings;
-        using BASE::adaptivity_settings;
-        using BASE::ThreadCount;
+        using Base_T::block_cluster_tree_settings;
+        using Base_T::cluster_tree_settings;
+        using Base_T::adaptivity_settings;
+        using Base_T::ThreadCount;
         
     protected:
         
@@ -615,7 +614,7 @@ namespace Repulsor
             if( !obstacle_initialized )
             {
                 wprint(className()+"::GetObstacle: Obstacle not initialized.");
-                obstacle = std::unique_ptr<BASE>(new CLASS());
+                obstacle = std::unique_ptr<Base_T>(new SimplicialMesh());
             }
             return *obstacle;
         }
@@ -784,16 +783,6 @@ namespace Repulsor
         
     public:
         
-        virtual CLASS & DownCast() override
-        {
-            return *this;
-        }
-        
-        virtual const CLASS & DownCast() const override
-        {
-            return *this;
-        }
-        
         virtual std::string ClassName() const override
         {
             return className();
@@ -803,13 +792,10 @@ namespace Repulsor
   
         static std::string className()
         {
-            return TO_STD_STRING(CLASS)+"<"+ToString(DOM_DIM)+","+ToString(AMB_DIM)+","+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+">";
+            return "SimplicialMesh<"+ToString(DOM_DIM)+","+ToString(AMB_DIM)+","+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+">";
         }
     };
 } // namespace Repulsor
 
 
 #include "SimplicialMesh/SimplicialMesh_Factory.hpp"
-
-#undef BASE
-#undef CLASS
