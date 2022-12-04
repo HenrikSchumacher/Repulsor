@@ -202,10 +202,12 @@ namespace Repulsor
         {
             std::stringstream s;
             
+            s << "{ \n";
             for( auto & p : cache )
             {
-                s << p.first << " ";
+                s << "\t" << p.first << "\n";
             }
+            s << "}";
             return s.str();
         }
         

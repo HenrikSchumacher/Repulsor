@@ -157,15 +157,19 @@ int main(int argc, const char * argv[])
     tpm.MetricValues(M);
     toc("tpm.MetricValues(M)");
     
-    tic("Matrix multiplication");
+    tic("tpm.MultiplyMetric");
     tpm.MultiplyMetric(M, alpha, X, beta, Y);
-    toc("Matrix multiplication");
+    toc("tpm.MultiplyMetric");
 
-    tic("Matrix multiplication");
+    tic("tpm.MultiplyMetric");
     tpm.MultiplyMetric(M, alpha, X, beta, Y);
-    toc("Matrix multiplication");
+    toc("tpm.MultiplyMetric");
    
+    dump(X.MaxNorm());
+    dump(Y.MaxNorm());
 
+    print("");
+    
 
     // Initialize mesh by the factory to allow runtime polymorphism.
     tic("Initialize obstacle mesh");
@@ -213,18 +217,36 @@ int main(int argc, const char * argv[])
     
     
     TangentPointEnergy0_Factory<Mesh_T,2,2,3,3> TPE0_factory;
+    TangentPointMetric0_Factory<Mesh_T,2,2,3,3> TPM0_factory;
     
     std::unique_ptr<Energy_T> tpe0_ptr = TPE0_factory.Make( dom_dim, amb_dim, q, p );
+    std::unique_ptr<Metric_T> tpm0_ptr = TPM0_factory.Make( dom_dim, amb_dim, q, p );
     
     const auto & tpe0 = *tpe0_ptr;
+    const auto & tpm0 = *tpm0_ptr;
     
     dump(tpe0.Value(M));
     
+    tic("tpm0.MetricValues(M)");
+    tpm0.MetricValues(M);
+    toc("tpm0.MetricValues(M)");
+    
+    tic("tpm0.MultiplyMetric");
+    tpm0.MultiplyMetric(M, alpha, X, beta, Y);
+    toc("tpm0.MultiplyMetric");
+
+    tic("tpm0.MultiplyMetric");
+    tpm0.MultiplyMetric(M, alpha, X, beta, Y);
+    toc("tpm0.MultiplyMetric");
+    
+    dump(X.MaxNorm());
+    dump(Y.MaxNorm());
     
     print("");
     print("Testing remesher.");
     
     std::unique_ptr<Mesh_T::Remesher_T> R = M_ptr->CreateRemesher();
+    
     
     Tensor1<INT,INT> edges (3);
     edges[0]=1;

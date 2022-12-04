@@ -1,27 +1,28 @@
 #pragma once
 
-#define CLASS EnergyDimRestricted
-#define BASE  EnergyBase<Real,Int,SReal,ExtReal>
-
 namespace Repulsor
 {
     template<int DOM_DIM, int AMB_DIM, typename Real, typename Int, typename SReal, typename ExtReal>
-    class CLASS : public BASE
+    class EnergyDimRestricted : public EnergyBase<Real,Int,SReal,ExtReal>
     {
+    private:
+        
+        using Base_T = EnergyBase<Real,Int,SReal,ExtReal>;
+        
     public:
         
-        using MeshBase_T        = typename BASE::MeshBase_T;
+        using MeshBase_T        = typename Base_T::MeshBase_T;
 
-        using Values_T          = typename BASE::Values_T;
-        using ValueContainer_T  = typename BASE::ValueContainer_T;
-        using TangentVector_T   = typename BASE::TangentVector_T;
-        using CotangentVector_T = typename BASE::CotangentVector_T;
+        using Values_T          = typename Base_T::Values_T;
+        using ValueContainer_T  = typename Base_T::ValueContainer_T;
+        using TangentVector_T   = typename Base_T::TangentVector_T;
+        using CotangentVector_T = typename Base_T::CotangentVector_T;
         
         using Mesh_T            = SimplicialMesh<DOM_DIM,AMB_DIM,Real,Int,SReal,ExtReal>;
         
-        CLASS() = default;
+        EnergyDimRestricted() = default;
 
-        virtual ~CLASS() override = default;
+        virtual ~EnergyDimRestricted() override = default;
         
         // Do a down cast and delegate implementation further to descendant class.
         ExtReal value( const MeshBase_T & M ) const override
@@ -63,11 +64,9 @@ namespace Repulsor
 
     public:
         
-//        virtual std::string Stats() const override = 0;
-        
         static std::string className()
         {
-            return TO_STD_STRING(CLASS)+"<"+ToString(DOM_DIM)+","+ToString(AMB_DIM)+","+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+">";
+            return "EnergyDimRestricted<"+ToString(DOM_DIM)+","+ToString(AMB_DIM)+","+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+">";
         }
         
         virtual std::string ClassName() const override
@@ -75,9 +74,6 @@ namespace Repulsor
             return className();
         }
         
-    };
+    }; // class EnergyDimRestricted
 
 }// namespace Repulsor
-
-#undef BASE
-#undef CLASS

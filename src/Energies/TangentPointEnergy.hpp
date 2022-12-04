@@ -1,9 +1,5 @@
 #pragma once
 
-#include "TangentPointEnergy/TP_Kernel_FF.hpp"
-#include "TangentPointEnergy/TP_Kernel_NF.hpp"
-#include "TangentPointEnergy/TP_Kernel_VF.hpp"
-
 #include "TangentPointEnergy/TP_Traversor.hpp"
 
 #define CLASS TangentPointEnergy
@@ -70,10 +66,9 @@ namespace Repulsor
         
     public:
         
-        
         std::string className() const
         {
-            return TO_STD_STRING(CLASS)+"<"+ToString(DOM_DIM)+","+ToString(AMB_DIM)+","+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+"> ("+ToString(q)+","+ToString(p)+")";
+            return TO_STD_STRING(CLASS)+"<"+ToString(DOM_DIM)+","+ToString(AMB_DIM)+","+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+">("+ToString(q)+","+ToString(p)+")";
         }
         
         virtual std::string ClassName() const override
@@ -90,5 +85,3 @@ namespace Repulsor
 #undef ROOT  
 #undef BASE
 #undef CLASS
-
-

@@ -1,26 +1,26 @@
 #pragma once
 
-#include "TangentPointEnergy0/TP0_Kernel_FF.hpp"
-#include "TangentPointEnergy0/TP0_Kernel_NF.hpp"
-#include "TangentPointEnergy0/TP0_Kernel_VF.hpp"
-
-#include "TangentPointEnergy0/TP0_Kernel_MultiplyMetric.hpp"
-
 #include "TangentPointEnergy0/TP0_Traversor.hpp"
 
 #define CLASS TangentPointEnergy0
-#define BASE  EnergyDimRestricted<DOM_DIM,AMB_DIM,Real,Int,SReal,ExtReal>
-#define ROOT  EnergyBase<Real,Int,SReal,ExtReal>
+#define BASE  EnergyDimRestricted<DOM_DIM,AMB_DIM,Real_,Int_,SReal_,ExtReal_>
+#define ROOT  EnergyBase<Real_,Int_,SReal_,ExtReal_>
 
 namespace Repulsor
 {
-    template<int DOM_DIM, int AMB_DIM, typename Real, typename Int, typename SReal, typename ExtReal>
+    template<int DOM_DIM, int AMB_DIM, typename Real_, typename Int_, typename SReal_, typename ExtReal_>
     class CLASS : public BASE
     {
     public:
         
+        using Real    = Real_;
+        using Int     = Int_;
+        using SReal   = SReal_;
+        using ExtReal = ExtReal_;
+        
         using Mesh_T                  = typename BASE::Mesh_T;
         using BlockClusterTree_T      = typename Mesh_T::BlockClusterTree_T;
+        using ClusterTree_T           = typename BlockClusterTree_T::ClusterTree_T;
         
         using Values_T                = typename BASE::Values_T;
         using ValueContainer_T        = typename BASE::ValueContainer_T;
@@ -29,8 +29,8 @@ namespace Repulsor
         
         CLASS( const Real q_, const Real p_ )
         :   BASE ()
-        ,   q    ( static_cast<Real>(q_) )
-        ,   p    ( static_cast<Real>(p_) )
+        ,   q ( q_ )
+        ,   p ( p_ )
         {}
         
         virtual ~CLASS() = default;
@@ -66,10 +66,9 @@ namespace Repulsor
         
     public:
         
-        
         std::string className() const
         {
-            return TO_STD_STRING(CLASS)+"<"+ToString(DOM_DIM)+","+ToString(AMB_DIM)+","+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+"> ("+ToString(q)+","+ToString(p)+")";
+            return TO_STD_STRING(CLASS)+"<"+ToString(DOM_DIM)+","+ToString(AMB_DIM)+","+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+">("+ToString(q)+","+ToString(p)+")";
         }
         
         virtual std::string ClassName() const override
@@ -86,5 +85,3 @@ namespace Repulsor
 #undef ROOT  
 #undef BASE
 #undef CLASS
-
-

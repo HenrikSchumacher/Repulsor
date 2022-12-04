@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../Energies/TangentPointEnergy/TP_Traversor.hpp"
+
 #define CLASS TangentPointMetric
 #define BASE  MetricDimRestricted<DOM_DIM,AMB_DIM,Real,Int,SReal,ExtReal,OperatorType::MixedOrder>
 #define ROOT  MetricBase<Real,Int,SReal,ExtReal>
@@ -64,7 +66,7 @@ namespace Repulsor
         
         std::string className() const
         {
-            return TO_STD_STRING(CLASS)+"<"+ToString(DOM_DIM)+","+ToString(AMB_DIM)+","+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+"> ("+ToString(q)+","+ToString(p)+")";
+            return TO_STD_STRING(CLASS)+"<"+ToString(DOM_DIM)+","+ToString(AMB_DIM)+","+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+">("+ToString(q)+","+ToString(p)+")";
         }
         
         virtual std::string ClassName() const override

@@ -1,11 +1,9 @@
 #pragma once
 
-#define CLASS EnergyBase
-
 namespace Repulsor
 {
     template<typename Real, typename Int, typename SReal, typename ExtReal>
-    class CLASS
+    class EnergyBase
     {
         ASSERT_FLOAT( Real    );
         ASSERT_FLOAT( SReal   );
@@ -24,9 +22,9 @@ namespace Repulsor
         using Values_T           = Tensor2<Real,LInt>;
         using ValueContainer_T   = std::unordered_map<std::string,Values_T>;
         
-        CLASS() = default;
+        EnergyBase() = default;
 
-        virtual ~CLASS() = default;
+        virtual ~EnergyBase() = default;
         
     protected:
         
@@ -98,12 +96,10 @@ namespace Repulsor
         virtual void differential( const MeshBase_T & M ) const = 0;
 
     public:
-        
-//        virtual std::string Stats() const = 0;
 
         static std::string className()
         {
-            return TO_STD_STRING(CLASS)+"<"+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+">";
+            return "EnergyBase<"+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+">";
         }
         
         virtual std::string ClassName() const
@@ -111,9 +107,7 @@ namespace Repulsor
             return className();
         }
         
-    };
+    }; // class EnergyBase
 
 }// namespace Repulsor
-
-#undef CLASS
 

@@ -2,34 +2,35 @@
 
 namespace Repulsor
 {
-#define CLASS Collision_Kernel
-#define BASE  Traversor_Kernel<ClusterTree_T_>
-    
     template<typename ClusterTree_T_>
-    class CLASS : public BASE
+    class Collision_Kernel : public Traversor_Kernel<ClusterTree_T_>
     {
+    private:
+        
+        using Base_T = Traversor_Kernel<ClusterTree_T_>;
+        
     public:
         
         using ClusterTree_T = ClusterTree_T_;
-        using Real    = typename BASE::Real;
-        using Int     = typename BASE::Int;
-        using SReal   = typename BASE::SReal;
-        using ExtReal = typename BASE::ExtReal;
+        using Real    = typename Base_T::Real;
+        using Int     = typename Base_T::Int;
+        using SReal   = typename Base_T::SReal;
+        using ExtReal = typename Base_T::ExtReal;
         
         using LInt    = size_t;
         
     public:
         
-        CLASS() = delete;
+        Collision_Kernel() = delete;
         
-        ~CLASS() = default;
+        ~Collision_Kernel() = default;
         
-        CLASS(
+        Collision_Kernel(
             const ClusterTree_T & S,
             const ClusterTree_T & T,
             const SReal t_init_
         )
-        :   BASE( S, T )
+        :   Base_T( S, T )
         ,   S_C_ser     ( S.ClusterSerialized()              )
         ,   S_C_up_ser  ( S.ClusterUpdatedSerialized()       )
         ,   T_C_ser     ( T.ClusterSerialized()              )
@@ -45,8 +46,8 @@ namespace Repulsor
         {}
         
 
-        CLASS( const CLASS & other )
-        :   BASE( other )
+        Collision_Kernel( const Collision_Kernel & other )
+        :   Base_T( other )
         ,   S_C_ser     ( other.S_C_ser     )
         ,   S_C_up_ser  ( other.S_C_up_ser  )
         ,   T_C_ser     ( other.T_C_ser     )
@@ -62,7 +63,7 @@ namespace Repulsor
         ,   triples     ( other.triples     )
         {}
         
-        friend void swap(CLASS &A, CLASS &B)
+        friend void swap(Collision_Kernel &A, Collision_Kernel &B)
         {
             // see https://stackoverflow.com/questions/5695548/public-friend-swap-member-function for details
             using std::swap;
@@ -83,7 +84,7 @@ namespace Repulsor
         }
 
         // Copy assignment
-        CLASS & operator=(CLASS other) // Intentionally no pass-by-reference here!
+        Collision_Kernel & operator=(Collision_Kernel other) // Intentionally no pass-by-reference here!
         {
             swap(*this, other);
 
@@ -91,13 +92,13 @@ namespace Repulsor
         }
                 
 //        // Move constructor
-//        CLASS( CLASS && other ) noexcept
+//        Collision_Kernel( Collision_Kernel && other ) noexcept
 //        {
 //            swap(*this, other);
 //        }
 //
 //        // Move assignment operator
-//        CLASS & operator=( CLASS && other ) noexcept
+//        Collision_Kernel & operator=( Collision_Kernel && other ) noexcept
 //        {
 //            if( this != &other )
 //            {
@@ -234,11 +235,9 @@ namespace Repulsor
       
         std::string ClassName() const
         {
-            return TO_STD_STRING(CLASS) + "<"+this->tree_string+">";
+            return "Collision_Kernel<"+this->tree_string+">";
         }
-    };
- 
-#undef BASE
-#undef CLASS
+        
+    }; // class Collision_Kernel
     
 } //namespace Repulsor

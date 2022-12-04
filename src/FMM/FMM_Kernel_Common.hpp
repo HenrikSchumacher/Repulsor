@@ -9,13 +9,6 @@ public:
     {
         if constexpr ( metric_flag )
         {
-            //DEBUGGER
-            print(this->ClassName()+"::Allocate");
-            dump(this->OffDiag().Dimension(0));
-            dump(this->OffDiag().Dimension(1));
-            dump(nnz);
-            dump(BLOCK_NNZ);
-            
             if(
                this->OffDiag().Dimension(0) != nnz
                ||

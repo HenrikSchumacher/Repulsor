@@ -10,9 +10,11 @@ namespace Repulsor
     >
     class TP_Kernel_FF : public FMM_Kernel_FF<ClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,metric_flag_>
     {
-    public:
+    private:
         
         using Base_T = FMM_Kernel_FF<ClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,metric_flag_>;
+        
+    public:
         
         using ClusterTree_T      = ClusterTree_T_;
         using Values_T           = typename Base_T::Values_T;

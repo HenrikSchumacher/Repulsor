@@ -1,8 +1,5 @@
 #pragma once
 
-#define CLASS MetricDimRestricted
-#define BASE  MetricBase<Real,Int,SReal,ExtReal>
-
 namespace Repulsor
 {
     template<
@@ -10,52 +7,41 @@ namespace Repulsor
         typename Real, typename Int, typename SReal, typename ExtReal,
         OperatorType op_type
     >
-    class CLASS : public BASE
+    class MetricDimRestricted : public MetricBase<Real,Int,SReal,ExtReal>
     {
+    private:
+     
+        using Base_T = MetricBase<Real,Int,SReal,ExtReal>;
+        
     public:
         
-        using MeshBase_T         = typename BASE::MeshBase_T;
+        using MeshBase_T         = typename Base_T::MeshBase_T;
 
-        using TangentVector_T    = typename BASE::TangentVector_T;
-        using CotangentVector_T  = typename BASE::CotangentVector_T;
+        using TangentVector_T    = typename Base_T::TangentVector_T;
+        using CotangentVector_T  = typename Base_T::CotangentVector_T;
         
-        using Values_T           = typename BASE::Values_T;
-        using ValueContainer_T   = typename BASE::ValueContainer_T;
+        using Values_T           = typename Base_T::Values_T;
+        using ValueContainer_T   = typename Base_T::ValueContainer_T;
         
         using Mesh_T             = SimplicialMesh<DOM_DIM,AMB_DIM,Real,Int,SReal,ExtReal>;
         
-        CLASS() = default;
+        MetricDimRestricted() = default;
 
-        virtual ~CLASS() override = default;
+        virtual ~MetricDimRestricted() override = default;
         
         ValueContainer_T & MetricValues( const MeshBase_T & M ) const override
         {
             std::string tag ( ClassName()+"::MetricValues" );
-            
-            // DEBUGGING
-            dump(tag);
-            dump(M.CacheKeys());
-            
+
             ptic(tag);
             if( !M.IsCached(tag))
             {
-                // DEBUGGER
-                print("compute_metric");
                 std::any thing ( std::move(compute_metric(M)) );
                 
                 M.SetCache( tag, thing );
             }
             
-            auto & result = std::any_cast<ValueContainer_T &>( M.GetCache(tag) );
-            
-            // DEBUGGING
-            std::stringstream s;
-            for( auto & p : result )
-            {
-                s << p.first << " ";
-            }
-            
-            dump(s.str());
+            ValueContainer_T & result = std::any_cast<ValueContainer_T &>( M.GetCache(tag) );
             
             ptoc(tag);
             
@@ -136,7 +122,7 @@ namespace Repulsor
         
         static std::string className()
         {
-            return TO_STD_STRING(CLASS)+"<"+ToString(DOM_DIM)+","+ToString(AMB_DIM)+","+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+">";
+            return "MetricDimRestricted<"+ToString(DOM_DIM)+","+ToString(AMB_DIM)+","+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+">";
         }
         
         virtual std::string ClassName() const override
@@ -144,9 +130,6 @@ namespace Repulsor
             return className();
         }
         
-    };
+    }; // class MetricDimRestricted
 
 }// namespace Repulsor
-
-#undef BASE
-#undef CLASS

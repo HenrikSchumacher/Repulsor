@@ -1,11 +1,9 @@
 #pragma once
 
-#define CLASS MetricBase
-
 namespace Repulsor
 {
     template<typename Real, typename Int, typename SReal, typename ExtReal>
-    class CLASS
+    class MetricBase
     {
         ASSERT_FLOAT(Real   );
         ASSERT_INT  (Int    );
@@ -24,9 +22,9 @@ namespace Repulsor
         using Values_T           = Tensor2<Real,size_t>;
         using ValueContainer_T   = std::unordered_map<std::string,Values_T>;
         
-        CLASS() = default;
+        MetricBase() = default;
 
-        virtual ~CLASS() = default;
+        virtual ~MetricBase() = default;
         
     protected:
         
@@ -68,7 +66,7 @@ namespace Repulsor
 
         static std::string className()
         {
-            return TO_STD_STRING(CLASS)+"<"+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+">";
+            return "MetricBase<"+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+">";
         }
         
         virtual std::string ClassName() const
@@ -76,10 +74,6 @@ namespace Repulsor
             return className();
         }
         
-    };
+    }; // class MetricBase
 
 }// namespace Repulsor
-
-#undef CLASS
-
-

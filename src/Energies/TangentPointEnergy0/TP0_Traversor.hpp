@@ -1,5 +1,10 @@
 #pragma once
 
+#include "TP0_Kernel_FF.hpp"
+#include "TP0_Kernel_NF.hpp"
+#include "TP0_Kernel_VF.hpp"
+#include "TP0_Kernel_MultiplyMetric.hpp"
+
 namespace Repulsor
 {
     using namespace FMM;
@@ -40,20 +45,20 @@ namespace Repulsor
         using Kernel_Block_MulAdd_T = TP0_Kernel_MultiplyMetric<
             AMB_DIM,AMB_DIM,
             Real, Real, Real, Int, LInt,
-            true,true, 1, 1                    // CAUTION: We use add-in instead of overwrite!
+            1, 1 // <-- this 1 means add-in
         >;
         
         using Kernel_Block_Mul_T = TP0_Kernel_MultiplyMetric<
             AMB_DIM,AMB_DIM,
             Real, Real, Real, Int, LInt,
-            true,true, 1, 0                    // CAUTION: We use add-in instead of overwrite!
+            1, 0 // <-- this 0 means overwrite
         >;
 
         
         using Kernel_Diag_MulAdd_T = TP0_Kernel_MultiplyMetric<
             AMB_DIM,AMB_DIM,
             Real, Real, Real, Int, LInt,
-            true,true, 1, 1                    // CAUTION: We use add-in instead of overwrite!
+            1, 1 // <-- this 1 means add-in
         >;
     
         static constexpr Int VF_blk_size = Kernel_Block_MulAdd_T::ROWS * Kernel_Block_MulAdd_T::COLS;

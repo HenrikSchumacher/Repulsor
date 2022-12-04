@@ -16,14 +16,16 @@ namespace Repulsor
     template<int DOM_DIM, int AMB_DIM, typename Real_, typename Int_, typename SReal_, typename ExtReal_>
     class SimplicialMesh : public SimplicialMeshBase<Real_,Int_,SReal_,ExtReal_>
     {
-    public :
+    private:
+        
+        using Base_T = SimplicialMeshBase<Real_,Int_,SReal_,ExtReal_>;
+        
+    public:
         
         using Real    = Real_;
         using Int     = Int_;
         using SReal   = SReal_;
         using ExtReal = ExtReal_;
-        
-        using Base_T  = SimplicialMeshBase<Real,Int,SReal,ExtReal>;
         
         using TangentVector_T    = typename Base_T::TangentVector_T;
         using CotangentVector_T  = typename Base_T::CotangentVector_T;

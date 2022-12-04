@@ -15,6 +15,10 @@ namespace Repulsor
         ASSERT_FLOAT(SReal_  );
         ASSERT_FLOAT(ExtReal_);
         
+    private:
+        
+        using Base_T = CollisionTreeBase<Real_,Int_,SReal_,ExtReal_,is_symmetric>;
+        
     public:
         
         using Real              = Real_;
@@ -22,7 +26,6 @@ namespace Repulsor
         using SReal             = SReal_;
         using ExtReal           = ExtReal_;
         
-        using Base_T            = CollisionTreeBase<Real,Int,SReal,ExtReal,is_symmetric>;
         using ClusterTree_T     = ClusterTree<AMB_DIM,Real,Int,SReal,ExtReal>;
         using CollisionMatrix_T = typename Base_T::CollisionMatrix_T;
         

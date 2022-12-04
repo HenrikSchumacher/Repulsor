@@ -11,9 +11,11 @@ namespace Repulsor
     >
     class TP0_Kernel_VF : public FMM_Kernel_VF<S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,metric_flag_>
     {
-    public:
+    private:
         
         using Base_T = FMM_Kernel_VF<S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,metric_flag_>;
+        
+    public:
         
         using ClusterTree_T      = ClusterTree_T_;
         

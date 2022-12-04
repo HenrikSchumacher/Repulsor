@@ -1,33 +1,34 @@
 #pragma once
 
-#define CLASS BlockSplit_Kernel
-#define BASE  Traversor_Kernel<ClusterTree_T_>
-
 namespace Repulsor
 {
     template<typename ClusterTree_T_, typename LInt_>
-    class CLASS : public BASE
+    class BlockSplit_Kernel : public Traversor_Kernel<ClusterTree_T_>
     {
+    private:
+        
+        using Base_T = Traversor_Kernel<ClusterTree_T_>;
+        
     public:
         
-        using ClusterTree_T = typename BASE::ClusterTree_T;
-        using Real    = typename BASE::Real;
-        using SReal   = typename BASE::SReal;
-        using ExtReal = typename BASE::ExtReal;
-        using Int     = typename BASE::Int;
+        using ClusterTree_T = typename Base_T::ClusterTree_T;
+        using Real    = typename Base_T::Real;
+        using SReal   = typename Base_T::SReal;
+        using ExtReal = typename Base_T::ExtReal;
+        using Int     = typename Base_T::Int;
         using LInt    = LInt_;
         
     public:
         
-//        CLASS() = default;
+//        BlockSplit_Kernel() = default;
         
-        CLASS(
+        BlockSplit_Kernel(
             const ClusterTree_T & S,
             const ClusterTree_T & T,
             const Real far_theta2_,
             const Real near_theta2_
         )
-        :   BASE( S, T )
+        :   Base_T( S, T )
         ,   inter_idx           ( 1 )
         ,   verynear_idx        ( 1 )
         ,   near_idx            ( 2 * ( S.PrimitiveCount() + T.PrimitiveCount() ) )
@@ -46,8 +47,8 @@ namespace Repulsor
         ,   intersection_theta2 ( near_theta2_                              )
         {}
         
-        CLASS( const CLASS & other )
-        : BASE( other )
+        BlockSplit_Kernel( const BlockSplit_Kernel & other )
+        : Base_T( other )
         ,   inter_idx           ( other.inter_idx.Capacity()    )
         ,   verynear_idx        ( other.verynear_idx.Capacity() )
         ,   near_idx            ( other.near_idx.Capacity()     )
@@ -66,7 +67,7 @@ namespace Repulsor
         ,   intersection_theta2 ( other.near_theta2             )
         {}
         
-        friend void swap(CLASS &A, CLASS &B)
+        friend void swap(BlockSplit_Kernel &A, BlockSplit_Kernel &B)
         {
             // see https://stackoverflow.com/questions/5695548/public-friend-swap-member-function for details
             using std::swap;
@@ -90,7 +91,7 @@ namespace Repulsor
         }
 
         // Copy assignment
-        CLASS & operator=(CLASS other) // Intentionally no pass-by-reference here!
+        BlockSplit_Kernel & operator=(BlockSplit_Kernel other) // Intentionally no pass-by-reference here!
         {
             swap(*this, other);
 
@@ -98,13 +99,13 @@ namespace Repulsor
         }
                 
 //        // Move constructor
-//        CLASS( CLASS && other ) noexcept
+//        BlockSplit_Kernel( BlockSplit_Kernel && other ) noexcept
 //        {
 //            swap(*this, other);
 //        }
 //
 //        // Move assignment operator
-//        CLASS & operator=( CLASS && other ) noexcept
+//        BlockSplit_Kernel & operator=( BlockSplit_Kernel && other ) noexcept
 //        {
 //            if( this != &other )
 //            {
@@ -113,7 +114,7 @@ namespace Repulsor
 //            return *this;
 //        }
         
-        ~CLASS() = default;
+        ~BlockSplit_Kernel() = default;
         
     public:
         PairAggregator<Int,Int,LInt> inter_idx;
@@ -270,12 +271,10 @@ namespace Repulsor
       
         std::string className() const
         {
-            return TO_STD_STRING(CLASS) + "<"+this->tree_string+">";
+            return "BlockSplit_Kernel<"+this->tree_string+">";
         }
-    };
+        
+    }; // class BlockSplit_Kernel
     
 } //namespace Repulsor
-
-#undef BASE
-#undef CLASS
 

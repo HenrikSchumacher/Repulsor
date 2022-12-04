@@ -1,5 +1,9 @@
 #pragma once
 
+#include "TP_Kernel_FF.hpp"
+#include "TP_Kernel_NF.hpp"
+#include "TP_Kernel_VF.hpp"
+
 namespace Repulsor
 {
     using namespace FMM;
