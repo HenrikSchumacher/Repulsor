@@ -116,15 +116,20 @@ namespace Repulsor
 */
             
             const Scalar a_0 ( a[0] );
-            const Scalar a_1 ( a[1] );
-
+            
             LOOP_UNROLL_FULL
             for( Int k = 0; k < MAX_RHS_COUNT; ++k )
             {
                 FMA( a_0, get_x(0,k), get_y(0,k) );
-                
+            }
+            
+            const Scalar a_1 ( a[1] );
+            
+            LOOP_UNROLL_FULL
+            for( Int j = 1; j < COLS; ++j )
+            {
                 LOOP_UNROLL_FULL
-                for( Int j = 1; j < COLS; ++j )
+                for( Int k = 0; k < MAX_RHS_COUNT; ++k )
                 {
                     FMA( a_1, get_x(j,k), get_y(j,k) );
                 }

@@ -50,7 +50,7 @@ namespace Repulsor
                 traversor( M.GetBlockClusterTree(), metric_values, s );
 
             (void)traversor.Compute();
-
+            
             return metric_values;
         }
         

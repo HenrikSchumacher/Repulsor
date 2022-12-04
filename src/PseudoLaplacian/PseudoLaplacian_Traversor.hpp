@@ -38,66 +38,34 @@ namespace Repulsor
         
         using TangentVector_T   = Tensor2<ExtReal,Int>;
         using CotangentVector_T = Tensor2<ExtReal,Int>;
-        
-        
 
         using Kernel_Block_MulAdd_T = ScalarBlockKernel_fixed<
             high_order ? AMB_DIM : 1, high_order ? AMB_DIM : 1, AMB_DIM, true,
             Real, Real, Real, Int, LInt,
             1,    1,
-            true, false, true, true,
-            true, false,
-            true
+            true, true, false, true,
+            true, true,
+            false
         >;
         
         using Kernel_Block_Mul_T = ScalarBlockKernel_fixed<
             high_order ? AMB_DIM : 1, high_order ? AMB_DIM : 1, AMB_DIM, true,
             Real, Real, Real, Int, LInt,
             1,    0,
-            true, false, true, true,
-            true, false,
-            true
+            true, true, false, true,
+            true, true,
+            false
         >;
         
         using Kernel_Diag_MulAdd_T = ScalarBlockKernel_fixed<
             high_order ? AMB_DIM : 1, high_order ? AMB_DIM : 1, AMB_DIM, true,
             Real, Real, Real, Int, LInt,
             1,    0,
-            true, false, true, true,
-            true, false,
-            true
+            true, true, false, true,
+            true, true,
+            false
         >;
-        
-//        using Kernel_Block_MulAdd_T = ArrowheadBlockKernel_fixed<
-//            AMB_DIM+1, AMB_DIM+1, AMB_DIM, true,
-//            Real, Real, Real, Int, LInt,
-//            1,    1,                    // CAUTION: We use add-in instead of overwrite!
-//                         true,
-//            true, false, true, true,
-//            true, false,
-//            true
-//        >;
-//
-//        using Kernel_Block_Mul_T = ArrowheadBlockKernel_fixed<
-//            AMB_DIM+1, AMB_DIM+1, AMB_DIM, true,
-//            Real, Real, Real, Int, LInt,
-//            1,    0,
-//                         true,
-//            true, false, true, true,
-//            true, false,
-//            true
-//        >;
-//
-//        using Kernel_Diag_MulAdd_T = DenseBlockKernel_fixed<
-//            AMB_DIM+1, AMB_DIM+1, AMB_DIM, true,
-//            Real, Real, Real, Int, LInt,
-//            1,    1,
-//            true, false, true,
-//            true, false, true, true,
-//            true, false,
-//            1   , 2,
-//            true
-//        >;
+
     
         static constexpr Int VF_blk_size = Kernel_Block_MulAdd_T::ROWS * Kernel_Block_MulAdd_T::COLS;
         static constexpr Int NF_blk_size =    Kernel_Block_Mul_T::ROWS *    Kernel_Block_Mul_T::COLS;
@@ -347,7 +315,7 @@ namespace Repulsor
         void NF_MultiplyMetric( const Int rhs_count ) const
         {
             SparseKernelMatrixCSR<Kernel_Block_Mul_T> matrix ( bct.Near() );
-            
+        
             matrix.Dot(
                 metric_values["NF"].data(),
                 one,  bct.GetT().PrimitiveInputBuffer().data(),

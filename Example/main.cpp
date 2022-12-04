@@ -220,9 +220,14 @@ int main(int argc, const char * argv[])
     TangentPointMetric0_Factory<Mesh_T,2,2,3,3> TPM0_factory;
     PseudoLaplacian_Factory    <Mesh_T,2,2,3,3> Prec_factory;
     
+    const REAL s = (p - 2)/q;
+    
+    dump(s);
+    dump(2-s);
+    
     std::unique_ptr<Energy_T> tpe0_ptr = TPE0_factory.Make( dom_dim, amb_dim, q, p );
     std::unique_ptr<Metric_T> tpm0_ptr = TPM0_factory.Make( dom_dim, amb_dim, q, p );
-    std::unique_ptr<Metric_T> prec_ptr = Prec_factory.Make( dom_dim, amb_dim, (p - 2)/q );
+    std::unique_ptr<Metric_T> prec_ptr = Prec_factory.Make( dom_dim, amb_dim, 2-s  );
     
     const auto & tpe0 = *tpe0_ptr;
     const auto & tpm0 = *tpm0_ptr;
@@ -249,6 +254,16 @@ int main(int argc, const char * argv[])
     prec.MetricValues(M);
     toc("prec.MetricValues(M)");
     
+    tic("prec.MultiplyMetric");
+    prec.MultiplyMetric(M, alpha, X, beta, Y);
+    toc("prec.MultiplyMetric");
+
+    tic("prec.MultiplyMetric");
+    prec.MultiplyMetric(M, alpha, X, beta, Y);
+    toc("prec.MultiplyMetric");
+    
+    dump(X.MaxNorm());
+    dump(Y.MaxNorm());
     
     print("");
     print("Testing remesher.");
@@ -265,7 +280,7 @@ int main(int argc, const char * argv[])
     
     R->CollapseEdges(edges.data(), edges.Size());
    
-    R->SplitEdges(edges.data(), edges.Size());
+    R->SplitEdges(   edges.data(), edges.Size());
     
 //    R->UnifyEdgeLengths(<#const Real collapse_threshold#>, <#const Real split_threshold#>)
 

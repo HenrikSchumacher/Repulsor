@@ -54,9 +54,9 @@ namespace Repulsor
         PseudoLaplacian_Kernel_FF() = delete;
         
         PseudoLaplacian_Kernel_FF( Configurator_T & conf, const Real s_ )
-        :   Base_T ( conf                               )
-        ,   s      ( s_                                 )
-        ,   s_exp  ( - two * (s-high_order) + S_DOM_DIM )
+        :   Base_T ( conf                            )
+        ,   s      ( s_                              )
+        ,   s_exp  ( -S_DOM_DIM/two - (s-high_order) )
         {}
         
         PseudoLaplacian_Kernel_FF( PseudoLaplacian_Kernel_FF & other )
