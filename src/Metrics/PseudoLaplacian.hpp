@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../PseudoLaplacian/PseudoLaplacian_Traversor.hpp"
+#include "PseudoLaplacian/PseudoLaplacian_Traversor.hpp"
 
 #define CLASS PseudoLaplacian
 
@@ -82,7 +82,7 @@ namespace Repulsor
 } // namespace Repulsor
 
 
-#include "../PseudoLaplacian/PseudoLaplacian_Factory.hpp"
+#include "PseudoLaplacian/PseudoLaplacian_Factory.hpp"
 
 #undef ROOT
 #undef BASE

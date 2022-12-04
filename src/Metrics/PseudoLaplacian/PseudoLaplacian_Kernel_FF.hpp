@@ -90,7 +90,7 @@ namespace Repulsor
         Real ii_block [BLOCK_NNZ] = {};
         Real jj_block [BLOCK_NNZ] = {};
      
-#include "../FMM/FMM_Kernel_Common.hpp"
+#include "../../FMM/FMM_Kernel_Common.hpp"
         
     public:
         
@@ -106,7 +106,7 @@ namespace Repulsor
                 r2  += v[l] * v[l];
             }
 
-            const Real val = MyMath::pow(r2, s_exp);
+            const Real val = - MyMath::pow(r2, s_exp);
             
             const Real b_over_a = b/a;
             const Real a_over_b = a/b;

@@ -1,9 +1,9 @@
 #pragma once
 
-#define BASE FMM_Kernel_NF<                              \
-    S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,is_symmetric_,  \
-    false,false,true                                     \
->
+#define BASE  FMM_Kernel_VF<                                                \
+        S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,is_symmetric_,                 \
+        false,false,true                                                    \
+    >
 
 namespace Repulsor
 {
@@ -13,7 +13,7 @@ namespace Repulsor
         bool is_symmetric_,
         bool high_order_
     >
-    class PseudoLaplacian_Kernel_NF : public BASE
+    class PseudoLaplacian_Kernel_VF : public BASE
     {
     private:
         
@@ -33,7 +33,6 @@ namespace Repulsor
         using Values_T           = typename Base_T::Values_T;
         using ValueContainer_T   = typename Base_T::ValueContainer_T;
 
-        
         using Base_T::AMB_DIM;
         using Base_T::PROJ_DIM;
         using Base_T::S_DOM_DIM;
@@ -54,39 +53,37 @@ namespace Repulsor
         
         using Base_T::S;
         using Base_T::T;
-//        using Base_T::S_Tree;
-//        using Base_T::T_Tree;
         
         using Base_T::zero;
         using Base_T::one;
         using Base_T::two;
         using Base_T::is_symmetric;
         
-        
-#include "../FMM/FMM_Kernel_Common.hpp"
-        
     public:
         
-        PseudoLaplacian_Kernel_NF() = delete;
+        PseudoLaplacian_Kernel_VF() = delete;
         
-        PseudoLaplacian_Kernel_NF( Configurator_T & conf, const Real s_ )
-        :   Base_T ( conf                            )
+        PseudoLaplacian_Kernel_VF(
+            Configurator_T & conf,
+            const Real theta_, const Int max_level_, const Real s_
+        )
+        :   Base_T ( conf, theta_, max_level_        )
         ,   s      ( s_                              )
         ,   s_exp  ( -S_DOM_DIM/two - (s-high_order) )
         {}
         
-        PseudoLaplacian_Kernel_NF( PseudoLaplacian_Kernel_NF & other )
+        PseudoLaplacian_Kernel_VF( PseudoLaplacian_Kernel_VF & other )
         :   Base_T (other       )
         ,   s      (other.s     )
         ,   s_exp  (other.s_exp )
         {}
         
-        ~PseudoLaplacian_Kernel_NF() = default;
+        ~PseudoLaplacian_Kernel_VF() = default;
         
     protected:
         
         using Base_T::metric_data;
-
+        
         using Base_T::S_diag;
         using Base_T::T_diag;
         
@@ -95,76 +92,126 @@ namespace Repulsor
         
         using Base_T::a;
         using Base_T::x;
+        using Base_T::x_buffer;
         using Base_T::P;
         
         using Base_T::b;
         using Base_T::y;
+        using Base_T::y_buffer;
         using Base_T::Q;
         
         using Base_T::lin_k;
         
-        using Base_T::S_scale;
-        using Base_T::T_scale;
+        using Base_T::S_Tree;
+        using Base_T::T_Tree;
+        
+        using Base_T::lambda;
+        using Base_T::mu;
         
         const Real s;
         const Real s_exp;
         
-        Real ii_block [BLOCK_NNZ]  = {};
-        Real jj_block [BLOCK_NNZ]  = {};
+        Real ij_block [BLOCK_NNZ] = {};
+        Real ii_block [BLOCK_NNZ] = {};
+        Real jj_block [BLOCK_NNZ] = {};
         
-    public:
+#include "../../FMM/FMM_Kernel_Common.hpp"
+// Now load the actual Compute method.
+#include "../../FMM/FMM_Kernel_VF_Common.hpp"
         
         
-        force_inline Real Compute( const LInt k_global )
+    protected:
+        
+        force_inline Real compute()
         {
-            Real v [AMB_DIM ] = {};
+            Real x    [AMB_DIM]  = {};
+            Real y    [AMB_DIM]  = {};
+            Real v    [AMB_DIM]  = {};
             
             Real r2 = zero;
             
-            for( Int l = 0; l < AMB_DIM; ++l )
+            const Real w = S_Tree.Weight() * T_Tree.Weight();
+            
+            for( Int i = 0; i < AMB_DIM; ++i )
             {
-                v[l] = y[l] - x[l];
-                r2  += v[l] * v[l];
-            }
+                x[i] = lambda[0] * x_buffer[AMB_DIM*0 +i];
+                y[i] = mu    [0] * y_buffer[AMB_DIM*0 +i];
 
-            const Real val = MyMath::pow(r2, s_exp);
+                for( Int ii = 1; ii < S_DOM_DIM+1; ++ii )
+                {
+                    x[i] += lambda[ii] * x_buffer[AMB_DIM*ii +i];
+                }
+                
+                for( Int ii = 1; ii < T_DOM_DIM+1; ++ii )
+                {
+                    y[i] += mu    [ii] * y_buffer[AMB_DIM*ii +i];
+                }
+                
+                v[i] = y[i] - x[i];
+                r2  += v[i] * v[i];
+            }
+            
+            const Real val = - w * MyMath::pow(r2, s_exp);
             
             const Real b_over_a = b/a;
             const Real a_over_b = a/b;
             
-            metric_data[BLOCK_NNZ * k_global] = val;
-            ii_block[0] -=   b_over_a * val;
-            jj_block[0]  = - a_over_b * val;
+            ij_block[0] += val;
+            ii_block[0] -= b_over_a * val;
+            jj_block[0] -= a_over_b * val;
             
             return 0;
         }
         
         
+    public:
+        
         force_inline void LoadS( const Int i_global )
         {
             this->loadS( i_global );
+            
+            if constexpr ( metric_flag )
+            {
+                zerofy_buffer( &ii_block[0], DIAG_NNZ );
+            }
         }
         
         force_inline void WriteS( const Int i_global )
         {
             this->writeS( i_global );
             
-            S_diag[DIAG_NNZ * i_global] += ii_block[0];
+            if constexpr ( metric_flag )
+            {
+                add_to_buffer<DIAG_NNZ>( &ii_block[0], &S_diag[DIAG_NNZ * i_global] );
+            }
         }
         
         force_inline void LoadT( const Int j_global )
         {
             this->loadT( j_global );
-        }
-
-        force_inline void WriteT( const Int j_global )
-        {
-            T_diag[DIAG_NNZ * j_global] += jj_block[0];
+            
+            if constexpr ( metric_flag )
+            {
+                zerofy_buffer( &ij_block[0], BLOCK_NNZ );
+                
+                zerofy_buffer( &jj_block[0], DIAG_NNZ );
+            }
         }
         
-        std::string className() const
+        force_inline void WriteT( const Int j_global )
         {
-            return "PseudoLaplacian_Kernel_NF<"
+            this->writeT( j_global );
+            
+            if constexpr ( metric_flag )
+            {
+                add_to_buffer<DIAG_NNZ>( &jj_block[0], &T_diag[DIAG_NNZ * j_global] );
+            }
+        }
+        
+        
+        std::string ClassName() const
+        {
+            return "PseudoLaplacian_Kernel_VF<"
             + ToString(S_DOM_DIM) + ","
             + ToString(T_DOM_DIM) + ","
             + this->GetS().ClassName() + ","
@@ -177,4 +224,3 @@ namespace Repulsor
 } // namespace Repulsor
 
 #undef BASE
-
