@@ -1,5 +1,10 @@
 #pragma once
 
+#define BASE FMM_Kernel_VF<                                                     \
+        S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,is_symmetric_,                     \
+        energy_flag_,diff_flag_,metric_flag_                                    \
+    >
+
 namespace Repulsor
 {
     template<
@@ -9,11 +14,11 @@ namespace Repulsor
         bool is_symmetric_,
         bool energy_flag_, bool diff_flag_, bool metric_flag_
     >
-    class TP0_Kernel_VF : public FMM_Kernel_VF<S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,metric_flag_>
+    class TP0_Kernel_VF : public BASE
     {
     private:
         
-        using Base_T = FMM_Kernel_VF<S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,metric_flag_>;
+        using Base_T = BASE;
         
     public:
         
@@ -338,7 +343,7 @@ namespace Repulsor
             
             if constexpr ( metric_flag )
             {
-                zerofy_buffer( &ii_block[0], DIAG_NNZ );
+                ii_block[0] = 0;
             }
         }
         
@@ -348,7 +353,7 @@ namespace Repulsor
             
             if constexpr ( metric_flag )
             {
-                add_to_buffer<DIAG_NNZ>( &ii_block[0], &S_diag[DIAG_NNZ * i_global] );
+                S_diag[DIAG_NNZ * i_global] += ii_block[0];
             }
         }
         
@@ -358,20 +363,14 @@ namespace Repulsor
             
             if constexpr ( metric_flag )
             {
-                zerofy_buffer( &ij_block[0], BLOCK_NNZ );
-                
-                zerofy_buffer( &jj_block[0], DIAG_NNZ );
             }
         }
 
-        
         force_inline void WriteT( const Int j_global )
         {
-            this->writeT( j_global );
-            
             if constexpr ( metric_flag )
             {
-                add_to_buffer<DIAG_NNZ>( &jj_block[0], &T_diag[DIAG_NNZ * j_global] );
+                T_diag[DIAG_NNZ * j_global] += jj_block[0];
             }
         }
         
@@ -393,4 +392,4 @@ namespace Repulsor
 
 } // namespace Repulsor
 
-
+#undef BASE

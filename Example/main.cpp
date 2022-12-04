@@ -218,12 +218,15 @@ int main(int argc, const char * argv[])
     
     TangentPointEnergy0_Factory<Mesh_T,2,2,3,3> TPE0_factory;
     TangentPointMetric0_Factory<Mesh_T,2,2,3,3> TPM0_factory;
+    PseudoLaplacian_Factory    <Mesh_T,2,2,3,3> Prec_factory;
     
     std::unique_ptr<Energy_T> tpe0_ptr = TPE0_factory.Make( dom_dim, amb_dim, q, p );
     std::unique_ptr<Metric_T> tpm0_ptr = TPM0_factory.Make( dom_dim, amb_dim, q, p );
+    std::unique_ptr<Metric_T> prec_ptr = Prec_factory.Make( dom_dim, amb_dim, (p - 2)/q );
     
     const auto & tpe0 = *tpe0_ptr;
     const auto & tpm0 = *tpm0_ptr;
+    const auto & prec = *prec_ptr;
     
     dump(tpe0.Value(M));
     
@@ -241,6 +244,11 @@ int main(int argc, const char * argv[])
     
     dump(X.MaxNorm());
     dump(Y.MaxNorm());
+    
+    tic("prec.MetricValues(M)");
+    prec.MetricValues(M);
+    toc("prec.MetricValues(M)");
+    
     
     print("");
     print("Testing remesher.");

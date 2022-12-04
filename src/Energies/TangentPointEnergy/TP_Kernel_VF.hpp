@@ -1,5 +1,10 @@
 #pragma once
 
+#define BASE FMM_Kernel_VF<                                             \
+        S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,is_symmetric_,             \
+        energy_flag_,diff_flag_,metric_flag_                            \
+    >
+
 namespace Repulsor
 {
     template<
@@ -9,11 +14,11 @@ namespace Repulsor
         bool is_symmetric_,
         bool energy_flag_, bool diff_flag_, bool metric_flag_
     >
-    class TP_Kernel_VF : public FMM_Kernel_VF<S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,metric_flag_>
+    class TP_Kernel_VF : public BASE
     {
     private:
         
-        using Base_T = FMM_Kernel_VF<S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,metric_flag_>;
+        using Base_T = BASE;
         
     public:
         
@@ -452,4 +457,4 @@ namespace Repulsor
 
 } // namespace Repulsor
 
-
+#undef BASE

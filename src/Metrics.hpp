@@ -4,6 +4,7 @@
 
 #include "Metrics/TangentPointMetric0.hpp"
 
+#include "Metrics/PseudoLaplacian.hpp"
 
 //#include "Metrics/Metric__NFK.hpp"
 //#include "Metrics/Metric__NFK_Adaptive.hpp"

@@ -1,6 +1,5 @@
 #pragma once
 
-
 #define BASE BlockKernel_fixed<                                             \
         AMB_DIM_+1,AMB_DIM_+1,MAX_RHS_COUNT_, true,                         \
         Scalar_, Scalar_in_, Scalar_out_, Int_, LInt_,                      \
