@@ -30,19 +30,34 @@ namespace Repulsor
         
         ValueContainer_T & MetricValues( const MeshBase_T & M ) const override
         {
-            ptic(ClassName()+"::MetricValues");
-            if( !M.IsCached(ClassName()+"::MetricValues"))
+            std::string tag ( ClassName()+"::MetricValues" );
+            
+            // DEBUGGING
+            dump(tag);
+            dump(M.CacheKeys());
+            
+            ptic(tag);
+            if( !M.IsCached(tag))
             {
+                // DEBUGGER
+                print("compute_metric");
                 std::any thing ( std::move(compute_metric(M)) );
                 
-                M.SetCache( ClassName()+"::MetricValues", thing );
+                M.SetCache( tag, thing );
             }
-
-            ptoc(ClassName()+"::MetricValues");
-
-            auto & result = std::any_cast<ValueContainer_T &>(
-                  M.GetCache(ClassName()+"::MetricValues")
-            );
+            
+            auto & result = std::any_cast<ValueContainer_T &>( M.GetCache(tag) );
+            
+            // DEBUGGING
+            std::stringstream s;
+            for( auto & p : result )
+            {
+                s << p.first << " ";
+            }
+            
+            dump(s.str());
+            
+            ptoc(tag);
             
             return result;
         }
@@ -61,7 +76,7 @@ namespace Repulsor
             }
             else
             {
-                eprint(ClassName()+"::differential: Input could not be downcast to compatible type. Doing nothing.");
+                eprint(ClassName()+"::compute_metric: Input could not be downcast to compatible type. Doing nothing.");
                 
                 return ValueContainer_T();
             }
@@ -103,7 +118,7 @@ namespace Repulsor
             }
             else
             {
-                eprint(ClassName()+"::multiply_metric: Input could not be downcast to compatible type. Doing nothing.");
+                eprint(ClassName()+"::MultiplyMetric: Input could not be downcast to compatible type. Doing nothing.");
             }
 
             S.Post( Y, alpha, beta, op_type );

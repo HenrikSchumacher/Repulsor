@@ -1,11 +1,9 @@
 #pragma once
 
-#define CLASS FMM_Configurator
-
 namespace Repulsor
 {
     template<typename ClusterTree_T_>
-    class alignas( OBJECT_ALIGNMENT ) CLASS
+    class alignas( OBJECT_ALIGNMENT ) FMM_Configurator
     {
     public:
         
@@ -23,22 +21,22 @@ namespace Repulsor
         
     public:
 
-        CLASS() = delete;
+        FMM_Configurator() = delete;
         
-        CLASS( const ClusterTree_T & S_, const ClusterTree_T & T_, ValueContainer_T & metric_values_ )
+        FMM_Configurator( const ClusterTree_T & S_, const ClusterTree_T & T_, ValueContainer_T & metric_values_ )
         :   S             ( S_             )
         ,   T             ( T_             )
         ,   metric_values ( metric_values_ )
         {}
         
         // Copy constructor
-        CLASS( const CLASS & other )
+        FMM_Configurator( const FMM_Configurator & other )
         :   S             ( other.S             )
         ,   T             ( other.T             )
         ,   metric_values ( other.metric_values )
         {}
         
-        ~CLASS() = default;
+        ~FMM_Configurator() = default;
 
     protected:
 
@@ -68,12 +66,10 @@ namespace Repulsor
         
         std::string ClassName() const
         {
-            return TO_STD_STRING(CLASS)+"<"+S.ClassName()+">";
+            return "FMM_Configurator<"+S.ClassName()+">";
         }
 
     };
 
 } // namespace Repulsor
-
-#undef CLASS
 

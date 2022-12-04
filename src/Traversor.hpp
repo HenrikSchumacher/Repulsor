@@ -44,7 +44,7 @@ namespace Repulsor
             }
         } // Constructor
         
-        virtual ~Traversor() = default;
+        ~Traversor() = default;
         
     protected:
 

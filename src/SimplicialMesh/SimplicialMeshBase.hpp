@@ -198,6 +198,17 @@ namespace Repulsor
             }
         }
         
+        std::string CacheKeys() const
+        {
+            std::stringstream s;
+            
+            for( auto & p : cache )
+            {
+                s << p.first << " ";
+            }
+            return s.str();
+        }
+        
         void ClearCache() const
         {
             cache = std::unordered_map<std::string,std::any>();

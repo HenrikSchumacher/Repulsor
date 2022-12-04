@@ -1,11 +1,5 @@
 #pragma once
 
-#define CLASS TP_Kernel_NF
-#define BASE FMM_Kernel_NF<                                  \
-    S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,is_symmetric_,      \
-    energy_flag_,diff_flag_,metric_flag_                     \
->
-
 namespace Repulsor
 {
     template<
@@ -15,51 +9,59 @@ namespace Repulsor
         bool is_symmetric_,
         bool energy_flag_, bool diff_flag_, bool metric_flag_
     >
-    class CLASS : public BASE
+    class TP_Kernel_NF : public FMM_Kernel_NF<
+            S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,is_symmetric_,
+            energy_flag_,diff_flag_,metric_flag_
+        >
     {
     public:
         
+        using Base_T = FMM_Kernel_NF<
+            S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,is_symmetric_,
+            energy_flag_,diff_flag_,metric_flag_
+        >;
+        
         using ClusterTree_T      = ClusterTree_T_;
         
-        using Real               = typename BASE::Real;
-        using SReal              = typename BASE::SReal;
-        using ExtReal            = typename BASE::ExtReal;
-        using Int                = typename BASE::Int;
-        using LInt               = typename BASE::LInt;
+        using Real               = typename Base_T::Real;
+        using SReal              = typename Base_T::SReal;
+        using ExtReal            = typename Base_T::ExtReal;
+        using Int                = typename Base_T::Int;
+        using LInt               = typename Base_T::LInt;
         
-        using Configurator_T     = typename BASE::Configurator_T;
-        using Values_T           = typename BASE::Values_T;
-        using ValueContainer_T   = typename BASE::ValueContainer_T;
+        using Configurator_T     = typename Base_T::Configurator_T;
+        using Values_T           = typename Base_T::Values_T;
+        using ValueContainer_T   = typename Base_T::ValueContainer_T;
 
         
-        using BASE::AMB_DIM;
-        using BASE::PROJ_DIM;
-        using BASE::S_DOM_DIM;
-        using BASE::T_DOM_DIM;
-        using BASE::S_COORD_DIM;
-        using BASE::T_COORD_DIM;
-        using BASE::T_DATA_DIM;
-        using BASE::S_DATA_DIM;
-        using BASE::energy_flag;
-        using BASE::diff_flag;
-        using BASE::metric_flag;
+        using Base_T::AMB_DIM;
+        using Base_T::PROJ_DIM;
+        using Base_T::S_DOM_DIM;
+        using Base_T::T_DOM_DIM;
+        using Base_T::S_COORD_DIM;
+        using Base_T::T_COORD_DIM;
+        using Base_T::T_DATA_DIM;
+        using Base_T::S_DATA_DIM;
+        using Base_T::energy_flag;
+        using Base_T::diff_flag;
+        using Base_T::metric_flag;
         
         static constexpr Int ROWS      = 1 + AMB_DIM;
         static constexpr Int COLS      = 1 + AMB_DIM;
         static constexpr Int BLOCK_NNZ = 1 + 2 * AMB_DIM;
         static constexpr Int DIAG_NNZ  = ROWS * COLS;
         
-        using BASE::zero;
-        using BASE::one;
-        using BASE::two;
-        using BASE::is_symmetric;
+        using Base_T::zero;
+        using Base_T::one;
+        using Base_T::two;
+        using Base_T::is_symmetric;
         
     public:
         
-        CLASS() = delete;
+        TP_Kernel_NF() = delete;
         
-        CLASS( Configurator_T & conf, const T1 q_half_, const T2 p_half_ )
-        :   BASE                 (conf       )
+        TP_Kernel_NF( Configurator_T & conf, const T1 q_half_, const T2 p_half_ )
+        :   Base_T               (conf       )
         ,   q                    (two*q_half_)
         ,   q_half               (q_half_    )
         ,   q_half_minus_1       (q_half-1   )
@@ -69,8 +71,8 @@ namespace Repulsor
         ,   minus_p_half_minus_1 (-p_half-1  )
         {}
         
-        CLASS( const CLASS & other )
-        :   BASE                 (other                     )
+        TP_Kernel_NF( TP_Kernel_NF & other )
+        :   Base_T               (other                     )
         ,   q                    (other.q                   )
         ,   q_half               (other.q_half              )
         ,   q_half_minus_1       (other.q_half_minus_1      )
@@ -80,40 +82,32 @@ namespace Repulsor
         ,   minus_p_half_minus_1 (other.minus_p_half_minus_1)
         {}
         
-        ~CLASS() = default;
+        ~TP_Kernel_NF() = default;
         
 #include "../../FMM/FMM_Kernel_Common.hpp"
         
     protected:
         
-        using BASE::metric_data;
-        
-        using BASE::S_data;
-        using BASE::S_D_data;
-        
-        using BASE::T_data;
-        using BASE::T_D_data;
+        using Base_T::metric_data;
 
-        using BASE::S_diag;
-        using BASE::T_diag;
+        using Base_T::S_diag;
+        using Base_T::T_diag;
         
-        using BASE::DX;
-        using BASE::DY;
+        using Base_T::DX;
+        using Base_T::DY;
         
-        using BASE::a;
-        using BASE::x;
-        using BASE::P;
+        using Base_T::a;
+        using Base_T::x;
+        using Base_T::P;
         
-        using BASE::b;
-        using BASE::y;
-        using BASE::Q;
+        using Base_T::b;
+        using Base_T::y;
+        using Base_T::Q;
         
-        using BASE::tri_i;
-        using BASE::tri_j;
-        using BASE::lin_k;
+        using Base_T::lin_k;
         
-        using BASE::S_scale;
-        using BASE::T_scale;
+        using Base_T::S_scale;
+        using Base_T::T_scale;
         
         const Real q;
         const T1   q_half;
@@ -377,7 +371,7 @@ namespace Repulsor
 
         std::string ClassName() const
         {
-            return TO_STD_STRING(CLASS)+"<"
+            return "TP_Kernel_NF<"
             + ToString(S_DOM_DIM) + ","
             + ToString(T_DOM_DIM) + ","
             + this->S.ClassName() + ","
@@ -388,10 +382,8 @@ namespace Repulsor
             + ToString(metric_flag) + ","
             ">";
         }
-    };
+        
+    }; // class TP_Kernel_NF
 
 } // namespace Repulsor
-
-#undef BASE
-#undef CLASS
 

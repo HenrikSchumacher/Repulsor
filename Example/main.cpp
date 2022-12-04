@@ -212,6 +212,18 @@ int main(int argc, const char * argv[])
     print("");
     
     
+    TangentPointEnergy0_Factory<Mesh_T,2,2,3,3> TPE0_factory;
+    
+    std::unique_ptr<Energy_T> tpe0_ptr = TPE0_factory.Make( dom_dim, amb_dim, q, p );
+    
+    const auto & tpe0 = *tpe0_ptr;
+    
+    dump(tpe0.Value(M));
+    
+    
+    print("");
+    print("Testing remesher.");
+    
     std::unique_ptr<Mesh_T::Remesher_T> R = M_ptr->CreateRemesher();
     
     Tensor1<INT,INT> edges (3);

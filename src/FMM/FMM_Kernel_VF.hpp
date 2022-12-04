@@ -1,8 +1,5 @@
 #pragma once
 
-#define CLASS FMM_Kernel_VF
-
-#define BASE  FMM_Kernel<ClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,metric_flag_>
 
 namespace Repulsor
 {
@@ -12,32 +9,34 @@ namespace Repulsor
         bool is_symmetric_,
         bool energy_flag_, bool diff_flag_, bool metric_flag_
     >
-    class CLASS : public BASE
+    class FMM_Kernel_VF : public FMM_Kernel<ClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,metric_flag_>
     {
     public:
         
+        using Base_T = FMM_Kernel<ClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,metric_flag_>;
+        
         using ClusterTree_T      = ClusterTree_T_;
-        using Real               = typename BASE::Real;
-        using SReal              = typename BASE::SReal;
-        using ExtReal            = typename BASE::ExtReal;
-        using Int                = typename BASE::Int;
-        using LInt               = typename BASE::LInt;
+        using Real               = typename Base_T::Real;
+        using SReal              = typename Base_T::SReal;
+        using ExtReal            = typename Base_T::ExtReal;
+        using Int                = typename Base_T::Int;
+        using LInt               = typename Base_T::LInt;
         
-        using Configurator_T     = typename BASE::Configurator_T;
-        using Values_T           = typename BASE::Values_T;
-        using ValueContainer_T   = typename BASE::ValueContainer_T;
+        using Configurator_T     = typename Base_T::Configurator_T;
+        using Values_T           = typename Base_T::Values_T;
+        using ValueContainer_T   = typename Base_T::ValueContainer_T;
         
         
         
-        using BASE::AMB_DIM;
-        using BASE::PROJ_DIM;
-        using BASE::symmetry_factor;
-        using BASE::is_symmetric;
-        using BASE::energy_flag;
-        using BASE::diff_flag;
-        using BASE::metric_flag;
-        using BASE::GetS;
-        using BASE::GetT;
+        using Base_T::AMB_DIM;
+        using Base_T::PROJ_DIM;
+        using Base_T::symmetry_factor;
+        using Base_T::is_symmetric;
+        using Base_T::energy_flag;
+        using Base_T::diff_flag;
+        using Base_T::metric_flag;
+        using Base_T::GetS;
+        using Base_T::GetT;
         
         static constexpr Int S_DOM_DIM = S_DOM_DIM_;
         static constexpr Int T_DOM_DIM = T_DOM_DIM_;
@@ -100,9 +99,9 @@ namespace Repulsor
         mutable Real const * restrict y_buffer  = nullptr;
 #endif
         
-        using BASE::tri_i;
-        using BASE::tri_j;
-        using BASE::lin_k;
+        using Base_T::tri_i;
+        using Base_T::tri_j;
+        using Base_T::lin_k;
 
         
         mutable S_Tree_T S_Tree;
@@ -134,10 +133,10 @@ namespace Repulsor
         
     public:
         
-        CLASS() = default;
+        FMM_Kernel_VF() = default;
         
-        CLASS( Configurator_T & conf, const Real theta_, const Int  max_level_ = 20 )
-        :   BASE        ( conf                                                              )
+        FMM_Kernel_VF( Configurator_T & conf, const Real theta_, const Int  max_level_ = 20 )
+        :   Base_T      ( conf                                                              )
         ,   S_data      ( GetS().PrimitiveNearFieldData().data()                            )
         ,   S_D_data    ( GetS().ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
         ,   S_diag      ( GetS().VF_Accumulator().data(               omp_get_thread_num()) )
@@ -161,8 +160,8 @@ namespace Repulsor
             }
         }
         
-        CLASS( const CLASS & other )
-        :   BASE        ( other                                                                   )
+        FMM_Kernel_VF( FMM_Kernel_VF & other )
+        :   Base_T        ( other                                                                   )
         ,   metric_data ( other.OffDiag().data()                                                  )
         ,   S_data      ( other.S_data                                                            )
         ,   S_D_data    ( other.GetS().ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
@@ -177,7 +176,7 @@ namespace Repulsor
         ,   max_level   ( other.max_level                                                         )
         {}
         
-        ~CLASS()
+        ~FMM_Kernel_VF()
         {
 //#ifdef REPULSOR__PRINT_REPORTS_FOR_ADAPTIVE_KERNELS
 //            logfile
@@ -284,12 +283,22 @@ namespace Repulsor
         
     public:
         
-        Values_T & OffDiag() const
+        Values_T & OffDiag()
         {
             return this->metric_values["VF"];
         }
         
-        Values_T & Diag() const
+        const Values_T & OffDiag() const
+        {
+            return this->metric_values["VF"];
+        }
+        
+        Values_T & Diag()
+        {
+            return this->metric_values["VF_diag"];
+        }
+        
+        const Values_T & Diag() const
         {
             return this->metric_values["VF_diag"];
         }
@@ -331,7 +340,7 @@ namespace Repulsor
         
         std::string ClassName() const
         {
-            return TO_STD_STRING(CLASS)+"<"
+            return "FMM_Kernel_VF<"
             + ToString(S_DOM_DIM) + ","
             + ToString(T_DOM_DIM) + ","
             + GetS().ClassName() + ","
@@ -344,7 +353,4 @@ namespace Repulsor
     };
 
 } // namespace Repulsor
-
-#undef BASE
-#undef CLASS
 

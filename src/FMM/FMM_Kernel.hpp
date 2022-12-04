@@ -1,7 +1,5 @@
 #pragma once
 
-#define CLASS FMM_Kernel
-
 namespace Repulsor
 {
     template<
@@ -9,7 +7,7 @@ namespace Repulsor
         bool is_symmetric_,
         bool energy_flag_, bool diff_flag_, bool metric_flag_
     >
-    class alignas( OBJECT_ALIGNMENT ) CLASS
+    class alignas( OBJECT_ALIGNMENT ) FMM_Kernel
     {
     public:
         
@@ -85,9 +83,9 @@ namespace Repulsor
         
     public:
 
-        CLASS() = delete;
+        FMM_Kernel() = delete;
         
-        explicit CLASS( Configurator_T & conf )
+        explicit FMM_Kernel( Configurator_T & conf )
         :   S             ( conf.GetS() )
         ,   T             ( conf.GetT() )
         ,   metric_values ( conf.MetricValues()        )   // In configure mode, kernels needs
@@ -95,7 +93,7 @@ namespace Repulsor
             Init();
         }
         
-        CLASS( const CLASS & other )
+        FMM_Kernel( const FMM_Kernel & other )
         :   S             ( other.S              )
         ,   T             ( other.T              )
         ,   metric_values ( other.metric_values  )
@@ -103,7 +101,7 @@ namespace Repulsor
             Init();
         }
         
-        ~CLASS() = default;
+        ~FMM_Kernel() = default;
 
     public:
         
@@ -133,11 +131,9 @@ namespace Repulsor
         
         std::string ClassName() const
         {
-            return TO_STD_STRING(CLASS)+"<"+S.ClassName()+">";
+            return "FMM_Kernel<"+S.ClassName()+">";
         }
 
     };
 
 } // namespace Repulsor
-
-#undef CLASS

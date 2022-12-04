@@ -1,7 +1,5 @@
 #pragma once
 
-#define CLASS AllPairs_Traversor
-
 // TODO: Handle symmetric/asymmetric cases correctly!
 
 namespace Repulsor
@@ -12,7 +10,7 @@ namespace Repulsor
     // Mostly intended to be used for comparison against FMM_Traversor.
     
     template<class Kernel_T>
-    class CLASS
+    class AllPairs_Traversor
     {
     public:
         
@@ -27,10 +25,10 @@ namespace Repulsor
         
         static constexpr bool is_symmetric = Kernel_T::is_symmetric;
         
-        CLASS() = default;
+        AllPairs_Traversor() = default;
         
         template<typename I0, typename I1>
-        CLASS( const I0 m_, const I1 n_, const Kernel_T & kernel_ )
+        AllPairs_Traversor( const I0 m_, const I1 n_, Kernel_T & kernel_ )
         :   m       ( m_      )
         ,   n       ( n_      )
         ,   kernel  ( kernel_ )
@@ -40,13 +38,13 @@ namespace Repulsor
         }
         
         // Copy constructor
-        CLASS( const CLASS & other )
+        AllPairs_Traversor( const AllPairs_Traversor & other )
         :   m       ( other.m      )
         ,   n       ( other.n      )
         ,   kernel  ( other.kernel )
         {}
 
-        ~CLASS() = default;
+        ~AllPairs_Traversor() = default;
         
     protected:
     
@@ -189,12 +187,10 @@ namespace Repulsor
         
         std::string ClassName() const
         {
-            return TO_STD_STRING(CLASS)+"<"+kernel.ClassName()+TypeName<LInt>::Get()+">";
+            return "AllPairs_Traversor<"+kernel.ClassName()+TypeName<LInt>::Get()+">";
         }
         
     };
     
 }// namespace Repulsor
-
-#undef CLASS
 

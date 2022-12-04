@@ -35,9 +35,6 @@ namespace Repulsor
         
         ~CLASS() = default;
         
-//        virtual ~CLASS() = default;
-        
-        
         
         friend void swap(CLASS &A, CLASS &B)
         {
@@ -75,33 +72,6 @@ namespace Repulsor
     protected:
         
         std::string tree_string;
-        
-    public:
-
-//        virtual void LoadClusterS( const Int i ) = 0;
-//        virtual void LoadClusterT( const Int j ) = 0;
-//
-//        virtual void LoadPrimitiveS( const Int i ) = 0;
-//        virtual void LoadPrimitiveT( const Int j ) = 0;
-//
-//        virtual bool IsAdmissable() = 0;
-//
-//        virtual SReal ClusterScoreS() = 0;
-//        virtual SReal ClusterScoreT() = 0;
-//
-//        virtual void ComputeLeafDiagonal() = 0;
-//        virtual void ComputeLeaf() = 0;
-//        virtual void ComputeLeafSwapped() = 0;
-//
-//        virtual void ComputeAdmissable() = 0;
-//        virtual void ComputeAdmissableSwapped() = 0;
-        
-//    protected:
-//
-//        virtual std::string ClassName() const
-//        {
-//            return className();
-//        }
         
     private:
         

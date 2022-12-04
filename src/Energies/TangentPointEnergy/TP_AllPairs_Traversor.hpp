@@ -1,7 +1,5 @@
 #pragma once
 
-#define CLASS TP_AllPairs_Traversor
-
 namespace Repulsor
 {
     using namespace FMM;
@@ -12,7 +10,7 @@ namespace Repulsor
         bool is_symmetric_,
         bool energy_flag, bool diff_flag, bool metric_flag
     >
-    class CLASS
+    class TP_AllPairs_Traversor
     {
     public:
         
@@ -82,9 +80,9 @@ namespace Repulsor
     
     public:
         
-        CLASS() = delete;
+        TP_AllPairs_Traversor() = delete;
         
-        CLASS(
+        TP_AllPairs_Traversor(
               const ClusterTree_T & S_,
               const ClusterTree_T & T_,
               ValueContainer_T & metric_values_,
@@ -105,7 +103,7 @@ namespace Repulsor
         ,   p_half_is_int ( p_half_real == static_cast<Real>(p_half_int) )
         {}
 
-        ~CLASS() = default;
+        ~TP_AllPairs_Traversor() = default;
         
 
     protected:
@@ -326,7 +324,7 @@ namespace Repulsor
         
         std::string ClassName() const
         {
-            return TO_STD_STRING(CLASS)+"<"
+            return "TP_AllPairs_Traversor<"
                 + ToString(S_DOM_DIM)   + ","
                 + ToString(T_DOM_DIM)   + ","
                 + S.ClassName()       + ","
@@ -335,9 +333,7 @@ namespace Repulsor
                 + ToString(metric_flag) +
                 + ">";
         }
-    };
+        
+    }; // class TP_AllPairs_Traversor
     
 }// namespace Repulsor
-
-#undef CLASS
-

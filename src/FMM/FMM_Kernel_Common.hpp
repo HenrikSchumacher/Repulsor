@@ -5,15 +5,22 @@ public:
         return BLOCK_NNZ;
     }
 
-    void Allocate( const LInt nnz ) const
+    void Allocate( const LInt nnz )
     {
         if constexpr ( metric_flag )
         {
+            //DEBUGGER
+            print(this->ClassName()+"::Allocate");
+            dump(this->OffDiag().Dimension(0));
+            dump(this->OffDiag().Dimension(1));
+            dump(nnz);
+            dump(BLOCK_NNZ);
+            
             if(
                this->OffDiag().Dimension(0) != nnz
                ||
                this->OffDiag().Dimension(1) != BLOCK_NNZ
-               )
+            )
             {
                 this->OffDiag() = Values_T( nnz, BLOCK_NNZ );
             }

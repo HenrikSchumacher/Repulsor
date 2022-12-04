@@ -1,7 +1,5 @@
 #pragma once
 
-#define CLASS FMM_Traversor
-
 // TODO: Handle symmetric/asymmetric cases correctly!
 
 namespace Repulsor
@@ -12,7 +10,7 @@ namespace Repulsor
     // Mostly intended to be used with the results of BlockClusterTree's GetMatrix<...>() routine the verynear/near/far block matrices.
     
     template<class Pattern_T, class Kernel_T>
-    class CLASS
+    class FMM_Traversor
     {
     public:
         
@@ -27,21 +25,20 @@ namespace Repulsor
         
         static constexpr bool is_symmetric = Kernel_T::is_symmetric;
         
-        CLASS() = delete;
+        FMM_Traversor() = delete;
         
-        CLASS( const Pattern_T & pattern_, const Kernel_T & kernel_ )
-        :   pattern ( pattern_  )
-        ,   kernel  ( kernel_   )
-        {
-        }
+        FMM_Traversor( const Pattern_T & pattern_, Kernel_T & kernel_ )
+        :   pattern ( pattern_ )
+        ,   kernel  ( kernel_  )
+        {}
         
         // Copy constructor
-        CLASS( const CLASS & other )
+        FMM_Traversor( const FMM_Traversor & other )
         :   pattern ( other.pattern )
         ,   kernel  ( other.kernel  )
         {}
 
-        ~CLASS() = default;
+        ~FMM_Traversor() = default;
         
     protected:
     
@@ -230,12 +227,10 @@ namespace Repulsor
         
         std::string ClassName() const
         {
-            return TO_STD_STRING(CLASS)+"<"+kernel.ClassName()+TypeName<LInt>::Get()+">";
+            return "FMM_Traversor<"+kernel.ClassName()+TypeName<LInt>::Get()+">";
         }
         
-    };
+    }; // class FMM_Traversor
     
 }// namespace Repulsor
-
-#undef CLASS
 
