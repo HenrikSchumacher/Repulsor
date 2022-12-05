@@ -295,37 +295,6 @@ namespace Repulsor
 //    |   - K_yx * v[2]   K_yx * v[2] * v[0]  K_yx * v[2] * v[1]  K_yx * v[2] * v[2]    |
 //    \                                                                                 /
 //
-//
-//                    const Real w_K_sym = w_K_xy + w_K_yx;
-//
-//                    ij_block[0]    -= w_K_sym;
-//                    ii_block[0][0] += w_K_sym;
-//                    jj_block[0][0] += w_K_sym;
-//
-//                    for( Int l = 0; l < AMB_DIM; ++l )
-//                    {
-//                        const Real w_K_xy_v = w_K_xy * v[l];
-//                        const Real w_K_yx_v = w_K_yx * v[l];
-//
-//                        ij_block[1+l]         += w_K_yx_v;
-//                        ij_block[1+AMB_DIM+l] -= w_K_xy_v;
-//
-//                        // store only upper triangle
-//                        ii_block[0][1+l] +=   w_K_xy_v;
-//                        jj_block[0][1+l] -=   w_K_yx_v;
-//                    }
-//
-//                    // store only upper triangle
-//                    for( Int i = 1; i < ROWS; ++i )
-//                    {
-//                        for( Int j = i; j < COLS; ++j )
-//                        {
-//                            const Real vv = v[i-1] * v[j-1];
-//
-//                            ii_block[i][j] += w_K_xy * vv;
-//                            jj_block[i][j] += w_K_yx * vv;
-//                        }
-//                    }
 */
                     
                     const Real w_K_sym = w_K_xy + w_K_yx;
@@ -402,7 +371,7 @@ namespace Repulsor
             
             if constexpr ( metric_flag )
             {
-                zerofy_buffer( &ii_block[0][0], DIAG_NNZ );
+                zerofy_buffer<DIAG_NNZ>( &ii_block[0][0] );
             }
         }
         
@@ -422,9 +391,9 @@ namespace Repulsor
             
             if constexpr ( metric_flag )
             {
-                zerofy_buffer( &ij_block[0], BLOCK_NNZ );
+                zerofy_buffer<BLOCK_NNZ>( &ij_block[0] );
                 
-                zerofy_buffer( &jj_block[0][0], DIAG_NNZ );
+                zerofy_buffer<DIAG_NNZ>( &jj_block[0][0] );
             }
         }
 

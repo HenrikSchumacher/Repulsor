@@ -172,7 +172,7 @@ namespace Repulsor
             
             if constexpr ( metric_flag )
             {
-                zerofy_buffer( &ii_block[0], DIAG_NNZ );
+                zerofy_buffer<DIAG_NNZ>( &ii_block[0] );
             }
         }
         
@@ -192,9 +192,9 @@ namespace Repulsor
             
             if constexpr ( metric_flag )
             {
-                zerofy_buffer( &ij_block[0], BLOCK_NNZ );
+                zerofy_buffer<BLOCK_NNZ>( &ij_block[0] );
                 
-                zerofy_buffer( &jj_block[0], DIAG_NNZ );
+                zerofy_buffer<DIAG_NNZ>( &jj_block[0] );
             }
         }
         

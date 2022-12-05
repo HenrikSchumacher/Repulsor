@@ -154,8 +154,8 @@ namespace Repulsor
 
             a = X[0];
 #ifdef FarField_S_Copy
-            copy_buffer( &X[1],         &x[0], AMB_DIM  );
-            copy_buffer( &X[1+AMB_DIM], &P[0], PROJ_DIM );
+            copy_buffer<AMB_DIM >( &X[1],         &x[0] );
+            copy_buffer<PROJ_DIM>( &X[1+AMB_DIM], &P[0] );
 #else
             x = &X[1];
             P = &X[1 + AMB_DIM];
@@ -163,7 +163,7 @@ namespace Repulsor
             
             if constexpr ( diff_flag )
             {
-                zerofy_buffer( &DX[0], S_DATA_DIM );
+                zerofy_buffer<S_DATA_DIM>( &DX[0] );
             }
         }
         
@@ -173,15 +173,15 @@ namespace Repulsor
             
             b = Y[0];
 #ifdef FarField_T_Copy
-            copy_buffer( &Y[1],         &y[0], AMB_DIM  );
-            copy_buffer( &Y[1+AMB_DIM], &Q[0], PROJ_DIM );
+            copy_buffer<AMB_DIM >( &Y[1],         &y[0] );
+            copy_buffer<PROJ_DIM>( &Y[1+AMB_DIM], &Q[0] );
 #else
             y = &Y[1];
             Q = &Y[1 + AMB_DIM];
 #endif
             if constexpr ( diff_flag )
             {
-                zerofy_buffer( &DY[0], T_DATA_DIM );
+                zerofy_buffer<T_DATA_DIM>( &DY[0] );
             }
         }
             

@@ -216,43 +216,43 @@ namespace Repulsor
 
         force_inline void loadS( const Int i_global )
         {
-            const Real * const X  = &S_data[S_DATA_DIM * i_global];
+            const Real * const X = &S_data[S_DATA_DIM * i_global];
     
             S_Tree.RequireSimplex(S_ser, i_global);
             
             a = X[0];
         
 #ifdef NearField_S_Copy
-            copy_buffer( &X[1],             &x_buffer[0], S_COORD_DIM );
-            copy_buffer( &X[1+S_COORD_DIM], &P[0]       , PROJ_DIM   );
+            copy_buffer<S_COORD_DIM>( &X[1],             &x_buffer[0] );
+            copy_buffer<PROJ_DIM   >( &X[1+S_COORD_DIM], &P[0]        );
 #else
             x_buffer = &X[1];
             P        = &X[1+T_COORD_DIM];
 #endif
             if constexpr ( diff_flag )
             {
-                zerofy_buffer( &DX[0], S_DATA_DIM );
+                zerofy_buffer<S_DATA_DIM>( &DX[0] );
             }
         }
         
         force_inline void loadT( const Int j_global )
         {
-            const Real * const Y  = &T_data[T_DATA_DIM * j_global];
+            const Real * const Y = &T_data[T_DATA_DIM * j_global];
     
             T_Tree.RequireSimplex(T_ser, j_global);
             
             b = Y[0];
         
 #ifdef NearField_T_Copy
-            copy_buffer( &Y[1],             &y_buffer[0], T_COORD_DIM );
-            copy_buffer( &Y[1+T_COORD_DIM], &Q[0]       , PROJ_DIM   );
+            copy_buffer<T_COORD_DIM>( &Y[1],             &y_buffer[0] );
+            copy_buffer<PROJ_DIM   >( &Y[1+T_COORD_DIM], &Q[0]        );
 #else
             y_buffer = &Y[1];
             Q        = &Y[1+T_COORD_DIM];
 #endif
             if constexpr ( diff_flag )
             {
-                zerofy_buffer( &DY[0], T_DATA_DIM );
+                zerofy_buffer<T_DATA_DIM>( &DY[0] );
             }
         }
         

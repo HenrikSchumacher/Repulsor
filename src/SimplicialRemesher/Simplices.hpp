@@ -43,7 +43,7 @@ protected:
         
         S_active[s] = true;
         
-        copy_buffer( vertex_list, simplices.data(s), S_vertex_count );
+        copy_buffer<S_vertex_count>( vertex_list, simplices.data(s) );
 
         ComputeSimplexConnectivity(s);
 

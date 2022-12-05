@@ -162,7 +162,7 @@ namespace Repulsor
             a = X[0];
             
 #ifdef NearField_S_Copy
-            copy_buffer( &X[1+S_COORD_DIM], &P[0], PROJ_DIM );
+            copy_buffer<PROJ_DIM>( &X[1+S_COORD_DIM], &P[0] );
 #else
             P = &X[1+S_COORD_DIM];
 #endif
@@ -178,7 +178,7 @@ namespace Repulsor
             
             if constexpr ( diff_flag )
             {
-                zerofy_buffer( &DX[0], S_DATA_DIM );
+                zerofy_buffer<S_DATA_DIM>( &DX[0] );
             }
         }
         
@@ -189,7 +189,7 @@ namespace Repulsor
             b = Y[0];
             
 #ifdef NearField_T_Copy
-            copy_buffer( &Y[1+T_COORD_DIM], &Q[0], PROJ_DIM );
+            copy_buffer<PROJ_DIM>( &Y[1+T_COORD_DIM], &Q[0] );
 #else
             Q = &Y[1+S_COORD_DIM];
 #endif
@@ -205,7 +205,7 @@ namespace Repulsor
             
             if constexpr ( diff_flag )
             {
-                zerofy_buffer( &DY[0], T_DATA_DIM );
+                zerofy_buffer<T_DATA_DIM>( &DY[0] );
             }
         }
 

@@ -312,7 +312,7 @@ namespace Repulsor
                             jj_block[j][i]  = a_over_b_K_yx * vv;
                         }
                     }
-                    copy_buffer( &ij_block[0], &metric_data[BLOCK_NNZ * k_global], BLOCK_NNZ );
+                    copy_buffer<BLOCK_NNZ>( &ij_block[0], &metric_data[BLOCK_NNZ * k_global] );
                 }
             }
             
@@ -332,7 +332,7 @@ namespace Repulsor
             
             if constexpr ( metric_flag )
             {
-                zerofy_buffer( &ii_block[0][0], DIAG_NNZ );
+                zerofy_buffer<DIAG_NNZ>( &ii_block[0][0] );
             }
         }
         
@@ -353,10 +353,10 @@ namespace Repulsor
             if constexpr ( metric_flag )
             {
                 // We can do an overwrite here.
-//                zerofy_buffer( &ij_block[0], BLOCK_NNZ );
+//                zerofy_buffer<BLOCK_NNZ>( &ij_block[0] );
                 
                 // We can do an overwrite here.
-//                zerofy_buffer( &jj_block[0][0], DIAG_NNZ );
+//                zerofy_buffer<DIAG_NNZ>( &jj_block[0][0] );
             }
         }
         
