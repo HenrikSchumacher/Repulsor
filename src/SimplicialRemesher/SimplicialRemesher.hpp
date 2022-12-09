@@ -44,7 +44,7 @@ namespace Repulsor
         using VertexList_T       = SortedList<Vertex_T,Int>;
         using SimplexList_T      = SortedList<Simplex_T,Int>;
         
-        using Vector_T   = Tensors::Small::Vector<AMB_DIM,Real,Int>;
+        using Vector_T   = Tensors::Tiny::Vector<AMB_DIM,Real,Int>;
         
         using MeshBase_T = SimplicialMeshBase<                Real,Int,SReal,ExtReal>;
         using Mesh_T     = SimplicialMesh    <DOM_DIM,AMB_DIM,Real,Int,SReal,ExtReal>;
