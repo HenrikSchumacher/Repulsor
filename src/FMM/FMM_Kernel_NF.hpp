@@ -145,11 +145,11 @@ namespace Repulsor
         
         force_inline void Prefetch( const Int j_next ) const
         {
-            prefetch_range<T_DATA_DIM,0,0>( &T_data[T_DATA_DIM * j_next] );
+            prefetch_buffer<T_DATA_DIM,0,0>( &T_data[T_DATA_DIM * j_next] );
             
             if constexpr ( diff_flag )
             {
-                prefetch_range<T_DATA_DIM,1,0>( &T_D_data[T_DATA_DIM * j_next] );
+                prefetch_buffer<T_DATA_DIM,1,0>( &T_D_data[T_DATA_DIM * j_next] );
             }
         }
         

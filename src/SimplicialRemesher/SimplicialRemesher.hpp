@@ -279,12 +279,12 @@ namespace Repulsor
             ptoc("Allocations");
 
             ptic("Copy");
-            copy_cast_buffer( V_coords_,  V_coords.data(),  vertex_count * AMB_DIM );
-            copy_cast_buffer( simplices_, simplices.data(), simplex_count * S_vertex_count );
+            copy_buffer( V_coords_,  V_coords.data(),  vertex_count * AMB_DIM );
+            copy_buffer( simplices_, simplices.data(), simplex_count * S_vertex_count );
             
             if( with_data )
             {
-               copy_cast_buffer( V_data_,  V_data.data(), vertex_count * V_data_dim_ );
+               copy_buffer( V_data_,  V_data.data(), vertex_count * V_data_dim_ );
             }
             ptoc("Copy");
 
