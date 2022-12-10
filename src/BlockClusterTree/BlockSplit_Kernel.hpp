@@ -137,7 +137,7 @@ namespace Repulsor
         SReal * restrict const S_P_serialized = nullptr;
         SReal * restrict const T_P_serialized = nullptr;
         
-        const SparseBinaryMatrixCSR<Int,Int> & A;
+        const Sparse::BinaryMatrixCSR<Int,Int> & A;
         
         Int C_i = -1;
         Int C_j = -1;

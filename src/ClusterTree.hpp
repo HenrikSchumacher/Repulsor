@@ -111,8 +111,8 @@ namespace Repulsor
               const Tensor1<Int ,Int>  &  P_ordering_,
               const Tensor2<Real,Int>  &  P_near_, // data used actual interaction computation; assumed to be of size PrimitiveCount() x NearDim(). For a triangle mesh in 3D, we want to feed each triangles i), area ii) barycenter and iii) normal as a 1 + 3 + 3 = 7 vector
               const Tensor2<Real,Int>  &  P_far_, // data used actual interaction computation; assumed to be of size PrimitiveCount() x FarDim(). For a triangle mesh in 3D, we want to feed each triangles i), area ii) barycenter and iii) orthoprojector onto normal space as a 1 + 3 + 6 = 10 vector
-              const SparseMatrixCSR<Real,Int,Int> & DiffOp,
-              const SparseMatrixCSR<Real,Int,Int> & AvOp,
+              const Sparse::MatrixCSR<Real,Int,Int> & DiffOp,
+              const Sparse::MatrixCSR<Real,Int,Int> & AvOp,
               const ClusterTreeSettings & settings_ = ClusterTreeSettings()
               )
         :   ClusterTreeBase_T( settings_ )
@@ -822,8 +822,8 @@ namespace Repulsor
 
         
         void ComputePrePost(
-            const SparseMatrixCSR<Real,Int,Int> & DiffOp,
-            const SparseMatrixCSR<Real,Int,Int> & AvOp
+            const Sparse::MatrixCSR<Real,Int,Int> & DiffOp,
+            const Sparse::MatrixCSR<Real,Int,Int> & AvOp
         )
         {
             if( !this->pre_post_initialized )
@@ -929,8 +929,8 @@ namespace Repulsor
         } // ComputePrePost
         
         void ComputeMixedPrePost(
-            const SparseMatrixCSR<Real,Int,Int> & DiffOp,
-            const SparseMatrixCSR<Real,Int,Int> & AvOp
+            const Sparse::MatrixCSR<Real,Int,Int> & DiffOp,
+            const Sparse::MatrixCSR<Real,Int,Int> & AvOp
         )
         {
             // Assemble a matrix in which the rows of lo_pre and hi_pre are interleaved in the form
