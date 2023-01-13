@@ -7,7 +7,8 @@
 // You can activate everything you want, but compile times might increase substatially.
 #define INT     int32_t
 #define EXTINT  int64_t
-#define REAL    float
+#define REAL    double
+#define SREAL   float
 #define EXTREAL double
 
 //#define REMESHER_VERBATIM
@@ -53,9 +54,9 @@ int main(int argc, const char * argv[])
     // ExtReal = ("external real") floating point type that is used by the outer world, e.g. for submitting the mesh's vertex coordinates and vectors to multiply against the metric.
     
     
-    using Mesh_T   = SimplicialMeshBase<REAL,INT,REAL,EXTREAL>;
-    using Energy_T = EnergyBase<REAL,INT,REAL,EXTREAL>;
-    using Metric_T = MetricBase<REAL,INT,REAL,EXTREAL>;
+    using Mesh_T   = SimplicialMeshBase<REAL,INT,SREAL,EXTREAL>;
+    using Energy_T = EnergyBase<REAL,INT,SREAL,EXTREAL>;
+    using Metric_T = MetricBase<REAL,INT,SREAL,EXTREAL>;
     
     // Create a factory that can make instances of SimplicialMesh with domain dimension in the range 2,...,2 and ambient dimension in the range 3,...,3.
     SimplicialMesh_Factory<Mesh_T,2,2,3,3> mesh_factory;
