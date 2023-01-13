@@ -27,8 +27,7 @@ namespace Repulsor
         virtual ~EnergyBase() = default;
         
     protected:
-        
-        static constexpr ExtReal ext_one = static_cast<ExtReal>(1);
+
         
     public:
         
@@ -76,7 +75,7 @@ namespace Repulsor
                 
                 CotangentVector_T diff ( M.VertexCount(), M.AmbDim() );
 
-                M.Assemble_ClusterTree_Derivatives( diff.data(), ext_one, false );
+                M.Assemble_ClusterTree_Derivatives( diff.data(), ExtReal(1), false );
                 
                 std::any thing ( std::move(diff) );
                 // TODO: Find out whether this incurs a copy operation.

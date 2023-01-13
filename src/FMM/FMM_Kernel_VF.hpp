@@ -116,7 +116,7 @@ namespace Repulsor
         
         const Real theta  = 10;
         const Real theta2 = 100;
-        const Int max_level = 30;
+        const Int  max_refinement = 20;
         
         mutable Int block_count = 0;
         mutable Int max_level_reached = 0;
@@ -137,19 +137,19 @@ namespace Repulsor
         
         FMM_Kernel_VF() = default;
         
-        FMM_Kernel_VF( Configurator_T & conf, const Real theta_, const Int  max_level_ = 20 )
-        :   Base_T      ( conf                                                              )
-        ,   S_data      ( GetS().PrimitiveNearFieldData().data()                            )
-        ,   S_D_data    ( GetS().ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
-        ,   S_diag      ( GetS().VF_Accumulator().data(               omp_get_thread_num()) )
-        ,   S_ser       ( GetS().PrimitiveSerialized().data()                               )
-        ,   T_data      ( GetT().PrimitiveNearFieldData().data()                            )
-        ,   T_D_data    ( GetT().ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
-        ,   T_diag      ( GetT().VF_Accumulator().data(               omp_get_thread_num()) )
-        ,   T_ser       ( GetT().PrimitiveSerialized().data()                               )
-        ,   theta       ( theta_                                                            )
-        ,   theta2      ( theta_ * theta_                                                   )
-        ,   max_level   ( max_level_                                                        )
+        FMM_Kernel_VF( Configurator_T & conf, const Real theta_, const Int max_refinement_  )
+        :   Base_T         ( conf                                                              )
+        ,   S_data         ( GetS().PrimitiveNearFieldData().data()                            )
+        ,   S_D_data       ( GetS().ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
+        ,   S_diag         ( GetS().VF_Accumulator().data(               omp_get_thread_num()) )
+        ,   S_ser          ( GetS().PrimitiveSerialized().data()                               )
+        ,   T_data         ( GetT().PrimitiveNearFieldData().data()                            )
+        ,   T_D_data       ( GetT().ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
+        ,   T_diag         ( GetT().VF_Accumulator().data(               omp_get_thread_num()) )
+        ,   T_ser          ( GetT().PrimitiveSerialized().data()                               )
+        ,   theta          ( theta_                                                            )
+        ,   theta2         ( theta_ * theta_                                                   )
+        ,   max_refinement ( max_refinement_                                                   )
         {
             if( GetS().PrimitiveSerialized().Dimension(1) != S_Tree.SimplexPrototype().Size() )
             {
@@ -175,7 +175,7 @@ namespace Repulsor
         ,   T_ser       ( other.T_ser                                                             )
         ,   theta       ( other.theta                                                             )
         ,   theta2      ( other.theta2                                                            )
-        ,   max_level   ( other.max_level                                                         )
+        ,   max_refinement ( other.max_refinement                                               )
         {}
         
         ~FMM_Kernel_VF()
@@ -339,6 +339,16 @@ namespace Repulsor
 
         
     public:
+        
+        Int MaxLevelReached() const
+        {
+            return max_level_reached;
+        }
+        
+        void Reduce( FMM_Kernel_VF & ker )
+        {
+            max_level_reached = std::max( max_level_reached, ker.max_level_reached);
+        }
         
         std::string ClassName() const
         {

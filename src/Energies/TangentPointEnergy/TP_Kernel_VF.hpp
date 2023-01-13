@@ -62,9 +62,9 @@ namespace Repulsor
         
         TP_Kernel_VF(
             Configurator_T & conf,
-            const Real theta_, const Int max_level_, const T1 q_half_, const T2 p_half_
+            const Real theta_, const Int max_refinement_, const T1 q_half_, const T2 p_half_
         )
-        :   Base_T               (conf, theta_, max_level_ )
+        :   Base_T               (conf, theta_, max_refinement_ )
         ,   q                    (two*q_half_)
         ,   q_half               (q_half_    )
         ,   q_half_minus_1       (q_half-1   )

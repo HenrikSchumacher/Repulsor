@@ -259,6 +259,9 @@ namespace Repulsor
         }
 
         
+        void Reduce( FMM_Kernel_NF & ker )
+        {}
+        
         std::string ClassName() const
         {
             return "FMM_Kernel_NF<"

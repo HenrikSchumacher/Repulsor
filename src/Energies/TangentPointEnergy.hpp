@@ -48,7 +48,7 @@ namespace Repulsor
             ValueContainer_T metric_values;
             
             TP_Traversor<DOM_DIM,DOM_DIM,BlockClusterTree_T,true,false,false>
-                traversor( M.GetBlockClusterTree(), metric_values, q, p );
+                traversor ( M.GetBlockClusterTree(), metric_values, q, p );
             
             return traversor.Compute();
         }

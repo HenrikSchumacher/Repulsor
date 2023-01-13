@@ -46,6 +46,8 @@ namespace Repulsor
         
         Kernel_T kernel;
         
+        Int max_level_reached = 0;
+        
     public:
 
         __attribute__((flatten)) Real Compute()
@@ -77,6 +79,8 @@ namespace Repulsor
             
             Real global_sum = static_cast<Real>(0);
 
+            max_level_reached = 0;
+             
             if( thread_count > 1 )
             {
                 #pragma omp parallel for num_threads( thread_count ) reduction( + : global_sum )
@@ -146,6 +150,11 @@ namespace Repulsor
                     }
                     
                     global_sum += local_sum;
+                    
+                    #pragma omp critical (FMM_Traversor_Reduction)
+                    {
+                        kernel.Reduce( ker );
+                    }
                 }
             }
             else

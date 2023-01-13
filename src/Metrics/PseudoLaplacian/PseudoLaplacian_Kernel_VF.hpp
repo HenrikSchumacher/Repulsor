@@ -65,9 +65,9 @@ namespace Repulsor
         
         PseudoLaplacian_Kernel_VF(
             Configurator_T & conf,
-            const Real theta_, const Int max_level_, const Real s_
+            const Real theta_, const Int max_refinement_, const Real s_
         )
-        :   Base_T ( conf, theta_, max_level_        )
+        :   Base_T ( conf, theta_, max_refinement_   )
         ,   s      ( s_                              )
         ,   s_exp  ( -S_DOM_DIM/two - (s-high_order) )
         {}

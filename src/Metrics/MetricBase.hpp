@@ -28,8 +28,6 @@ namespace Repulsor
         
     protected:
         
-        static constexpr ExtReal ext_one = static_cast<ExtReal>(1);
-        
     public:
         
         virtual ValueContainer_T & MetricValues( const MeshBase_T & M ) const = 0;

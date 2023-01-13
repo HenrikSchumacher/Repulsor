@@ -16,10 +16,10 @@ public:
         {
             if( from_above )
             {
-                if( S_Tree.Level() >= this->max_level )
+                if( S_Tree.Level() >= this->max_refinement )
                 {
                     // If at lowest level and inadmissable then we just compute the energy and move up.
-//                    max_level_reached = max_level;
+                    this->max_level_reached = this->max_refinement;
 //                    block_count++;
 //                    bottom_count++;
                     sum += compute();
@@ -38,7 +38,7 @@ public:
                     if( admissable )
                     {
                         // We compute energy, go to parent, and prepare the next child of the parent.
-//                        max_level_reached = std::max( max_level_reached, S_Tree.Level() );
+                        this->max_level_reached = std::max( this->max_level_reached, S_Tree.Level() );
 //                        block_count++;
                         sum += compute();
                         S_Tree.ToParent();

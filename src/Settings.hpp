@@ -42,6 +42,9 @@ namespace Repulsor
         double near_field_separation_parameter = 10.;
         double near_field_intersection_parameter = 10000000000.;
         
+        // Maximal number of subdivisions to apply for simplices in the very-near field./
+        size_t max_refinement = 20;
+        
         BlockSplitMethod block_split_method = BlockSplitMethod::Parallel;
         
         BlockClusterTreeSettings() = default;
@@ -50,13 +53,12 @@ namespace Repulsor
     
     struct AdaptivitySettings
     {
-        long long  max_level = 30;
-        long long  min_level = 0;
+        int    max_refinement = 30;
         double theta = 10.;
         double intersection_theta = 10000000000.;
-        
+
         AdaptivitySettings() = default;
-        
+
         ~AdaptivitySettings() = default;
     };
 

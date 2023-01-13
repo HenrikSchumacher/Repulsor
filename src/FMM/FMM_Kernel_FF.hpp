@@ -234,6 +234,8 @@ namespace Repulsor
             return this->metric_values["FF_diag"];
         }
 
+        void Reduce( FMM_Kernel_FF & ker )
+        {}
         
         std::string ClassName() const
         {

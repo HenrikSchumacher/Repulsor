@@ -114,7 +114,7 @@ namespace Repulsor
         Configurator_T conf;
         
         ValueContainer_T & metric_values;
-
+        
         const Real q;
         const Real p;
         const Real q_half_real;
