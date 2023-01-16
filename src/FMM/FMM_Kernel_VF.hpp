@@ -124,7 +124,9 @@ namespace Repulsor
         mutable Int inadmissable_count = 0;
         mutable Int primitive_count = 0;
         mutable Real total_sum = static_cast<Real>(0);
-
+        
+        mutable size_t evaluations = 0;
+        
 //#ifdef REPULSOR__PRINT_REPORTS_FOR_ADAPTIVE_KERNELS
 //        mutable std::ofstream logfile;
 //        mutable std::ofstream simplex_file;
@@ -135,7 +137,8 @@ namespace Repulsor
         
     public:
         
-        FMM_Kernel_VF() = default;
+//        FMM_Kernel_VF() = default;
+        FMM_Kernel_VF() = delete;
         
         FMM_Kernel_VF( Configurator_T & conf, const Real theta_, const Int max_refinement_  )
         :   Base_T         ( conf                                                              )
@@ -149,7 +152,10 @@ namespace Repulsor
         ,   T_ser          ( GetT().PrimitiveSerialized().data()                               )
         ,   theta          ( theta_                                                            )
         ,   theta2         ( theta_ * theta_                                                   )
-        ,   max_refinement ( max_refinement_                                                   )
+        ,   max_refinement ( std::min(
+                                  max_refinement_,
+                                  std::min(S_Tree_T::MaxLevel(),S_Tree_T::MaxLevel())
+                              )                                                                )
         {
             if( GetS().PrimitiveSerialized().Dimension(1) != S_Tree.SimplexPrototype().Size() )
             {
@@ -160,10 +166,15 @@ namespace Repulsor
             {
                 eprint(ClassName()+" Constructor: GetT().PrimitiveSerialized().Dimension(1) != T_Tree.SimplexPrototype().Size()");
             }
+            
+            if( max_refinement_ > max_refinement )
+            {
+                wprint(ClassName()+" Constructor: Reduced max_refinement from "+ToString(max_refinement_)+" to "+ToString(max_refinement)+" to prevent integer overflow.");
+            }
         }
         
         FMM_Kernel_VF( FMM_Kernel_VF & other )
-        :   Base_T        ( other                                                                   )
+        :   Base_T      ( other                                                                   )
         ,   metric_data ( other.OffDiag().data()                                                  )
         ,   S_data      ( other.S_data                                                            )
         ,   S_D_data    ( other.GetS().ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
@@ -175,7 +186,9 @@ namespace Repulsor
         ,   T_ser       ( other.T_ser                                                             )
         ,   theta       ( other.theta                                                             )
         ,   theta2      ( other.theta2                                                            )
-        ,   max_refinement ( other.max_refinement                                               )
+        ,   max_refinement      ( other.max_refinement                                            )
+        ,   max_level_reached   ( other.max_level_reached                                         )
+        ,   evaluations         ( other.evaluations                                               )
         {}
         
         ~FMM_Kernel_VF()
@@ -345,9 +358,16 @@ namespace Repulsor
             return max_level_reached;
         }
         
-        void Reduce( FMM_Kernel_VF & ker )
+        size_t EvaluationCount() const
         {
-            max_level_reached = std::max( max_level_reached, ker.max_level_reached);
+            return evaluations;
+        }
+        
+        void Reduce( const FMM_Kernel_VF & ker )
+        {
+            max_level_reached = std::max( max_level_reached, ker.MaxLevelReached() );
+            
+            evaluations += ker.EvaluationCount();
         }
         
         std::string ClassName() const

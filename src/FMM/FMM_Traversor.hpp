@@ -46,40 +46,36 @@ namespace Repulsor
         
         Kernel_T kernel;
         
-        Int max_level_reached = 0;
-        
     public:
 
         __attribute__((flatten)) Real Compute()
         {
             ptic(ClassName()+"::Compute");
-            
+
             if( pattern.NonzeroCount() <= 0 )
             {
                 ptoc(ClassName()+"::Compute");
                 return static_cast<Real> (0);
             }
-            
+
             const auto & job_ptr = COND(
                 is_symmetric,
                 pattern.UpperTriangularJobPtr(),
                 pattern.JobPtr()
             );
-            
+
             // Make sure that pattern.Diag() is created before the parallel region.
             if constexpr ( is_symmetric )
             {
                 (void)pattern.Diag();
             }
-            
+
             kernel.Allocate( pattern.NonzeroCount() );
-            
+
             
             const Int thread_count = job_ptr.Size()-1;
             
             Real global_sum = static_cast<Real>(0);
-
-            max_level_reached = 0;
              
             if( thread_count > 1 )
             {
@@ -90,18 +86,18 @@ namespace Repulsor
                     
                     Kernel_T ker ( kernel );
 
+                    Real local_sum (0);
                     
-                    Real local_sum = static_cast<Real>(0);
-                    
-                    const LInt * restrict const diag = COND(is_symmetric, pattern.Diag().data(), nullptr);
-                    
-                    const LInt * restrict const rp = pattern.Outer().data();
-                    const  Int * restrict const ci = pattern.Inner().data();
+                    ptr<LInt> diag = COND(is_symmetric, pattern.Diag().data(), nullptr);
+                    ptr<LInt> rp   = pattern.Outer().data();
+                    ptr<Int>  ci = pattern.Inner().data();
                     
                     // Kernel is supposed the following rows of pattern:
                     const Int i_begin = job_ptr[thread  ];
                     const Int i_end   = job_ptr[thread+1];
-
+                    
+                    const Time start_time = Clock::now();
+                    
                     for( Int i = i_begin; i < i_end; ++i )
                     {
                         // These are the corresponding nonzero blocks in i-th row.
@@ -149,28 +145,33 @@ namespace Repulsor
                         
                     }
                     
+                    const Time stop_time = Clock::now();
+                    
                     global_sum += local_sum;
                     
-                    #pragma omp critical (FMM_Traversor_Reduction)
-                    {
-                        kernel.Reduce( ker );
-                    }
+//                    #pragma omp critical (FMM_Traversor_Reduction)
+//                    {
+//                        valprint("d",thread);
+//                        kernel.Reduce( ker );
+//                        valprint("e",thread);
+//                    }
+                    
+                    ker.PrintReport( thread, Duration(start_time,stop_time) );
                 }
             }
             else
             {
+                const Time start_time = Clock::now();
+                
                 for( Int thread = 0; thread < thread_count; ++thread )
                 {
                     // Initialize local kernel and feed it all the information that is going to be constant along its life time.
                     
-                    Kernel_T ker ( kernel );
+                    Real local_sum (0);
                     
-                    Real local_sum = static_cast<Real>(0);
-                    
-                    const LInt * restrict const diag = COND(is_symmetric, pattern.Diag().data(), nullptr);
-                    
-                    const LInt * restrict const rp = pattern.Outer().data();
-                    const  Int * restrict const ci = pattern.Inner().data();
+                    ptr<LInt> diag = COND(is_symmetric, pattern.Diag().data(), nullptr);
+                    ptr<LInt> rp   = pattern.Outer().data();
+                    ptr<Int>  ci   = pattern.Inner().data();
                     
                     // Kernel is supposed the following rows of pattern:
                     const Int i_begin = job_ptr[thread  ];
@@ -185,20 +186,20 @@ namespace Repulsor
                         if( k_end > k_begin )
                         {
                             // Clear the local vector chunk of the kernel.
-                            ker.LoadS(i);
+                            kernel.LoadS(i);
                             
                             // Perform all but the last calculation in row with prefetch.
                             for( LInt k = k_begin; k < k_end-1; ++k )
                             {
                                 const Int j = ci[k];
 
-                                ker.LoadT(j);
+                                kernel.LoadT(j);
 
-                                ker.Prefetch(ci[k+1]);
+                                kernel.Prefetch(ci[k+1]);
 
-                                local_sum += ker.Compute(k);
+                                local_sum += kernel.Compute(k);
 
-                                ker.WriteT(j);
+                                kernel.WriteT(j);
                             }
                             
                             // Perform last calculation in row without prefetch.
@@ -207,16 +208,16 @@ namespace Repulsor
                                 
                                 const  Int j = ci[k];
                                 
-                                ker.LoadT(j);
+                                kernel.LoadT(j);
                                 
-                                local_sum += ker.Compute(k);
+                                local_sum += kernel.Compute(k);
                                 
-                                ker.WriteT(j);
+                                kernel.WriteT(j);
                             }
                             
                             // Incorporate the kernel's local vector chunk into the i-th chunk if the output Y.
                             
-                            ker.WriteS(i);
+                            kernel.WriteS(i);
                         }
                         
                         // Incoporate the local vector chunk into the i-th chunk of the output.
@@ -225,6 +226,10 @@ namespace Repulsor
                     
                     global_sum += local_sum;
                 }
+                
+                const Time stop_time = Clock::now();
+                
+                kernel.PrintReport( 0, Duration(start_time,stop_time) );
             }
 
             ptoc(ClassName()+"::Compute");

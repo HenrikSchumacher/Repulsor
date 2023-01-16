@@ -97,26 +97,11 @@ namespace Repulsor
 
             return *this;
         }
-                
-//        // Move constructor
-//        BlockSplit_Kernel( BlockSplit_Kernel && other ) noexcept
-//        {
-//            swap(*this, other);
-//        }
-//
-//        // Move assignment operator
-//        BlockSplit_Kernel & operator=( BlockSplit_Kernel && other ) noexcept
-//        {
-//            if( this != &other )
-//            {
-//                swap( *this, other );
-//            }
-//            return *this;
-//        }
-        
+         
         ~BlockSplit_Kernel() = default;
         
     public:
+        
         PairAggregator<Int,Int,LInt> inter_idx;
         PairAggregator<Int,Int,LInt> verynear_idx;
         PairAggregator<Int,Int,LInt> near_idx;
@@ -131,11 +116,11 @@ namespace Repulsor
         
         GJK_Algorithm<ClusterTree_T::AMB_DIM,GJK_Real,Int> G;
         
-        SReal * restrict const S_C_serialized = nullptr;
-        SReal * restrict const T_C_serialized = nullptr;
+        mut<SReal> S_C_serialized = nullptr;
+        mut<SReal> T_C_serialized = nullptr;
 
-        SReal * restrict const S_P_serialized = nullptr;
-        SReal * restrict const T_P_serialized = nullptr;
+        mut<SReal> S_P_serialized = nullptr;
+        mut<SReal> T_P_serialized = nullptr;
         
         const SparseBinaryMatrixCSR<Int,Int> & A;
         
@@ -189,7 +174,7 @@ namespace Repulsor
         
         force_inline void ComputeLeafDiagonal()
         {
-//            near_idx.Push( P_i, P_i );
+//            near_idx.Push(P_i,P_i);
         }
         
         force_inline void ComputeLeaf()
@@ -202,7 +187,7 @@ namespace Repulsor
             
             if( admissable )
             {
-                near_idx.Push( P_i, P_j );
+                near_idx.Push(P_i,P_j);
             }
             else
             {
@@ -212,11 +197,11 @@ namespace Repulsor
                 
                 if( intersecting )
                 {
-                    inter_idx.Push( P_i, P_j );
+                    inter_idx.Push(P_i,P_j);
                 }
                 else
                 {
-                    verynear_idx.Push( P_i, P_j );
+                    verynear_idx.Push(P_i,P_j);
                 }
             }
         }
@@ -231,32 +216,32 @@ namespace Repulsor
             
             if( admissable )
             {
-                near_idx.Push( P_j, P_i );
+                near_idx.Push(P_j,P_i);
             }
             else
             {
                 const bool intersecting = (!G.SeparatedQ()) && G.IntersectingQ(
-                    *S_P_proto, *T_P_proto, intersection_theta2
+                    *S_P_proto, *T_P_proto//, intersection_theta2
                 );
                 
                 if( intersecting )
                 {
-                    inter_idx.Push( P_j, P_i );
+                    inter_idx.Push(P_j,P_i);
                 }
                 else
                 {
-                    verynear_idx.Push( P_j, P_i );
+                    verynear_idx.Push(P_j,P_i);
                 }
             }
         }
         
         force_inline void ComputeAdmissable()
         {
-            far_idx.Push( C_i, C_j );
+            far_idx.Push(C_i,C_j);
         }
         force_inline void ComputeAdmissableSwapped()
         {
-            far_idx.Push( C_j, C_i );
+            far_idx.Push(C_j,C_i);
         }
 
         
@@ -276,5 +261,5 @@ namespace Repulsor
         
     }; // class BlockSplit_Kernel
     
-} //namespace Repulsor
+} // namespace Repulsor
 

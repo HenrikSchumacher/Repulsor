@@ -4,7 +4,7 @@
    
 public:
 
-    virtual Int CollapseEdges( const Edge_T * restrict const e_list, const Int n ) override
+    virtual Int CollapseEdges( ptr<Edge_T> e_list, const Int n ) override
     {
         ptic(className()+"::CollapseEdges");
         

@@ -4,7 +4,7 @@
 
 public:
 
-    virtual Int SplitEdges( const Edge_T * restrict const e_list, const Int n ) override
+    virtual Int SplitEdges( ptr<Edge_T> e_list, const Int n ) override
     {
         ptic(className()+"::SplitEdges");
         

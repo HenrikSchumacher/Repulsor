@@ -11,12 +11,21 @@ namespace Repulsor
         
 #include "SimplexHierarchy_Details.hpp"
         
-        constexpr Int ChildCount() const
+        static constexpr Int ChildCount()
         {
             return 2;
         }
         
-        void ToChild( const Int k )
+        static constexpr Level_T MaxLevel()
+        {
+            return std::floor(
+                std::log( static_cast<double>(std::numeric_limits<Column_T>::max())))
+                /
+                std::log(static_cast<double>(ChildCount())
+            );
+        }
+        
+        void ToChild( const Child_T k )
         {
             current_simplex_computed = false;
             
@@ -68,7 +77,7 @@ namespace Repulsor
             {
                 current_simplex_computed = false;
                 
-                Int k = child_id;
+                const Child_T k = child_id;
                 
                 column = (column-child_id) / ChildCount();
                 former_child_id = child_id;

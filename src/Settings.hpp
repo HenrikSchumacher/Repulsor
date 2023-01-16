@@ -15,10 +15,6 @@ namespace Repulsor
 
         BoundingVolumeType bounding_volume_type = BoundingVolumeType::AABB;
         
-        ClusterTreeSettings() = default;
-        
-        ~ClusterTreeSettings() = default;
-        
     }; // ClusterTreeSettings
     
     struct BlockClusterTreeSettings
@@ -43,12 +39,9 @@ namespace Repulsor
         double near_field_intersection_parameter = 10000000000.;
         
         // Maximal number of subdivisions to apply for simplices in the very-near field./
-        size_t max_refinement = 20;
+        int max_refinement = 30;
         
         BlockSplitMethod block_split_method = BlockSplitMethod::Parallel;
-        
-        BlockClusterTreeSettings() = default;
-        ~BlockClusterTreeSettings() = default;
     };
     
     struct AdaptivitySettings
@@ -56,10 +49,6 @@ namespace Repulsor
         int    max_refinement = 30;
         double theta = 10.;
         double intersection_theta = 10000000000.;
-
-        AdaptivitySettings() = default;
-
-        ~AdaptivitySettings() = default;
     };
 
 } // namespace Repulsor

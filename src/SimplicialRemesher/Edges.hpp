@@ -120,8 +120,8 @@ protected:
     {
         Real L2 = 0.;
         
-        Real const * restrict const V = V_coords.data(edges(e,0));
-        Real const * restrict const W = V_coords.data(edges(e,1));
+        ptr<Real> V = V_coords.data(edges(e,0));
+        ptr<Real> W = V_coords.data(edges(e,1));
         
         for( Int k = 0; k < AMB_DIM; ++k )
         {

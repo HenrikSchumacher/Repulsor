@@ -29,7 +29,7 @@ namespace Repulsor
         
         using Base_T::MetricValues;
         
-        CLASS( const Real s_ )
+        explicit CLASS( const Real s_ )
         :   Base_T ()
         ,   s ( s_ )
         {}

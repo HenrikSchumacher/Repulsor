@@ -276,15 +276,16 @@ namespace Repulsor
                 kernels[thread].far_idx.Finalize();
             }
             
+            
+            size_t intersection_count = 0;
+            
             for( Int thread = 0; thread < thread_count; ++thread )
             {
                    inter_idx[thread] = std::move( kernels[thread].inter_idx    );
                 verynear_idx[thread] = std::move( kernels[thread].verynear_idx );
                     near_idx[thread] = std::move( kernels[thread].near_idx     );
                      far_idx[thread] = std::move( kernels[thread].far_idx      );
-                
-                
-                
+
                 logprint("Thread "+ToString(thread)+" aggregated this many elements: "
                     + "\n\t intersections:   \t" + ToString(inter_idx[thread].Size())
                     + "\n\t very near field: \t" + ToString(verynear_idx[thread].Size())
@@ -292,7 +293,15 @@ namespace Repulsor
                     + "\n\t far field:       \t" + ToString(far_idx[thread].Size())
                     + "\n"
                 );
+                
+                intersection_count += static_cast<size_t>(inter_idx[thread].Size());
             }
+            
+            if( intersection_count > 0 )
+            {
+                wprint(className()+"::ComputeBlocks detected "+ToString(intersection_count)+" intersections.");
+            }
+            
             ptoc(className()+"::ComputeBlocks: reduce kernels");
             
             ptoc(className()+"::ComputeBlocks");

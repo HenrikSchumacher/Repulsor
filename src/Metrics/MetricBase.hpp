@@ -33,12 +33,10 @@ namespace Repulsor
         virtual ValueContainer_T & MetricValues( const MeshBase_T & M ) const = 0;
 
         virtual void MultiplyMetric(
-            const MeshBase_T &             M,
-            const ExtReal                  alpha,
-            const ExtReal * restrict const X,
-            const ExtReal                  beta,
-                  ExtReal * restrict const Y,
-            const Int                      rhs_count,
+            const MeshBase_T & M,
+            const ExtReal alpha, ptr<ExtReal> X,
+            const ExtReal beta,  mut<ExtReal> Y,
+            const Int  rhs_count,
             const bool VF_flag = true,
             const bool NF_flag = true,
             const bool FF_flag = true

@@ -64,6 +64,7 @@ namespace Repulsor
         
         
 #include "../../FMM/FMM_Kernel_Common.hpp"
+#include "../../FMM/FMM_Kernel_NF_Common.hpp"
         
     public:
         

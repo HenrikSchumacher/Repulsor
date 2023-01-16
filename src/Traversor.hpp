@@ -61,15 +61,16 @@ namespace Repulsor
         std::deque<Int> i_queue;
         std::deque<Int> j_queue;
         
-        const Int * restrict const S_C_left;
-        const Int * restrict const S_C_right;
-        const Int * restrict const S_C_begin;
-        const Int * restrict const S_C_end;
         
-        const Int * restrict const T_C_left;
-        const Int * restrict const T_C_right;
-        const Int * restrict const T_C_begin;
-        const Int * restrict const T_C_end;
+        ptr<Int> S_C_left;
+        ptr<Int> S_C_right;
+        ptr<Int> S_C_begin;
+        ptr<Int> S_C_end;
+        
+        ptr<Int> T_C_left;
+        ptr<Int> T_C_right;
+        ptr<Int> T_C_begin;
+        ptr<Int> T_C_end;
         
     public:
         

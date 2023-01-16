@@ -247,7 +247,7 @@ namespace Repulsor
             return V_coords.data();
         }
         
-        virtual void SemiStaticUpdate( const ExtReal * restrict const new_V_coords_ ) override
+        virtual void SemiStaticUpdate( ptr<ExtReal> new_V_coords_ ) override
         {
             ptic(className()+"::SemiStaticUpdate");
             
@@ -289,7 +289,9 @@ namespace Repulsor
             MovingPrimitive_T P_moving;
             
             Tensor2<SReal,Int> P_velocities_serialized ( SimplexCount(), P_moving.VelocitySize(), 0 );
-            SReal * restrict const P_v_ser = P_velocities_serialized.data();
+            mut<SReal> P_v_ser = P_velocities_serialized.data();
+            
+            
             
             const Tensor1<Int,Int> P_ordering = GetClusterTree().PrimitiveOrdering();
 
@@ -319,7 +321,7 @@ namespace Repulsor
             ptoc(className()+"::LoadUpdateVectors");
         }
         
-        virtual ExtReal MaximumSafeStepSize( const ExtReal * restrict const vecs, const ExtReal max_time ) override
+        virtual ExtReal MaximumSafeStepSize( ptr<ExtReal> vecs, const ExtReal max_time ) override
         {
             ptic(className()+"::MaximumSafeStepSize");
             
@@ -698,8 +700,8 @@ namespace Repulsor
             
             constexpr Int simplex_size = DOM_DIM+1;
             
-            const Real * restrict const V = V_coords.data();
-            const Int  * restrict const S = simplices.data();
+            ptr<Real> V = V_coords.data();
+            ptr<Int>  S = simplices.data();
             
             s << "domain_dimension" << "\t" << DOM_DIM << "\n";
             s << "ambient_dimension" << "\t" << AMB_DIM << "\n";

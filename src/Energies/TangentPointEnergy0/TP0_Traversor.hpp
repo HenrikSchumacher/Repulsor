@@ -247,7 +247,7 @@ namespace Repulsor
                 energy_flag, diff_flag, metric_flag
             >;
 
-            Kernel_T ker ( conf, bct.NearFieldSeparationParameter(), 20, q_half_, p_half_ );
+            Kernel_T ker ( conf, bct.NearFieldSeparationParameter(), int_cast<Int>(bct.Settings().max_refinement), q_half_, p_half_ );
 
             FMM_Traversor traversor ( bct.VeryNear(), ker );
             en += traversor.Compute();

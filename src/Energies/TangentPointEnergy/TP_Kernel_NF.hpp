@@ -86,6 +86,7 @@ namespace Repulsor
         ~TP_Kernel_NF() = default;
         
 #include "../../FMM/FMM_Kernel_Common.hpp"
+#include "../../FMM/FMM_Kernel_NF_Common.hpp"
         
     protected:
         
@@ -370,6 +371,8 @@ namespace Repulsor
             }
         }
 
+    public:
+        
         std::string ClassName() const
         {
             return "TP_Kernel_NF<"

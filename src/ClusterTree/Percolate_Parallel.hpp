@@ -11,20 +11,17 @@ public:
             Tensor1<Int,Int> stack  ( 2*max_depth+2 );
             Tensor1<Int,Int> depths ( 2*max_depth+2 );
             
-            Int stack_ptr    = null;
+            Int stack_ptr     = null;
             stack [stack_ptr] = null;
             depths[stack_ptr] = null;
-            
-            const Int * restrict const left  = C_left.data();
-            const Int * restrict const right = C_right.data();
             
             while( stack_ptr >= null )
             {
                 // We are at cluster C.
                 const Int d = depths[stack_ptr];
                 const Int C = stack [stack_ptr--]; //pop
-                const Int L = left  [C];
-                const Int R = right [C];
+                const Int L = C_left[C];
+                const Int R = C_right[C];
                 
                 if( ( d < max_depth ) && (L >= null) && (R >= null) )
                 {

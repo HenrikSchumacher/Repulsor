@@ -374,6 +374,7 @@ namespace Repulsor
             }
         }
         
+    public:
         
         std::string ClassName() const
         {

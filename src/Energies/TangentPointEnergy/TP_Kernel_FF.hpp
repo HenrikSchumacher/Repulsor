@@ -48,8 +48,6 @@ namespace Repulsor
         using Base_T::diff_flag;
         using Base_T::metric_flag;
         
-#include "../../FMM/FMM_Kernel_Common.hpp"
-        
     public:
         
         TP_Kernel_FF() = delete;
@@ -77,6 +75,9 @@ namespace Repulsor
         {}
         
         ~TP_Kernel_FF() = default;
+        
+#include "../../FMM/FMM_Kernel_Common.hpp"
+#include "../../FMM/FMM_Kernel_FF_Common.hpp"
         
     protected:
 
@@ -351,6 +352,8 @@ namespace Repulsor
                 add_to_buffer<DIAG_NNZ>( &jj_block[0][0], &T_diag[DIAG_NNZ * j_global] );
             }
         }
+        
+    public:
         
         std::string ClassName() const
         {

@@ -184,8 +184,9 @@ namespace Repulsor
             Tensor2<ExtReal,Int> coords    (vertex_count, amb_dim);
             Tensor2<Int,Int>     simplices (simplex_count,simplex_size);
             
-            ExtReal * restrict const V = coords.data();
-            Int     * restrict const S = simplices.data();
+            
+            mut<ExtReal> V = coords.data();
+            mut<Int>     S = simplices.data();
             
             
             for( Int i = 0; i < vertex_count; ++i )

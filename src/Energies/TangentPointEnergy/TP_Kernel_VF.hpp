@@ -408,6 +408,8 @@ namespace Repulsor
             }
         }
         
+    public:
+        
         std::string ClassName() const
         {
             return "TP_Kernel_VF<"

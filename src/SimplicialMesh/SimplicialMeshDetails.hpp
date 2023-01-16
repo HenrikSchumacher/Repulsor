@@ -643,7 +643,7 @@ namespace Repulsor
 
             } // for( Int i = i_begin; i < i_end; ++i )
 
-		} // #pragma omp parallel num_threads( ThreadCount() )
+		} // #pragma omp parallel for num_threads( ThreadCount() )
 
         ptoc(ClassName()+"::ComputeNearFarData");
     }
@@ -913,7 +913,7 @@ namespace Repulsor
 
             } // for( Int i = i_begin; i < i_end; ++i )
 
-		} // #pragma omp parallel num_threads( ThreadCount() )
+		} // #pragma omp parallel for num_threads( ThreadCount() )
 
         ptoc(ClassName()+"::ComputeNearFarData");
     }
@@ -1204,7 +1204,7 @@ namespace Repulsor
 
             } // for( Int i = i_begin; i < i_end; ++i )
 
-		} // #pragma omp parallel num_threads( ThreadCount() )
+		} // #pragma omp parallel for num_threads( ThreadCount() )
 
         ptoc(ClassName()+"::ComputeNearFarData");
     }
@@ -1653,7 +1653,7 @@ namespace Repulsor
 
             } // for( Int i = i_begin; i < i_end; ++i )
 
-		} // #pragma omp parallel num_threads( ThreadCount() )
+		} // #pragma omp parallel for num_threads( ThreadCount() )
 
         ptoc(ClassName()+"::ComputeNearFarData");
     }
@@ -2208,7 +2208,7 @@ namespace Repulsor
 
             } // for( Int i = i_begin; i < i_end; ++i )
 
-		} // #pragma omp parallel num_threads( ThreadCount() )
+		} // #pragma omp parallel for num_threads( ThreadCount() )
 
         ptoc(ClassName()+"::ComputeNearFarData");
     }
@@ -2857,7 +2857,7 @@ namespace Repulsor
 
             } // for( Int i = i_begin; i < i_end; ++i )
 
-        } // #pragma omp parallel num_threads( ThreadCount() )
+        } // #pragma omp parallel for num_threads( ThreadCount() )
 
         ptoc(ClassName()+"::ComputeNearFarData");
     }
@@ -3693,7 +3693,7 @@ namespace Repulsor
 
             } // for( Int i = i_begin; i < i_end; ++i )
 
-        } // #pragma omp parallel num_threads( ThreadCount() )
+        } // #pragma omp parallel for num_threads( ThreadCount() )
 
         ptoc(ClassName()+"::ComputeNearFarData");
     }

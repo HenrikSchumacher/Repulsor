@@ -573,55 +573,7 @@ namespace Repulsor
 #include "Percolate_Tasks.hpp"
 #include "Percolate_Parallel.hpp"
 
-        
-        //        void PercolateDown_Parallel( const Int max_leaves ) const
-        //        {
-        //            ptic(ClassName()+"::PercolateDown_Parallel");
-        //
-        //            DUMP(max_leaves);
-        //
-        //            std::deque<Int> queue;
-        //            queue.push_back(static_cast<Int>(0));
-        //
-        //            const Int  * restrict const left  = ClusterLeft().data();
-        //            const Int  * restrict const right = ClusterRight().data();
-        //                  Real * restrict const c     = C_out.data();
-        //
-        //            while( !queue.empty() && ( queue.size() < max_leaves ) )
-        //            {
-        //                const Int C = queue.front();
-        //                              queue.pop_front();
-        //
-        //                const Int L = left [C];
-        //                const Int R = right[C];
-        //
-        ////                if( ( L >= 0 ) && ( R >= 0 ) )
-        //                if( L >= 0 )
-        //                {
-        //                    #pragma omp simd aligned( c : ALIGNMENT )
-        //                    for( Int k = 0; k < buffer_dim; ++k )
-        //                    {
-        //                        const Real buffer = c[ buffer_dim * C + k ];
-        //                        c[ buffer_dim * L + k ] += buffer;
-        //                        c[ buffer_dim * R + k ] += buffer;
-        //                    }
-        //
-        //                    queue.push_back(R);
-        //                    queue.push_back(L);
-        //                }
-        //            }
-        //
-        ////            ptic("parallel");
-        //            #pragma omp parallel for num_threads( ThreadCount() ) schedule( static )
-        //            for( Int k = 0; k < queue.size(); ++k )
-        //            {
-        //                PercolateDown_Sequential(queue[k]);
-        //            }
-        ////            ptoc("parallel");
-        //            ptoc(ClassName()+"::PercolateDown_Parallel");
-        //        }
-        
-        
+
         
     public:
         
@@ -863,8 +815,8 @@ namespace Repulsor
             // Collect first entry of thread_C_D_far into C_out.
             for( Int thread = 0; thread < thread_count; ++thread )
             {
-                const Real * restrict const from = thread_C_D_far.data(thread);
-                      Real * restrict const to   = C_out.data();
+                ptr<Real> from = thread_C_D_far.data(thread);
+                mut<Real> to   = C_out.data();
                 
                 #pragma omp parallel for num_threads( thread_count ) schedule( static )
                 for( Int i = 0; i < cluster_count; ++i )
@@ -875,8 +827,8 @@ namespace Repulsor
             
             //Before percolating the energies down we have to transform them to densities.
             {
-                const Real * restrict const a = C_far.data();
-                      Real * restrict const e = C_out.data();
+                ptr<Real> a = C_far.data();
+                mut<Real> e = C_out.data();
                 
                 #pragma omp parallel for num_threads( thread_count ) schedule( static )
                 for( Int i = 0; i < cluster_count; ++i )
@@ -892,8 +844,8 @@ namespace Repulsor
             // Now the simplex far field densities are stored in P_out.
             // We have to convert them back to energies before we add the energies from thread_P_D_near.
             {
-                const Real * restrict const a = P_near.data();
-                      Real * restrict const e = P_out.data();
+                ptr<Real> a = P_near.data();
+                mut<Real> e = P_out.data();
                 
                 #pragma omp parallel for num_threads( thread_count ) schedule( static )
                 for( Int i = 0; i < primitive_count; ++i )
@@ -906,8 +858,8 @@ namespace Repulsor
             // Add first entries of thread_P_D_near into P_out.
             for( Int thread = 0; thread < thread_count; ++thread )
             {
-                const Real * restrict const from = thread_P_D_near.data(thread);
-                      Real * restrict const to   = P_out.data();
+                ptr<Real> from = thread_P_D_near.data(thread);
+                mut<Real> to   = P_out.data();
                 
                 #pragma omp parallel for num_threads( thread_count ) schedule( static )
                 for( Int i = 0; i < primitive_count; ++i )
@@ -920,7 +872,7 @@ namespace Repulsor
             
         } // CollectPrimitiveEnergies
         
-        void CollectPrimitiveEnergies( ExtReal * restrict const output, const ExtReal weight, bool addTo = false ) const
+        void CollectPrimitiveEnergies( mut<ExtReal> output, const ExtReal weight, bool addTo = false ) const
         {
             ptic(ClassName()+"::CollectPrimitiveEnergies");
             
@@ -931,8 +883,8 @@ namespace Repulsor
             
             // Copy the values to output. We must not forget reorder!
             {
-                const    Int  * restrict const o    = P_inverse_ordering.data();
-                const    Real * restrict const from = P_out.data();
+                ptr<Int>  o    = P_inverse_ordering.data();
+                ptr<Real> from = P_out.data();
             
                 #pragma omp parallel for num_threads( ThreadCount() ) schedule( static )
                 for( Int i = 0; i < primitive_count; ++i )
@@ -946,7 +898,7 @@ namespace Repulsor
        
         } // CollectPrimitiveEnergies
             
-        void CollectDensity( ExtReal * restrict const output, const ExtReal weight, bool addTo = false ) const
+        void CollectDensity( mut<ExtReal> output, const ExtReal weight, bool addTo = false ) const
         {
             ptic(ClassName()+"::CollectDensity");
             
@@ -976,8 +928,8 @@ namespace Repulsor
             
             // Divide by primitive volumes to get densities.
             {
-                const Real * restrict const a = P_near.data();
-                      Real * restrict const e = P_out.data();
+                ptr<Real> a = P_near.data();
+                mut<Real> e = P_out.data();
                 
                 #pragma omp parallel for num_threads(ThreadCount()) schedule( static )
                 for( Int j = 0; j < primitive_count; ++j )
@@ -995,8 +947,8 @@ namespace Repulsor
 
             // Finally, we divide by the dual volumes to obtain the vertex densities.
             {
-                const ExtReal * restrict const a = dual_volumes.data();
-                      ExtReal * restrict const e = output;
+                ptr<ExtReal> a = dual_volumes.data();
+                mut<ExtReal> e = output;
                 
                 #pragma omp parallel for simd num_threads(ThreadCount()) aligned( a, e : ALIGNMENT ) schedule( static )
                 for( Int i = 0; i < vertex_count; ++i )
@@ -1016,8 +968,7 @@ namespace Repulsor
         virtual void SemiStaticUpdate(
             const Tensor2<Real,Int> & P_near_, const Tensor2<Real,Int> & P_far_ ) = 0;
         
-        virtual void SemiStaticUpdate(
-            const Real * restrict const P_near_, const Real * restrict const P_far_ ) = 0;
+        virtual void SemiStaticUpdate( ptr<Real> P_near_, ptr<Real> P_far_ ) = 0;
         
 //##################################################################################################
 //##        Moments

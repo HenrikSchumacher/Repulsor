@@ -123,17 +123,17 @@ protected:
         Int stack_ptr    = null;
         stack[stack_ptr] = C_root;
         
-        const Int  * restrict const left  = C_left.data();
-        const Int  * restrict const right = C_right.data();
-              Real * restrict const c     = C_in.data();
+//        ptr<Int>  left  = C_left.data();
+//        ptr<Int>  right = C_left.data();
+//        mut<Real> c     = C_in.data();
         
         while( (stack_ptr >= null) && ( stack_ptr < 126 ) )
         {
             // We are at cluster C.
             const Int d = depths[stack_ptr];
             const Int C = stack [stack_ptr];
-            const Int L = left  [C];
-            const Int R = right [C];
+            const Int L = C_left[C];
+            const Int R = C_right[C];
             
             if( !visited[stack_ptr] )
             {
@@ -169,7 +169,7 @@ protected:
                 for( Int k = 0; k < BUFFER_DIM; ++k )
                 {
                     // Overwrite, not add-into. Thus cleansing is not required.
-                    c[C_offset + k] = c[L_offset + k] + c[R_offset + k];
+                    C_in[C_offset + k] = C_in[L_offset + k] + C_in[R_offset + k];
                 }
                 visited[stack_ptr] = false;
                 --stack_ptr;  // pop
@@ -193,17 +193,17 @@ protected:
         Int stack_ptr    = null;
         stack[stack_ptr] = C_root;
         
-        const Int  * restrict const left  = C_left.data();
-        const Int  * restrict const right = C_right.data();
-              Real * restrict const c     = C_in.data();
+//        ptr<Int>  left  = C_left.data();
+//        ptr<Int>  right = C_right.data();
+//        mut<Real> c     = C_in.data();
         
         while( (stack_ptr >= null) && ( stack_ptr < 126 ) )
         {
             // We are at cluster C.
             const Int d = depths[stack_ptr];
-            const Int C = stack[stack_ptr];
-            const Int L = left [C];
-            const Int R = right[C];
+            const Int C = stack [stack_ptr];
+            const Int L = C_left[C];
+            const Int R = C_right[C];
             
             if( !visited[stack_ptr] )
             {
@@ -239,7 +239,7 @@ protected:
                 for( Int k = 0; k < buffer_dim; ++k )
                 {
                     // Overwrite, not add-into. Thus cleansing is not required.
-                    c[C_offset + k] = c[L_offset + k] + c[R_offset + k];
+                    C_in[C_offset + k] = C_in[L_offset + k] + C_in[R_offset + k];
                 }
                 visited[stack_ptr] = false;
                 --stack_ptr;  // pop
@@ -382,17 +382,17 @@ protected:
         Int stack_ptr    = null;
         stack[stack_ptr] = C_root;
         
-        const Int  * restrict const left  = C_left.data();
-        const Int  * restrict const right = C_right.data();
-              Real * restrict const c     = C_out.data();
+//        ptr<Int>  left  = C_left.data();
+//        ptr<Int>  right = C_right.data();
+//        mut<Real> c     = C_out.data();
         
         while( (stack_ptr >= null) && ( stack_ptr < 126 ) )
         {
             // We are at cluster C.
             const Int d = depths[stack_ptr];
             const Int C = stack [stack_ptr];
-            const Int L = left  [C];
-            const Int R = right [C];
+            const Int L = C_left[C];
+            const Int R = C_right[C];
             --stack_ptr; // pop
             
             if( (d < max_depth) && (L >= null) && (R >= null) )
@@ -405,10 +405,10 @@ protected:
                 LOOP_UNROLL_FULL
                 for( Int k = 0; k < BUFFER_DIM; ++k )
                 {
-                    const Real buffer = c[C_offset + k];
+                    const Real buffer = C_out[C_offset + k];
                     
-                    c[L_offset + k] += buffer;
-                    c[R_offset + k] += buffer;
+                    C_out[L_offset + k] += buffer;
+                    C_out[R_offset + k] += buffer;
                 }
                 
                 // push
@@ -435,20 +435,20 @@ protected:
         Int stack  [128] = {};
         Int depths [128] = {};
 
-        Int stack_ptr = null;
+        Int stack_ptr    = null;
         stack[stack_ptr] = C_root;
         
-        const Int  * restrict const left  = C_left.data();
-        const Int  * restrict const right = C_right.data();
-              Real * restrict const c     = C_out.data();
+//        ptr<Int>  left  = C_left.data();
+//        ptr<Int>  right = C_right.data();
+//        mut<Real> c     = C_out.data();
         
         while( (stack_ptr >= null) && ( stack_ptr < 126 ) )
         {
             // We are at cluster C.
             const Int d = depths[stack_ptr];
             const Int C = stack [stack_ptr];
-            const Int L = left  [C];
-            const Int R = right [C];
+            const Int L = C_left[C];
+            const Int R = C_right[C];
             --stack_ptr; //pop
             
             if( (d < max_depth) && (L >= null) && (R >= null) )
@@ -461,10 +461,10 @@ protected:
                 LOOP_UNROLL(4)
                 for( Int k = 0; k < buffer_dim; ++k )
                 {
-                    const Real buffer = c[C_offset + k];
+                    const Real buffer = C_out[C_offset + k];
                     
-                    c[L_offset + k] += buffer;
-                    c[R_offset + k] += buffer;
+                    C_out[L_offset + k] += buffer;
+                    C_out[R_offset + k] += buffer;
                 }
 
                 // push

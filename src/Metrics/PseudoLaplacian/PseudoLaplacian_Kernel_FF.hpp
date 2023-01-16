@@ -1,7 +1,5 @@
 #pragma once
 
-#define BASE FMM_Kernel_FF<ClusterTree_T_,is_symmetric_,false,false,true>
-
 namespace Repulsor
 {
     template<
@@ -10,11 +8,11 @@ namespace Repulsor
         bool is_symmetric_,
         bool high_order_
     >
-    class PseudoLaplacian_Kernel_FF : public BASE
+    class PseudoLaplacian_Kernel_FF : public FMM_Kernel_FF<ClusterTree_T_,is_symmetric_,false,false,true>
     {
     private:
         
-        using Base_T = BASE;
+        using Base_T = FMM_Kernel_FF<ClusterTree_T_,is_symmetric_,false,false,true>;
         
     public:
         
@@ -29,7 +27,6 @@ namespace Repulsor
         using Configurator_T     = typename Base_T::Configurator_T;
         using Values_T           = typename Base_T::Values_T;
         using ValueContainer_T   = typename Base_T::ValueContainer_T;
-
     
         using Base_T::AMB_DIM;
         using Base_T::PROJ_DIM;
@@ -42,8 +39,7 @@ namespace Repulsor
         static constexpr Int  BLOCK_NNZ  = 1;
         static constexpr Int  DIAG_NNZ   = 1;
         
-        static constexpr bool metric_flag = true;
-        
+        using Base_T::metric_flag;
         using Base_T::zero;
         using Base_T::one;
         using Base_T::two;
@@ -91,6 +87,7 @@ namespace Repulsor
         Real jj_block [BLOCK_NNZ] = {};
      
 #include "../../FMM/FMM_Kernel_Common.hpp"
+#include "../../FMM/FMM_Kernel_FF_Common.hpp"
         
     public:
         
@@ -156,6 +153,3 @@ namespace Repulsor
     };
 
 } // namespace Repulsor
-
-#undef BASE
-

@@ -86,9 +86,9 @@ namespace Repulsor
         FMM_Kernel() = delete;
         
         explicit FMM_Kernel( Configurator_T & conf )
-        :   S             ( conf.GetS() )
-        ,   T             ( conf.GetT() )
-        ,   metric_values ( conf.MetricValues()        )   // In configure mode, kernels needs
+        :   S             ( conf.GetS()          )
+        ,   T             ( conf.GetT()          )
+        ,   metric_values ( conf.MetricValues()  )   // In configure mode, kernels needs
         {
             Init();
         }

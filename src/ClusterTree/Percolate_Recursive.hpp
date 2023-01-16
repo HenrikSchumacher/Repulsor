@@ -128,7 +128,7 @@ protected:
             percolateUp_Recursive<BUFFER_DIM>(R);
             
             // Aftwards, compute the sum of the two children.
-            Real * restrict const c = C_in.data();
+//            Real * restrict const c = C_in.data();
             
             const Int C_offset = buffer_dim * C;
             const Int L_offset = buffer_dim * L;
@@ -138,7 +138,7 @@ protected:
             for( Int k = 0; k < BUFFER_DIM; ++k )
             {
                 // Overwrite, not add-into. Thus cleansing is not required.
-                c[C_offset+k] = c[L_offset+k] + c[R_offset+k];
+                C_in[C_offset+k] = C_in[L_offset+k] + C_in[R_offset+k];
             }
         }
         
@@ -159,7 +159,7 @@ protected:
             percolateUp_Recursive_gen(R);
             
             // Aftwards, compute the sum of the two children.
-            Real * restrict const c = C_in.data();
+//            Real * restrict const c = C_in.data();
             
             const Int C_offset = buffer_dim * C;
             const Int L_offset = buffer_dim * L;
@@ -169,7 +169,7 @@ protected:
             for( Int k = 0; k < buffer_dim; ++k )
             {
                 // Overwrite, not add-into. Thus cleansing is not required.
-                c[C_offset + k] = c[L_offset + k] + c[R_offset + k];
+                C_in[C_offset + k] = C_in[L_offset + k] + C_in[R_offset + k];
             }
         }
         

@@ -262,7 +262,7 @@ namespace Repulsor
             
             FMM_Traversor traversor ( bct.VeryNear(), ker );
             en += traversor.Compute();
-
+            
             if constexpr ( metric_flag )
             {
                 if constexpr ( is_symmetric )
@@ -276,8 +276,6 @@ namespace Repulsor
                 ker.Diag() = bct.GetS().VF_Accumulator().template AddReduce<Real,LInt>();
                 ptoc("Reduce VF_Accumulators");
             }
-            
-            dump(ker.MaxLevelReached())
             
             ptoc(ClassName()+"::VF_Compute");
         }
@@ -294,7 +292,7 @@ namespace Repulsor
                 BlockClusterTree_T::IsSymmetric(),
                 energy_flag, diff_flag, metric_flag
             >;
-
+            
             Kernel_T ker ( conf, q_half_, p_half_ );
 
             FMM_Traversor traversor ( bct.Near(), ker );
@@ -314,7 +312,6 @@ namespace Repulsor
                 ker.Diag() = bct.GetS().NF_Accumulator().template AddReduce<Real,LInt>();
                 ptoc("Reduce NF_Accumulators");
             }
-
             ptoc(ClassName()+"::NF_Compute");
         }
         

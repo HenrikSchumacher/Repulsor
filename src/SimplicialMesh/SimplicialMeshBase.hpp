@@ -77,7 +77,7 @@ namespace Repulsor
             return thread_count;
         }
         
-        virtual void SemiStaticUpdate( const ExtReal * restrict const V_coords_ ) = 0;
+        virtual void SemiStaticUpdate( ptr<ExtReal> V_coords_ ) = 0;
         
         virtual const ClusterTree_T & GetClusterTree() const = 0;
         
@@ -88,26 +88,26 @@ namespace Repulsor
         virtual const SparseBinaryMatrixCSR<Int,Int> & DerivativeAssembler() const = 0;
         
         virtual void Assemble_ClusterTree_Derivatives(
-            ExtReal * output,
+            mut<ExtReal> output,
             const ExtReal weight,
             bool addTo = false
         ) const = 0;
 
         virtual void Assemble_ClusterTree_SimplexEnergies(
-            ExtReal * output,
+            mut<ExtReal> output,
             const ExtReal weight,
             bool addTo = false
         ) const = 0;
         
         virtual void Assemble_ClusterTree_Density(
-            ExtReal * output,
+            mut<ExtReal> output,
             const ExtReal weight,
             bool addTo = false
         ) const = 0;
         
-        virtual void LoadUpdateVectors( const ExtReal * restrict const vecs, const ExtReal max_time ) = 0;
+        virtual void LoadUpdateVectors( ptr<ExtReal> vecs, const ExtReal max_time ) = 0;
 
-        virtual ExtReal MaximumSafeStepSize( const ExtReal * restrict const vecs, const ExtReal max_time ) = 0;
+        virtual ExtReal MaximumSafeStepSize( ptr<ExtReal> vecs, const ExtReal max_time ) = 0;
         
 //#######################################################################################
 //      Obstacle
@@ -203,7 +203,7 @@ namespace Repulsor
             std::stringstream s;
             
             s << "{ \n";
-            for( auto & p : cache )
+            for( auto const & p : cache )
             {
                 s << "\t" << p.first << "\n";
             }

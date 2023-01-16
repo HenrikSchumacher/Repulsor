@@ -59,9 +59,6 @@ namespace Repulsor
         using Base_T::two;
         using Base_T::is_symmetric;
         
-        
-#include "../../FMM/FMM_Kernel_Common.hpp"
-        
     public:
         
         TP0_Kernel_NF() = delete;
@@ -93,6 +90,9 @@ namespace Repulsor
         {}
         
         ~TP0_Kernel_NF() = default;
+        
+#include "../../FMM/FMM_Kernel_Common.hpp"
+#include "../../FMM/FMM_Kernel_NF_Common.hpp"
         
     protected:
         
@@ -348,7 +348,9 @@ namespace Repulsor
             }
         }
         
-        std::string className() const
+    public:
+        
+        std::string ClassName() const
         {
             return "TP0_Kernel_NF<"
             + ToString(S_DOM_DIM) + ","

@@ -401,8 +401,8 @@ namespace Repulsor
             {
                 // It is quite certainly _NOT_ a good idea to parallelize this loop (false sharing!).
                 const Int last = PrimitiveCount();
-                const Int * restrict const ord     = P_ordering.data();
-                      Int * restrict const inv_ord = P_inverse_ordering.data();
+                ptr<Int> ord     = P_ordering.data();
+                mut<Int> inv_ord = P_inverse_ordering.data();
                 
                 for( Int i = 0; i < last; ++i )
                 {
@@ -529,7 +529,7 @@ namespace Repulsor
             ptoc(className()+"::AllocateNearFarData");
         }
         
-        void ComputePrimitiveData( const Real * restrict const P_near_, const Real * restrict const P_far_ )
+        void ComputePrimitiveData( ptr<Real> P_near_, ptr<Real> P_far_ )
         {
             ptic(className()+"::ComputePrimitiveData");
             
@@ -537,10 +537,10 @@ namespace Repulsor
             const Int near_dim = NearDim();
             const Int  far_dim =  FarDim();
 
-            const Int * restrict const ord = P_ordering.data();
+            ptr<Int> ord = P_ordering.data();
             
-            Real * restrict const P_near__ = P_near.data();
-            Real * restrict const P_far__  = P_far.data();
+            mut<Real> P_near__ = P_near.data();
+            mut<Real> P_far__  = P_far.data();
             
             #pragma omp parallel for num_threads( ThreadCount() ) shared( P_near__, P_far__, P_near_, P_far_, ord ) schedule( static )
             for( Int i = 0; i < primitive_count; ++i )
@@ -578,7 +578,7 @@ namespace Repulsor
             const Int L = C_left [C];
             const Int R = C_right[C];
             
-            Real * restrict const C_C = C_far.data(C);
+            mut<Real> C_C = C_far.data(C);
             
             if( L >= 0 && R >= 0 )
             {
@@ -593,8 +593,8 @@ namespace Repulsor
                 }
                 #pragma omp taskwait
 
-                const Real * restrict const C_L = C_far.data(L);
-                const Real * restrict const C_R = C_far.data(R);
+                ptr<Real> C_L = C_far.data(L);
+                ptr<Real> C_R = C_far.data(R);
                 
                 Real L_weight = C_L[0];
                 Real R_weight = C_R[0];
@@ -623,7 +623,7 @@ namespace Repulsor
                 
                 for( Int i = begin; i < end; ++i )
                 {
-                    const Real * restrict const P = P_far.data(i);
+                    ptr<Real> P = P_far.data(i);
                     
                     const Real a = P[0];
                     
@@ -769,7 +769,7 @@ namespace Repulsor
             C_to_P.Outer()[PrimitiveCount()] = PrimitiveCount();
             
             {
-                Int * restrict const inner__ = C_to_P.Inner().data();
+                mut<Int> inner__ = C_to_P.Inner().data();
                 
                 const Int leaf_cluster_count = LeafClusterCount();
                 
@@ -789,8 +789,8 @@ namespace Repulsor
             }
             
             {
-                Int * restrict const i = C_to_P.Outer().data();
-                Int * restrict const j = P_to_C.Inner().data();
+                mut<Int> i = C_to_P.Outer().data();
+                mut<Int> j = P_to_C.Inner().data();
                 
                 const Int primitive_count = PrimitiveCount();
                 
@@ -805,10 +805,10 @@ namespace Repulsor
             {
                 Int cluster_count = ClusterCount();
                 
-                Int       * restrict const outer__ = P_to_C.Outer().data();
-                Int const * restrict const left__  = C_left.data();
-                Int const * restrict const begin__ = C_begin.data();
-                Int const * restrict const end__   = C_end.data();
+                mut<Int> outer__ = P_to_C.Outer().data();
+                ptr<Int> left__  = C_left.data();
+                ptr<Int> begin__ = C_begin.data();
+                ptr<Int> end__   = C_end.data();
                 
                 for ( Int C = 0; C < cluster_count; ++C )
                 {
@@ -847,12 +847,12 @@ namespace Repulsor
                     
                     hi_pre.Outer().Read( DiffOp.Outer().data() );
                 
-                    Int  const * restrict const ord      = P_ordering.data();
-                    Int  const * restrict const i_input  = DiffOp.Inner().data();
-                    Int        * restrict const i_output = hi_pre.Inner().data();
-                    Real const * restrict const r_input  = DiffOp.Values().data();
-                    Real       * restrict const r_output = hi_pre.Values().data();
-                    Real const * restrict const near     = P_near.data();
+                    ptr<Int>  ord      = P_ordering.data();
+                    ptr<Int>  i_input  = DiffOp.Inner().data();
+                    mut<Int>  i_output = hi_pre.Inner().data();
+                    ptr<Real> r_input  = DiffOp.Values().data();
+                    mut<Real> r_output = hi_pre.Values().data();
+                    ptr<Real> near     = P_near.data();
                 
                     const Int near_dim = NearDim();
                     const Int size = DiffOp.NonzeroCount() / primitive_count;
@@ -890,12 +890,12 @@ namespace Repulsor
                 {
                     lo_pre.Outer().Read( AvOp.Outer().data() );
                                         
-                    Int  const * restrict const ord      = P_ordering.data();
-                    Int  const * restrict const i_input  =   AvOp.Inner().data();
-                    Int        * restrict const i_output = lo_pre.Inner().data();
-                    Real const * restrict const r_input  =   AvOp.Values().data();
-                    Real       * restrict const r_output = lo_pre.Values().data();
-                    Real const * restrict const near     = P_near.data();
+                    ptr<Int>  ord      = P_ordering.data();
+                    ptr<Int>  i_input  =   AvOp.Inner().data();
+                    mut<Int>  i_output = lo_pre.Inner().data();
+                    ptr<Real> r_input  =   AvOp.Values().data();
+                    mut<Real> r_output = lo_pre.Values().data();
+                    ptr<Real> near     = P_near.data();
                     
                     const Int near_dim = NearDim();
                     const Int size = AvOp.NonzeroCount() / primitive_count;
@@ -952,20 +952,20 @@ namespace Repulsor
                     ThreadCount()
                 );
                 
-                Int  const * restrict const ord       = P_ordering.data();
-                Real const * restrict const near      = P_near.data();
+                ptr<Int>  ord       = P_ordering.data();
+                ptr<Real> near      = P_near.data();
                 
-//                Int  const * restrict const av_outer  = AvOp.Outer().data()      + 1;
-//                Int  const * restrict const di_outer  = DiffOp.Outer().data()    + 1;
-                Int        * restrict const mi_outer  = mixed_pre.Outer().data() + 1;
+//                ptr<Int> av_outer  = AvOp.Outer().data()      + 1;
+//                ptr<Int> di_outer  = DiffOp.Outer().data()    + 1;
+                mut<Int>  mi_outer  = mixed_pre.Outer().data() + 1;
                 
-                Int  const * restrict const av_inner  = AvOp.Inner().data();
-                Int  const * restrict const di_inner  = DiffOp.Inner().data();
-                Int        * restrict const mi_inner  = mixed_pre.Inner().data();
+                ptr<Int>  av_inner  = AvOp.Inner().data();
+                ptr<Int>  di_inner  = DiffOp.Inner().data();
+                mut<Int>  mi_inner  = mixed_pre.Inner().data();
                 
-                Real const * restrict const av_values = AvOp.Values().data();
-                Real const * restrict const di_values = DiffOp.Values().data();
-                Real       * restrict const mi_values = mixed_pre.Values().data();
+                ptr<Real> av_values = AvOp.Values().data();
+                ptr<Real> di_values = DiffOp.Values().data();
+                mut<Real> mi_values = mixed_pre.Values().data();
             
                 const Int near_dim = NearDim();
                 const Int av_row_size = AvOp.NonzeroCount() / primitive_count;
@@ -1057,7 +1057,7 @@ namespace Repulsor
             SemiStaticUpdate( P_near_.data(), P_far_.data() );
         } // SemiStaticUpdate
         
-        void SemiStaticUpdate( const Real * restrict const P_near_, const Real * restrict const P_far_ ) override
+        void SemiStaticUpdate( ptr<Real> P_near_, ptr<Real> P_far_ ) override
         {
             // Updates only the computational data like primitive/cluster areas, centers of mass and normals. All data related to clustering or multipole acceptance criteria remain are unchanged.
             
@@ -1088,11 +1088,11 @@ namespace Repulsor
             C_updated_serialized = Tensor2<SReal,Int>( ClusterCount(),   C_proto[0]->Size() );
             
             
-            const SReal * restrict const P_p_ser = P_serialized.data();
-            const SReal * restrict const P_v_ser = P_velocities_serialized.data();
+            ptr<SReal> P_p_ser = P_serialized.data();
+            ptr<SReal> P_v_ser = P_velocities_serialized.data();
             
-                  SReal * restrict const P_up_ser = P_updated_serialized.data();
-                  SReal * restrict const C_up_ser = C_updated_serialized.data();
+            mut<SReal> P_up_ser = P_updated_serialized.data();
+            mut<SReal> C_up_ser = C_updated_serialized.data();
             
             ptic(className()+"::TakeUpdateVectors - Compute the primitives updated with max_time.");
             // TODO: Potentially wastful code.
@@ -1195,13 +1195,13 @@ namespace Repulsor
             const Int near_dim = NearDim();
             const Int primitive_count = PrimitiveCount();
             
-                  Real * restrict const to      = P_D_near.data();
-            const Int  * restrict const inv_ord = P_inverse_ordering.data();
+            mut<Real> to      = P_D_near.data();
+            ptr<Int>  inv_ord = P_inverse_ordering.data();
 
             // Add the other slices. (Start with the first slice if we were asked to add into.)
             for( Int thread = 0; thread < ThreadCount(); ++thread )
             {
-                const Real * restrict const from = thread_P_D_near.data(thread);
+                ptr<Real> from = thread_P_D_near.data(thread);
 
                 if( thread == 0 && !addto )
                 {
@@ -1244,9 +1244,9 @@ namespace Repulsor
             
             this->ClustersToPrimitives(false);
 
-            const Real * restrict const from    = P_out.data();
-                  Real * restrict const to      = P_D_far.data();
-            const Int  * restrict const inv_ord = P_inverse_ordering.data();
+            ptr<Real> from    = P_out.data();
+            mut<Real> to      = P_D_far.data();
+            ptr<Int>  inv_ord = P_inverse_ordering.data();
             
             // Finally, permute data for the outside world.
             if( addto )

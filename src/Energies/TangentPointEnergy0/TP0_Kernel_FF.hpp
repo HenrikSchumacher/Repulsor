@@ -119,6 +119,7 @@ namespace Repulsor
         Real jj_block [BLOCK_NNZ] = {};
      
 #include "../../FMM/FMM_Kernel_Common.hpp"
+#include "../../FMM/FMM_Kernel_FF_Common.hpp"
         
     public:
         
@@ -326,8 +327,10 @@ namespace Repulsor
                 add_to_buffer<DIAG_NNZ>( &jj_block[0], &T_diag[DIAG_NNZ * j_global] );
             }
         }
+        
+    public:
 
-        std::string className() const
+        std::string ClassName() const
         {
             return "TP0_Kernel_FF<"
             + ToString(S_DOM_DIM) + ","
