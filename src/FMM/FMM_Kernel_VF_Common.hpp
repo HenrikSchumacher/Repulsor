@@ -4,8 +4,6 @@ public:
     {
         Real sum = static_cast<Real>(0);
         
-//        ++primitive_count;
-        
         bool from_above = true;
         bool shall_continue = true;
         
@@ -14,14 +12,16 @@ public:
     
         while( shall_continue )
         {
+//            logprint("level { "+ToString(S_Tree.Level())+","+ToString(T_Tree.Level())+" }");
+            
             if( from_above )
             {
+//                logprint("from_above");
                 if( S_Tree.Level() >= this->max_refinement )
                 {
                     // If at lowest level and inadmissable then we just compute the energy and move up.
-                    this->max_level_reached = this->max_refinement;
-//                    block_count++;
-//                    bottom_count++;
+                    this->max_level_reached = std::max( this->max_level_reached,this->max_refinement );
+                    ++this->evaluations;
                     sum += compute();
                     S_Tree.ToParent();
                     T_Tree.ToParent();
@@ -29,17 +29,20 @@ public:
                 }
                 else
                 {
+//                    logprint("not max_level");
                     // If not at lowest level, then we have to check for admissability.
-                    auto & P = S_Tree.SimplexPrototype();
-                    auto & Q = T_Tree.SimplexPrototype();
-                    
-                    const bool admissable = this->gjk.MultipoleAcceptanceCriterion(P, Q, this->theta2);
+                    const bool admissable = this->gjk.MultipoleAcceptanceCriterion(
+                        S_Tree.SimplexPrototype(),
+                        T_Tree.SimplexPrototype(),
+                        this->theta2
+                    );
                     
                     if( admissable )
                     {
+//                        logprint("admissable");
                         // We compute energy, go to parent, and prepare the next child of the parent.
                         this->max_level_reached = std::max( this->max_level_reached, S_Tree.Level() );
-//                        block_count++;
+                        ++this->evaluations;
                         sum += compute();
                         S_Tree.ToParent();
                         T_Tree.ToParent();
@@ -47,6 +50,7 @@ public:
                     }
                     else
                     {
+//                        logprint("inadmisable");
                         // If inadmissable, we go a level deeper.
 
                         S_Tree.ToChild(0);
@@ -57,12 +61,13 @@ public:
             }
             else
             {
+//                logprint("from_below");
                 // If we come from below, we have to find the next pair of simplices to visit.
                 
-                Int S_k = S_Tree.FormerChildID();
-                Int T_k = T_Tree.FormerChildID();
+                const Int S_k = S_Tree.FormerChildID();
+                const Int T_k = T_Tree.FormerChildID();
                 
-//                    print("Coming from "+ToString(S_k)+"-th child of S and "+ToString(T_k)+"-th child of T.");
+//                logprint("Coming from "+ToString(S_k)+"-th child of S and "+ToString(T_k)+"-th child of T.");
                 
                 if( T_k < T_Tree.ChildCount()-1 )
                 {
@@ -107,4 +112,21 @@ public:
         }
         
         return this->symmetry_factor * sum;
+    }
+
+
+    void PrintReport( Int thread, float time ) const
+    {
+        logprint("Thread "+ToString(thread)+": "
+            + "\n\t kernel:        \t" + this->ClassName()
+            + "\n\t time elapsed:  \t" + ToString(time)
+            + "\n\t evaluations:   \t" + ToString(this->evaluations)
+            + "\n\t deepest level: \t" + ToString(this->max_level_reached)
+            + "\n"
+        );
+        
+        if( this->max_level_reached >= this->max_refinement )
+        {
+            wprint(this->ClassName()+" on thread "+ToString(thread)+" reached the maximal allowed refinement level "+ToString(this->max_refinement)+".");
+        }
     }
