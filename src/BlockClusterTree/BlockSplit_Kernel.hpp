@@ -122,7 +122,7 @@ namespace Repulsor
         mut<SReal> S_P_serialized = nullptr;
         mut<SReal> T_P_serialized = nullptr;
         
-        const SparseBinaryMatrixCSR<Int,Int> & A;
+        const Sparse::BinaryMatrixCSR<Int,Int> & A;
         
         Int C_i = -1;
         Int C_j = -1;

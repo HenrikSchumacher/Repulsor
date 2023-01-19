@@ -256,7 +256,7 @@ namespace Repulsor
             {
                 if constexpr ( is_symmetric )
                 {
-                    SparseKernelMatrixCSR<Kernel_Block_Mul_T> matrix ( bct.VeryNear() );
+                    Sparse::KernelMatrixCSR<Kernel_Block_Mul_T> matrix ( bct.VeryNear() );
                     
                     matrix.FillLowerTriangleFromUpperTriangle( ker.OffDiag().data() );
                 }
@@ -292,7 +292,7 @@ namespace Repulsor
             {
                 if constexpr ( is_symmetric )
                 {
-                    SparseKernelMatrixCSR<Kernel_Block_Mul_T> matrix ( bct.Near() );
+                    Sparse::KernelMatrixCSR<Kernel_Block_Mul_T> matrix ( bct.Near() );
                     
                     matrix.FillLowerTriangleFromUpperTriangle( ker.OffDiag().data() );
                 }
@@ -328,7 +328,7 @@ namespace Repulsor
             {
                 if constexpr ( is_symmetric )
                 {
-                    SparseKernelMatrixCSR<Kernel_Block_Mul_T> matrix ( bct.Far() );
+                    Sparse::KernelMatrixCSR<Kernel_Block_Mul_T> matrix ( bct.Far() );
                     
                     matrix.FillLowerTriangleFromUpperTriangle( ker.OffDiag().data() );
                 }
@@ -390,7 +390,7 @@ namespace Repulsor
 
         void NF_MultiplyMetric( const Int rhs_count ) const
         {
-            SparseKernelMatrixCSR<Kernel_Block_Mul_T> matrix ( bct.Near() );
+            Sparse::KernelMatrixCSR<Kernel_Block_Mul_T> matrix ( bct.Near() );
             
             matrix.Dot(
                 metric_values["NF"].data(),
@@ -417,7 +417,7 @@ namespace Repulsor
         
         void VF_MultiplyMetric( const Int rhs_count ) const
         {
-            SparseKernelMatrixCSR<Kernel_Block_MulAdd_T> matrix ( bct.VeryNear() );
+            Sparse::KernelMatrixCSR<Kernel_Block_MulAdd_T> matrix ( bct.VeryNear() );
             
             matrix.Dot(
                 metric_values["VF"].data(),
@@ -444,7 +444,7 @@ namespace Repulsor
         
         void FF_MultiplyMetric( const Int rhs_count ) const
         {
-            SparseKernelMatrixCSR<Kernel_Block_Mul_T> matrix ( bct.Far() );
+            Sparse::KernelMatrixCSR<Kernel_Block_Mul_T> matrix ( bct.Far() );
             
             matrix.Dot(
                 metric_values["FF"].data(),

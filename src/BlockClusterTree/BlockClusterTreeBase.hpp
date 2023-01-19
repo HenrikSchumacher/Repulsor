@@ -22,10 +22,10 @@ namespace Repulsor
         
         using Setting_T          = BlockClusterTreeSettings;
 
-        using Inter_Pattern_T    = SparseBinaryMatrixCSR<Int,LInt>;
-        using VeryNear_Pattern_T = SparseBinaryMatrixCSR<Int,LInt>;
-        using Near_Pattern_T     = SparseBinaryMatrixCSR<Int,LInt>;
-        using Far_Pattern_T      = SparseBinaryMatrixCSR<Int,LInt>;
+        using Inter_Pattern_T    = Sparse::BinaryMatrixCSR<Int,LInt>;
+        using VeryNear_Pattern_T = Sparse::BinaryMatrixCSR<Int,LInt>;
+        using Near_Pattern_T     = Sparse::BinaryMatrixCSR<Int,LInt>;
+        using Far_Pattern_T      = Sparse::BinaryMatrixCSR<Int,LInt>;
         
         using ClusterTreeBase_T  = ClusterTreeBase<Real,Int,SReal,ExtReal>;
 

@@ -116,7 +116,7 @@ namespace Repulsor
         const Tensor2<SReal,Int> & T_P_ser;
         const Tensor2<SReal,Int> & T_P_v_ser;
         
-        const SparseBinaryMatrixCSR<Int,Int> & A;
+        const Sparse::BinaryMatrixCSR<Int,Int> & A;
         
         CollisionFinder<ClusterTree_T::AMB_DIM,Real,Int,SReal> C;
         
