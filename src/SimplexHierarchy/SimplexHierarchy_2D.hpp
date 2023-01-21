@@ -8,15 +8,28 @@ namespace Repulsor
     template<int AMB_DIM, typename Real, typename Int, typename SReal>
     class alignas( OBJECT_ALIGNMENT ) SimplexHierarchy<DOM_DIM,AMB_DIM,Real,Int,SReal>
     {
-        
+    
 #include "SimplexHierarchy_Details.hpp"
         
-        constexpr Int ChildCount() const
+    public:
+        
+        static constexpr Child_T ChildCount()
         {
             return 4;
         }
         
-        void ToChild( const Int k )
+        static constexpr Level_T MaxLevel()
+        {
+            return std::floor(
+                std::log( static_cast<double>(std::numeric_limits<Column_T>::max())))
+                /
+                std::log(static_cast<double>(ChildCount())
+            );
+        }
+        
+    public:
+        
+        void ToChild( const Child_T k )
         {
             current_simplex_computed = false;
             
@@ -66,7 +79,7 @@ namespace Repulsor
             {
                 current_simplex_computed = false;
                 
-                Int k = child_id;
+                const Child_T k = child_id;
                 
                 column = (column-child_id) / ChildCount();
                 former_child_id = child_id;

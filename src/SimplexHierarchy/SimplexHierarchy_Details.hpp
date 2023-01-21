@@ -1,3 +1,12 @@
+public:
+
+    static constexpr Int SIZE = 1 + (DOM_DIM+2) * AMB_DIM;
+
+    using Level_T  = int32_t;
+    using Child_T  = int32_t;
+    using Column_T = uint64_t;
+//    using Column_T = int32_t;
+ 
 protected:
 
     static constexpr SReal zero = static_cast<SReal>(0);
@@ -6,20 +15,19 @@ protected:
     static constexpr SReal two  = static_cast<SReal>(2);
     static constexpr SReal nth  = one / static_cast<SReal>(DOM_DIM+1);
 
-    SReal root_serialized    [1 + (DOM_DIM+2) * AMB_DIM] = {};
-    SReal simplex_serialized [1 + (DOM_DIM+2) * AMB_DIM] = {};
+    SReal root_serialized    [SIZE] = {};
+    SReal simplex_serialized [SIZE] = {};
     
     SReal corners [DOM_DIM+1][DOM_DIM+1] = {};
     SReal center  [DOM_DIM+1] = {};
     
     Polytope<DOM_DIM+1,AMB_DIM,Real,Int,SReal,SReal,Int> P;
     
-    Int simplex_id = -1;
-    Int level  = 0;
-    Int column = 0;
-
-    Int child_id =  0;
-    Int former_child_id = -1;
+    Int      simplex_id      = -1;
+    Level_T  level           =  0;
+    Column_T column          =  0;
+    Child_T  child_id        =  0;
+    Child_T  former_child_id = -1;
     
     SReal scale  = one;
     SReal weight = one;
@@ -35,6 +43,36 @@ public:
 
     virtual ~SimplexHierarchy() = default;
     
+    bool Check()
+    {
+        if( !(0 <= simplex_id && simplex_id <= std::numeric_limits<Int>::max()) )
+        {
+            eprint("Overflow of simplex_id detected.");
+            return false;
+        };
+        
+        if( !(0 <= column && column <= std::numeric_limits<Column_T>::max()) )
+        {
+            eprint("Overflow of column detected.");
+            return false;
+        };
+        
+        if( !(0 <= child_id && child_id <= ChildCount()) )
+        {
+            eprint("Overflow of child_id detected.");
+            return false;
+        };
+        
+        if( !(0 <= former_child_id && former_child_id <= ChildCount()) )
+        {
+            eprint("Overflow of former_child_id detected.");
+            return false;
+        };
+        
+        return true;
+    }
+
+
     constexpr Int VertexCount() const
     {
         return DOM_DIM+1;
@@ -94,9 +132,9 @@ public:
             // root_serialized[0] is the squared radius!
             simplex_serialized[0] = scale * scale * root_serialized[0];
             
-            const SReal * restrict const root    =    &root_serialized[1 + AMB_DIM];
-                  SReal * restrict const c       = &simplex_serialized[1          ];
-                  SReal * restrict const current = &simplex_serialized[1 + AMB_DIM];
+            ptr<SReal> root    =    &root_serialized[1 + AMB_DIM];
+            mut<SReal> c       = &simplex_serialized[1          ];
+            mut<SReal> current = &simplex_serialized[1 + AMB_DIM];
 
             for( Int k = 0; k < AMB_DIM; ++k )
             {
@@ -181,12 +219,12 @@ public:
         return weight;
     }
     
-    Int Level() const
+    Level_T Level() const
     {
         return level;
     }
     
-    Int Column() const
+    Column_T Column() const
     {
         return column;
     }
@@ -196,20 +234,14 @@ public:
         return simplex_id;
     }
 
-    Int ChildID() const
+    Child_T ChildID() const
     {
         return child_id;
     }
-    Int FormerChildID() const
+    Child_T FormerChildID() const
     {
         return former_child_id;
     }
-
-    bool IsLastChild() const
-    {
-        return (0< child_id) && (child_id < ChildCount()-1);
-    }
-
 
     const SReal * Center() const
     {
@@ -330,7 +362,7 @@ public:
         
         RequireSubsimplex();
         
-        SReal * restrict const q = &simplex_serialized[0] + 1 + AMB_DIM;
+        mut<SReal> q = &simplex_serialized[0] + 1 + AMB_DIM;
         
         for( Int i = 0; i < DOM_DIM+1 * AMB_DIM; ++i )
         {

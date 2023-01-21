@@ -43,7 +43,7 @@ protected:
         
         S_active[s] = true;
         
-        copy_buffer( vertex_list, simplices.data(s), S_vertex_count );
+        copy_buffer<S_vertex_count>( vertex_list, simplices.data(s) );
 
         ComputeSimplexConnectivity(s);
 
@@ -54,7 +54,7 @@ protected:
     {
         // Find the index of the k-th edge in simplex s.
         
-        const Pair_T p = std::minmax( simplices(s,tri_i[k]), simplices(s,tri_j[k]) );
+        const Pair_T p ( std::minmax( simplices(s,tri_i[k]), simplices(s,tri_j[k]) ) );
         
         return ( edge_lookup.count(p) > 0 ) ? edge_lookup[p] : -13;
     }
@@ -63,7 +63,7 @@ protected:
         const Simplex_T s,
         const Vertex_T v_0,
         const Vertex_T v_1,
-        Vertex_T * restrict const vertex_list
+        mut<Vertex_T> vertex_list
     )
     {
         // Fill v_list with the vertices in simplex s that oppose v_0 and v_1.

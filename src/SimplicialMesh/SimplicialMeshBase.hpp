@@ -1,39 +1,44 @@
 #pragma once
 
-#define CLASS SimplicialMeshBase
-
 namespace Repulsor
 {
-    template<typename Real, typename Int, typename SReal, typename ExtReal>
-    class EnergyBase;
-    
-    template<typename Real, typename Int, typename SReal, typename ExtReal>
+    template<typename Real_, typename Int_, typename SReal_, typename ExtReal_>
     class SimplicialRemesherBase;
     
-    template<typename Real, typename Int, typename SReal, typename ExtReal>
-    class CLASS
+    template<typename Real_, typename Int_, typename SReal_, typename ExtReal_>
+    class SimplicialMeshBase
     {
-        ASSERT_FLOAT(Real);
-        ASSERT_INT(Int);
-        ASSERT_FLOAT(SReal);
-        ASSERT_FLOAT(ExtReal);
         
+        ASSERT_FLOAT(Real_);
+        ASSERT_INT(Int_);
+        ASSERT_FLOAT(SReal_);
+        ASSERT_FLOAT(ExtReal_);
         
     public:
         
-        using ClusterTreeBase_T      =        ClusterTreeBase<Real,Int,SReal,ExtReal>;
-        using BlockClusterTreeBase_T =   BlockClusterTreeBase<Real,Int,SReal,ExtReal>;
-        using CollisionTreeBase_T    =      CollisionTreeBase<Real,Int,SReal,ExtReal>;
-        using RemesherBase_T         = SimplicialRemesherBase<Real,Int,SReal,ExtReal>;
+        using Real    = Real_;
+        using Int     = Int_;
+        using SReal   = SReal_;
+        using ExtReal = ExtReal_;
         
-        CLASS () {}
+        using ClusterTree_T              =        ClusterTreeBase<Real,Int,SReal,ExtReal>;
+        using BlockClusterTree_T         =   BlockClusterTreeBase<Real,Int,SReal,ExtReal,true>;
+        using CollisionTree_T            =      CollisionTreeBase<Real,Int,SReal,ExtReal,true>;
+        using ObstacleBlockClusterTree_T =   BlockClusterTreeBase<Real,Int,SReal,ExtReal,false>;
+        using ObstacleCollisionTree_T    =      CollisionTreeBase<Real,Int,SReal,ExtReal,false>;
+        using Remesher_T                 = SimplicialRemesherBase<Real,Int,SReal,ExtReal>;
         
-        explicit CLASS( const Int thread_count_ )
+        using TangentVector_T            = Tensor2<ExtReal,Int>;
+        using CotangentVector_T          = Tensor2<ExtReal,Int>;
+        
+        SimplicialMeshBase() = default;
+
+        virtual ~SimplicialMeshBase() = default;
+        
+        explicit SimplicialMeshBase( const Int thread_count_ )
         :   thread_count( std::max( static_cast<Int>(1), thread_count_) )
         {};
         
-        virtual ~CLASS() = default;
-
         mutable      ClusterTreeSettings       cluster_tree_settings;
         mutable BlockClusterTreeSettings block_cluster_tree_settings;
         mutable       AdaptivitySettings         adaptivity_settings;
@@ -41,6 +46,9 @@ namespace Repulsor
     protected:
         
         const Int thread_count = 1;
+        
+        mutable std::unordered_map<std::string,std::any> cache;
+        mutable std::unordered_map<std::string,std::any> persistent_cache;
             
     public:
         
@@ -69,264 +77,59 @@ namespace Repulsor
             return thread_count;
         }
         
-        virtual void SemiStaticUpdate(
-            const ExtReal * restrict const V_coords_,
-            const bool transp_ = false
-        ) = 0;
+        virtual void SemiStaticUpdate( ptr<ExtReal> V_coords_, const bool transp_ = false ) = 0;
         
-        virtual const ClusterTreeBase_T & GetClusterTree() const = 0;
+        virtual const ClusterTree_T & GetClusterTree() const = 0;
         
-        virtual const BlockClusterTreeBase_T & GetBlockClusterTree() const = 0;
+        virtual const BlockClusterTree_T & GetBlockClusterTree() const = 0;
         
-        virtual const CollisionTreeBase_T & GetCollisionTree() const = 0;
+        virtual const CollisionTree_T & GetCollisionTree() const = 0;
                 
-        virtual const SparseBinaryMatrixCSR<Int,Int> & DerivativeAssembler() const = 0;
+        virtual const Sparse::BinaryMatrixCSR<Int,Int> & DerivativeAssembler() const = 0;
         
         virtual void Assemble_ClusterTree_Derivatives(
-            ExtReal * output,
+            mut<ExtReal> output,
             const ExtReal weight,
             bool addTo = false
         ) const = 0;
 
         virtual void Assemble_ClusterTree_SimplexEnergies(
-            ExtReal * output,
+            mut<ExtReal> output,
             const ExtReal weight,
             bool addTo = false
         ) const = 0;
         
         virtual void Assemble_ClusterTree_Density(
-            ExtReal * output,
+            mut<ExtReal> output,
             const ExtReal weight,
             bool addTo = false
         ) const = 0;
         
-        virtual void LoadUpdateVectors(
-            const ExtReal * restrict const vecs,
-            const ExtReal max_time,
-            const bool transp_ = false
-        ) = 0;
+        virtual void LoadUpdateVectors( ptr<ExtReal> vecs, const ExtReal max_time, const bool transp_ = false ) = 0;
 
-        virtual ExtReal MaximumSafeStepSize(
-            const ExtReal * restrict const vecs,
-            const ExtReal max_time,
-            const bool transp_ = false
-        ) = 0;
+        virtual ExtReal MaximumSafeStepSize( ptr<ExtReal> vecs, const ExtReal max_time, const bool transp_ = false ) = 0;
         
 //#######################################################################################
 //      Obstacle
 //#######################################################################################
         
-    public:
-        
-        virtual void LoadObstacle( std::unique_ptr<CLASS> obstacle_ ) = 0;
-
-        virtual const CLASS & GetObstacle() const = 0;
-        
-        virtual bool ObstacleInitialized() const = 0;
-        
-        virtual const ClusterTreeBase_T & GetObstacleClusterTree() const = 0;
-        
-        virtual const BlockClusterTreeBase_T & GetObstacleBlockClusterTree() const = 0;
-        
-        virtual const CollisionTreeBase_T & GetObstacleCollisionTree() const = 0;
-        
-//##############################################################################################
-//      Tangent-point
-//##############################################################################################
-
-    public:
-        
-        virtual std::pair<Real,Real> GetTangentPointExponents() const = 0;
-        
-        virtual void SetTangentPointExponents( const Real alpha, const Real beta ) const = 0;
-        
-        virtual ExtReal GetTangentPointWeight() const = 0;
-        
-        virtual void SetTangentPointWeight( const ExtReal weight ) const = 0;
-        
-//##############################################################################################
-//      TangentPointEnergy
-//##############################################################################################
-
-        
-        virtual ExtReal TangentPointEnergy() const = 0;
-
-        virtual ExtReal TangentPointEnergy_Differential( ExtReal * output, bool addTo = false ) const  = 0;
-        
-        virtual ExtReal TangentPointEnergy_Differential( Tensor1<ExtReal,Int> & output, bool addTo = false ) const  = 0;
-        
-        virtual ExtReal TangentPointEnergy_Differential( Tensor2<ExtReal,Int> & output, bool addTo = false ) const  = 0;
-        
-        virtual void TangentPointEnergy_Density( ExtReal * output, bool addTo = false ) const  = 0;
-        
-        virtual void TangentPointEnergy_Density( Tensor1<ExtReal,Int> & output, bool addTo = false ) const  = 0;
-        
-        virtual void TangentPointEnergy_SimplexEnergies( ExtReal * output, bool addTo = false ) const  = 0;
-        
-        virtual void TangentPointEnergy_SimplexEnergies( Tensor1<ExtReal,Int> & output, bool addTo = false ) const  = 0;
-        
-        
-//##############################################################################################
-//      TangentPointObstacleEnergy
-//##############################################################################################
-
-
-        virtual ExtReal TangentPointObstacleEnergy() const = 0;
-
-        virtual ExtReal TangentPointObstacleEnergy_Differential( ExtReal * output, bool addTo = false ) const  = 0;
-        
-        virtual ExtReal TangentPointObstacleEnergy_Differential( Tensor1<ExtReal,Int> & output, bool addTo = false ) const = 0;
-        
-        virtual ExtReal TangentPointObstacleEnergy_Differential( Tensor2<ExtReal,Int> & output, bool addTo = false ) const = 0;
-        
-        virtual void TangentPointObstacleEnergy_Density( ExtReal * output, bool addTo = false ) const  = 0;
-        
-        virtual void TangentPointObstacleEnergy_Density( Tensor1<ExtReal,Int> & output, bool addTo = false ) const = 0;
-   
-        virtual void TangentPointObstacleEnergy_SimplexEnergies( ExtReal * output, bool addTo = false ) const  = 0;
-        
-        virtual void TangentPointObstacleEnergy_SimplexEnergies( Tensor1<ExtReal,Int> & output, bool addTo = false ) const  = 0;
-        
-//##############################################################################################
-//      Custom energy (allows for loading arbitrary EnergyBase object )
-//##############################################################################################
+    // TODO: Make list of obstacles.
         
     public:
         
-        virtual void LoadCustomEnergy( std::unique_ptr<EnergyBase<Real,Int,SReal,ExtReal>> e ) const = 0;
-        
-        virtual ExtReal GetCustomEnergyWeight() const = 0;
+        virtual void  LoadObstacle( std::unique_ptr<SimplicialMeshBase> obstacle_ ) = 0;
 
-        virtual void SetCustomEnergyWeight( const ExtReal weight ) const = 0;
-
-        virtual ExtReal CustomEnergy() const = 0;
-
-        virtual ExtReal CustomEnergy_Differential( ExtReal * output, bool addTo = false ) const = 0;
- 
-        virtual ExtReal CustomEnergy_Differential( Tensor1<ExtReal,Int> & output, bool addTo = false ) const = 0;
+        virtual const SimplicialMeshBase & GetObstacle() const = 0;
         
-        virtual ExtReal CustomEnergy_Differential( Tensor2<ExtReal,Int> & output, bool addTo = false ) const = 0;
+        virtual bool  ObstacleInitialized() const = 0;
         
+        virtual const ClusterTree_T & GetObstacleClusterTree() const = 0;
         
-        virtual void CustomEnergy_Density( ExtReal * output, bool addTo = false ) const  = 0;
+        virtual const ObstacleBlockClusterTree_T & GetObstacleBlockClusterTree() const = 0;
         
-        virtual void CustomEnergy_Density( Tensor1<ExtReal,Int> & output, bool addTo = false ) const =0;
-        
-        virtual void CustomEnergy_SimplexEnergies( ExtReal * output, bool addTo = false ) const  = 0;
-        
-        virtual void CustomEnergy_SimplexEnergies( Tensor1<ExtReal,Int> & output, bool addTo = false ) const  = 0;
-        
-//##############################################################################################
-//      Trivial energy (for debugging purposes)
-//##############################################################################################
-        
-        virtual ExtReal GetTrivialEnergyWeight() const = 0;
-
-        virtual void SetTrivialEnergyWeight( const ExtReal weight ) const = 0;
-
-        virtual ExtReal TrivialEnergy() const = 0;
-
-        virtual ExtReal TrivialEnergy_Differential( ExtReal * output, bool addTo = false ) const = 0;
-
-        virtual ExtReal TrivialEnergy_Differential( Tensor1<ExtReal,Int> & output, bool addTo = false ) const = 0;
-        
-        virtual ExtReal TrivialEnergy_Differential( Tensor2<ExtReal,Int> & output, bool addTo = false ) const = 0;
-        
-//##############################################################################################
-//      TrivialObstacleEnergy (for debugging purposes)
-//##############################################################################################
-         
-        
-        virtual ExtReal TrivialObstacleEnergy() const = 0;
-
-        virtual ExtReal TrivialObstacleEnergy_Differential( ExtReal * output, bool addTo = false ) const = 0;
-        
-        virtual ExtReal TrivialObstacleEnergy_Differential( Tensor1<ExtReal,Int> & output, bool addTo = false ) const = 0;
-        
-        virtual ExtReal TrivialObstacleEnergy_Differential( Tensor2<ExtReal,Int> & output, bool addTo = false ) const = 0;
-
-        
-        
-//##############################################################################################
-//      TangentPointMetric
-//##############################################################################################
-
-        
-        virtual void TangentPointMetric_Multiply(
-            const ExtReal alpha, const ExtReal * U,
-            const ExtReal  beta,       ExtReal * V,
-            Int cols
-        ) const  = 0;
-        
-        virtual void TangentPointMetric_Multiply(
-            const ExtReal alpha, const Tensor1<ExtReal,Int> & U,
-            const ExtReal  beta,       Tensor1<ExtReal,Int> & V
-        ) const = 0;
-        
-        virtual void TangentPointMetric_Multiply(
-            const ExtReal alpha, const Tensor2<ExtReal,Int> & U,
-            const ExtReal  beta,       Tensor2<ExtReal,Int> & V
-        ) const = 0;
-        
-        virtual void TangentPointMetric_Multiply(
-            const ExtReal alpha, const ExtReal * U,
-            const ExtReal  beta,       ExtReal * V,
-            Int cols,
-            KernelType kernel
-        ) const = 0;
-        
-        virtual void TangentPointMetric_Multiply(
-            const ExtReal alpha, const Tensor1<ExtReal,Int> & U,
-            const ExtReal  beta,       Tensor1<ExtReal,Int> & V,
-            KernelType kernel
-        ) const = 0;
-        
-        virtual void TangentPointMetric_Multiply(
-            const ExtReal alpha, const Tensor2<ExtReal,Int> & U,
-            const ExtReal  beta,       Tensor2<ExtReal,Int> & V,
-            KernelType kernel
-        ) const = 0;
-        
-        
-        virtual const Tensor1<Real,Int> & TangentPointMetric_Values(
-            const bool farQ,
-            const KernelType kernel
-        ) const = 0;
-        
-        virtual void TangentPointMetric_ApplyKernel(
-            const bool farQ,
-            const KernelType kernel
-        ) const = 0;
-        
-////##############################################################################################
-////      TangentPointSingularMetric
-////##############################################################################################
-//
-//        
-//        virtual void TangentPointSingularMetric_Multiply(
-//            const ExtReal alpha, const ExtReal * U,
-//            const ExtReal  beta,       ExtReal * V,
-//            Int cols
-//        ) const  = 0;
-//        
-//        virtual void TangentPointSingularMetric_Multiply(
-//            const ExtReal alpha, const Tensor1<ExtReal,Int> & U,
-//            const ExtReal  beta,       Tensor1<ExtReal,Int> & V
-//        ) const = 0;
-//        
-//        virtual void TangentPointSingularMetric_Multiply(
-//            const ExtReal alpha, const Tensor2<ExtReal,Int> & U,
-//            const ExtReal  beta,       Tensor2<ExtReal,Int> & V
-//        ) const = 0;
-//        
-//        virtual const Tensor1<Real,Int> & TangentPointSingularMetric_Values(
-//            const bool farQ
-//        ) const = 0;
-//        
-//        virtual void TangentPointSingularMetric_ApplyKernel(
-//            const bool farQ
-//        ) const = 0;
-        
+        virtual const ObstacleCollisionTree_T & GetObstacleCollisionTree() const = 0;
+    
+            
 //##############################################################################################
 //      IO
 //##############################################################################################
@@ -341,24 +144,83 @@ namespace Repulsor
         
     public:
         
-        virtual std::unique_ptr<RemesherBase_T> CreateRemesher() = 0;
+        virtual std::unique_ptr<Remesher_T> CreateRemesher() = 0;
         
 //##############################################################################################
 //      Standard interface
 //##############################################################################################
         
     public:
-                                                          
-        virtual CLASS & DownCast() = 0;
-
-        virtual const CLASS & DownCast() const = 0;
+        
+        bool IsCached( const std::string & s ) const
+        {
+            // For some reason gcc-12 does not allow me to return static_cast<bool>( cache.count(s) ) directly.
+            
+            bool result = false;
+            
+            #pragma omp critical (cache)
+            {
+                result = static_cast<bool>( cache.count(s) );
+            }
+            
+            return result;
+        }
+        
+        std::any & GetCache( const std::string & s ) const
+        {
+            // For some reason gcc-12 does not allow me to return cache.at(s) directly. =/
+            // Maybe because that might throw an exception.
+            
+            std::any * thing;
+            
+            #pragma omp critical (cache)
+            {
+                try
+                {
+                    thing = &cache.at(s);
+                }
+                catch( const std::out_of_range & e )
+                {
+                    eprint(ClassName()+"GetCache: Key \""+s+"\" not found!.");
+                    throw; //an internal catch block forwards the exception to its external level
+                }
+            }
+            
+            return *thing;
+        }
+        
+        // Caution! This function is destructive.
+        void SetCache( const std::string & s, std::any & thing ) const
+        {
+            #pragma omp critical (cache)
+            {
+                cache[s] = std::move(thing);
+            }
+        }
+        
+        std::string CacheKeys() const
+        {
+            std::stringstream s;
+            
+            s << "{ \n";
+            for( auto const & p : cache )
+            {
+                s << "\t" << p.first << "\n";
+            }
+            s << "}";
+            return s.str();
+        }
+        
+        void ClearCache() const
+        {
+            cache = std::unordered_map<std::string,std::any>();
+        }
         
         virtual std::string ClassName() const
         {
-            return TO_STD_STRING(CLASS)+"<"+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+">";
+            return "SimplicialMeshBase<"+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+">";
         }
-    };
+        
+    }; // class SimplicialMeshBase
     
 } // namespace Repulsor
-
-#undef CLASS

@@ -1,122 +1,128 @@
 #pragma once
 
-#define CLASS ClusterTree
-#define BASE  ClusterTreeBase<Real,Int,SReal,ExtReal>
-
+#include "ClusterTree/Cluster.hpp"
+#include "ClusterTree/ClusterTreeBase.hpp"
 
 namespace Repulsor
 {
-    template<int AMB_DIM, typename Real, typename Int, typename SReal, typename ExtReal>
-    class CLASS : public BASE
+    template<int AMB_DIM_, typename Real_, typename Int_, typename SReal_, typename ExtReal_>
+    class ClusterTree : public ClusterTreeBase<Real_,Int_,SReal_,ExtReal_>
     {
     public:
         
+        using Real    = Real_;
+        using Int     = Int_;
+        using SReal   = SReal_;
+        using ExtReal = ExtReal_;
+        
+        static constexpr Int AMB_DIM = AMB_DIM_;
+        
         using       Primitive_T =       PolytopeBase<AMB_DIM,GJK_Real,Int,SReal>;
         using MovingPrimitive_T = MovingPolytopeBase<AMB_DIM,GJK_Real,Int,SReal>;
-                                  
+        
         using BoundingVolume_T  = AABB<AMB_DIM,GJK_Real,Int,SReal>;
         
-        using ClusterTreeBase_T = BASE;
+        using ClusterTreeBase_T = ClusterTreeBase<Real,Int,SReal,ExtReal>;
         
-        using DataContainer_T   = typename BASE::DataContainer_T;
-        using BufferContainer_T = typename BASE::BufferContainer_T;
-     
+        using DataContainer_T   = typename ClusterTreeBase_T::DataContainer_T;
+        using BufferContainer_T = typename ClusterTreeBase_T::BufferContainer_T;
+        
         // In principle, ThreadTensor3<Real,Int> should have better scaling on multiple socket machines, because I tried to encourages that the thread-local arrays are allocated on local RAM. -- On my tiny Quad Core however, it performs a bit _WORSE_ than Tensor3<Real,Int>.
-        using DerivativeContainer_T = typename BASE::DerivativeContainer_T;
+        using DerivativeContainer_T = typename ClusterTreeBase_T::DerivativeContainer_T;
         
     public:
         
-        using BASE::SplitThreshold;
-        using BASE::ThreadCount;
-        using BASE::PrimitiveCount;
-        using BASE::ClusterCount;
-        using BASE::LeafClusterCount;
-//        using BASE::RequireClusterMoments;
+        using ClusterTreeBase_T::SplitThreshold;
+        using ClusterTreeBase_T::ThreadCount;
+        using ClusterTreeBase_T::PrimitiveCount;
+        using ClusterTreeBase_T::ClusterCount;
+        using ClusterTreeBase_T::LeafClusterCount;
+        //        using ClusterTreeBase_T::RequireClusterMoments;
         
     protected:
         
-        using BASE::P_ordering;
-        using BASE::P_inverse_ordering;
-        using BASE::P_score_buffer;
-        using BASE::P_perm_buffer;
-        using BASE::P_serialized;
-        using BASE::P_updated_serialized;
-        using BASE::P_velocities_serialized;
-        using BASE::P_near;
-        using BASE::P_D_near;
-        using BASE::P_far;
-        using BASE::P_D_far;
-        using BASE::thread_P_D_near;
-        using BASE::P_moments;
-        using BASE::P_in;
-        using BASE::P_out;
+        using ClusterTreeBase_T::P_ordering;
+        using ClusterTreeBase_T::P_inverse_ordering;
+        using ClusterTreeBase_T::P_score_buffer;
+        using ClusterTreeBase_T::P_perm_buffer;
+        using ClusterTreeBase_T::P_serialized;
+        using ClusterTreeBase_T::P_updated_serialized;
+        using ClusterTreeBase_T::P_velocities_serialized;
+        using ClusterTreeBase_T::P_near;
+        using ClusterTreeBase_T::P_D_near;
+        using ClusterTreeBase_T::P_far;
+        using ClusterTreeBase_T::P_D_far;
+        using ClusterTreeBase_T::thread_P_D_near;
+        using ClusterTreeBase_T::P_moments;
+        using ClusterTreeBase_T::P_in;
+        using ClusterTreeBase_T::P_out;
         
-        using BASE::C_begin;
-        using BASE::C_end;
-        using BASE::C_depth;
-        using BASE::C_right;
-        using BASE::C_left;
-        using BASE::C_next;
-        using BASE::C_serialized;
-        using BASE::C_updated_serialized;
-        using BASE::C_thread_serialized;
-        using BASE::C_far;
-        using BASE::thread_C_D_far;
-        using BASE::C_moments;
-        using BASE::C_in;
-        using BASE::C_out;
+        using ClusterTreeBase_T::C_begin;
+        using ClusterTreeBase_T::C_end;
+        using ClusterTreeBase_T::C_depth;
+        using ClusterTreeBase_T::C_right;
+        using ClusterTreeBase_T::C_left;
+        using ClusterTreeBase_T::C_next;
+        using ClusterTreeBase_T::C_serialized;
+        using ClusterTreeBase_T::C_updated_serialized;
+        using ClusterTreeBase_T::C_thread_serialized;
+        using ClusterTreeBase_T::C_far;
+        using ClusterTreeBase_T::thread_C_D_far;
+        using ClusterTreeBase_T::C_moments;
+        using ClusterTreeBase_T::C_in;
+        using ClusterTreeBase_T::C_out;
         
-        using BASE::leaf_clusters;
-        using BASE::leaf_cluster_ptr;
-        using BASE::leaf_cluster_lookup;
-        using BASE::thread_cluster_counter;
-
-        using BASE::depth;
-        using BASE::settings;
+        using ClusterTreeBase_T::leaf_clusters;
+        using ClusterTreeBase_T::leaf_cluster_ptr;
+        using ClusterTreeBase_T::leaf_cluster_lookup;
+        using ClusterTreeBase_T::thread_cluster_counter;
         
-//        using BASE::stack_array;
-//        using BASE::queue_array;
+        using ClusterTreeBase_T::depth;
+        using ClusterTreeBase_T::settings;
         
-        using BASE::C_to_P;
-        using BASE::P_to_C;
-        using BASE::hi_pre;
-        using BASE::lo_pre;
-        using BASE::mixed_pre;
-        using BASE::hi_post;
-        using BASE::lo_post;
-        using BASE::mixed_post;
+        //        using ClusterTreeBase_T::stack_array;
+        //        using ClusterTreeBase_T::queue_array;
+        
+        using ClusterTreeBase_T::C_to_P;
+        using ClusterTreeBase_T::P_to_C;
+        using ClusterTreeBase_T::hi_pre;
+        using ClusterTreeBase_T::lo_pre;
+        using ClusterTreeBase_T::mixed_pre;
+        using ClusterTreeBase_T::hi_post;
+        using ClusterTreeBase_T::lo_post;
+        using ClusterTreeBase_T::mixed_post;
         
     public:
         
-        CLASS()
-        : P_proto (1)
-        , C_proto (1)
-        , P_moving(1)
+        ClusterTree()
+        :   P_proto (1)
+        ,   C_proto (1)
+        ,   P_moving(1)
         {
             ptic(className()+" default constructor");
             ptoc(className()+" default constructor");
         }
         
         // To allow polymorphism, we require the user to create instances of the desired types for the primitives and the bounding volumes, so that we can Clone() them.
-        CLASS(
-            const Primitive_T        & P_proto_,
-            const Tensor2<SReal,Int> & P_serialized_,
-            const BoundingVolume_T   & C_proto_,
-            const Tensor1<Int ,Int>  & P_ordering_,
-            const Tensor2<Real,Int>  & P_near_, // data used actual interaction computation; assumed to be of size PrimitiveCount() x NearDim(). For a triangle mesh in 3D, we want to feed each triangles i), area ii) barycenter and iii) normal as a 1 + 3 + 3 = 7 vector
-            const Tensor2<Real,Int>  & P_far_, // data used actual interaction computation; assumed to be of size PrimitiveCount() x FarDim(). For a triangle mesh in 3D, we want to feed each triangles i), area ii) barycenter and iii) orthoprojector onto normal space as a 1 + 3 + 6 = 10 vector
-            const SparseMatrixCSR<Real,Int,Int> & DiffOp,
-            const SparseMatrixCSR<Real,Int,Int> & AvOp,
-            const ClusterTreeSettings & settings_ = ClusterTreeSettings()
-        )
-        :   BASE(settings_)
-        ,   P_proto ( ThreadCount() )
-        ,   C_proto ( ThreadCount() )
-        ,   P_moving( ThreadCount() )
+        ClusterTree(
+              const Primitive_T        &  P_proto_,
+              const Tensor2<SReal,Int> &  P_serialized_,
+              const BoundingVolume_T   &  C_proto_,
+              const Tensor1<Int ,Int>  &  P_ordering_,
+              const Tensor2<Real,Int>  &  P_near_, // data used actual interaction computation; assumed to be of size PrimitiveCount() x NearDim(). For a triangle mesh in 3D, we want to feed each triangles i), area ii) barycenter and iii) normal as a 1 + 3 + 3 = 7 vector
+              const Tensor2<Real,Int>  &  P_far_, // data used actual interaction computation; assumed to be of size PrimitiveCount() x FarDim(). For a triangle mesh in 3D, we want to feed each triangles i), area ii) barycenter and iii) orthoprojector onto normal space as a 1 + 3 + 6 = 10 vector
+              const Sparse::MatrixCSR<Real,Int,Int> & DiffOp,
+              const Sparse::MatrixCSR<Real,Int,Int> & AvOp,
+              const ClusterTreeSettings & settings_ = ClusterTreeSettings()
+              )
+        :   ClusterTreeBase_T( settings_ )
+        ,   P_proto      ( ThreadCount() )
+        ,   C_proto      ( ThreadCount() )
+        ,   P_moving     ( ThreadCount() )
         {
             ptic(className()+"()");
             
-            P_serialized = P_serialized_;
+            P_serialized = P_serialized_;   // It's a unneccessary copy, but not too expensive.
             
             if( P_ordering_.Dimension(0) == P_serialized.Dimension(0) )
             {
@@ -147,11 +153,11 @@ namespace Repulsor
                 eprint(className()+" : P_far_.Dimension(0) != PrimitiveCount()");
                 return;
             }
-    
+            
             this->AllocateNearFarData( P_near_.Dimension(1), P_far_.Dimension(1) );
-
+            
             this->ComputePrimitiveData( P_near_.data(), P_far_.data() );
-
+            
             this->ComputeClusterData();
             
             this->ComputePrimitiveToClusterMatrix();
@@ -163,9 +169,9 @@ namespace Repulsor
             ptoc(className()+"()");
         }
         
-        virtual ~CLASS() override = default;
-
-    
+        virtual ~ClusterTree() override = default;
+        
+        
     protected:
         
         
@@ -181,20 +187,20 @@ namespace Repulsor
         mutable std::vector<std::unique_ptr<MovingPrimitive_T>> P_moving;
         
     public:
-
-//        mutable std::vector<std::unique_ptr<MultipoleMomentsBase<Real,Int>>> M_ker;
-//        mutable Int moment_degree = 0;
+        
+        //        mutable std::vector<std::unique_ptr<MultipoleMomentsBase<Real,Int>>> M_ker;
+        //        mutable Int moment_degree = 0;
         
         
     private:
-
+        
         void ComputeClusters()
         {
             ptic(className()+"::ComputeClusters");
             
             // Request some temporary memory for threads.
             
-    //        P_ordering         = iota<Int>   ( PrimitiveCount() );
+            //        P_ordering         = iota<Int>   ( PrimitiveCount() );
             P_inverse_ordering = Tensor1<Int,Int>( PrimitiveCount() );
             
             // Padding every row to prevent false sharing.
@@ -207,7 +213,7 @@ namespace Repulsor
             ++thread_cluster_counter(thread,0);
             
             auto * root = new Cluster<Int>( thread, 0, 0, PrimitiveCount(), 0 );
-                            
+            
             // Initial bounding volume of root node.
             C_proto[thread]->SetPointer( C_thread_serialized.data(thread), 0 );
             C_proto[thread]->FromPrimitives( *P_proto[thread], P_serialized.data(), 0, PrimitiveCount(), ThreadCount() );
@@ -222,21 +228,21 @@ namespace Repulsor
             C_thread_serialized = Tensor3<SReal,Int>();
             
             thread_cluster_counter = Tensor2<Int,Int>();
-                
+            
             ptoc(className()+"::ComputeClusters");
         }
         
         void Split( Cluster<Int> * root )
         {
             ptic(className()+"::Split");
-
+            
             P_score_buffer = iota<SReal,Int>( PrimitiveCount() );
             
             P_perm_buffer = Tensor1<Int,Int>( PrimitiveCount() );
             
-            #pragma omp parallel num_threads( ThreadCount() ) shared( root )
+#pragma omp parallel num_threads( ThreadCount() ) shared( root )
             {
-                #pragma omp single nowait
+#pragma omp single nowait
                 {
                     split( root, ThreadCount() );
                 }
@@ -269,56 +275,56 @@ namespace Repulsor
                 // Remark: Some bounding volume types, e.g., AABBs can use some information from the Split pass to compute the children's bounding volumes. This is why we merge the splitting pass with the computation of the children's bounding columes.
                 
                 // Remark: Make sure that bounding volumes are already computed for the child clusters. Moreover, we want that the serialized data is stored in the thread's storage that _created_ the new clusters. This is why we do NOT compute the bounding volumes at the beginning of Split; C is possibly created by another thread and we _must not_ write to that thread's memory.
-
+                
                 Primitive_T & P = *P_proto[thread];
                 
                 Int split_index = C_proto[thread]->Split(
-                    P,                                                  // prototype for primitves
-                    P_serialized.data(), begin, end,                    // which primitives are in question
-                    P_ordering.data(),                                  // which primitives are in question
-                    C_thread_serialized.data(C->thread),    C->ID,      // where to get   the bounding volume info for current cluster
-                    C_thread_serialized.data(   thread),  left_ID,      // where to store the bounding volume info for left  child (if successful!)
-                    C_thread_serialized.data(   thread), right_ID,      // where to store the bounding volume info for right child (if successful!)
-                    P_score_buffer.data(),                              // some scratch space for storing local scores
-                    P_perm_buffer.data(),                               // scratch space for storing local permutations
-                    P_inverse_ordering.data(),                          // abusing P_inverse_ordering as scratch space for storing inverses of local permutations
-                    free_thread_count
-                );
+                     P,                                                  // prototype for primitves
+                     P_serialized.data(), begin, end,                    // which primitives are in question
+                     P_ordering.data(),                                  // which primitives are in question
+                     C_thread_serialized.data(C->thread),    C->ID,      // where to get   the bounding volume info for current cluster
+                     C_thread_serialized.data(   thread),  left_ID,      // where to store the bounding volume info for left  child (if successful!)
+                     C_thread_serialized.data(   thread), right_ID,      // where to store the bounding volume info for right child (if successful!)
+                     P_score_buffer.data(),                              // some scratch space for storing local scores
+                     P_perm_buffer.data(),                               // scratch space for storing local permutations
+                     P_inverse_ordering.data(),                          // abusing P_inverse_ordering as scratch space for storing inverses of local permutations
+                     free_thread_count
+                 );
                 
                 
-//                if( (begin < split_index) && (split_index < end) )
-//                {
-                    // create new nodes...
-                    thread_cluster_counter(thread,0) += 2;
-                    // We use raw pointers for performance reasons because we want to delete Cluster instances in the parallel serialization pass.
-                    C->left  = new Cluster<Int> ( thread,  left_ID, begin,       split_index, C->depth+1 );
-                    C->right = new Cluster<Int> ( thread, right_ID, split_index, end,         C->depth+1 );
-
-                    // ... and split them in parallel
-                    #pragma omp task final(free_thread_count<1)
-                    {
-                        split( C->left, free_thread_count/2 );
-                    }
-                    #pragma omp task final(free_thread_count<1)
-                    {
-                        split( C->right, free_thread_count - free_thread_count/2 );
-                    }
-                    #pragma omp taskwait
-                    
-                    // collecting statistics for the later serialization
-                    // counting ourselves as descendant, too!
-                    C->descendant_count = 1 + C->left->descendant_count + C->right->descendant_count;
-                    C->descendant_leaf_count = C->left->descendant_leaf_count + C->right->descendant_leaf_count;
-                    C->max_depth = std::max( C->left->max_depth, C->right->max_depth );
-//                }
-//                else
-//                {
-//    //                wprint(className()+"::split : Failed to split cluster. Creating leaf node with "+ToString(end-begin)+" primitives.");
-//                    // count cluster as leaf cluster
-//                    // counting ourselves as descendant, too!
-//                    C->descendant_count = 1;
-//                    C->descendant_leaf_count = 1;
-//                }
+                //                if( (begin < split_index) && (split_index < end) )
+                //                {
+                // create new nodes...
+                thread_cluster_counter(thread,0) += 2;
+                // We use raw pointers for performance reasons because we want to delete Cluster instances in the parallel serialization pass.
+                C->left  = new Cluster<Int> ( thread,  left_ID, begin,       split_index, C->depth+1 );
+                C->right = new Cluster<Int> ( thread, right_ID, split_index, end,         C->depth+1 );
+                
+                // ... and split them in parallel
+#pragma omp task final(free_thread_count<1)
+                {
+                    split( C->left, free_thread_count/2 );
+                }
+#pragma omp task final(free_thread_count<1)
+                {
+                    split( C->right, free_thread_count - free_thread_count/2 );
+                }
+#pragma omp taskwait
+                
+                // collecting statistics for the later serialization
+                // counting ourselves as descendant, too!
+                C->descendant_count = 1 + C->left->descendant_count + C->right->descendant_count;
+                C->descendant_leaf_count = C->left->descendant_leaf_count + C->right->descendant_leaf_count;
+                C->max_depth = std::max( C->left->max_depth, C->right->max_depth );
+                //                }
+                //                else
+                //                {
+                //    //                wprint(className()+"::split : Failed to split cluster. Creating leaf node with "+ToString(end-begin)+" primitives.");
+                //                    // count cluster as leaf cluster
+                //                    // counting ourselves as descendant, too!
+                //                    C->descendant_count = 1;
+                //                    C->descendant_leaf_count = 1;
+                //                }
             }
             else
             {
@@ -329,14 +335,14 @@ namespace Repulsor
                 return;
             }
         } //split
-
-
+        
+        
         void Serialize( Cluster<Int> * const root )
         {
             ptic(className()+"::Serialize");
             
-    //            tree_max_depth = root->max_depth;
-    //
+            //            tree_max_depth = root->max_depth;
+            //
             // We have to allocated these two arrays first, so that ClusterCount() and LeafClusterCount() return correct results.
             C_serialized  = Tensor2<SReal,Int>( root->descendant_count, C_proto[0]->Size() );
             leaf_clusters = Tensor1<Int,Int>( root->descendant_leaf_count );
@@ -373,14 +379,14 @@ namespace Repulsor
                     {
                         leaf_cluster_lookup = Tensor1<Int,Int>( ClusterCount(), -1 );
                     }
-//                    #pragma omp task
-//                    {
-//                        queue_array = Tensor1<Int,Int>( ClusterCount() );
-//                    }
+                    //                    #pragma omp task
+                    //                    {
+                    //                        queue_array = Tensor1<Int,Int>( ClusterCount() );
+                    //                    }
                     #pragma omp taskwait
                 }
             }
-
+            
             #pragma omp parallel num_threads( ThreadCount() )
             {
                 #pragma omp single nowait
@@ -388,15 +394,15 @@ namespace Repulsor
                     serialize( root, 0, 0, ThreadCount() );
                 }
             }
-
+            
             depth = root->max_depth;
-//            stack_array = Tensor1<Int,Int>( 2 * depth + 1 );
+            //            stack_array = Tensor1<Int,Int>( 2 * depth + 1 );
             
             {
                 // It is quite certainly _NOT_ a good idea to parallelize this loop (false sharing!).
                 const Int last = PrimitiveCount();
-                const Int * restrict const ord     = P_ordering.data();
-                      Int * restrict const inv_ord = P_inverse_ordering.data();
+                ptr<Int> ord     = P_ordering.data();
+                mut<Int> inv_ord = P_inverse_ordering.data();
                 
                 for( Int i = 0; i < last; ++i )
                 {
@@ -406,9 +412,9 @@ namespace Repulsor
             
             leaf_cluster_ptr = Tensor1<Int,Int> ( LeafClusterCount() + 1 );
             leaf_cluster_ptr[0] = 0;
-
+            
             // This loop is probably too short to be parallelized.
-    //            #pragma omp parallel for num_threads( ThreadCount() )
+            //            #pragma omp parallel for num_threads( ThreadCount() )
             for( Int i = 0; i < LeafClusterCount(); ++i )
             {
                 leaf_cluster_ptr[ i + 1 ] = C_end[leaf_clusters[i]];
@@ -437,14 +443,24 @@ namespace Repulsor
             {
                 C_left [ID] = ID + 1;
                 C_right[ID] = ID + 1 + C->left->descendant_count;
-        //
-                #pragma omp task final(free_thread_count<1)
+                //
+                #pragma omp task final( free_thread_count < 1 )
                 {
-                    serialize( C->left, C_left[ID], leaf_before_count, free_thread_count/2 );
+                    serialize(
+                        C->left,
+                        C_left[ID],
+                        leaf_before_count,
+                        free_thread_count/2
+                    );
                 }
-                #pragma omp task final(free_thread_count<1)
+                #pragma omp task final( free_thread_count < 1 )
                 {
-                    serialize( C->right, C_right[ID], leaf_before_count + C->left->descendant_leaf_count, free_thread_count - free_thread_count/2 );
+                    serialize(
+                        C->right,
+                        C_right[ID],
+                        leaf_before_count + C->left->descendant_leaf_count,
+                        free_thread_count - free_thread_count/2
+                    );
                 }
                 #pragma omp taskwait
                 
@@ -461,7 +477,7 @@ namespace Repulsor
                 leaf_cluster_lookup[ID] = leaf_before_count;
             }
         } //serialize
-            
+        
     public:
         
         Int AmbDim() const override
@@ -494,7 +510,6 @@ namespace Repulsor
             return 1 + AMB_DIM + (AMB_DIM*(AMB_DIM+1))/2;
         }
         
-        
     private:
             
         void AllocateNearFarData( const Int near_dim_, const Int far_dim_ ) // reordering and computing bounding boxes
@@ -508,13 +523,13 @@ namespace Repulsor
             
             thread_P_D_near = DerivativeContainer_T( ThreadCount(), PrimitiveCount(), near_dim_ );
             
-            C_far    = DataContainer_T( ClusterCount(), far_dim_ );
+            C_far           = DataContainer_T( ClusterCount(), far_dim_ );
             thread_C_D_far  = DerivativeContainer_T( ThreadCount(), ClusterCount(), far_dim_ );
             
             ptoc(className()+"::AllocateNearFarData");
         }
         
-        void ComputePrimitiveData( const Real * restrict const P_near_, const Real * restrict const P_far_ )
+        void ComputePrimitiveData( ptr<Real> P_near_, ptr<Real> P_far_ )
         {
             ptic(className()+"::ComputePrimitiveData");
             
@@ -522,10 +537,10 @@ namespace Repulsor
             const Int near_dim = NearDim();
             const Int  far_dim =  FarDim();
 
-            const Int * restrict const ord = P_ordering.data();
+            ptr<Int> ord = P_ordering.data();
             
-            Real * restrict const P_near__ = P_near.data();
-            Real * restrict const P_far__  = P_far.data();
+            mut<Real> P_near__ = P_near.data();
+            mut<Real> P_far__  = P_far.data();
             
             #pragma omp parallel for num_threads( ThreadCount() ) shared( P_near__, P_far__, P_near_, P_far_, ord ) schedule( static )
             for( Int i = 0; i < primitive_count; ++i )
@@ -534,7 +549,7 @@ namespace Repulsor
 
                 copy_buffer( &P_near_[near_dim * j], &P_near__[near_dim * i], near_dim );
 
-                copy_buffer( &P_far_[far_dim * j],   &P_far__[far_dim * i],   far_dim  );
+                copy_buffer( &P_far_  [far_dim * j], &P_far__  [far_dim * i], far_dim  );
             }
             
             ptoc(className()+"::ComputePrimitiveData");
@@ -563,9 +578,10 @@ namespace Repulsor
             const Int L = C_left [C];
             const Int R = C_right[C];
             
-            Real * restrict const C_C = C_far.data(C);
+            mut<Real> C_C = C_far.data(C);
             
-            if( L >= 0 && R >= 0 ){
+            if( L >= 0 && R >= 0 )
+            {
                 //C points to interior node.
                 #pragma omp task final(free_thread_count<1)  shared( L )
                 {
@@ -577,8 +593,8 @@ namespace Repulsor
                 }
                 #pragma omp taskwait
 
-                const Real * restrict const C_L = C_far.data(L);
-                const Real * restrict const C_R = C_far.data(R);
+                ptr<Real> C_L = C_far.data(L);
+                ptr<Real> C_R = C_far.data(R);
                 
                 Real L_weight = C_L[0];
                 Real R_weight = C_R[0];
@@ -607,7 +623,7 @@ namespace Repulsor
                 
                 for( Int i = begin; i < end; ++i )
                 {
-                    const Real * restrict const P = P_far.data(i);
+                    ptr<Real> P = P_far.data(i);
                     
                     const Real a = P[0];
                     
@@ -742,18 +758,18 @@ namespace Repulsor
         {
             ptic(className()+"::ComputePrimitiveToClusterMatrix");
             
-            P_to_C = SparseBinaryMatrixCSR<Int,Int>(
+            P_to_C = Sparse::BinaryMatrixCSR<Int,Int>(
                 ClusterCount(), PrimitiveCount(), PrimitiveCount(), ThreadCount() );
             
             P_to_C.Outer()[0] = 0;
             
-            C_to_P = SparseBinaryMatrixCSR<Int,Int>(
+            C_to_P = Sparse::BinaryMatrixCSR<Int,Int>(
                 PrimitiveCount(), ClusterCount(), PrimitiveCount(), ThreadCount() );
             
             C_to_P.Outer()[PrimitiveCount()] = PrimitiveCount();
             
             {
-                Int * restrict const inner__ = C_to_P.Inner().data();
+                mut<Int> inner__ = C_to_P.Inner().data();
                 
                 const Int leaf_cluster_count = LeafClusterCount();
                 
@@ -773,8 +789,8 @@ namespace Repulsor
             }
             
             {
-                Int * restrict const i = C_to_P.Outer().data();
-                Int * restrict const j = P_to_C.Inner().data();
+                mut<Int> i = C_to_P.Outer().data();
+                mut<Int> j = P_to_C.Inner().data();
                 
                 const Int primitive_count = PrimitiveCount();
                 
@@ -789,10 +805,10 @@ namespace Repulsor
             {
                 Int cluster_count = ClusterCount();
                 
-                Int       * restrict const outer__ = P_to_C.Outer().data();
-                Int const * restrict const left__  = C_left.data();
-                Int const * restrict const begin__ = C_begin.data();
-                Int const * restrict const end__   = C_end.data();
+                mut<Int> outer__ = P_to_C.Outer().data();
+                ptr<Int> left__  = C_left.data();
+                ptr<Int> begin__ = C_begin.data();
+                ptr<Int> end__   = C_end.data();
                 
                 for ( Int C = 0; C < cluster_count; ++C )
                 {
@@ -806,8 +822,8 @@ namespace Repulsor
 
         
         void ComputePrePost(
-            const SparseMatrixCSR<Real,Int,Int> & DiffOp,
-            const SparseMatrixCSR<Real,Int,Int> & AvOp
+            const Sparse::MatrixCSR<Real,Int,Int> & DiffOp,
+            const Sparse::MatrixCSR<Real,Int,Int> & AvOp
         )
         {
             if( !this->pre_post_initialized )
@@ -819,7 +835,7 @@ namespace Repulsor
                 
                 ptic("hi_pre");
                 
-                hi_pre = SparseMatrixCSR<Real,Int,Int>(
+                hi_pre = Sparse::MatrixCSR<Real,Int,Int>(
                     DiffOp.RowCount(),
                     DiffOp.ColCount(),
                     DiffOp.NonzeroCount(),
@@ -831,12 +847,12 @@ namespace Repulsor
                     
                     hi_pre.Outer().Read( DiffOp.Outer().data() );
                 
-                    Int  const * restrict const ord      = P_ordering.data();
-                    Int  const * restrict const i_input  = DiffOp.Inner().data();
-                    Int        * restrict const i_output = hi_pre.Inner().data();
-                    Real const * restrict const r_input  = DiffOp.Values().data();
-                    Real       * restrict const r_output = hi_pre.Values().data();
-                    Real const * restrict const near     = P_near.data();
+                    ptr<Int>  ord      = P_ordering.data();
+                    ptr<Int>  i_input  = DiffOp.Inner().data();
+                    mut<Int>  i_output = hi_pre.Inner().data();
+                    ptr<Real> r_input  = DiffOp.Values().data();
+                    mut<Real> r_output = hi_pre.Values().data();
+                    ptr<Real> near     = P_near.data();
                 
                     const Int near_dim = NearDim();
                     const Int size = DiffOp.NonzeroCount() / primitive_count;
@@ -858,15 +874,13 @@ namespace Repulsor
                 ptoc("hi_pre");
                 
                 ptic("hi_post");
-                
-                DUMP(hi_pre.Stats());
-                
+                pdump(hi_pre.Stats());
                 hi_post = hi_pre.Transpose();
-                
                 ptoc("hi_post");
                 
                 ptic("lo_pre");
-                lo_pre = SparseMatrixCSR<Real,Int,Int>(
+                
+                lo_pre = Sparse::MatrixCSR<Real,Int,Int>(
                     AvOp.RowCount(),
                     AvOp.ColCount(),
                     AvOp.NonzeroCount(),
@@ -877,12 +891,12 @@ namespace Repulsor
                 {
                     lo_pre.Outer().Read( AvOp.Outer().data() );
                                         
-                    Int  const * restrict const ord      = P_ordering.data();
-                    Int  const * restrict const i_input  =   AvOp.Inner().data();
-                    Int        * restrict const i_output = lo_pre.Inner().data();
-                    Real const * restrict const r_input  =   AvOp.Values().data();
-                    Real       * restrict const r_output = lo_pre.Values().data();
-                    Real const * restrict const near     = P_near.data();
+                    ptr<Int>  ord      = P_ordering.data();
+                    ptr<Int>  i_input  =   AvOp.Inner().data();
+                    mut<Int>  i_output = lo_pre.Inner().data();
+                    ptr<Real> r_input  =   AvOp.Values().data();
+                    mut<Real> r_output = lo_pre.Values().data();
+                    ptr<Real> near     = P_near.data();
                     
                     const Int near_dim = NearDim();
                     const Int size = AvOp.NonzeroCount() / primitive_count;
@@ -904,9 +918,7 @@ namespace Repulsor
                 ptoc("lo_pre");
                 
                 ptic("lo_post");
-                
-                DUMP(lo_pre.Stats());
-                
+                pdump(lo_pre.Stats());
                 lo_post = lo_pre.Transpose();
                 ptoc("lo_post");
                 
@@ -918,8 +930,8 @@ namespace Repulsor
         } // ComputePrePost
         
         void ComputeMixedPrePost(
-            const SparseMatrixCSR<Real,Int,Int> & DiffOp,
-            const SparseMatrixCSR<Real,Int,Int> & AvOp
+            const Sparse::MatrixCSR<Real,Int,Int> & DiffOp,
+            const Sparse::MatrixCSR<Real,Int,Int> & AvOp
         )
         {
             // Assemble a matrix in which the rows of lo_pre and hi_pre are interleaved in the form
@@ -934,27 +946,27 @@ namespace Repulsor
                 
                 ptic("mixed_pre");
                 
-                mixed_pre = SparseMatrixCSR<Real,Int,Int>(
+                mixed_pre = Sparse::MatrixCSR<Real,Int,Int>(
                     AvOp.RowCount() + DiffOp.RowCount(),
                     AvOp.ColCount(),
                     AvOp.NonzeroCount() + DiffOp.NonzeroCount(),
                     ThreadCount()
                 );
                 
-                Int  const * restrict const ord       = P_ordering.data();
-                Real const * restrict const near      = P_near.data();
+                ptr<Int>  ord       = P_ordering.data();
+                ptr<Real> near      = P_near.data();
                 
-//                Int  const * restrict const av_outer  = AvOp.Outer().data()      + 1;
-//                Int  const * restrict const di_outer  = DiffOp.Outer().data()    + 1;
-                Int        * restrict const mi_outer  = mixed_pre.Outer().data() + 1;
+//                ptr<Int> av_outer  = AvOp.Outer().data()      + 1;
+//                ptr<Int> di_outer  = DiffOp.Outer().data()    + 1;
+                mut<Int>  mi_outer  = mixed_pre.Outer().data() + 1;
                 
-                Int  const * restrict const av_inner  = AvOp.Inner().data();
-                Int  const * restrict const di_inner  = DiffOp.Inner().data();
-                Int        * restrict const mi_inner  = mixed_pre.Inner().data();
+                ptr<Int>  av_inner  = AvOp.Inner().data();
+                ptr<Int>  di_inner  = DiffOp.Inner().data();
+                mut<Int>  mi_inner  = mixed_pre.Inner().data();
                 
-                Real const * restrict const av_values = AvOp.Values().data();
-                Real const * restrict const di_values = DiffOp.Values().data();
-                Real       * restrict const mi_values = mixed_pre.Values().data();
+                ptr<Real> av_values = AvOp.Values().data();
+                ptr<Real> di_values = DiffOp.Values().data();
+                mut<Real> mi_values = mixed_pre.Values().data();
             
                 const Int near_dim = NearDim();
                 const Int av_row_size = AvOp.NonzeroCount() / primitive_count;
@@ -967,7 +979,7 @@ namespace Repulsor
                     
                     const Real a = near[ near_dim * i ];
     
-                    // Copy the single of AvOp that belong to primitive i.
+                    // Copy the single rowof AvOp that belongs to primitive i.
                     {
                         const Int read_begin    = av_row_size * j;
                         const Int write_begin   = mi_block_size * i;
@@ -1002,11 +1014,8 @@ namespace Repulsor
                 ptoc("mixed_pre");
 
                 ptic("mixed_post");
-                
-                DUMP(mixed_pre.Stats());
-                
+                pdump(mixed_pre.Stats());
                 mixed_post = mixed_pre.Transpose();
-                
                 ptoc("mixed_post");
                 
                 this->mixed_pre_post_initialized = true;
@@ -1049,7 +1058,7 @@ namespace Repulsor
             SemiStaticUpdate( P_near_.data(), P_far_.data() );
         } // SemiStaticUpdate
         
-        void SemiStaticUpdate( const Real * restrict const P_near_, const Real * restrict const P_far_ ) override
+        void SemiStaticUpdate( ptr<Real> P_near_, ptr<Real> P_far_ ) override
         {
             // Updates only the computational data like primitive/cluster areas, centers of mass and normals. All data related to clustering or multipole acceptance criteria remain are unchanged.
             
@@ -1071,6 +1080,7 @@ namespace Repulsor
         {
             ptic(className()+"::TakeUpdateVectors");
             
+            this->update_time = max_time;
             // ATTENTION: We assume here that P_velocities_serialized are handed over already in correct order and won't be used anymore and just destroyed by the caller. This allows us to just swap the Tensor2s here, saving us a big copy operation.
             swap( P_velocities_serialized, P_velocities_serialized_ );
             
@@ -1079,11 +1089,11 @@ namespace Repulsor
             C_updated_serialized = Tensor2<SReal,Int>( ClusterCount(),   C_proto[0]->Size() );
             
             
-            const SReal * restrict const P_p_ser = P_serialized.data();
-            const SReal * restrict const P_v_ser = P_velocities_serialized.data();
+            ptr<SReal> P_p_ser = P_serialized.data();
+            ptr<SReal> P_v_ser = P_velocities_serialized.data();
             
-                  SReal * restrict const P_up_ser = P_updated_serialized.data();
-                  SReal * restrict const C_up_ser = C_updated_serialized.data();
+            mut<SReal> P_up_ser = P_updated_serialized.data();
+            mut<SReal> C_up_ser = C_updated_serialized.data();
             
             ptic(className()+"::TakeUpdateVectors - Compute the primitives updated with max_time.");
             // TODO: Potentially wastful code.
@@ -1128,7 +1138,6 @@ namespace Repulsor
                         
                         C_bv.SetPointer( C_up_ser, C );
                         C_bv.FromPrimitives( P_, P_up_ser, C_begin[C], C_end[C], 1 );
-                        
                     }
                 }
             }
@@ -1157,7 +1166,7 @@ namespace Repulsor
                             C_bv.SetPointer ( C_up_ser, C );
                             C_bv.Read       ( C_up_ser, L );
                             C_bv.Merge      ( C_up_ser, R );
-                            stack_ptr--;
+                            --stack_ptr;
                         }
                         else
                         {
@@ -1168,7 +1177,7 @@ namespace Repulsor
                     }
                     else
                     {
-                        stack_ptr--;
+                        --stack_ptr;
                     }
                 }
             }
@@ -1187,46 +1196,31 @@ namespace Repulsor
             const Int near_dim = NearDim();
             const Int primitive_count = PrimitiveCount();
             
-            if( !addto )
-            {
-                // Write first slice.
-                const Real * restrict const from = thread_P_D_near.data(0);
-                      Real * restrict const to   =        P_D_near.data();
-                
-                #pragma omp parallel for num_threads( ThreadCount() ) schedule( static )
-                for( Int i = 0; i < primitive_count; ++i )
-                {
-                    const Int j = P_inverse_ordering[i];
+            mut<Real> to      = P_D_near.data();
+            ptr<Int>  inv_ord = P_inverse_ordering.data();
 
-                    copy_buffer( &from[near_dim * j], &to[near_dim * i], near_dim );
-                }
-            }
-            
             // Add the other slices. (Start with the first slice if we were asked to add into.)
-            for( Int thread = 1-addto; thread < ThreadCount(); ++thread )
+            for( Int thread = 0; thread < ThreadCount(); ++thread )
             {
-                const Real * restrict const from = thread_P_D_near.data(thread);
-                      Real * restrict const to   =        P_D_near.data();
-                
-                const Int  * restrict const inv_ord = P_inverse_ordering.data();
-                
-                #pragma omp parallel for num_threads( ThreadCount() ) schedule( static )
-                for( Int i = 0; i < primitive_count; ++i )
-                {
-                    const Int j = inv_ord[i];
-                    
-                    #pragma omp simd
-                    for( Int k = 0; k < near_dim; ++k )
-                    {
-                        to[ near_dim * i + k ] += from[ near_dim * j + k ];
-                    }
+                ptr<Real> from = thread_P_D_near.data(thread);
 
-                    // THIS WAS WRONG!!!
-//                    copy_buffer( &from[near_dim * j], &to[near_dim * i], near_dim );
+                if( thread == 0 && !addto )
+                {
+                    #pragma omp parallel for num_threads( ThreadCount() ) schedule( static )
+                    for( Int i = 0; i < primitive_count; ++i )
+                    {
+                        copy_buffer( &from[near_dim * inv_ord[i]], &to[near_dim * i], near_dim );
+                    }
+                }
+                else
+                {
+                    #pragma omp parallel for num_threads( ThreadCount() ) schedule( static )
+                    for( Int i = 0; i < primitive_count; ++i )
+                    {
+                        add_to_buffer( &from[near_dim * inv_ord[i]], &to[near_dim * i], near_dim );
+                    }
                 }
             }
-            
-
             
             ptoc(className()+"::CollectNearFieldDerivatives");
             
@@ -1240,66 +1234,37 @@ namespace Repulsor
             ptic(className()+"::CollectFarFieldDerivatives");
             
             const Int far_dim         = FarDim();
-            const Int cluster_count   = ClusterCount();
             const Int primitive_count = PrimitiveCount();
             const Int thread_count    = ThreadCount();
             
             this->RequireBuffers(far_dim);
             
-            // Write first slice.
-            copy_buffer( thread_C_D_far.data(0), C_out.data(), cluster_count * far_dim );
-            
-            // Add the other slices.
-            for( Int thread = 1; thread < thread_count; ++thread )
-            {
-                const Real * restrict const from = thread_C_D_far.data(thread);
-                      Real * restrict const to   = C_out.data();
-                const Int last = cluster_count * far_dim;
-                
-                #pragma omp parallel for simd num_threads( thread_count )
-                for( Int i = 0; i < last; ++i )
-                {
-                    to[i] += from[i];
-                }
-            }
+            thread_C_D_far.AddReduce( C_out.data(), false );
             
             this->PercolateDown();
             
             this->ClustersToPrimitives(false);
 
+            ptr<Real> from    = P_out.data();
+            mut<Real> to      = P_D_far.data();
+            ptr<Int>  inv_ord = P_inverse_ordering.data();
+            
             // Finally, permute data for the outside world.
-            if(addto)
+            if( addto )
             {
-                const Real * restrict const from = P_out.data();
-                      Real * restrict const to   = P_D_far.data();
-                const Int  * restrict const inv_ord = P_inverse_ordering.data();
-                
                 #pragma omp parallel for num_threads( thread_count ) schedule( static )
                 for( Int i = 0; i < primitive_count; ++i )
                 {
-                    const Int j = inv_ord[i];
-                    
-                    #pragma omp simd
-                    for( Int k = 0; k < far_dim; ++k )
-                    {
-                        to[ far_dim * i + k ] += from[ far_dim * j + k ];
-                    }
+                    add_to_buffer( &from[far_dim * inv_ord[i]], &to[far_dim * i], far_dim );
                 }
             }
             else
             {
-                const Real * restrict const from = P_out.data();
-                      Real * restrict const to   = P_D_far.data();
-                const Int  * restrict const inv_ord = P_inverse_ordering.data();
-                
                 #pragma omp parallel for num_threads( thread_count ) schedule( static )
                 for( Int i = 0; i < primitive_count; ++i )
                 {
-                    const Int j = inv_ord[i];
-                    
-                    copy_buffer( &from[far_dim * j], &to[far_dim * i], far_dim );
+                    copy_buffer( &from[far_dim * inv_ord[i]], &to[far_dim * i], far_dim );
                 }
-                
             }
             
             ptoc(className()+"::CollectFarFieldDerivatives");
@@ -1350,12 +1315,9 @@ namespace Repulsor
         
         static std::string className()
         {
-            return TO_STD_STRING(CLASS) + "<"+ToString(AMB_DIM)+","+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+">";
+            return  "ClusterTree<"+ToString(AMB_DIM)+","+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+">";
         }
 
-    }; // CLASS
+    }; // class ClusterTree
     
 } // namespace Repulsor
-
-#undef BASE
-#undef CLASS

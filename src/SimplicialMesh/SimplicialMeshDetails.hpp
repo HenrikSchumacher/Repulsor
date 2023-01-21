@@ -32,8 +32,8 @@ namespace Repulsor
 		      Tensor3<Real,Int> & P_hull_coords,
 		      Tensor2<Real,Int> & P_near,
 		      Tensor2<Real,Int> & P_far,
-		SparseMatrixCSR<Real,Int,Int> & DiffOp,
-		SparseMatrixCSR<Real,Int,Int> & AvOp
+		Sparse::MatrixCSR<Real,Int,Int> & DiffOp,
+		Sparse::MatrixCSR<Real,Int,Int> & AvOp 
 	) const
     {
         ptic(ClassName()+"::ComputeNearFarDataOps");
@@ -126,8 +126,8 @@ namespace Repulsor
         #pragma omp parallel for num_threads( ThreadCount() )
         for( Int thread = 0; thread < ThreadCount(); ++thread )
         {
-			const Real * restrict const V_coords__      = V_coords.data();	
-			const Int  * restrict const simplices__     = simplices.data();
+			ptr<Real> V_coords__      = V_coords.data();	
+			ptr<Int>  simplices__     = simplices.data();
 
 			Real hull    [1][1];
 
@@ -138,8 +138,8 @@ namespace Repulsor
 
             for( Int i = i_begin; i < i_end; ++i )
             {
-				Real * restrict const near = P_near.data(i);                    
-				Real * restrict const far  = P_far.data(i);   
+				ptr<Real> near = P_near.data(i);                    
+				ptr<Real> far  = P_far.data(i);   
             
 				simplex[0] = simplices__[1*i +0];
 
@@ -164,8 +164,8 @@ namespace Repulsor
 		      Tensor3<Real,Int> & P_hull_coords,
 		      Tensor2<Real,Int> & P_near,
 		      Tensor2<Real,Int> & P_far,
-		SparseMatrixCSR<Real,Int,Int> & DiffOp,
-		SparseMatrixCSR<Real,Int,Int> & AvOp 
+		Sparse::MatrixCSR<Real,Int,Int> & DiffOp,
+		Sparse::MatrixCSR<Real,Int,Int> & AvOp 
 	) const
     {
         ptic(ClassName()+"::ComputeNearFarDataOps");
@@ -179,19 +179,19 @@ namespace Repulsor
         #pragma omp parallel for num_threads( ThreadCount() )
         for( Int thread = 0; thread < ThreadCount(); ++thread )
         {
-			Int  * restrict const AvOp_outer = AvOp.Outer().data();
-			Int  * restrict const AvOp_inner = AvOp.Inner().data();
+			ptr<Int> AvOp_outer = AvOp.Outer().data();
+			ptr<Int> AvOp_inner = AvOp.Inner().data();
 			AvOp.Value().Fill(static_cast<Real>(1));
 
-			Int  * restrict const DiffOp_outer = DiffOp.Outer().data();
-			Int  * restrict const DiffOp_inner = DiffOp.Inner().data();
+			mut<Int> DiffOp_outer = DiffOp.Outer().data();
+			mut<Int> DiffOp_inner = DiffOp.Inner().data();
 			DiffOp.Value().SetZero();
 
-			const Real * restrict const V_coords__      = V_coords.data();
+			ptr<Real> V_coords__      = V_coords.data();
 			
-			const Int  * restrict const simplices__     = simplices.data();
-				  Real * restrict const P_hull_coords__ = P_hull_coords.data();
-				  Real * restrict const P_coords__      = P_coords.data();
+			ptr<Int>  simplices__     = simplices.data();
+			mut<Real> P_hull_coords__ = P_hull_coords.data();
+		    mut<Real> P_coords__      = P_coords.data();
 
 			Int simplex        [1];
 			Int sorted_simplex [1];
@@ -202,8 +202,8 @@ namespace Repulsor
             for( Int i = i_begin; i < i_end; ++i )
             {
 
-				Real * restrict const near = P_near.data(i);                    
-				Real * restrict const far  = P_far.data(i);
+				mut<Real> near = P_near.data(i);                    
+				mut<Real> far  = P_far.data(i);
 
 				simplex[0] = sorted_simplex[0] = simplices__[1*i +0];
                   
@@ -246,10 +246,10 @@ namespace Repulsor
             eprint("in DNearToHulls: P_D_near.Dimension(1) != 3. Aborting");
         }
 
-		//const Real * restrict const V_coords__  = V_coords.data();
-		//const Int  * restrict const simplices__ = simplices.data();
-		const Real * restrict const P_D_near__  = P_D_near.data();
-			  Real * restrict const buffer__    = buffer.data();
+		//ptr<Real> V_coords__  = V_coords.data();
+		//ptr<Int>  simplices__ = simplices.data();
+		ptr<Real> P_D_near__  = P_D_near.data();
+		mut<Real> buffer__    = buffer.data();
         
         if( addTo )
 		{
@@ -288,10 +288,10 @@ namespace Repulsor
             eprint("in DFarToHulls: P_D_far.Dimension(1) != 3. Aborting");
         }
 
-		//const Real * restrict const V_coords__  = V_coords.data();
-		//const Int  * restrict const simplices__ = simplices.data();
-		const Real * restrict const P_D_far__   = P_D_far.data();
-			  Real * restrict const buffer__    = buffer.data();
+		//ptr<Real> V_coords__  = V_coords.data();
+		//ptr<Int>  simplices__ = simplices.data();
+		ptr<Real> P_D_far__   = P_D_far.data();
+		mut<Int>  buffer__    = buffer.data();
         
         if( addTo )
 		{
@@ -360,8 +360,8 @@ namespace Repulsor
         #pragma omp parallel for num_threads( ThreadCount() )
         for( Int thread = 0; thread < ThreadCount(); ++thread )
         {
-			const Real * restrict const V_coords__      = V_coords.data();	
-			const Int  * restrict const simplices__     = simplices.data();
+			ptr<Real> V_coords__      = V_coords.data();	
+			ptr<Int>  simplices__     = simplices.data();
 
 			Real hull    [1][2];
 
@@ -372,8 +372,8 @@ namespace Repulsor
 
             for( Int i = i_begin; i < i_end; ++i )
             {
-				Real * restrict const near = P_near.data(i);                    
-				Real * restrict const far  = P_far.data(i);   
+				ptr<Real> near = P_near.data(i);                    
+				ptr<Real> far  = P_far.data(i);   
             
 				simplex[0] = simplices__[1*i +0];
 
@@ -402,8 +402,8 @@ namespace Repulsor
 		      Tensor3<Real,Int> & P_hull_coords,
 		      Tensor2<Real,Int> & P_near,
 		      Tensor2<Real,Int> & P_far,
-		SparseMatrixCSR<Real,Int,Int> & DiffOp,
-		SparseMatrixCSR<Real,Int,Int> & AvOp
+		Sparse::MatrixCSR<Real,Int,Int> & DiffOp,
+		Sparse::MatrixCSR<Real,Int,Int> & AvOp 
 	) const
     {
         ptic(ClassName()+"::ComputeNearFarDataOps");
@@ -417,19 +417,19 @@ namespace Repulsor
         #pragma omp parallel for num_threads( ThreadCount() )
         for( Int thread = 0; thread < ThreadCount(); ++thread )
         {
-			Int  * restrict const AvOp_outer = AvOp.Outer().data();
-			Int  * restrict const AvOp_inner = AvOp.Inner().data();
+			ptr<Int> AvOp_outer = AvOp.Outer().data();
+			ptr<Int> AvOp_inner = AvOp.Inner().data();
 			AvOp.Value().Fill(static_cast<Real>(1));
 
-			Int  * restrict const DiffOp_outer = DiffOp.Outer().data();
-			Int  * restrict const DiffOp_inner = DiffOp.Inner().data();
+			mut<Int> DiffOp_outer = DiffOp.Outer().data();
+			mut<Int> DiffOp_inner = DiffOp.Inner().data();
 			DiffOp.Value().SetZero();
 
-			const Real * restrict const V_coords__      = V_coords.data();
+			ptr<Real> V_coords__      = V_coords.data();
 			
-			const Int  * restrict const simplices__     = simplices.data();
-				  Real * restrict const P_hull_coords__ = P_hull_coords.data();
-				  Real * restrict const P_coords__      = P_coords.data();
+			ptr<Int>  simplices__     = simplices.data();
+			mut<Real> P_hull_coords__ = P_hull_coords.data();
+		    mut<Real> P_coords__      = P_coords.data();
 
 			Int simplex        [1];
 			Int sorted_simplex [1];
@@ -440,8 +440,8 @@ namespace Repulsor
             for( Int i = i_begin; i < i_end; ++i )
             {
 
-				Real * restrict const near = P_near.data(i);                    
-				Real * restrict const far  = P_far.data(i);
+				mut<Real> near = P_near.data(i);                    
+				mut<Real> far  = P_far.data(i);
 
 				simplex[0] = sorted_simplex[0] = simplices__[1*i +0];
                   
@@ -490,10 +490,10 @@ namespace Repulsor
             eprint("in DNearToHulls: P_D_near.Dimension(1) != 6. Aborting");
         }
 
-		//const Real * restrict const V_coords__  = V_coords.data();
-		//const Int  * restrict const simplices__ = simplices.data();
-		const Real * restrict const P_D_near__  = P_D_near.data();
-			  Real * restrict const buffer__    = buffer.data();
+		//ptr<Real> V_coords__  = V_coords.data();
+		//ptr<Int>  simplices__ = simplices.data();
+		ptr<Real> P_D_near__  = P_D_near.data();
+		mut<Real> buffer__    = buffer.data();
         
         if( addTo )
 		{
@@ -534,10 +534,10 @@ namespace Repulsor
             eprint("in DFarToHulls: P_D_far.Dimension(1) != 6. Aborting");
         }
 
-		//const Real * restrict const V_coords__  = V_coords.data();
-		//const Int  * restrict const simplices__ = simplices.data();
-		const Real * restrict const P_D_far__   = P_D_far.data();
-			  Real * restrict const buffer__    = buffer.data();
+		//ptr<Real> V_coords__  = V_coords.data();
+		//ptr<Int>  simplices__ = simplices.data();
+		ptr<Real> P_D_far__   = P_D_far.data();
+		mut<Int>  buffer__    = buffer.data();
         
         if( addTo )
 		{
@@ -608,8 +608,8 @@ namespace Repulsor
         #pragma omp parallel for num_threads( ThreadCount() )
         for( Int thread = 0; thread < ThreadCount(); ++thread )
         {
-			const Real * restrict const V_coords__      = V_coords.data();	
-			const Int  * restrict const simplices__     = simplices.data();
+			ptr<Real> V_coords__      = V_coords.data();	
+			ptr<Int>  simplices__     = simplices.data();
 
 			Real hull    [1][3];
 
@@ -620,8 +620,8 @@ namespace Repulsor
 
             for( Int i = i_begin; i < i_end; ++i )
             {
-				Real * restrict const near = P_near.data(i);                    
-				Real * restrict const far  = P_far.data(i);   
+				ptr<Real> near = P_near.data(i);                    
+				ptr<Real> far  = P_far.data(i);   
             
 				simplex[0] = simplices__[1*i +0];
 
@@ -655,8 +655,8 @@ namespace Repulsor
 		      Tensor3<Real,Int> & P_hull_coords,
 		      Tensor2<Real,Int> & P_near,
 		      Tensor2<Real,Int> & P_far,
-		SparseMatrixCSR<Real,Int,Int> & DiffOp,
-		SparseMatrixCSR<Real,Int,Int> & AvOp
+		Sparse::MatrixCSR<Real,Int,Int> & DiffOp,
+		Sparse::MatrixCSR<Real,Int,Int> & AvOp 
 	) const
     {
         ptic(ClassName()+"::ComputeNearFarDataOps");
@@ -670,19 +670,19 @@ namespace Repulsor
         #pragma omp parallel for num_threads( ThreadCount() )
         for( Int thread = 0; thread < ThreadCount(); ++thread )
         {
-			Int  * restrict const AvOp_outer = AvOp.Outer().data();
-			Int  * restrict const AvOp_inner = AvOp.Inner().data();
+			ptr<Int> AvOp_outer = AvOp.Outer().data();
+			ptr<Int> AvOp_inner = AvOp.Inner().data();
 			AvOp.Value().Fill(static_cast<Real>(1));
 
-			Int  * restrict const DiffOp_outer = DiffOp.Outer().data();
-			Int  * restrict const DiffOp_inner = DiffOp.Inner().data();
+			mut<Int> DiffOp_outer = DiffOp.Outer().data();
+			mut<Int> DiffOp_inner = DiffOp.Inner().data();
 			DiffOp.Value().SetZero();
 
-			const Real * restrict const V_coords__      = V_coords.data();
+			ptr<Real> V_coords__      = V_coords.data();
 			
-			const Int  * restrict const simplices__     = simplices.data();
-				  Real * restrict const P_hull_coords__ = P_hull_coords.data();
-				  Real * restrict const P_coords__      = P_coords.data();
+			ptr<Int>  simplices__     = simplices.data();
+			mut<Real> P_hull_coords__ = P_hull_coords.data();
+		    mut<Real> P_coords__      = P_coords.data();
 
 			Int simplex        [1];
 			Int sorted_simplex [1];
@@ -693,8 +693,8 @@ namespace Repulsor
             for( Int i = i_begin; i < i_end; ++i )
             {
 
-				Real * restrict const near = P_near.data(i);                    
-				Real * restrict const far  = P_far.data(i);
+				mut<Real> near = P_near.data(i);                    
+				mut<Real> far  = P_far.data(i);
 
 				simplex[0] = sorted_simplex[0] = simplices__[1*i +0];
                   
@@ -750,10 +750,10 @@ namespace Repulsor
             eprint("in DNearToHulls: P_D_near.Dimension(1) != 10. Aborting");
         }
 
-		//const Real * restrict const V_coords__  = V_coords.data();
-		//const Int  * restrict const simplices__ = simplices.data();
-		const Real * restrict const P_D_near__  = P_D_near.data();
-			  Real * restrict const buffer__    = buffer.data();
+		//ptr<Real> V_coords__  = V_coords.data();
+		//ptr<Int>  simplices__ = simplices.data();
+		ptr<Real> P_D_near__  = P_D_near.data();
+		mut<Real> buffer__    = buffer.data();
         
         if( addTo )
 		{
@@ -796,10 +796,10 @@ namespace Repulsor
             eprint("in DFarToHulls: P_D_far.Dimension(1) != 10. Aborting");
         }
 
-		//const Real * restrict const V_coords__  = V_coords.data();
-		//const Int  * restrict const simplices__ = simplices.data();
-		const Real * restrict const P_D_far__   = P_D_far.data();
-			  Real * restrict const buffer__    = buffer.data();
+		//ptr<Real> V_coords__  = V_coords.data();
+		//ptr<Int>  simplices__ = simplices.data();
+		ptr<Real> P_D_far__   = P_D_far.data();
+		mut<Int>  buffer__    = buffer.data();
         
         if( addTo )
 		{
@@ -872,8 +872,8 @@ namespace Repulsor
         #pragma omp parallel for num_threads( ThreadCount() )
         for( Int thread = 0; thread < ThreadCount(); ++thread )
         {
-			const Real * restrict const V_coords__      = V_coords.data();	
-			const Int  * restrict const simplices__     = simplices.data();
+			ptr<Real> V_coords__      = V_coords.data();	
+			ptr<Int>  simplices__     = simplices.data();
 
 			Real hull    [1][4];
 
@@ -884,8 +884,8 @@ namespace Repulsor
 
             for( Int i = i_begin; i < i_end; ++i )
             {
-				Real * restrict const near = P_near.data(i);                    
-				Real * restrict const far  = P_far.data(i);   
+				ptr<Real> near = P_near.data(i);                    
+				ptr<Real> far  = P_far.data(i);   
             
 				simplex[0] = simplices__[1*i +0];
 
@@ -925,8 +925,8 @@ namespace Repulsor
 		      Tensor3<Real,Int> & P_hull_coords,
 		      Tensor2<Real,Int> & P_near,
 		      Tensor2<Real,Int> & P_far,
-		SparseMatrixCSR<Real,Int,Int> & DiffOp,
-		SparseMatrixCSR<Real,Int,Int> & AvOp
+		Sparse::MatrixCSR<Real,Int,Int> & DiffOp,
+		Sparse::MatrixCSR<Real,Int,Int> & AvOp 
 	) const
     {
         ptic(ClassName()+"::ComputeNearFarDataOps");
@@ -940,19 +940,19 @@ namespace Repulsor
         #pragma omp parallel for num_threads( ThreadCount() )
         for( Int thread = 0; thread < ThreadCount(); ++thread )
         {
-			Int  * restrict const AvOp_outer = AvOp.Outer().data();
-			Int  * restrict const AvOp_inner = AvOp.Inner().data();
+			ptr<Int> AvOp_outer = AvOp.Outer().data();
+			ptr<Int> AvOp_inner = AvOp.Inner().data();
 			AvOp.Value().Fill(static_cast<Real>(1));
 
-			Int  * restrict const DiffOp_outer = DiffOp.Outer().data();
-			Int  * restrict const DiffOp_inner = DiffOp.Inner().data();
+			mut<Int> DiffOp_outer = DiffOp.Outer().data();
+			mut<Int> DiffOp_inner = DiffOp.Inner().data();
 			DiffOp.Value().SetZero();
 
-			const Real * restrict const V_coords__      = V_coords.data();
+			ptr<Real> V_coords__      = V_coords.data();
 			
-			const Int  * restrict const simplices__     = simplices.data();
-				  Real * restrict const P_hull_coords__ = P_hull_coords.data();
-				  Real * restrict const P_coords__      = P_coords.data();
+			ptr<Int>  simplices__     = simplices.data();
+			mut<Real> P_hull_coords__ = P_hull_coords.data();
+		    mut<Real> P_coords__      = P_coords.data();
 
 			Int simplex        [1];
 			Int sorted_simplex [1];
@@ -963,8 +963,8 @@ namespace Repulsor
             for( Int i = i_begin; i < i_end; ++i )
             {
 
-				Real * restrict const near = P_near.data(i);                    
-				Real * restrict const far  = P_far.data(i);
+				mut<Real> near = P_near.data(i);                    
+				mut<Real> far  = P_far.data(i);
 
 				simplex[0] = sorted_simplex[0] = simplices__[1*i +0];
                   
@@ -1028,10 +1028,10 @@ namespace Repulsor
             eprint("in DNearToHulls: P_D_near.Dimension(1) != 15. Aborting");
         }
 
-		//const Real * restrict const V_coords__  = V_coords.data();
-		//const Int  * restrict const simplices__ = simplices.data();
-		const Real * restrict const P_D_near__  = P_D_near.data();
-			  Real * restrict const buffer__    = buffer.data();
+		//ptr<Real> V_coords__  = V_coords.data();
+		//ptr<Int>  simplices__ = simplices.data();
+		ptr<Real> P_D_near__  = P_D_near.data();
+		mut<Real> buffer__    = buffer.data();
         
         if( addTo )
 		{
@@ -1076,10 +1076,10 @@ namespace Repulsor
             eprint("in DFarToHulls: P_D_far.Dimension(1) != 15. Aborting");
         }
 
-		//const Real * restrict const V_coords__  = V_coords.data();
-		//const Int  * restrict const simplices__ = simplices.data();
-		const Real * restrict const P_D_far__   = P_D_far.data();
-			  Real * restrict const buffer__    = buffer.data();
+		//ptr<Real> V_coords__  = V_coords.data();
+		//ptr<Int>  simplices__ = simplices.data();
+		ptr<Real> P_D_far__   = P_D_far.data();
+		mut<Int>  buffer__    = buffer.data();
         
         if( addTo )
 		{
@@ -1154,7 +1154,7 @@ namespace Repulsor
         #pragma omp parallel for num_threads( ThreadCount() )
         for( Int thread = 0; thread < ThreadCount(); ++thread )
         {
-			const Real * restrict const V_coords__      = V_coords.data();	
+			ptr<Real> V_coords__      = V_coords.data();	
 			const Int  * restrict const simplices__     = simplices.data();
 
 			Real hull    [2][2];
@@ -1216,8 +1216,8 @@ namespace Repulsor
 		      Tensor3<Real,Int> & P_hull_coords,
 		      Tensor2<Real,Int> & P_near,
 		      Tensor2<Real,Int> & P_far,
-		SparseMatrixCSR<Real,Int,Int> & DiffOp,
-		SparseMatrixCSR<Real,Int,Int> & AvOp
+		Sparse::MatrixCSR<Real,Int,Int> & DiffOp,
+		Sparse::MatrixCSR<Real,Int,Int> & AvOp 
 	) const
     {
         ptic(ClassName()+"::ComputeNearFarDataOps");
@@ -1231,19 +1231,19 @@ namespace Repulsor
         #pragma omp parallel for num_threads( ThreadCount() )
         for( Int thread = 0; thread < ThreadCount(); ++thread )
         {
-			Int  * restrict const AvOp_outer = AvOp.Outer().data();
-			Int  * restrict const AvOp_inner = AvOp.Inner().data();
-			Real * restrict const AvOp_value = AvOp.Values().data();
+			mut<Int>  AvOp_outer = AvOp.Outer().data();
+			mut<Int>  AvOp_inner = AvOp.Inner().data();
+			mut<Real> AvOp_value = AvOp.Values().data();
 
-			Int  * restrict const DiffOp_outer = DiffOp.Outer().data();
-			Int  * restrict const DiffOp_inner = DiffOp.Inner().data();
-			Real * restrict const DiffOp_value = DiffOp.Value().data();
+			mut<Int>  DiffOp_outer = DiffOp.Outer().data();
+			mut<Int>  DiffOp_inner = DiffOp.Inner().data();
+			mut<Real> DiffOp_value = DiffOp.Value().data();
 
-			const Real * restrict const V_coords__      = V_coords.data();
+			ptr<Real> V_coords__      = V_coords.data();
 			
-			const Int  * restrict const simplices__     = simplices.data();
-				  Real * restrict const P_hull_coords__ = P_hull_coords.data();
-				  Real * restrict const P_coords__      = P_coords.data();
+			ptr<Int>  simplices__     = simplices.data();
+		    mut<Real> P_hull_coords__ = P_hull_coords.data();
+			mut<Real> P_coords__      = P_coords.data();
 
 			Real df       [2][1];
 			Real dfdagger [1][2];
@@ -1259,8 +1259,8 @@ namespace Repulsor
             for( Int i = i_begin; i < i_end; ++i )
             {
 
-				Real * restrict const near = P_near.data(i);                    
-				Real * restrict const far  = P_far.data(i);
+				mut<Real> near = P_near.data(i);                    
+				mut<Real> far  = P_far.data(i);
 
 				simplex[0] = sorted_simplex[0] = simplices__[2*i +0];
 				simplex[1] = sorted_simplex[1] = simplices__[2*i +1];
@@ -1339,10 +1339,10 @@ namespace Repulsor
             eprint("in DNearToHulls: P_D_near.Dimension(1) != 8. Aborting");
         }
 
-		const Real * restrict const V_coords__  = V_coords.data();
-		const Int  * restrict const simplices__ = simplices.data();
-		const Real * restrict const P_D_near__  = P_D_near.data();
-			  Real * restrict const buffer__    = buffer.data();
+		ptr<Real> V_coords__  = V_coords.data();
+		ptr<Int>  simplices__ = simplices.data();
+		ptr<Real> P_D_near__  = P_D_near.data();
+		mut<Real> buffer__    = buffer.data();
         
         if( addTo )
 		{
@@ -1451,10 +1451,10 @@ namespace Repulsor
             eprint("in DFarToHulls: P_D_far.Dimension(1) != 6. Aborting");
         }
 
-		const Real * restrict const V_coords__  = V_coords.data();
-		const Int  * restrict const simplices__ = simplices.data();
-		const Real * restrict const P_D_far__   = P_D_far.data();
-			  Real * restrict const buffer__    = buffer.data();
+		ptr<Real> V_coords__  = V_coords.data();
+		ptr<Int>  simplices__ = simplices.data();
+		ptr<Real> P_D_far__   = P_D_far.data();
+		mut<Real> buffer__    = buffer.data();
         
         if( addTo )
 		{
@@ -1595,7 +1595,7 @@ namespace Repulsor
         #pragma omp parallel for num_threads( ThreadCount() )
         for( Int thread = 0; thread < ThreadCount(); ++thread )
         {
-			const Real * restrict const V_coords__      = V_coords.data();	
+			ptr<Real> V_coords__      = V_coords.data();	
 			const Int  * restrict const simplices__     = simplices.data();
 
 			Real hull    [2][3];
@@ -1665,8 +1665,8 @@ namespace Repulsor
 		      Tensor3<Real,Int> & P_hull_coords,
 		      Tensor2<Real,Int> & P_near,
 		      Tensor2<Real,Int> & P_far,
-		SparseMatrixCSR<Real,Int,Int> & DiffOp,
-		SparseMatrixCSR<Real,Int,Int> & AvOp
+		Sparse::MatrixCSR<Real,Int,Int> & DiffOp,
+		Sparse::MatrixCSR<Real,Int,Int> & AvOp 
 	) const
     {
         ptic(ClassName()+"::ComputeNearFarDataOps");
@@ -1680,19 +1680,19 @@ namespace Repulsor
         #pragma omp parallel for num_threads( ThreadCount() )
         for( Int thread = 0; thread < ThreadCount(); ++thread )
         {
-			Int  * restrict const AvOp_outer = AvOp.Outer().data();
-			Int  * restrict const AvOp_inner = AvOp.Inner().data();
-			Real * restrict const AvOp_value = AvOp.Values().data();
+			mut<Int>  AvOp_outer = AvOp.Outer().data();
+			mut<Int>  AvOp_inner = AvOp.Inner().data();
+			mut<Real> AvOp_value = AvOp.Values().data();
 
-			Int  * restrict const DiffOp_outer = DiffOp.Outer().data();
-			Int  * restrict const DiffOp_inner = DiffOp.Inner().data();
-			Real * restrict const DiffOp_value = DiffOp.Value().data();
+			mut<Int>  DiffOp_outer = DiffOp.Outer().data();
+			mut<Int>  DiffOp_inner = DiffOp.Inner().data();
+			mut<Real> DiffOp_value = DiffOp.Value().data();
 
-			const Real * restrict const V_coords__      = V_coords.data();
+			ptr<Real> V_coords__      = V_coords.data();
 			
-			const Int  * restrict const simplices__     = simplices.data();
-				  Real * restrict const P_hull_coords__ = P_hull_coords.data();
-				  Real * restrict const P_coords__      = P_coords.data();
+			ptr<Int>  simplices__     = simplices.data();
+		    mut<Real> P_hull_coords__ = P_hull_coords.data();
+			mut<Real> P_coords__      = P_coords.data();
 
 			Real df       [3][1];
 			Real dfdagger [1][3];
@@ -1708,8 +1708,8 @@ namespace Repulsor
             for( Int i = i_begin; i < i_end; ++i )
             {
 
-				Real * restrict const near = P_near.data(i);                    
-				Real * restrict const far  = P_far.data(i);
+				mut<Real> near = P_near.data(i);                    
+				mut<Real> far  = P_far.data(i);
 
 				simplex[0] = sorted_simplex[0] = simplices__[2*i +0];
 				simplex[1] = sorted_simplex[1] = simplices__[2*i +1];
@@ -1801,10 +1801,10 @@ namespace Repulsor
             eprint("in DNearToHulls: P_D_near.Dimension(1) != 13. Aborting");
         }
 
-		const Real * restrict const V_coords__  = V_coords.data();
-		const Int  * restrict const simplices__ = simplices.data();
-		const Real * restrict const P_D_near__  = P_D_near.data();
-			  Real * restrict const buffer__    = buffer.data();
+		ptr<Real> V_coords__  = V_coords.data();
+		ptr<Int>  simplices__ = simplices.data();
+		ptr<Real> P_D_near__  = P_D_near.data();
+		mut<Real> buffer__    = buffer.data();
         
         if( addTo )
 		{
@@ -1955,10 +1955,10 @@ namespace Repulsor
             eprint("in DFarToHulls: P_D_far.Dimension(1) != 10. Aborting");
         }
 
-		const Real * restrict const V_coords__  = V_coords.data();
-		const Int  * restrict const simplices__ = simplices.data();
-		const Real * restrict const P_D_far__   = P_D_far.data();
-			  Real * restrict const buffer__    = buffer.data();
+		ptr<Real> V_coords__  = V_coords.data();
+		ptr<Int>  simplices__ = simplices.data();
+		ptr<Real> P_D_far__   = P_D_far.data();
+		mut<Real> buffer__    = buffer.data();
         
         if( addTo )
 		{
@@ -2141,7 +2141,7 @@ namespace Repulsor
         #pragma omp parallel for num_threads( ThreadCount() )
         for( Int thread = 0; thread < ThreadCount(); ++thread )
         {
-			const Real * restrict const V_coords__      = V_coords.data();	
+			ptr<Real> V_coords__      = V_coords.data();	
 			const Int  * restrict const simplices__     = simplices.data();
 
 			Real hull    [2][4];
@@ -2220,8 +2220,8 @@ namespace Repulsor
 		      Tensor3<Real,Int> & P_hull_coords,
 		      Tensor2<Real,Int> & P_near,
 		      Tensor2<Real,Int> & P_far,
-		SparseMatrixCSR<Real,Int,Int> & DiffOp,
-		SparseMatrixCSR<Real,Int,Int> & AvOp
+		Sparse::MatrixCSR<Real,Int,Int> & DiffOp,
+		Sparse::MatrixCSR<Real,Int,Int> & AvOp 
 	) const
     {
         ptic(ClassName()+"::ComputeNearFarDataOps");
@@ -2235,19 +2235,19 @@ namespace Repulsor
         #pragma omp parallel for num_threads( ThreadCount() )
         for( Int thread = 0; thread < ThreadCount(); ++thread )
         {
-			Int  * restrict const AvOp_outer = AvOp.Outer().data();
-			Int  * restrict const AvOp_inner = AvOp.Inner().data();
-			Real * restrict const AvOp_value = AvOp.Values().data();
+			mut<Int>  AvOp_outer = AvOp.Outer().data();
+			mut<Int>  AvOp_inner = AvOp.Inner().data();
+			mut<Real> AvOp_value = AvOp.Values().data();
 
-			Int  * restrict const DiffOp_outer = DiffOp.Outer().data();
-			Int  * restrict const DiffOp_inner = DiffOp.Inner().data();
-			Real * restrict const DiffOp_value = DiffOp.Value().data();
+			mut<Int>  DiffOp_outer = DiffOp.Outer().data();
+			mut<Int>  DiffOp_inner = DiffOp.Inner().data();
+			mut<Real> DiffOp_value = DiffOp.Value().data();
 
-			const Real * restrict const V_coords__      = V_coords.data();
+			ptr<Real> V_coords__      = V_coords.data();
 			
-			const Int  * restrict const simplices__     = simplices.data();
-				  Real * restrict const P_hull_coords__ = P_hull_coords.data();
-				  Real * restrict const P_coords__      = P_coords.data();
+			ptr<Int>  simplices__     = simplices.data();
+		    mut<Real> P_hull_coords__ = P_hull_coords.data();
+			mut<Real> P_coords__      = P_coords.data();
 
 			Real df       [4][1];
 			Real dfdagger [1][4];
@@ -2263,8 +2263,8 @@ namespace Repulsor
             for( Int i = i_begin; i < i_end; ++i )
             {
 
-				Real * restrict const near = P_near.data(i);                    
-				Real * restrict const far  = P_far.data(i);
+				mut<Real> near = P_near.data(i);                    
+				mut<Real> far  = P_far.data(i);
 
 				simplex[0] = sorted_simplex[0] = simplices__[2*i +0];
 				simplex[1] = sorted_simplex[1] = simplices__[2*i +1];
@@ -2370,10 +2370,10 @@ namespace Repulsor
             eprint("in DNearToHulls: P_D_near.Dimension(1) != 19. Aborting");
         }
 
-		const Real * restrict const V_coords__  = V_coords.data();
-		const Int  * restrict const simplices__ = simplices.data();
-		const Real * restrict const P_D_near__  = P_D_near.data();
-			  Real * restrict const buffer__    = buffer.data();
+		ptr<Real> V_coords__  = V_coords.data();
+		ptr<Int>  simplices__ = simplices.data();
+		ptr<Real> P_D_near__  = P_D_near.data();
+		mut<Real> buffer__    = buffer.data();
         
         if( addTo )
 		{
@@ -2560,10 +2560,10 @@ namespace Repulsor
             eprint("in DFarToHulls: P_D_far.Dimension(1) != 15. Aborting");
         }
 
-		const Real * restrict const V_coords__  = V_coords.data();
-		const Int  * restrict const simplices__ = simplices.data();
-		const Real * restrict const P_D_far__   = P_D_far.data();
-			  Real * restrict const buffer__    = buffer.data();
+		ptr<Real> V_coords__  = V_coords.data();
+		ptr<Int>  simplices__ = simplices.data();
+		ptr<Real> P_D_far__   = P_D_far.data();
+		mut<Real> buffer__    = buffer.data();
         
         if( addTo )
 		{
@@ -2782,8 +2782,8 @@ namespace Repulsor
         #pragma omp parallel for num_threads( ThreadCount() )
         for( Int thread = 0; thread < ThreadCount(); ++thread )
         {
-			const Real * restrict const V_coords__      = V_coords.data();	
-			const Int  * restrict const simplices__     = simplices.data();
+			ptr<Real> V_coords__      = V_coords.data();	
+			ptr<Int>  simplices__     = simplices.data();
 
 			Real hull    [3][3];
 			Real df      [3][2];
@@ -2869,8 +2869,8 @@ namespace Repulsor
 		      Tensor3<Real,Int> & P_hull_coords,
 		      Tensor2<Real,Int> & P_near,
 		      Tensor2<Real,Int> & P_far,
-		SparseMatrixCSR<Real,Int,Int> & DiffOp,
-		SparseMatrixCSR<Real,Int,Int> & AvOp
+		Sparse::MatrixCSR<Real,Int,Int> & DiffOp,
+		Sparse::MatrixCSR<Real,Int,Int> & AvOp 
 	) const
     {
         ptic(ClassName()+"::ComputeNearFarDataOps");
@@ -2884,19 +2884,19 @@ namespace Repulsor
         #pragma omp parallel for num_threads( ThreadCount() )
         for( Int thread = 0; thread < ThreadCount(); ++thread )
         {
-			Int  * restrict const AvOp_outer = AvOp.Outer().data();
-			Int  * restrict const AvOp_inner = AvOp.Inner().data();
-			Real * restrict const AvOp_value = AvOp.Values().data();
+			mut<Int>  AvOp_outer = AvOp.Outer().data();
+			mut<Int>  AvOp_inner = AvOp.Inner().data();
+			mut<Real> AvOp_value = AvOp.Values().data();
 
-			Int  * restrict const DiffOp_outer = DiffOp.Outer().data();
-			Int  * restrict const DiffOp_inner = DiffOp.Inner().data();
-			Real * restrict const DiffOp_value = DiffOp.Values().data();
+			mut<Int>  DiffOp_outer = DiffOp.Outer().data();
+			mut<Int>  DiffOp_inner = DiffOp.Inner().data();
+			mut<Real> DiffOp_value = DiffOp.Values().data();
 
-			const Real * restrict const V_coords__      = V_coords.data();
+			ptr<Real> V_coords__      = V_coords.data();
 			
-			const Int  * restrict const simplices__     = simplices.data();
-				  Real * restrict const P_hull_coords__ = P_hull_coords.data();
-				  Real * restrict const P_coords__      = P_coords.data();
+			ptr<Int>  simplices__     = simplices.data();
+		    mut<Real> P_hull_coords__ = P_hull_coords.data();
+			mut<Real> P_coords__      = P_coords.data();
 
 			Real df       [3][2];
 			Real dfdagger [2][3];
@@ -2912,8 +2912,8 @@ namespace Repulsor
             for( Int i = i_begin; i < i_end; ++i )
             {
 
-				Real * restrict const near = P_near.data(i);                    
-				Real * restrict const far  = P_far.data(i);
+				mut<Real> near = P_near.data(i);                    
+				mut<Real> far  = P_far.data(i);
 
 				simplex[0] = sorted_simplex[0] = simplices__[3*i +0];
 				simplex[1] = sorted_simplex[1] = simplices__[3*i +1];
@@ -2997,7 +2997,7 @@ namespace Repulsor
 
                 // derivative operator  (3 x 3 matrix)
 
-                Real * restrict const Df = &DiffOp_value[ 9 * i ];
+                mut<Real> Df = &DiffOp_value[ 9 * i ];
 
 				Df[ 0] = - dfdagger[0][0] - dfdagger[1][0];
 				Df[ 1] =   dfdagger[0][0];
@@ -3030,10 +3030,10 @@ namespace Repulsor
             eprint("in DNearToHulls: P_D_near.Dimension(1) != 16. Aborting");
         }
         
-		const Real * restrict const V_coords__  = V_coords.data();
-        const Int  * restrict const simplices__ = simplices.data();
-		const Real * restrict const P_D_near__  = P_D_near.data();
-              Real * restrict const buffer__    = buffer.data();
+		ptr<Real> V_coords__  = V_coords.data();
+        ptr<Int>  simplices__ = simplices.data();
+		ptr<Real> P_D_near__  = P_D_near.data();
+        mut<Real> buffer__    = buffer.data();
 
 		if( addTo )
 		{
@@ -3306,9 +3306,9 @@ namespace Repulsor
             eprint("in DFarToHulls: P_D_far.Dimension(1) != 10. Aborting");
         }
         
-		const Real * restrict const V_coords__  = V_coords.data();
-        const Int  * restrict const simplices__ = simplices.data();
-		const Real * restrict const P_D_far__   = P_D_far.data();
+		ptr<Real> V_coords__  = V_coords.data();
+        ptr<Int>  simplices__ = simplices.data();
+		ptr<Real> P_D_far__   = P_D_far.data();
               Real * restrict const buffer__    = buffer.data();
 
 		if( addTo )
@@ -3606,8 +3606,8 @@ namespace Repulsor
         #pragma omp parallel for num_threads( ThreadCount() )
         for( Int thread = 0; thread < ThreadCount(); ++thread )
         {
-			const Real * restrict const V_coords__      = V_coords.data();	
-			const Int  * restrict const simplices__     = simplices.data();
+			ptr<Real> V_coords__      = V_coords.data();	
+			ptr<Int>  simplices__     = simplices.data();
 
 			Real hull    [3][4];
 			Real df      [4][2];
@@ -3705,8 +3705,8 @@ namespace Repulsor
 		      Tensor3<Real,Int> & P_hull_coords,
 		      Tensor2<Real,Int> & P_near,
 		      Tensor2<Real,Int> & P_far,
-		SparseMatrixCSR<Real,Int,Int> & DiffOp,
-		SparseMatrixCSR<Real,Int,Int> & AvOp
+		Sparse::MatrixCSR<Real,Int,Int> & DiffOp,
+		Sparse::MatrixCSR<Real,Int,Int> & AvOp 
 	) const
     {
         ptic(ClassName()+"::ComputeNearFarDataOps");
@@ -3720,19 +3720,19 @@ namespace Repulsor
         #pragma omp parallel for num_threads( ThreadCount() )
         for( Int thread = 0; thread < ThreadCount(); ++thread )
         {
-			Int  * restrict const AvOp_outer = AvOp.Outer().data();
-			Int  * restrict const AvOp_inner = AvOp.Inner().data();
-			Real * restrict const AvOp_value = AvOp.Values().data();
+			mut<Int>  AvOp_outer = AvOp.Outer().data();
+			mut<Int>  AvOp_inner = AvOp.Inner().data();
+			mut<Real> AvOp_value = AvOp.Values().data();
 
-			Int  * restrict const DiffOp_outer = DiffOp.Outer().data();
-			Int  * restrict const DiffOp_inner = DiffOp.Inner().data();
-			Real * restrict const DiffOp_value = DiffOp.Values().data();
+			mut<Int>  DiffOp_outer = DiffOp.Outer().data();
+			mut<Int>  DiffOp_inner = DiffOp.Inner().data();
+			mut<Real> DiffOp_value = DiffOp.Values().data();
 
-			const Real * restrict const V_coords__      = V_coords.data();
+			ptr<Real> V_coords__      = V_coords.data();
 			
-			const Int  * restrict const simplices__     = simplices.data();
-				  Real * restrict const P_hull_coords__ = P_hull_coords.data();
-				  Real * restrict const P_coords__      = P_coords.data();
+			ptr<Int>  simplices__     = simplices.data();
+		    mut<Real> P_hull_coords__ = P_hull_coords.data();
+			mut<Real> P_coords__      = P_coords.data();
 
 			Real df       [4][2];
 			Real dfdagger [2][4];
@@ -3748,8 +3748,8 @@ namespace Repulsor
             for( Int i = i_begin; i < i_end; ++i )
             {
 
-				Real * restrict const near = P_near.data(i);                    
-				Real * restrict const far  = P_far.data(i);
+				mut<Real> near = P_near.data(i);                    
+				mut<Real> far  = P_far.data(i);
 
 				simplex[0] = sorted_simplex[0] = simplices__[3*i +0];
 				simplex[1] = sorted_simplex[1] = simplices__[3*i +1];
@@ -3849,7 +3849,7 @@ namespace Repulsor
 
                 // derivative operator  (4 x 3 matrix)
 
-                Real * restrict const Df = &DiffOp_value[ 12 * i ];
+                mut<Real> Df = &DiffOp_value[ 12 * i ];
 
 				Df[ 0] = - dfdagger[0][0] - dfdagger[1][0];
 				Df[ 1] =   dfdagger[0][0];
@@ -3885,10 +3885,10 @@ namespace Repulsor
             eprint("in DNearToHulls: P_D_near.Dimension(1) != 23. Aborting");
         }
         
-		const Real * restrict const V_coords__  = V_coords.data();
-        const Int  * restrict const simplices__ = simplices.data();
-		const Real * restrict const P_D_near__  = P_D_near.data();
-              Real * restrict const buffer__    = buffer.data();
+		ptr<Real> V_coords__  = V_coords.data();
+        ptr<Int>  simplices__ = simplices.data();
+		ptr<Real> P_D_near__  = P_D_near.data();
+        mut<Real> buffer__    = buffer.data();
 
 		if( addTo )
 		{
@@ -6001,9 +6001,9 @@ namespace Repulsor
             eprint("in DFarToHulls: P_D_far.Dimension(1) != 15. Aborting");
         }
         
-		const Real * restrict const V_coords__  = V_coords.data();
-        const Int  * restrict const simplices__ = simplices.data();
-		const Real * restrict const P_D_far__   = P_D_far.data();
+		ptr<Real> V_coords__  = V_coords.data();
+        ptr<Int>  simplices__ = simplices.data();
+		ptr<Real> P_D_far__   = P_D_far.data();
               Real * restrict const buffer__    = buffer.data();
 
 		if( addTo )

@@ -1,87 +1,75 @@
 #pragma once
 
-#define CLASS MetricBase
-
 namespace Repulsor
 {
     template<typename Real, typename Int, typename SReal, typename ExtReal>
-    class CLASS
+    class MetricBase
     {
         ASSERT_FLOAT(Real   );
         ASSERT_INT  (Int    );
         ASSERT_FLOAT(SReal  );
         ASSERT_FLOAT(ExtReal);
         
+    public:
+        
+        using MeshBase_T         = SimplicialMeshBase<Real,Int,SReal,ExtReal>;
+        
+        using TangentVector_T    = typename MeshBase_T::TangentVector_T;
+        using CotangentVector_T  = typename MeshBase_T::CotangentVector_T;
+        
+        using BlockClusterTree_T = typename MeshBase_T::BlockClusterTree_T;
+        
+        using Values_T           = Tensor2<Real,size_t>;
+        using ValueContainer_T   = std::unordered_map<std::string,Values_T>;
+        
+        MetricBase() = default;
+
+        virtual ~MetricBase() = default;
+        
     protected:
         
-        mutable ExtReal weight;
-        
-        virtual void RequireMetrics() const  = 0;
-        
     public:
         
-        CLASS() {}
-        
-        CLASS( const ExtReal weight_ ) : weight(weight_) {}
+        virtual ValueContainer_T & MetricValues( const MeshBase_T & M ) const = 0;
 
-        virtual ~CLASS() = default;
-
+        virtual void MultiplyMetric(
+            const MeshBase_T & M,
+            const ExtReal alpha, ptr<ExtReal> X,
+            const ExtReal beta,  mut<ExtReal> Y,
+            const Int  rhs_count,
+            const bool VF_flag = true,
+            const bool NF_flag = true,
+            const bool FF_flag = true
+        ) const = 0;
         
-        virtual ExtReal GetWeight() const
+        // Return the differential of the energy; use caching.
+        void MultiplyMetric(
+            const MeshBase_T & M,
+            const ExtReal alpha,
+            const TangentVector_T & X,
+            const ExtReal beta,
+                  CotangentVector_T & Y,
+            const bool VF_flag = true,
+            const bool NF_flag = true,
+            const bool FF_flag = true
+        ) const
         {
-            return weight;
+            this->MultiplyMetric( M, alpha, X.data(), beta, Y.data(), X.Dimension(1), VF_flag, NF_flag, FF_flag );
         }
-        
-        virtual ExtReal SetWeight( const ExtReal weight_ ) const
-        {
-            return weight = weight_;
-        }
-        
-        virtual const std::map<KernelType, Tensor1<Real,Int>> & NearFieldValues() const = 0;
 
-        virtual const std::map<KernelType, Tensor1<Real,Int>> & FarFieldValues() const = 0;
-
-        
-//###########################################################################################
-//      Matrix multiplication
-//###########################################################################################
-
-        virtual void ApplyNearFieldKernel( const Real factor, const KernelType type ) const = 0;
-        
-        virtual void ApplyFarFieldKernel ( const Real factor, const KernelType type ) const = 0;
-        
-        virtual void Multiply_DenseMatrix(
-            const Real    alpha, const ExtReal * X,
-            const ExtReal beta,        ExtReal * Y,
-            const Int cols,
-            const KernelType type
-        ) const = 0;
-
-        virtual void Multiply_DenseMatrix(
-            const Real    alpha, const Tensor1<ExtReal,Int> & X,
-            const ExtReal beta,        Tensor1<ExtReal,Int> & Y,
-            KernelType type
-        ) const = 0;
-        
-        virtual void Multiply_DenseMatrix(
-            const Real    alpha, const Tensor2<ExtReal,Int> & X,
-            const ExtReal beta,        Tensor2<ExtReal,Int> & Y,
-            KernelType type
-        ) const = 0;
-        
-//        virtual void TestDiagonal() const = 0;
         
     public:
-        
-        virtual std::string Stats() const = 0;
+
+        static std::string className()
+        {
+            return "MetricBase<"+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+">";
+        }
         
         virtual std::string ClassName() const
         {
-            return TO_STD_STRING(CLASS)+"<"+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+">";
+            return className();
         }
         
-    };
-    
-}// namespace Repulor
+    }; // class MetricBase
 
-#undef CLASS
+}// namespace Repulsor

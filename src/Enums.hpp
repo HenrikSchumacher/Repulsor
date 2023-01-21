@@ -26,10 +26,10 @@ namespace Repulsor
     
     enum class TreePercolationAlgorithm
     {
-        Tasks,
         Sequential,
         Recursive,
-        BruteForce
+        Tasks,
+        Parallel
     };
 
     enum class InteractionKernels
@@ -39,7 +39,7 @@ namespace Repulsor
         Degenerate
     };
     
-    enum class KernelType
+    enum class OperatorType
     {
         FractionalOnly,
         HighOrder,
@@ -47,14 +47,39 @@ namespace Repulsor
         LowOrder,
         SquaredDistance
     };
-    
-    static std::map<KernelType, std::string> KernelTypeName
+  
+    enum class InOut : int
     {
-        {KernelType::FractionalOnly, "FractionalOnly"},
-        {KernelType::HighOrder, "HighOrder"},
-        {KernelType::MixedOrder, "MixedOrder"},
-        {KernelType::LowOrder, "LowOrder"},
-        {KernelType::SquaredDistance, "SquaredDistance"}
+        In,
+        Out
+    };
+    
+    namespace FMM
+    {
+        enum class Type : int
+        {
+            IN = -1,
+            VF =  0,
+            NF =  1,
+            FF =  2
+        };
+    }
+    
+//    namespace FMM
+//    {
+//        static constexpr int IN = -1;
+//        static constexpr int VF =  0;
+//        static constexpr int NF =  1;
+//        static constexpr int FF =  2;
+//    };
+    
+    static std::map<OperatorType, std::string> OperatorTypeName
+    {
+        {OperatorType::FractionalOnly, "FractionalOnly"},
+        {OperatorType::HighOrder, "HighOrder"},
+        {OperatorType::MixedOrder, "MixedOrder"},
+        {OperatorType::LowOrder, "LowOrder"},
+        {OperatorType::SquaredDistance, "SquaredDistance"}
     };
     
 } // namespace Repulsor

@@ -11,12 +11,17 @@ namespace Repulsor
         
 #include "SimplexHierarchy_Details.hpp"
         
-        constexpr Int ChildCount() const
+        static constexpr Int ChildCount()
         {
             return 1;
         }
         
-        void ToChild( const Int k )
+        static constexpr Level_T MaxLevel()
+        {
+            return 0;
+        }
+        
+        void ToChild( const Child_T k )
         {
             current_simplex_computed = false;
             

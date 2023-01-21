@@ -44,7 +44,7 @@ namespace Repulsor
         using VertexList_T       = SortedList<Vertex_T,Int>;
         using SimplexList_T      = SortedList<Simplex_T,Int>;
         
-        using Vector_T   = Tensors::Small::Vector<AMB_DIM,Real,Int>;
+        using Vector_T   = Tensors::Tiny::Vector<AMB_DIM,Real,Int>;
         
         using MeshBase_T = SimplicialMeshBase<                Real,Int,SReal,ExtReal>;
         using Mesh_T     = SimplicialMesh    <DOM_DIM,AMB_DIM,Real,Int,SReal,ExtReal>;
@@ -230,9 +230,9 @@ namespace Repulsor
         
         template<typename Real_1, typename Int_1, typename Real_2>
         void LoadMeshFromPointers(
-            const Real_1 * restrict const V_coords_ ,  const Int vertex_count_,
-            const Int_1  * restrict const simplices_,  const Int simplex_count_,
-            const Real_2 * restrict const V_data_,     const Int V_data_dim_,
+            ptr<Real_1> V_coords_ ,  const Int vertex_count_,
+            ptr<Int_1> simplices_,   const Int simplex_count_,
+            ptr<Real_2> V_data_,     const Int V_data_dim_,
             const Int thread_count_ = 1
         )
         {
@@ -279,12 +279,13 @@ namespace Repulsor
             ptoc("Allocations");
 
             ptic("Copy");
-            copy_cast_buffer( V_coords_,  V_coords.data(),  vertex_count * AMB_DIM );
-            copy_cast_buffer( simplices_, simplices.data(), simplex_count * S_vertex_count );
+
+            copy_buffer( V_coords_,  V_coords.data(),  vertex_count * AMB_DIM );
+            copy_buffer( simplices_, simplices.data(), simplex_count * S_vertex_count );
             
             if( with_data )
             {
-               copy_cast_buffer( V_data_,  V_data.data(), vertex_count * V_data_dim_ );
+               copy_buffer( V_data_,  V_data.data(), vertex_count * V_data_dim_ );
             }
             ptoc("Copy");
 
@@ -354,11 +355,19 @@ namespace Repulsor
                         eprint(className()+"::Compress: invalid vertex found in edge "+ToString(e)+".");
                     }
                     
-                    edges(e_count,0) = v_0;
-                    edges(e_count,1) = v_1;
-                    
-                    E_active[e]         = false;
-                    E_active[e_count]   = true;
+                    if( v_0 <= v_1 )
+                    {
+                        edges(e_count,0) = v_0;
+                        edges(e_count,1) = v_1;
+                    }
+                    else
+                    {
+                        edges(e_count,0) = v_1;
+                        edges(e_count,1) = v_0;
+                    }
+
+                    E_active[e]       = false;
+                    E_active[e_count] = true;
                     
                     ++e_count;
                 }
