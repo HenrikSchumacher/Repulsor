@@ -156,7 +156,7 @@ namespace Repulsor
 //                        valprint("e",thread);
 //                    }
                     
-                    ker.PrintReport( thread, Duration(start_time,stop_time) );
+                    ker.PrintReport( thread, Tools::Duration(start_time,stop_time) );
                 }
             }
             else
@@ -229,7 +229,7 @@ namespace Repulsor
                 
                 const Time stop_time = Clock::now();
                 
-                kernel.PrintReport( 0, Duration(start_time,stop_time) );
+                kernel.PrintReport( 0, Tools::Duration(start_time,stop_time) );
             }
 
             ptoc(ClassName()+"::Compute");

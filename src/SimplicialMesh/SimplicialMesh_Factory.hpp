@@ -159,6 +159,13 @@ namespace Repulsor
             
             std::ifstream s (file_name);
             
+            if( !s.good() )
+            {
+                eprint("Make_FromFile: File "+file_name+" could not be opened.");
+                
+                return nullptr;
+            }
+            
             std::string str;
             Int amb_dim;
             Int dom_dim;

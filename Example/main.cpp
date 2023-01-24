@@ -19,7 +19,6 @@
 
 int main(int argc, const char * argv[])
 {
-    
     using namespace Repulsor;
     using namespace Tensors;
     using namespace Tools;
@@ -287,13 +286,3 @@ int main(int argc, const char * argv[])
 
     return 0;
 }
-
-
-//Tools : de972b1
-//
-//Repulsor @ aba2a61        -> Tensors @ e53823b    -> Tools @ b9bc3a8
-//                          -> GJK @ 4dabb10        -> Tools @ 0240511
-//
-//Repulsor @ 134df90 (dev)  -> Tensors @ e53823b    -> GJK @ 4dabb10        -> Tools @ 0240511
-//
-//Tensors @ e6dd849         -> Tools @ e913468
