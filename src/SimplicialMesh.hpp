@@ -408,7 +408,7 @@ namespace Repulsor
                     const JobPointers<Int> job_ptr ( SimplexCount(), ThreadCount() );
                     
                     ptic("Creating primitives");
-                    const Int thread_count = job_ptr.Size()-1;
+                    const Int thread_count = job_ptr.ThreadCount();
                     
                     #pragma omp parallel for num_threads(thread_count)
                     for( Int thread = 0; thread < thread_count; ++thread )

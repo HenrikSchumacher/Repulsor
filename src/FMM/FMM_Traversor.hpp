@@ -73,7 +73,7 @@ namespace Repulsor
             kernel.Allocate( pattern.NonzeroCount() );
 
             
-            const Int thread_count = job_ptr.Size()-1;
+            const Int thread_count = job_ptr.ThreadCount();
             
             Real global_sum = static_cast<Real>(0);
              
