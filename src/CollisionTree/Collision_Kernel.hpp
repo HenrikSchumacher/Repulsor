@@ -188,7 +188,7 @@ namespace Repulsor
         
         force_inline void ComputeLeaf()
         {
-            if( A.FindNonzeroPosition(P_i,P_j) < static_cast<int>(0) )
+            if( A.FindNonzeroPosition(P_i,P_j).found )
             {
                 const SReal t = C.FindMaximumSafeStepSize(
                     S_P_ser.data(P_i), S_P_v_ser.data(P_i),
@@ -207,7 +207,7 @@ namespace Repulsor
         
         force_inline void ComputeLeafSwapped()
         {
-            if( A.FindNonzeroPosition(P_i,P_j) < static_cast<int>(0) )
+            if( A.FindNonzeroPosition(P_i,P_j).found )
             {
                 const SReal t = C.FindMaximumSafeStepSize(
                     S_P_ser.data(P_i), S_P_v_ser.data(P_i),

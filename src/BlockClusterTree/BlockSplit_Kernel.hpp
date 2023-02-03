@@ -179,7 +179,7 @@ namespace Repulsor
         
         force_inline void ComputeLeaf()
         {
-            const bool neighbor_found = A.FindNonzeroPosition(P_i,P_j) >= 0;
+            const bool neighbor_found = A.FindNonzeroPosition(P_i,P_j).found;
 
             const bool admissable = neighbor_found || G.MultipoleAcceptanceCriterion(
                     *S_P_proto, *T_P_proto, near_theta2
@@ -208,7 +208,7 @@ namespace Repulsor
         
         force_inline void ComputeLeafSwapped()
         {
-            const bool neighbor_found = A.FindNonzeroPosition(P_i,P_j) >= 0;
+            const bool neighbor_found = A.FindNonzeroPosition(P_i,P_j).found;
 
             const bool admissable = neighbor_found || G.MultipoleAcceptanceCriterion(
                 *S_P_proto, *T_P_proto, near_theta2
