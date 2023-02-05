@@ -187,7 +187,7 @@ namespace Repulsor
         
         std::string ClassName() const
         {
-            return "AllPairs_Traversor<"+kernel.ClassName()+TypeName<LInt>::Get()+">";
+            return "AllPairs_Traversor<"+kernel.ClassName()+TypeName<LInt>+">";
         }
         
     };

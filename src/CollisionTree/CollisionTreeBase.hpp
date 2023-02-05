@@ -53,7 +53,7 @@ namespace Repulsor
         
         virtual std::string ClassName() const
         {
-            return  "CollisionTreeBase<"+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+">";
+            return  std::string("CollisionTreeBase<")+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+","+TypeName<ExtReal>+">";
         }
 
     }; // class CollisionTreeBase

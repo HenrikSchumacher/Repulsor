@@ -62,7 +62,7 @@ namespace Repulsor
 
         static std::string className()
         {
-            return "MetricBase<"+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+">";
+            return std::string("MetricBase<")+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+","+TypeName<ExtReal>+">";
         }
         
         virtual std::string ClassName() const

@@ -229,14 +229,14 @@ namespace Repulsor
         std::string ClassName()
         {
             return std::string("SimplicialMesh_Factory")+"<"
-            + ToString(MinDomDim)      + ","
-            + ToString(MaxDomDim)      + ","
-            + ToString(MinAmbDim)      + ","
-            + ToString(MaxAmbDim)      + ","
-            + TypeName<Real>::Get()    + ","
-            + TypeName<Int>::Get()     + ","
-            + TypeName<SReal>::Get()   + ","
-            + TypeName<ExtReal>::Get() + ","
+            + ToString(MinDomDim)+ ","
+            + ToString(MaxDomDim)+ ","
+            + ToString(MinAmbDim)+ ","
+            + ToString(MaxAmbDim)+ ","
+            + TypeName<Real>     + ","
+            + TypeName<Int>      + ","
+            + TypeName<SReal>    + ","
+            + TypeName<ExtReal>  + ","
             + ">";
         }
         

@@ -100,14 +100,14 @@ namespace Repulsor
         std::string ClassName()
         {
             return TO_STD_STRING(CLASS)+"_Factory<"
-            + ToString(MIN_DOM_DIM)      + ","
-            + ToString(MAX_DOM_DIM)      + ","
-            + ToString(MIN_AMB_DIM)      + ","
-            + ToString(MAX_AMB_DIM)      + ","
-            + TypeName<Real>::Get()    + ","
-            + TypeName<Int>::Get()     + ","
-            + TypeName<SReal>::Get()   + ","
-            + TypeName<ExtReal>::Get() + ","
+            + ToString(MIN_DOM_DIM)+ ","
+            + ToString(MAX_DOM_DIM)+ ","
+            + ToString(MIN_AMB_DIM)+ ","
+            + ToString(MAX_AMB_DIM)+ ","
+            + TypeName<Real>       + ","
+            + TypeName<Int>        + ","
+            + TypeName<SReal>      + ","
+            + TypeName<ExtReal>    + ","
             + ">";
         }
         

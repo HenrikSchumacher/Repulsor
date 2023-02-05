@@ -143,8 +143,8 @@ namespace Repulsor
             return "TP0_Kernel_MultiplyMetric<"
                 +ToString(AMB_DIM)
             +","+ToString(MAX_RHS_COUNT)
-            +","+TypeName<Scalar>::Get()+","+TypeName<Scalar_in>::Get()+","+TypeName<Scalar_out>::Get()
-            +","+TypeName<Int>::Get()+","+TypeName<LInt>::Get()
+            +","+TypeName<Scalar>+","+TypeName<Scalar_in>+","+TypeName<Scalar_out>
+            +","+TypeName<Int>+","+TypeName<LInt>
             +","+ToString(alpha_flag)
             +","+ToString(beta_flag)
             +">";

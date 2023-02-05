@@ -236,7 +236,7 @@ namespace Repulsor
         
         static std::string className()
         {
-            return  "CollisionTree<"+ToString(AMB_DIM)+","+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+","+ToString(is_symmetric)+">";
+            return  "CollisionTree<"+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+","+TypeName<ExtReal>+","+ToString(is_symmetric)+">";
         }
 
     }; // class CollisionTree

@@ -137,10 +137,10 @@ namespace Repulsor
             + ToString(MAX_DOM_DIM_T)    + ","
             + ToString(MIN_AMB_DIM)      + ","
             + ToString(MAX_AMB_DIM)      + ","
-            + TypeName<Real>::Get()    + ","
-            + TypeName<Int>::Get()     + ","
-            + TypeName<SReal>::Get()   + ","
-            + TypeName<ExtReal>::Get() + ","
+            + TypeName<Real>    + ","
+            + TypeName<Int>     + ","
+            + TypeName<SReal>   + ","
+            + TypeName<ExtReal> + ","
             + ">";
         }
         

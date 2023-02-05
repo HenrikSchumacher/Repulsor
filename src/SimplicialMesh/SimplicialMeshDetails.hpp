@@ -9,7 +9,7 @@ namespace Repulsor
     {
 		inline std::string ClassName() const
         {
-            return "SimplicialMeshDetails<"+ToString(DOM_DIM)+","+ToString(AMB_DIM)+","+TypeName<Real>::Get()+","+TypeName<Int>::Get()+">";
+            return std::string("SimplicialMeshDetails<")+ToString(DOM_DIM)+","+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+">";
         }
 
 		
@@ -105,7 +105,7 @@ namespace Repulsor
 	
 		inline std::string ClassName() const
         {
-            return "SimplicialMeshDetails<0,1,"+TypeName<Real>::Get()+","+TypeName<Int>::Get()+">";
+            return std::string("SimplicialMeshDetails<0,1,")+TypeName<Real>+","+TypeName<Int>+">";
         }
 		
 	void ComputeNearFarData( 
@@ -339,7 +339,7 @@ namespace Repulsor
 	
 		inline std::string ClassName() const
         {
-            return "SimplicialMeshDetails<0,2,"+TypeName<Real>::Get()+","+TypeName<Int>::Get()+">";
+            return std::string("SimplicialMeshDetails<0,2,")+TypeName<Real>+","+TypeName<Int>+">";
         }
 		
 	void ComputeNearFarData( 
@@ -587,7 +587,7 @@ namespace Repulsor
 	
 		inline std::string ClassName() const
         {
-            return "SimplicialMeshDetails<0,3,"+TypeName<Real>::Get()+","+TypeName<Int>::Get()+">";
+            return std::string("SimplicialMeshDetails<0,3,")+TypeName<Real>+","+TypeName<Int>+">";
         }
 		
 	void ComputeNearFarData( 
@@ -851,7 +851,7 @@ namespace Repulsor
 	
 		inline std::string ClassName() const
         {
-            return "SimplicialMeshDetails<0,4,"+TypeName<Real>::Get()+","+TypeName<Int>::Get()+">";
+            return std::string("SimplicialMeshDetails<0,4,")+TypeName<Real>+","+TypeName<Int>+">";
         }
 		
 	void ComputeNearFarData( 
@@ -1133,7 +1133,7 @@ namespace Repulsor
 	
 		inline std::string ClassName() const
         {
-            return "SimplicialMeshDetails<1,2,"+TypeName<Real>::Get()+","+TypeName<Int>::Get()+">";
+            return std::string("SimplicialMeshDetails<1,2,")+TypeName<Real>+","+TypeName<Int>+">";
         }
 		
 	void ComputeNearFarData( 
@@ -1574,7 +1574,7 @@ namespace Repulsor
 	
 		inline std::string ClassName() const
         {
-            return "SimplicialMeshDetails<1,3,"+TypeName<Real>::Get()+","+TypeName<Int>::Get()+">";
+            return std::string("SimplicialMeshDetails<1,3,")+TypeName<Real>+","+TypeName<Int>+">";
         }
 		
 	void ComputeNearFarData( 
@@ -2120,7 +2120,7 @@ namespace Repulsor
 	
 		inline std::string ClassName() const
         {
-            return "SimplicialMeshDetails<1,4,"+TypeName<Real>::Get()+","+TypeName<Int>::Get()+">";
+            return std::string("SimplicialMeshDetails<1,4,")+TypeName<Real>+","+TypeName<Int>+">";
         }
 		
 	void ComputeNearFarData( 
@@ -2761,7 +2761,7 @@ namespace Repulsor
 	
 		inline std::string ClassName() const
         {
-            return "SimplicialMeshDetails<2,3,"+TypeName<Real>::Get()+","+TypeName<Int>::Get()+">";
+            return std::string("SimplicialMeshDetails<2,3,")+TypeName<Real>+","+TypeName<Int>+">";
         }
 		
 	void ComputeNearFarData( 
@@ -3585,7 +3585,7 @@ namespace Repulsor
 	
 		inline std::string ClassName() const
         {
-            return "SimplicialMeshDetails<2,4,"+TypeName<Real>::Get()+","+TypeName<Int>::Get()+">";
+            return std::string("SimplicialMeshDetails<2,4,")+TypeName<Real>+","+TypeName<Int>+">";
         }
 		
 	void ComputeNearFarData( 

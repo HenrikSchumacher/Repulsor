@@ -98,7 +98,7 @@ namespace Repulsor
 
         static std::string className()
         {
-            return "EnergyBase<"+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+">";
+            return std::string("EnergyBase<")+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+","+TypeName<ExtReal>+">";
         }
         
         virtual std::string ClassName() const

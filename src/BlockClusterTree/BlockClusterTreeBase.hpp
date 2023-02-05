@@ -76,7 +76,7 @@ namespace Repulsor
         
         virtual std::string ClassName() const
         {
-            return  "BlockClusterTreeBase<"+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+","+ToString(is_symmetric)+">";
+            return  std::string("BlockClusterTreeBase<")+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+","+TypeName<ExtReal>+","+ToString(is_symmetric)+">";
         }
         
     }; // class BlockClusterTreeBase

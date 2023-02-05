@@ -1315,7 +1315,7 @@ namespace Repulsor
         
         static std::string className()
         {
-            return  "ClusterTree<"+ToString(AMB_DIM)+","+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+">";
+            return  "ClusterTree<"+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+","+TypeName<ExtReal>+">";
         }
 
     }; // class ClusterTree

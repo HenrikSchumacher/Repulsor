@@ -76,7 +76,7 @@ namespace Repulsor
         
         virtual std::string ClassName() const
         {
-            return TO_STD_STRING(CLASS) + "<"+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+">";
+            return TO_STD_STRING(CLASS) + "<"+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+","+TypeName<ExtReal>+">";
         }
         
     };

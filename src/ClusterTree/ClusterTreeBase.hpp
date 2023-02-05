@@ -987,7 +987,7 @@ namespace Repulsor
     private:
         std::string className() const
         {
-            return "ClusterTreeBase<"+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+">";
+            return std::string("ClusterTreeBase<")+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+","+TypeName<ExtReal>+">";
         }
         
     public:

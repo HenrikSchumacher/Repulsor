@@ -382,8 +382,8 @@ namespace Repulsor
             + ToString(S_DOM_DIM) + ","
             + ToString(T_DOM_DIM) + ","
             + S.ClassName() + ","
-            + TypeName<T1>::Get() + ","
-            + TypeName<T2>::Get() + ","
+            + TypeName<T1> + ","
+            + TypeName<T2> + ","
             + ToString(energy_flag) + ","
             + ToString(diff_flag) + ","
             + ToString(metric_flag) +

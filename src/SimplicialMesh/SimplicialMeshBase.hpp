@@ -218,7 +218,7 @@ namespace Repulsor
         
         virtual std::string ClassName() const
         {
-            return "SimplicialMeshBase<"+TypeName<Real>::Get()+","+TypeName<Int>::Get()+","+TypeName<SReal>::Get()+","+TypeName<ExtReal>::Get()+">";
+            return std::string("SimplicialMeshBase<")+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+","+TypeName<ExtReal>+">";
         }
         
     }; // class SimplicialMeshBase
