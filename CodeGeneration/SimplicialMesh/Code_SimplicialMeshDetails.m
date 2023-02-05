@@ -31,7 +31,7 @@
 (*	*)
 (*		inline std::string ClassName() const*)
 (*        {*)
-(*            return str::string(\"SimplicialMeshDetails<",ToString[n],",",ToString[m],",\")+TypeName<Real>+\",\"+TypeName<Int>+\">\";*)
+(*            return std::string(\"SimplicialMeshDetails<",ToString[n],",",ToString[m],",\")+TypeName<Real>+\",\"+TypeName<Int>+\">\";*)
 (*        }*)
 (*		",*)
 (*ComputeNearFarData[n,m],*)
