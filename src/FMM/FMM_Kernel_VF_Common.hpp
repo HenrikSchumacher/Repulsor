@@ -64,12 +64,12 @@ public:
 //                logprint("from_below");
                 // If we come from below, we have to find the next pair of simplices to visit.
                 
-                const Int S_k = S_Tree.FormerChildID();
-                const Int T_k = T_Tree.FormerChildID();
+                const typename Base_T::S_Tree_T::Child_T S_k = S_Tree.FormerChildID();
+                const typename Base_T::T_Tree_T::Child_T T_k = T_Tree.FormerChildID();
                 
 //                logprint("Coming from "+ToString(S_k)+"-th child of S and "+ToString(T_k)+"-th child of T.");
                 
-                if( T_k < T_Tree.ChildCount()-1 )
+                if( T_k + 1 < T_Tree.ChildCount() )
                 {
                     S_Tree.ToChild(S_k);
                     T_Tree.ToChild(T_k+1);
@@ -77,7 +77,7 @@ public:
                 }
                 else
                 {
-                    if( S_k < S_Tree.ChildCount()-1 )
+                    if( S_k + 1 < S_Tree.ChildCount() )
                     {
                         S_Tree.ToChild(S_k+1);
                         T_Tree.ToChild(0);

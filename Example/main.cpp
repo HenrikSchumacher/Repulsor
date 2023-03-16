@@ -6,6 +6,7 @@
 // We have to toggle which domain dimensions and ambient dimensions shall be supported by runtime polymorphism before we load Repulsor.hpp
 // You can activate everything you want, but compile times might increase substatially.
 #define INT     int32_t
+//#define INT     int64_t
 #define EXTINT  int64_t
 #define REAL    double
 #define SREAL   float
@@ -58,6 +59,7 @@ int main(int argc, const char * argv[])
     using Metric_T = MetricBase<REAL,INT,SREAL,EXTREAL>;
     
     // Create a factory that can make instances of SimplicialMesh with domain dimension in the range 2,...,2 and ambient dimension in the range 3,...,3.
+    // (The main purpose of this factory is to tell the compiler which template instantiations of SimplicialMesh it shall generate. Note that with obstacles one might want to use meshes of various dimensions. So this factory basically about saving compile time.)
     SimplicialMesh_Factory<Mesh_T,2,2,3,3> mesh_factory;
     
     
@@ -84,11 +86,11 @@ int main(int argc, const char * argv[])
     M.adaptivity_settings.theta                                    = 10.0;
 
     tic("Creating ClusterTree");
-    M.GetClusterTree();
+    M.GetClusterTree();           // Not necessary. Will automatically called by al routines that require it.
     toc("Creating ClusterTree");
     
     tic("Creating BlockClusterTree");
-    M.GetBlockClusterTree();
+    M.GetBlockClusterTree();      // Not necessary. Will automatically called by al routines that require it.
     toc("Creating BlockClusterTree");
 
     valprint("M.GetClusterTree().ThreadCount()",M.GetClusterTree().ThreadCount());
@@ -102,6 +104,7 @@ int main(int argc, const char * argv[])
     const REAL q = 6;
     const REAL p = 12;
     
+    // Again some factories.
     TangentPointEnergy_Factory<Mesh_T,2,2,3,3> TPE_factory;
     TangentPointMetric_Factory<Mesh_T,2,2,3,3> TPM_factory;
     
@@ -154,7 +157,7 @@ int main(int argc, const char * argv[])
     //Performs generalized matrix-matrix product Y = alpha * A * X + beta * Y, where A is the tangent-point metric.
     
     tic("tpm.MetricValues(M)");
-    tpm.MetricValues(M);
+    tpm.MetricValues(M);         // Not necessary. Will automatically called by al routines that require it.
     toc("tpm.MetricValues(M)");
     
     tic("tpm.MultiplyMetric");
@@ -188,7 +191,7 @@ int main(int argc, const char * argv[])
     print("");
 
     tic("Create obstacle trees");
-    M.GetObstacleBlockClusterTree();
+    M.GetObstacleBlockClusterTree();    // Not necessary. Will automatically called by al routines that require it.
     toc("Create obstacle trees");
     print("");
 

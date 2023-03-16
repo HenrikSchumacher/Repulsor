@@ -116,10 +116,10 @@ namespace Repulsor
         
         const Real theta  = 10;
         const Real theta2 = 100;
-        const Int  max_refinement = 20;
+        const typename S_Tree_T::Child_T max_refinement = 20;
         
         mutable Int block_count = 0;
-        mutable Int max_level_reached = 0;
+        mutable typename S_Tree_T::Child_T max_level_reached = 0;
         mutable Int bottom_count = 0;
         mutable Int inadmissable_count = 0;
         mutable Int primitive_count = 0;
@@ -153,7 +153,7 @@ namespace Repulsor
         ,   theta          ( theta_                                                            )
         ,   theta2         ( theta_ * theta_                                                   )
         ,   max_refinement ( std::min(
-                                  max_refinement_,
+                                  int_cast<typename S_Tree_T::Child_T>(max_refinement_),
                                   std::min(S_Tree_T::MaxLevel(),S_Tree_T::MaxLevel())
                               )                                                                )
         {
