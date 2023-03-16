@@ -952,7 +952,7 @@ namespace Repulsor
                 ptr<ExtReal> a = dual_volumes.data();
                 mut<ExtReal> e = output;
                 
-                #pragma omp parallel for simd num_threads(ThreadCount()) aligned( a, e : ALIGNMENT ) schedule( static )
+                #pragma omp parallel for num_threads(ThreadCount()) schedule( static )
                 for( Int i = 0; i < vertex_count; ++i )
                 {
                     e[i] /= a[i];
