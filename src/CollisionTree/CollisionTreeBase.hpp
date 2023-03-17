@@ -49,7 +49,10 @@ namespace Repulsor
         
         virtual const ClusterTreeBase_T & GetT() const = 0;
 
-        virtual ExtReal MaximumSafeStepSize( const SReal t_) const = 0;
+        virtual ExtReal MaximumSafeStepSize(
+            const SReal t_,
+            const SReal TOL
+        ) const = 0;
         
         virtual std::string ClassName() const
         {

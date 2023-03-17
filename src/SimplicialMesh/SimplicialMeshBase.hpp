@@ -107,7 +107,12 @@ namespace Repulsor
         
         virtual void LoadUpdateVectors( ptr<ExtReal> vecs, const ExtReal max_time, const bool transp_ = false ) = 0;
 
-        virtual ExtReal MaximumSafeStepSize( ptr<ExtReal> vecs, const ExtReal max_time, const bool transp_ = false ) = 0;
+        virtual ExtReal MaximumSafeStepSize(
+            ptr<ExtReal> vecs,
+            const ExtReal max_time,
+            const ExtReal TOL = scalar_cast<ExtReal>(0.0625),
+            const bool transp_ = false
+        ) = 0;
         
 //#######################################################################################
 //      Obstacle

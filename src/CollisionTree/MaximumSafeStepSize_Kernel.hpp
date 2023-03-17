@@ -26,7 +26,8 @@ namespace Repulsor
         MaximumSafeStepSize_Kernel(
             const ClusterTree_T & S,
             const ClusterTree_T & T,
-            const SReal t_init_
+            const SReal t_init_,
+            const SReal TOL
         )
         :   Base_T( S, T )
         ,   S_C_ser     ( S.ClusterSerialized()              )
@@ -38,7 +39,7 @@ namespace Repulsor
         ,   T_P_ser     ( T.PrimitiveSerialized()            )
         ,   T_P_v_ser   ( T.PrimitiveVelocitiesSerialized()  )
         ,   A           ( S.PrimitiveAdjacencyMatrix()       )
-        ,   C           ( S.MovingPrimitivePrototype(), T.MovingPrimitivePrototype() )
+        ,   C           ( S.MovingPrimitivePrototype(), T.MovingPrimitivePrototype(), TOL )
         ,   t_init      ( t_init_ )
         ,   t_max       ( t_init_ )
         {}
@@ -59,6 +60,7 @@ namespace Repulsor
         ,   t_init      ( other.t_init      )
         ,   t_max       ( other.t_max       )
         {}
+        
         friend void swap(MaximumSafeStepSize_Kernel &A, MaximumSafeStepSize_Kernel &B)
         {
             // see https://stackoverflow.com/questions/5695548/public-friend-swap-member-function for details

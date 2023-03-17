@@ -100,7 +100,7 @@ namespace Repulsor
                 
                 for( Int thread = 0; thread < thread_count; ++thread )
                 {
-                    kernels.emplace_back( S, T, t );
+                    kernels.emplace_back( S, T, t, static_cast<SReal>(0.0625) );
                 }
                 ptoc(ClassName()+"::PrimitiveCollisionMatrix: Prepare kernels");
                 
@@ -154,7 +154,10 @@ namespace Repulsor
         
     public:
         
-        ExtReal MaximumSafeStepSize( const SReal t_) const override
+        ExtReal MaximumSafeStepSize(
+            const SReal t_,
+            const SReal TOL
+        ) const override
         {
             ptic(ClassName()+"::MaximumSafeStepSize");
             
@@ -170,7 +173,7 @@ namespace Repulsor
             ptic(ClassName()+"::MaximumSafeStepSize: Prepare kernels");
                 for( Int thread = 0; thread < thread_count; ++thread )
                 {
-                    kernels.emplace_back( S, T, t );
+                    kernels.emplace_back( S, T, t, TOL );
                 }
             ptoc(ClassName()+"::MaximumSafeStepSize: Prepare kernels");
             
@@ -190,15 +193,15 @@ namespace Repulsor
             ptic(ClassName()+"::MaximumSafeStepSize: Reduce kernels");
                 for( Int thread = 0; thread < thread_count; ++thread )
                 {
-                    kernels.emplace_back( S, T, t );
+                    SReal s = kernels[thread].MaxTime();
+                    t = std::min( t, s );
                 }
+//                for( Int thread = 0; thread < thread_count; ++thread )
+//                {
+//                    kernels.emplace_back( S, T, t, TOL );
+//                }
             ptoc(ClassName()+"::MaximumSafeStepSize: Reduce kernels");
             
-            for( Int thread = 0; thread < thread_count; ++thread )
-            {
-                SReal s = kernels[thread].MaxTime();
-                t = std::min( t, s );
-            }
             
             ptoc(ClassName()+"::MaximumSafeStepSize");
             

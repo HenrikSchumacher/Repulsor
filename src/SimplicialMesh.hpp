@@ -340,7 +340,12 @@ namespace Repulsor
             ptoc(className()+"::LoadUpdateVectors");
         }
         
-        virtual ExtReal MaximumSafeStepSize( ptr<ExtReal> vecs, const ExtReal max_time, const bool transp_ = false ) override
+        virtual ExtReal MaximumSafeStepSize(
+            ptr<ExtReal> vecs,
+            const ExtReal max_time,
+            const ExtReal TOL = scalar_cast<ExtReal>(0.0625),
+            const bool transp_ = false
+        ) override
         {
             ptic(className()+"::MaximumSafeStepSize");
             
@@ -352,12 +357,12 @@ namespace Repulsor
             {
                 obstacle->LoadUpdateVectors( static_cast<ExtReal *>(nullptr), max_time );
 
-                t = GetObstacleCollisionTree().MaximumSafeStepSize(t);
+                t = GetObstacleCollisionTree().MaximumSafeStepSize(t,TOL);
 
                 logprint("GetObstacleCollisionTree().MaximumSafeStepSize(t) = "+ToString(t));
             }
             
-            t = GetCollisionTree().MaximumSafeStepSize(t);
+            t = GetCollisionTree().MaximumSafeStepSize(t,TOL);
             
             logprint("GetCollisionTree().MaximumSafeStepSize(t)         = "+ToString(t));
             
