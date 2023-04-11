@@ -138,8 +138,8 @@ namespace Repulsor
 
             for( Int i = i_begin; i < i_end; ++i )
             {
-				ptr<Real> near = P_near.data(i);                    
-				ptr<Real> far  = P_far.data(i);   
+				mut<Real> near = P_near.data(i);                    
+				mut<Real> far  = P_far.data(i);   
             
 				simplex[0] = simplices__[1*i +0];
 
@@ -179,8 +179,8 @@ namespace Repulsor
         #pragma omp parallel for num_threads( ThreadCount() )
         for( Int thread = 0; thread < ThreadCount(); ++thread )
         {
-			ptr<Int> AvOp_outer = AvOp.Outer().data();
-			ptr<Int> AvOp_inner = AvOp.Inner().data();
+			mut<Int> AvOp_outer = AvOp.Outer().data();
+			mut<Int> AvOp_inner = AvOp.Inner().data();
 			AvOp.Value().Fill(static_cast<Real>(1));
 
 			mut<Int> DiffOp_outer = DiffOp.Outer().data();
@@ -291,7 +291,7 @@ namespace Repulsor
 		//ptr<Real> V_coords__  = V_coords.data();
 		//ptr<Int>  simplices__ = simplices.data();
 		ptr<Real> P_D_far__   = P_D_far.data();
-		mut<Int>  buffer__    = buffer.data();
+		mut<Real> buffer__    = buffer.data();
         
         if( addTo )
 		{
@@ -372,8 +372,8 @@ namespace Repulsor
 
             for( Int i = i_begin; i < i_end; ++i )
             {
-				ptr<Real> near = P_near.data(i);                    
-				ptr<Real> far  = P_far.data(i);   
+				mut<Real> near = P_near.data(i);                    
+				mut<Real> far  = P_far.data(i);   
             
 				simplex[0] = simplices__[1*i +0];
 
@@ -417,8 +417,8 @@ namespace Repulsor
         #pragma omp parallel for num_threads( ThreadCount() )
         for( Int thread = 0; thread < ThreadCount(); ++thread )
         {
-			ptr<Int> AvOp_outer = AvOp.Outer().data();
-			ptr<Int> AvOp_inner = AvOp.Inner().data();
+			mut<Int> AvOp_outer = AvOp.Outer().data();
+			mut<Int> AvOp_inner = AvOp.Inner().data();
 			AvOp.Value().Fill(static_cast<Real>(1));
 
 			mut<Int> DiffOp_outer = DiffOp.Outer().data();
@@ -537,7 +537,7 @@ namespace Repulsor
 		//ptr<Real> V_coords__  = V_coords.data();
 		//ptr<Int>  simplices__ = simplices.data();
 		ptr<Real> P_D_far__   = P_D_far.data();
-		mut<Int>  buffer__    = buffer.data();
+		mut<Real> buffer__    = buffer.data();
         
         if( addTo )
 		{
@@ -620,8 +620,8 @@ namespace Repulsor
 
             for( Int i = i_begin; i < i_end; ++i )
             {
-				ptr<Real> near = P_near.data(i);                    
-				ptr<Real> far  = P_far.data(i);   
+				mut<Real> near = P_near.data(i);                    
+				mut<Real> far  = P_far.data(i);   
             
 				simplex[0] = simplices__[1*i +0];
 
@@ -670,8 +670,8 @@ namespace Repulsor
         #pragma omp parallel for num_threads( ThreadCount() )
         for( Int thread = 0; thread < ThreadCount(); ++thread )
         {
-			ptr<Int> AvOp_outer = AvOp.Outer().data();
-			ptr<Int> AvOp_inner = AvOp.Inner().data();
+			mut<Int> AvOp_outer = AvOp.Outer().data();
+			mut<Int> AvOp_inner = AvOp.Inner().data();
 			AvOp.Value().Fill(static_cast<Real>(1));
 
 			mut<Int> DiffOp_outer = DiffOp.Outer().data();
@@ -799,7 +799,7 @@ namespace Repulsor
 		//ptr<Real> V_coords__  = V_coords.data();
 		//ptr<Int>  simplices__ = simplices.data();
 		ptr<Real> P_D_far__   = P_D_far.data();
-		mut<Int>  buffer__    = buffer.data();
+		mut<Real> buffer__    = buffer.data();
         
         if( addTo )
 		{
@@ -884,8 +884,8 @@ namespace Repulsor
 
             for( Int i = i_begin; i < i_end; ++i )
             {
-				ptr<Real> near = P_near.data(i);                    
-				ptr<Real> far  = P_far.data(i);   
+				mut<Real> near = P_near.data(i);                    
+				mut<Real> far  = P_far.data(i);   
             
 				simplex[0] = simplices__[1*i +0];
 
@@ -940,8 +940,8 @@ namespace Repulsor
         #pragma omp parallel for num_threads( ThreadCount() )
         for( Int thread = 0; thread < ThreadCount(); ++thread )
         {
-			ptr<Int> AvOp_outer = AvOp.Outer().data();
-			ptr<Int> AvOp_inner = AvOp.Inner().data();
+			mut<Int> AvOp_outer = AvOp.Outer().data();
+			mut<Int> AvOp_inner = AvOp.Inner().data();
 			AvOp.Value().Fill(static_cast<Real>(1));
 
 			mut<Int> DiffOp_outer = DiffOp.Outer().data();
@@ -1079,7 +1079,7 @@ namespace Repulsor
 		//ptr<Real> V_coords__  = V_coords.data();
 		//ptr<Int>  simplices__ = simplices.data();
 		ptr<Real> P_D_far__   = P_D_far.data();
-		mut<Int>  buffer__    = buffer.data();
+		mut<Real> buffer__    = buffer.data();
         
         if( addTo )
 		{
@@ -3309,7 +3309,7 @@ namespace Repulsor
 		ptr<Real> V_coords__  = V_coords.data();
         ptr<Int>  simplices__ = simplices.data();
 		ptr<Real> P_D_far__   = P_D_far.data();
-              Real * restrict const buffer__    = buffer.data();
+        mut<Real> buffer__    = buffer.data();
 
 		if( addTo )
 		{
@@ -6004,7 +6004,7 @@ namespace Repulsor
 		ptr<Real> V_coords__  = V_coords.data();
         ptr<Int>  simplices__ = simplices.data();
 		ptr<Real> P_D_far__   = P_D_far.data();
-              Real * restrict const buffer__    = buffer.data();
+        mut<Real> buffer__    = buffer.data();
 
 		if( addTo )
 		{

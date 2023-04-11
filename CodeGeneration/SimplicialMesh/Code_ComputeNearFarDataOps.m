@@ -61,8 +61,8 @@ StringJoin[
         #pragma omp parallel for num_threads( ThreadCount() )
         for( Int thread = 0; thread < ThreadCount(); ++thread )
         {
-			ptr<Int> AvOp_outer = AvOp.Outer().data();
-			ptr<Int> AvOp_inner = AvOp.Inner().data();
+			mut<Int> AvOp_outer = AvOp.Outer().data();
+			mut<Int> AvOp_inner = AvOp.Inner().data();
 			AvOp.Value().Fill(static_cast<Real>(1));
 
 			mut<Int> DiffOp_outer = DiffOp.Outer().data();

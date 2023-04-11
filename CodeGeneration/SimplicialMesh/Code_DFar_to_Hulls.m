@@ -99,7 +99,7 @@ StringJoin["
 		//ptr<Real> V_coords__  = V_coords.data();
 		//ptr<Int>  simplices__ = simplices.data();
 		ptr<Real> P_D_far__   = P_D_far.data();
-		mut<Int>  buffer__    = buffer.data();
+		mut<Real> buffer__    = buffer.data();
         
         if( addTo )
 		{
@@ -316,7 +316,7 @@ StringJoin["
 		ptr<Real> V_coords__  = V_coords.data();
         ptr<Int>  simplices__ = simplices.data();
 		ptr<Real> P_D_far__   = P_D_far.data();
-              Real * restrict const buffer__    = buffer.data();
+        mut<Real> buffer__    = buffer.data();
 
 		if( addTo )
 		{

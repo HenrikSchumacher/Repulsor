@@ -66,8 +66,8 @@ StringJoin[
 
             for( Int i = i_begin; i < i_end; ++i )
             {
-				ptr<Real> near = P_near.data(i);                    
-				ptr<Real> far  = P_far.data(i);   
+				mut<Real> near = P_near.data(i);                    
+				mut<Real> far  = P_far.data(i);   
             
 ",
 Table[line[4,"simplex[",s[j],"] = simplices__[",s[n+1],"*i +",s[j],"]"],{j,0,n+1-1}],
