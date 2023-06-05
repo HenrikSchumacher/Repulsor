@@ -88,6 +88,10 @@ virtual Int FlipEdges( ptr<Edge_T> e_list, const Int n, const bool check_Delauna
 }
 
 
+virtual Int FlipEdges( const std::vector<Int> & e_list, const bool check_Delaunay = false  ) override
+{
+    return this->FlipEdges( e_list.data(), int_cast<Int>(e_list.size()), check_Delaunay );
+}
 
 Int FlipEdge( const Vertex_T v_0, const Vertex_T v_1, const bool check_Delaunay = false )
 {

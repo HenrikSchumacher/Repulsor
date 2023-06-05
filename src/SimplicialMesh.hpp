@@ -7,10 +7,10 @@ namespace Repulsor
 //    template<int DOM_DIM, int AMB_DIM, typename Real, typename Int, typename SReal, typename ExtReal>
 //    class TangentPoint;
     
-    template<typename Real_, typename Int_, typename SReal_, typename ExtReal_>
+    template<typename Real_, typename Int_>
     class SimplicialRemesherBase;
     
-    template<int DOM_DIM, int AMB_DIM, typename Real_, typename Int_, typename SReal_, typename ExtReal_>
+    template<int DOM_DIM, int AMB_DIM, typename Real_, typename Int_>
     class SimplicialRemesher;
     
     template<int DOM_DIM, int AMB_DIM, typename Real_, typename Int_, typename SReal_, typename ExtReal_>
@@ -41,8 +41,10 @@ namespace Repulsor
         using CollisionTree_T            =          CollisionTree<AMB_DIM,Real,Int,SReal,ExtReal,true>;
         using ObstacleCollisionTree_T    =          CollisionTree<AMB_DIM,Real,Int,SReal,ExtReal,false>;
 
-        using Remesher_T         =     SimplicialRemesher<DOM_DIM,AMB_DIM,Real,Int,SReal,ExtReal>;
-        using RemesherBase_T     = SimplicialRemesherBase<                Real,Int,SReal,ExtReal>;
+        using Remesher_T         = SimplicialRemesher<DOM_DIM,AMB_DIM,Real,Int>;
+        
+        using RemesherBase_T     = typename Base_T::Remesher_T;
+        
         using Obstacle_T         = Base_T;
         
         SimplicialMesh() = default;
@@ -52,7 +54,7 @@ namespace Repulsor
             // vertex coordinates; assumed to be of size vertex_count_ x AMB_DIM
             const Tensor2<Int,Int> & simplices_,
             // simplices; assumed to be of size simplex_count_ x (DOM_DIM+1)
-            const long long thread_count_ = 1
+            const std::size_t thread_count_ = 1
         )
         :   SimplicialMesh(
                   V_coords_.data(),
@@ -116,10 +118,10 @@ namespace Repulsor
         template<typename ExtReal_2, typename ExtInt>
         SimplicialMesh(
             const ExtReal_2 * V_coords_, // vertex coordinates; assumed to be of size vertex_count_ x AMB_DIM
-            const long long vertex_count_,
+            const std::size_t vertex_count_,
             const ExtInt * simplices_, // simplices; assumed to be of size simplex_count_ x (DOM_DIM+1)
-            const long long simplex_count_,
-            const long long thread_count_ = 1
+            const std::size_t simplex_count_,
+            const std::size_t thread_count_ = 1
         )
         :   SimplicialMesh( V_coords_, vertex_count_, false, simplices_, simplex_count_, false, thread_count_)
         {}
@@ -127,12 +129,12 @@ namespace Repulsor
         template<typename ExtReal_2, typename ExtInt>
         SimplicialMesh(
             const ExtReal_2 * vertex_coords_, // vertex coordinates; assumed to be of size vertex_count_ x AMB_DIM
-            const long long vertex_count_,
+            const std::size_t vertex_count_,
             const bool vertex_coords_transpose,
             const ExtInt * simplices_, // simplices; assumed to be of size simplex_count_ x (DOM_DIM+1)
-            const long long simplex_count_,
+            const std::size_t simplex_count_,
             const bool simplices_transpose,
-            const long long thread_count_ = 1
+            const std::size_t thread_count_ = 1
         )
         :   Base_T    ( static_cast<Int>(thread_count_) )
         ,   V_coords  ( ToTensor2<Real,Int>(
@@ -166,28 +168,13 @@ namespace Repulsor
         using Base_T::ThreadCount;
         
     protected:
-        
-        mutable bool cluster_tree_initialized = false;
-        mutable std::unique_ptr<ClusterTree_T> cluster_tree
-              = std::unique_ptr<ClusterTree_T>( new ClusterTree_T() );
-        
-        mutable bool block_cluster_tree_initialized = false;
-        mutable std::unique_ptr<BlockClusterTree_T> block_cluster_tree
-              = std::unique_ptr<BlockClusterTree_T>( new BlockClusterTree_T(*cluster_tree, *cluster_tree) );
-        
-        mutable bool collision_tree_initialized = false;
-        mutable std::unique_ptr<CollisionTree_T> collision_tree
-              = std::unique_ptr<CollisionTree_T>( new CollisionTree_T(*cluster_tree, *cluster_tree ) );
+
         
         mutable SReal max_update_step_size = 0;
         
         Tensor2<Real,Int> V_coords;
         Tensor2<Int,Int>  simplices;
-        
-        mutable bool derivative_assembler_initialized = false;
-
-        mutable Sparse::BinaryMatrixCSR<Int,Int> derivative_assembler;
-        
+                
         mutable Primitive_T P_proto;
         
         mutable Tensor1<Int,Int> simplex_row_pointers;
@@ -248,17 +235,19 @@ namespace Repulsor
             return V_coords.data();
         }
         
-        virtual void SemiStaticUpdate( ptr<ExtReal> new_V_coords_, const bool transp_ = false ) override
+        virtual void SemiStaticUpdate( ptr<ExtReal> new_V_coords_, const bool transp_ = false ) const override
         {
             ptic(className()+"::SemiStaticUpdate");
             
+            Tensor2<Real,Int> new_V_coords (VertexCount(),AmbDim());
+            
             if( transp_ )
             {
-                V_coords.ReadTransposed(new_V_coords_);
+                new_V_coords.ReadTransposed(new_V_coords_);
             }
             else
             {
-                V_coords.Read(new_V_coords_);
+                new_V_coords.Read(new_V_coords_);
             }
             
             this->ClearCache();
@@ -266,26 +255,26 @@ namespace Repulsor
             Tensor2<Real,Int> P_near( SimplexCount(), NearDim() );
             Tensor2<Real,Int> P_far ( SimplexCount(), FarDim()  );
 
-            details.ComputeNearFarData( V_coords, simplices, P_near, P_far );
+            details.ComputeNearFarData( new_V_coords, simplices, P_near, P_far );
             
-            cluster_tree->SemiStaticUpdate( P_near, P_far );
+            GetClusterTree().SemiStaticUpdate( P_near, P_far );
             
             ptoc(className()+"::SemiStaticUpdate");
         }
        
         
         virtual void LoadUpdateVectors(
-            const ExtReal * const vecs,
+            ptr<ExtReal> vecs,
             const ExtReal max_time,
             const bool transp_
-        ) override
+        ) const override
         {
             ptic(className()+"::LoadUpdateVectors");
             
             max_update_step_size = static_cast<SReal>(max_time);
-            collision_tree_initialized = false;
             
-            auto V_updates = Tensor2<Real,Int>( VertexCount(), AMB_DIM );
+            Tensor2<Real,Int> V_updates ( VertexCount(), AMB_DIM );
+
             if( vecs == nullptr )
             {
                 V_updates.Fill(static_cast<Real>(0));
@@ -311,8 +300,7 @@ namespace Repulsor
             mut<SReal> P_v_ser = P_velocities_serialized.data();
             
             
-            
-            const Tensor1<Int,Int> P_ordering = GetClusterTree().PrimitiveOrdering();
+            const Tensor1<Int,Int> & P_ordering = GetClusterTree().PrimitiveOrdering();
 
             JobPointers<Int> job_ptr ( SimplexCount(), thread_count );
             
@@ -353,14 +341,11 @@ namespace Repulsor
             
             ExtReal t = max_time;
 
-            if( obstacle_initialized )
-            {
-                obstacle->LoadUpdateVectors( static_cast<ExtReal *>(nullptr), max_time );
+            GetObstacle().LoadUpdateVectors( static_cast<ExtReal *>(nullptr), max_time );
 
-                t = GetObstacleCollisionTree().MaximumSafeStepSize(t,TOL);
+            t = GetObstacleCollisionTree().MaximumSafeStepSize(t,TOL);
 
-                logprint("GetObstacleCollisionTree().MaximumSafeStepSize(t) = "+ToString(t));
-            }
+            logprint("GetObstacleCollisionTree().MaximumSafeStepSize(t) = "+ToString(t));
             
             t = GetCollisionTree().MaximumSafeStepSize(t,TOL);
             
@@ -373,7 +358,9 @@ namespace Repulsor
         
         virtual const ClusterTree_T & GetClusterTree() const override
         {
-            if( !cluster_tree_initialized )
+            static std::string tag ( "ClusterTree" );
+            
+            if( !this->InCacheQ( tag ) )
             {
                 ptic(className()+"::GetClusterTree");
                 if( (V_coords.Dimension(0) > 0) && (simplices.Dimension(0) > 0) )
@@ -383,43 +370,43 @@ namespace Repulsor
                     auto P_hull_coords = Tensor3<Real,Int> ( SimplexCount(), DOM_DIM+1, AMB_DIM );
                     auto P_near        = Tensor2<Real,Int> ( SimplexCount(), NearDim() );
                     auto P_far         = Tensor2<Real,Int> ( SimplexCount(), FarDim() );
-                    
+
                     Tensor2<SReal,Int> P_serialized ( SimplexCount(), P_proto.Size() );
-                    
+
                     auto DiffOp = Sparse::MatrixCSR<Real,Int,Int>(
                         SimplexCount() * AMB_DIM,
                         VertexCount(),
                         SimplexCount() * AMB_DIM * (DOM_DIM+1),
                         ThreadCount()
                     );
-        
+
                     DiffOp.Outer()[SimplexCount() * AMB_DIM] = SimplexCount() * AMB_DIM * (DOM_DIM+1);
-                    
+
                     auto AvOp = Sparse::MatrixCSR<Real,Int,Int>(
                         SimplexCount(),
                         VertexCount(),
                         SimplexCount() * (DOM_DIM+1),
                         ThreadCount()
                     );
-                    
+
                     AvOp.Outer()[SimplexCount()] = SimplexCount() * (DOM_DIM+1);
-                                
+
                     ptoc("Allocations");
-                    
+
                     // What remains is to compute P_coords, P_hull_coords, P_near and P_far and the nonzero values of DiffOp.
                     details.ComputeNearFarDataOps( V_coords, simplices, P_coords, P_hull_coords, P_near, P_far, DiffOp, AvOp );
 
 
                     const JobPointers<Int> job_ptr ( SimplexCount(), ThreadCount() );
-                    
+
                     ptic("Creating primitives");
                     const Int thread_count = job_ptr.ThreadCount();
-                    
+
                     #pragma omp parallel for num_threads(thread_count)
                     for( Int thread = 0; thread < thread_count; ++thread )
                     {
                         Primitive_T P;
-                        
+
                         Int i_begin = job_ptr[thread];
                         Int i_end   = job_ptr[thread+1];
 
@@ -430,17 +417,17 @@ namespace Repulsor
                         }
                     }
                     ptoc("Creating primitives");
-                    
+
                     ptic("Initializing cluster prototypes");
-                    
-                    std::unique_ptr<BoundingVolume_T> C_proto;
+
+                    std::shared_ptr<BoundingVolume_T> C_proto;
 
                     switch( cluster_tree_settings.bounding_volume_type )
                     {
                         case BoundingVolumeType::AABB_MedianSplit:
                         {
                             logprint("Using AABB_MedianSplit as bounding volume.");
-                            C_proto = std::unique_ptr<BoundingVolume_T>(
+                            C_proto = std::shared_ptr<BoundingVolume_T>(
                                 static_cast<BoundingVolume_T*>(new AABB_MedianSplit<AMB_DIM,GJK_Real,Int,SReal>)
                             );
                             break;
@@ -448,7 +435,7 @@ namespace Repulsor
                         case BoundingVolumeType::AABB_PreorderedSplit:
                         {
                             logprint("Using AABB_PreorderedSplit as bounding volume.");
-                            C_proto = std::unique_ptr<BoundingVolume_T>(
+                            C_proto = std::shared_ptr<BoundingVolume_T>(
                                 static_cast<BoundingVolume_T*>(new AABB_PreorderedSplit<AMB_DIM,GJK_Real,Int,SReal>)
                             );
                             break;
@@ -456,41 +443,46 @@ namespace Repulsor
                         default:
                         {
                             logprint("Using AABB_LongestAxisSplit as bounding volume.");
-                            C_proto = std::unique_ptr<BoundingVolume_T>(
+                            C_proto = std::shared_ptr<BoundingVolume_T>(
                                 static_cast<BoundingVolume_T*>(new AABB_LongestAxisSplit<AMB_DIM,GJK_Real,Int,SReal>)
                             );
                         }
                     }
 
                     ptoc("Initializing cluster prototypes");
-                    
+
                     if( cluster_tree_settings.thread_count <= 0 )
                     {
                         cluster_tree_settings.thread_count = ThreadCount();
                     }
-                    
-                    cluster_tree = std::make_unique<ClusterTree_T>(
-                        P_proto, P_serialized, *C_proto, Tensor1<Int,Int>(0),
-                        P_near, P_far,
-                        DiffOp, AvOp,
-                        cluster_tree_settings
+
+                    this->SetCache( tag,
+                        std::make_any<ClusterTree_T>(
+                            P_proto, P_serialized, *C_proto, Tensor1<Int,Int>(0),
+                            P_near, P_far,
+                            DiffOp, AvOp,
+                            cluster_tree_settings
+                        )
                     );
-                    
-                    cluster_tree_initialized = true;
                 }
                 else
                 {
-                    cluster_tree = std::make_unique<ClusterTree_T>();
+                    eprint(ClassName()+"(V_coords.Dimension(0) <= 0) || (simplices.Dimension(0) <= 0)");
+
+                    this->SetCache( tag, std::make_any<ClusterTree_T>() );
                 }
-                
+
                 ptoc(className()+"::GetClusterTree");
             }
-            return *cluster_tree;
+
+            return std::any_cast<ClusterTree_T &>( this->GetCache(tag) );
         }
 
         virtual const BlockClusterTree_T & GetBlockClusterTree() const override
         {
-            if( !block_cluster_tree_initialized )
+            static std::string tag ( "BlockClusterTree" );
+            
+            if( !this->InCacheQ( tag ) )
             {
                 ptic(className()+"::GetBlockClusterTree");
                 
@@ -499,37 +491,44 @@ namespace Repulsor
                 
                 block_cluster_tree_settings.max_refinement = adaptivity_settings.max_refinement;
                 
-                block_cluster_tree = std::make_unique<BlockClusterTree_T>(
-                    GetClusterTree(),
-                    GetClusterTree(),
-                    block_cluster_tree_settings
+                this->SetCache( tag,
+                    std::make_any<BlockClusterTree_T>(
+                        GetClusterTree(),
+                        GetClusterTree(),
+                        block_cluster_tree_settings
+                    )
                 );
-                
-                block_cluster_tree_initialized = true;
                 
                 ptoc(className()+"::GetBlockClusterTree");
             }
-            return *block_cluster_tree;
+            
+            return std::any_cast<BlockClusterTree_T &>( this->GetCache(tag) );
         }
         
         virtual const CollisionTree_T & GetCollisionTree() const override
         {
-            if( !collision_tree_initialized )
+            static std::string tag ( "CollisionTree" );
+            
+            if( !this->InCacheQ( tag ) )
             {
                 ptic(className()+"::GetCollisionTree");
-                
-                collision_tree = std::make_unique<CollisionTree_T>( GetClusterTree(), GetClusterTree() );
 
-                collision_tree_initialized = true;
+                this->SetCache( tag,
+                    std::make_any<CollisionTree_T>( GetClusterTree(), GetClusterTree() )
+                );
 
                 ptoc(className()+"::GetCollisionTree");
             }
-            return *collision_tree;
+            
+            return std::any_cast<CollisionTree_T &>( this->GetCache(tag) );
         }
         
         const Sparse::BinaryMatrixCSR<Int,Int> & DerivativeAssembler() const override
         {
-            if( !derivative_assembler_initialized )
+            
+            static std::string tag ( "DerivativeAssembler" );
+            
+            if( !this->InCacheQ( tag ) )
             {
                 ptic(className()+"::DerivativeAssembler");
             
@@ -543,17 +542,16 @@ namespace Repulsor
                 A.Outer().iota();
                 A.Inner().Read(simplices.data());
                 
-                derivative_assembler = A.Transpose();
-                
-                derivative_assembler_initialized = true;
+                this->SetCache( tag, std::any( std::move(A.Transpose()) ) );
                 
                 ptoc(className()+"::DerivativeAssembler");
             }
-            return derivative_assembler;
+            
+            return std::any_cast<Sparse::BinaryMatrixCSR<Int,Int> &>( this->GetCache(tag) );
             
         } // DerivativeAssembler
         
-        void Assemble_ClusterTree_Derivatives( ExtReal * output, const ExtReal weight, bool addTo = false ) const override
+        void Assemble_ClusterTree_Derivatives( mut<ExtReal> output, const ExtReal weight, bool addTo = false ) const override
         {
             ptic(className()+"::Assemble_ClusterTree_Derivatives");
             
@@ -575,7 +573,7 @@ namespace Repulsor
             ptoc(className()+"::Assemble_ClusterTree_Derivatives");
         }
         
-        void Assemble_ClusterTree_Density( ExtReal * output, const ExtReal weight, bool addTo = false ) const override
+        void Assemble_ClusterTree_Density( mut<ExtReal> output, const ExtReal weight, bool addTo = false ) const override
         {
             ptic(className()+"::Assemble_ClusterTree_Density");
             
@@ -584,7 +582,7 @@ namespace Repulsor
             ptoc(className()+"::Assemble_ClusterTree_Density");
         }
         
-        void Assemble_ClusterTree_SimplexEnergies( ExtReal * output, const ExtReal weight, bool addTo = false ) const override
+        void Assemble_ClusterTree_SimplexEnergies( mut<ExtReal> output, const ExtReal weight, bool addTo = false ) const override
         {
             ptic(className()+"::Assemble_ClusterTree_SimplexEnergies");
             
@@ -596,56 +594,45 @@ namespace Repulsor
 //##############################################################################################
 //      Obstacle
 //##############################################################################################
-    
-        
-        mutable bool obstacle_initialized = false;
-        mutable std::unique_ptr<Obstacle_T> obstacle = nullptr;
-        
-        mutable bool obstacle_block_cluster_tree_initialized = false;
-        mutable std::unique_ptr<ObstacleBlockClusterTree_T> obstacle_block_cluster_tree
-              = std::unique_ptr<ObstacleBlockClusterTree_T>(
-                    new ObstacleBlockClusterTree_T(*cluster_tree, *cluster_tree) );
-        
-        
-        mutable bool obstacle_collision_tree_initialized = false;
-        mutable std::unique_ptr<ObstacleCollisionTree_T> obstacle_collision_tree
-              = std::unique_ptr<ObstacleCollisionTree_T>(
-                    new ObstacleCollisionTree_T(*cluster_tree, *cluster_tree) );
-        
-        bool ObstacleInitialized() const override
-        {
-            return obstacle != nullptr;
-        }
-        
+
         virtual void LoadObstacle( std::unique_ptr<Obstacle_T> obstacle_ ) override
         {
+            static std::string tag ( "Obstacle" );
+            
+            std::shared_ptr<Obstacle_T> obstacle;
+            
             // Input obstacle is moved.
             if( obstacle_->AmbDim() != AmbDim() )
             {
                 eprint(className()+"::LoadObstacle: Attempted to load obstacle of ambient dimension "+ToString(obstacle_->AmbDim())+" into mesh of ambient dimension "+ToString(AmbDim())+". Setting obstacle to nullptr."
                 );
-                obstacle = nullptr;
-                return;
+                
+                // We have to construct an empy SimplicialMesh because Obstacle_T is abstract.
+                obstacle = std::make_shared<SimplicialMesh>();
+            
             }
-            
-            obstacle = std::move(obstacle_);
-            
-            obstacle_block_cluster_tree = nullptr;
-            obstacle_block_cluster_tree_initialized = false;
-            
-            obstacle->cluster_tree_settings = cluster_tree_settings;
-            
-            obstacle_initialized = true;
+            else
+            {
+                obstacle = std::move(obstacle_);
+            }
+
+            this->SetCache(tag, std::any( obstacle ) );
+
         }
         
         const Obstacle_T & GetObstacle() const override
         {
-            if( !obstacle_initialized )
+            static std::string tag ("Obstacle");
+
+            if( !this->InCacheQ(tag) )
             {
-                wprint(className()+"::GetObstacle: Obstacle not initialized.");
-                obstacle = std::unique_ptr<Base_T>(new SimplicialMesh());
+                wprint( ClassName()+"::GetObstacle: Obstacle not initialized.");
+                
+                // We have to construct an empy SimplicialMesh because Obstacle_T is abstract.
+                this->SetCache(tag, std::any(std::make_shared<SimplicialMesh>()) );
             }
-            return *obstacle;
+            
+            return *std::any_cast<std::shared_ptr<Obstacle_T>>( this->GetCache(tag) );
         }
         
         virtual const ClusterTree_T & GetObstacleClusterTree() const override
@@ -655,48 +642,41 @@ namespace Repulsor
         
         virtual const ObstacleBlockClusterTree_T & GetObstacleBlockClusterTree() const override
         {
-            if( !obstacle_block_cluster_tree_initialized )
+            static std::string tag ( "ObstacleBlockClusterTree" );
+            
+            if( !this->InCacheQ( tag ) )
             {
                 ptic(className()+"::GetObstacleBlockClusterTree");
-                if( obstacle_initialized )
-                {
-                    obstacle_block_cluster_tree = std::make_unique<ObstacleBlockClusterTree_T>(
-                        GetClusterTree(), GetObstacleClusterTree(), block_cluster_tree_settings
-                    );
-                    obstacle_block_cluster_tree_initialized = true;
-                }
-                else
-                {
-                    wprint(className()+"::GetObstacleBlockClusterTree: Obstacle not initialized.");
-                }
-                ptoc(className()+"::GetObstacleBlockClusterTree");
                 
+                this->SetCache( tag,
+                    std::make_any<ObstacleBlockClusterTree_T>(
+                        GetClusterTree(), GetObstacleClusterTree(), block_cluster_tree_settings
+                    )
+                );
+                
+                ptoc(className()+"::GetObstacleBlockClusterTree");
+
             }
-            return *obstacle_block_cluster_tree;
+            
+            return std::any_cast<ObstacleBlockClusterTree_T &>( this->GetCache(tag) );
         }
         
         virtual const ObstacleCollisionTree_T & GetObstacleCollisionTree() const override
         {
-            if( !obstacle_collision_tree_initialized )
+            static std::string tag ( "ObstacleCollisionTree" );
+            
+            if( !this->InCacheQ(tag) )
             {
                 ptic(className()+"::GetObstacleCollisionTree");
                 
-                if( obstacle_initialized )
-                {
-                    obstacle_collision_tree = std::make_unique<ObstacleCollisionTree_T>(
-                            GetClusterTree(), GetObstacleClusterTree()
-                    );
-
-                    obstacle_collision_tree_initialized = true;
-                }
-                else
-                {
-                    print(ClassName()+"GetObstacleCollisionTree: Obstacle not initialized.");
-                }
+                this->SetCache( tag,
+                    std::make_any<ObstacleCollisionTree_T>( GetClusterTree(), GetObstacleClusterTree() )
+                );
 
                 ptoc(className()+"::GetObstacleCollisionTree");
             }
-            return *obstacle_collision_tree;
+            
+            return std::any_cast<ObstacleCollisionTree_T &>( this->GetCache(tag) );
         }
 
         
@@ -762,7 +742,14 @@ namespace Repulsor
         {
             ptic(ClassName()+"::CreateRemesher");
             
-            Remesher_T * R = new Remesher_T();
+            Real * null = nullptr;
+            
+            Remesher_T * R = new Remesher_T(
+                VertexCoordinates().data(), VertexCoordinates().Dimension(0),
+                Simplices().data(),         Simplices().Dimension(0),
+                null,                       0,
+                ThreadCount()
+            );
             
             ptoc(ClassName()+"::CreateRemesher");
             

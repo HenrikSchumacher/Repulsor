@@ -76,6 +76,12 @@ namespace Repulsor
         
         virtual ~ClusterTreeBase() = default;
         
+    public:
+        
+        ClusterTreeBase(const ClusterTreeBase & rhs) = default;
+        
+        ClusterTreeBase(ClusterTreeBase && rhs) = default;
+        
     protected:
         
         static constexpr Int null = static_cast<Int>(0);
@@ -968,9 +974,9 @@ namespace Repulsor
 //##################################################################################################
 
         virtual void SemiStaticUpdate(
-            const Tensor2<Real,Int> & P_near_, const Tensor2<Real,Int> & P_far_ ) = 0;
+            const Tensor2<Real,Int> & P_near_, const Tensor2<Real,Int> & P_far_ ) const = 0;
         
-        virtual void SemiStaticUpdate( ptr<Real> P_near_, ptr<Real> P_far_ ) = 0;
+        virtual void SemiStaticUpdate( ptr<Real> P_near_, ptr<Real> P_far_ ) const = 0;
         
 //##################################################################################################
 //##        Moments

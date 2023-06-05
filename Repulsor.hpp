@@ -2,7 +2,6 @@
 
     #define REPULSOR_HPP
 
-    #include <any>
     #include <tuple>
     #include <unordered_map>
 

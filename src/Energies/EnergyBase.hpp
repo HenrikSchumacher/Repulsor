@@ -39,15 +39,15 @@ namespace Repulsor
     public:
         
         // Return the value of the energy; use caching.
-        ExtReal Value( const MeshBase_T & M ) const
+        ExtReal Value( MeshBase_T & M ) const
         {
             ptic(ClassName()+"::Value");
             
-            if( !M.IsCached(ClassName()+"::Value"))
+            if( !M.InCacheQ(ClassName()+"::Value"))
             {
-                std::any energy = value(M);
+//                std::any energy = value(M);
                 
-                M.SetCache( ClassName()+"::Value", energy );
+                M.SetCache( ClassName()+"::Value", value(M) );
             }
             
             ptoc(ClassName()+"::Value");
@@ -63,11 +63,11 @@ namespace Repulsor
     public:
 
         // Return the differential of the energy; use caching.
-        const CotangentVector_T & Differential( const MeshBase_T & M ) const
+        const CotangentVector_T & Differential( MeshBase_T & M ) const
         {
             ptic(ClassName()+"::Differential");
             
-            if( !M.IsCached(ClassName()+"::Differential"))
+            if( !M.InCacheQ(ClassName()+"::Differential"))
             {
 //                M.GetS().CleanseDerivativeBuffers();
 
@@ -77,9 +77,8 @@ namespace Repulsor
 
                 M.Assemble_ClusterTree_Derivatives( diff.data(), ExtReal(1), false );
                 
-                std::any thing ( std::move(diff) );
                 // TODO: Find out whether this incurs a copy operation.
-                M.SetCache( ClassName()+"::Differential", thing );
+                M.SetCache( ClassName()+"::Differential", std::move(diff) );
             }
             
             ptoc(ClassName()+"::Differential");

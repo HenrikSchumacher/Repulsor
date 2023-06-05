@@ -34,11 +34,9 @@ namespace Repulsor
             std::string tag ( ClassName()+"::MetricValues" );
 
             ptic(tag);
-            if( !M.IsCached(tag))
+            if( !M.InCacheQ(tag))
             {
-                std::any thing ( std::move(compute_metric(M)) );
-                
-                M.SetCache( tag, thing );
+                M.SetCache( tag, compute_metric(M) );
             }
             
             ValueContainer_T & result = std::any_cast<ValueContainer_T &>( M.GetCache(tag) );
@@ -53,11 +51,9 @@ namespace Repulsor
             std::string tag ( ClassName()+"::MetricValues" );
 
             ptic(tag);
-            if( !M.IsCached(tag))
+            if( !M.InCacheQ(tag))
             {
-                std::any thing ( std::move(compute_metric(M)) );
-                
-                M.SetCache( tag, thing );
+                M.SetCache( tag, compute_metric(M) );
             }
             
             ValueContainer_T & result = std::any_cast<ValueContainer_T &>( M.GetCache(tag) );
@@ -95,7 +91,7 @@ namespace Repulsor
     public:
         
         void MultiplyMetric(
-            const MeshBase_T &  M,
+            const MeshBase_T & M,
             const ExtReal alpha, ptr<ExtReal> X,
             const ExtReal beta,  mut<ExtReal> Y,
             const Int  rhs_count,
@@ -118,7 +114,7 @@ namespace Repulsor
         }
         
         void MultiplyMetric(
-            const Mesh_T  & M,
+            const Mesh_T & M,
             const ExtReal alpha, ptr<ExtReal> X,
             const ExtReal beta,  mut<ExtReal> Y,
             const Int  rhs_count,

@@ -24,6 +24,12 @@ public:
         return collapse_counter;
     }
 
+
+    virtual Int CollapseEdges( const std::vector<Int> & e_list ) override
+    {
+        return this->CollapseEdges( e_list.data(), int_cast<Int>(e_list.size()) );
+    }
+
 protected:
 
     Int CollapseEdge( const Vertex_T v_0, const Vertex_T v_1 )

@@ -24,19 +24,23 @@ namespace Repulsor
         }
     };
  
-    template<int DOM_DIM, int AMB_DIM, typename Real_, typename Int_, typename SReal_, typename ExtReal_>
-    class SimplicialRemesher : public SimplicialRemesherBase<Real_,Int_,SReal_,ExtReal_>
+    template<int DOM_DIM, int AMB_DIM, typename Real_, typename Int_>
+    class SimplicialRemesher : public SimplicialRemesherBase<Real_,Int_>
     {
-        using Real    = Real_;
-        using Int     = Int_;
-        using SReal   = SReal_;
-        using ExtReal = ExtReal_;
+    public:
         
-        using Vertex_T   = Int;
-        using Edge_T     = Int;
-        using Simplex_T  = Int;
+        using Base_T  = SimplicialRemesherBase<Real_,Int_>;
         
-        using Pair_T     = std::pair<Vertex_T,Vertex_T>;
+        using Real    = typename Base_T::Real;
+        using Int     = typename Base_T::Int;
+        
+        using Vertex_T   = typename Base_T::Vertex_T;
+        using Edge_T     = typename Base_T::Edge_T;
+        using Simplex_T  = typename Base_T::Simplex_T;
+        
+//        using MeshBase_T = typename Base_T::MeshBase_T;
+        
+        using Pair_T             = std::pair<Vertex_T,Vertex_T>;
         
         using EdgeContainer_T    = Tensor2<Vertex_T,Int>;
         using SimplexContainer_T = Tensor2<Vertex_T,Int>;
@@ -44,10 +48,7 @@ namespace Repulsor
         using VertexList_T       = SortedList<Vertex_T,Int>;
         using SimplexList_T      = SortedList<Simplex_T,Int>;
         
-        using Vector_T   = Tensors::Tiny::Vector<AMB_DIM,Real,Int>;
-        
-        using MeshBase_T = SimplicialMeshBase<                Real,Int,SReal,ExtReal>;
-        using Mesh_T     = SimplicialMesh    <DOM_DIM,AMB_DIM,Real,Int,SReal,ExtReal>;
+        using Vector_T           = Tensors::Tiny::Vector<AMB_DIM,Real,Int>;
 
 //        using BoolContainer_T = std::vector<bool>;
         using BoolContainer_T = Tensor1<bool,Int>;
@@ -113,24 +114,60 @@ namespace Repulsor
             Init();
         }
         
-        explicit SimplicialRemesher( const Mesh_T & M )
+//        explicit SimplicialRemesher( const Mesh_T & M )
+//        {
+//            Init();
+//
+//            this->LoadMesh(M);
+//        }
+//
+//        explicit SimplicialRemesher( const Mesh_T & M, const Tensor2<Real,Int> & u )
+//        {
+//            Init();
+//
+//            this->LoadMesh(M,u);
+//        }
+        
+
+        template<typename Real_1, typename Int_1>
+        SimplicialRemesher(
+            ptr<Real_1> V_coords_ ,  const Int vertex_count_,
+            ptr< Int_1> simplices_,   const Int simplex_count_,
+            const Int thread_count_ = 1
+        )
         {
             Init();
             
-            this->LoadMesh(M);
+            Real * null = nullptr;
+            
+            this->LoadMesh(
+                V_coords_ ,  vertex_count_,
+                simplices_,  simplex_count_,
+                null,        Int(0),
+                thread_count_
+           );
         }
         
-        explicit SimplicialRemesher( const Mesh_T & M, const Tensor2<Real,Int> & u )
+        template<typename Real_1, typename Int_1, typename Real_2>
+        SimplicialRemesher(
+            ptr<Real_1> V_coords_ ,  const Int vertex_count_,
+            ptr< Int_1> simplices_,  const Int simplex_count_,
+            ptr<Real_2> V_data_,     const Int V_data_dim_,
+            const Int thread_count_ = 1
+        )
         {
             Init();
             
-            this->LoadMesh(M,u);
+            this->LoadMesh(
+                V_coords_ ,  vertex_count_,
+                simplices_,  simplex_count_,
+                V_data_,     V_data_dim_,
+                thread_count_
+           );
         }
-        
         
         virtual ~SimplicialRemesher() = default;
         
-        //DONE.
         void Init()
         {
             Int k = 0;
@@ -147,7 +184,6 @@ namespace Repulsor
             }
         }
         
-        //DONE.
         void CheckInit() const
         {
             print(className()+"::CheckInit");
@@ -166,77 +202,31 @@ namespace Repulsor
         }
         
         
-        //DONE.
         virtual Int VertexCount() const override
         {
             return vertex_count;
         }
 
-        //DONE.
         virtual Int EdgeCount() const override
         {
             return edge_count;
         }
         
-        //DONE.
         virtual Int SimplexCount() const override
         {
             return simplex_count;
         }
-        
-        virtual void LoadMesh( const MeshBase_T & M ) override
-        {
-            Real * null = nullptr;
-            
-            LoadMeshFromPointers(
-                M.VertexCoordinates().data(),  M.VertexCount(),
-                M.Simplices().data(),          M.SimplexCount(),
-                null,                          zero,
-                M.ThreadCount()
-            );
-        }
-        
-        virtual void LoadMesh( const MeshBase_T & M, const Tensor2<Real,Int> & V_data_ ) override
-        {
-            LoadMeshFromPointers(
-                M.VertexCoordinates().data(),  M.VertexCount(),
-                M.Simplices().data(),          M.SimplexCount(),
-                V_data_.data(),                V_data_.Dimension(1),
-                M.ThreadCount()
-            );
-        }
-        
-        virtual void LoadMesh( const MeshBase_T & M, const Real * V_data_, const Int V_data_dim_ ) override
-        {
-            LoadMeshFromPointers(
-                M.VertexCoordinates().data(),  M.VertexCount(),
-                M.Simplices().data(),          M.SimplexCount(),
-                V_data_,                       V_data_dim_,
-                M.ThreadCount()
-            );
-        }
-        
-        virtual void LoadMesh_External( const MeshBase_T & M, const ExtReal * V_data_, const Int V_data_dim_ ) override
-        {
-            LoadMeshFromPointers(
-                M.VertexCoordinates().data(),  M.VertexCount(),
-                M.Simplices().data(),          M.SimplexCount(),
-                V_data_,                       V_data_dim_,
-                M.ThreadCount()
-            );
-        }
     
     public:
         
-        template<typename Real_1, typename Int_1, typename Real_2>
-        void LoadMeshFromPointers(
-            ptr<Real_1> V_coords_ ,  const Int vertex_count_,
-            ptr<Int_1> simplices_,   const Int simplex_count_,
-            ptr<Real_2> V_data_,     const Int V_data_dim_,
+        void LoadMesh(
+            ptr<Real> V_coords_ ,  const Int vertex_count_,
+            ptr<Int>  simplices_,  const Int simplex_count_,
+            ptr<Real> V_data_,     const Int V_data_dim_,
             const Int thread_count_ = 1
-        )
+        ) override
         {
-            ptic(className()+"::LoadMeshFromPointers");
+            ptic(className()+"::LoadMesh");
 
             vertex_count  = vertex_count_;
             edge_count    = 0;
@@ -298,9 +288,9 @@ namespace Repulsor
             ptoc("ComputeConnectivity");
             compressed = true;
 
-            ptoc(className()+"::LoadMeshFromPointers");
+            ptoc(className()+"::LoadMesh");
             
-        } // LoadMeshFromPointers
+        } // LoadMesh
         
     public:
         
@@ -410,21 +400,15 @@ namespace Repulsor
         } // Compress
 
         
-        virtual std::unique_ptr<MeshBase_T> CreateMesh() override
-        {
-            Compress();
-            return std::make_unique<Mesh_T>(
-                V_coords.data(), vertex_count,
-                simplices.data(), simplex_count,
-                thread_count
-            );
-        } //CreateMesh
-        
-        virtual Tensor2<Real,Int> VertexData() override
-        {
-            Compress();
-            return Tensor2<Real,Int>( V_data.data(), vertex_count, V_data.Dimension(1) );
-        } //CreateMesh
+//        virtual std::unique_ptr<MeshBase_T> CreateMesh() override
+//        {
+//            Compress();
+//            return std::make_unique<Mesh_T>(
+//                V_coords.data(), vertex_count,
+//                simplices.data(), simplex_count,
+//                thread_count
+//            );
+//        } //CreateMesh
 
 #include "Vertices.hpp"
 #include "Edges.hpp"
@@ -665,11 +649,43 @@ namespace Repulsor
             return className();
         }
         
+        
+        virtual const Tensor2<Real,Int> & VertexCoordinates() override
+        {
+            return V_coords;
+        }
+        
+//        virtual Tensor2<Real,Int> VertexData() override
+//        {
+//            Compress();
+//            return Tensor2<Real,Int>( V_data.data(), vertex_count, V_data.Dimension(1) );
+//        }
+        
+        virtual const Tensor2<Real,Int> & VertexData() override
+        {
+            return V_data;
+        }
+        
+        virtual const Tensor2<Int,Int> & Simplices() override
+        {
+            return simplices;
+        }
+        
+        virtual Int DomDim() override
+        {
+            return DOM_DIM;
+        }
+        
+        virtual Int AmbDim() override
+        {
+            return AMB_DIM;
+        }
+        
     private:
         
         static std::string className()
         {
-            return "SimplicialRemesher<"+ToString(DOM_DIM)+","+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+","+TypeName<ExtReal>+">";
+            return "SimplicialRemesher<"+ToString(DOM_DIM)+","+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+">";
         }
         
     };

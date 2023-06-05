@@ -278,13 +278,10 @@ int main(int argc, const char * argv[])
     
     std::unique_ptr<Mesh_T::Remesher_T> R = M_ptr->CreateRemesher();
     
-    
     Tensor1<INT,INT> edges (3);
     edges[0]=1;
     edges[1]=2;
     edges[2]=3;
-    
-    R->LoadMesh(M);
     
     R->CollapseEdges(edges.data(), edges.Size());
    

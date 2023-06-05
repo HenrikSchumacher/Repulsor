@@ -24,6 +24,11 @@ public:
         return split_counter;
     }
 
+virtual Int SplitEdges( const std::vector<Int> & e_list ) override
+{
+    return this->SplitEdges( e_list.data(), int_cast<Int>(e_list.size()) );
+}
+
 protected:
 
     Int SplitEdge( const Vertex_T v_0, const Vertex_T v_1 )

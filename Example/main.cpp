@@ -53,18 +53,18 @@ int main(int argc, const char * argv[])
     // SReal   = ("short real") floating point type for storage of clustering information
     // ExtReal = ("external real") floating point type that is used by the outer world, e.g. for submitting the mesh's vertex coordinates and vectors to multiply against the metric.
     
-    
+
     using Mesh_T   = SimplicialMeshBase<REAL,INT,SREAL,EXTREAL>;
     using Energy_T = EnergyBase<REAL,INT,SREAL,EXTREAL>;
     using Metric_T = MetricBase<REAL,INT,SREAL,EXTREAL>;
-    
+
     // Create a factory that can make instances of SimplicialMesh with domain dimension in the range 2,...,2 and ambient dimension in the range 3,...,3.
     // (The main purpose of this factory is to tell the compiler which template instantiations of SimplicialMesh it shall generate. Note that with obstacles one might want to use meshes of various dimensions. So this factory basically about saving compile time.)
     SimplicialMesh_Factory<Mesh_T,2,2,3,3> mesh_factory;
-    
-    
+
+
     // This factory allows run-time polymorphism. But know that all specializations of SimplicialMesh in theses ranges have to be compiled! That may lead to horrific compile times, thus the ability to restrict the ranges in the factory.
-    
+
     // Initialize mesh by the mesh_factory to allow runtime polymorphism.
     tic("Initializing mesh");
     std::unique_ptr<Mesh_T> M_ptr = mesh_factory.Make(
@@ -72,13 +72,13 @@ int main(int argc, const char * argv[])
         &simplices[0][0],          simplex_count, dom_dim+1, false,
         thread_count
     );
-    
+
     auto & M = *M_ptr;  // I don't like pointers. Give me a reference.
-    
+
     dump(M.ThreadCount());
 
     toc("Initializing mesh");
-    
+
     // Some quite decent settings for 2-dimensional surfaces.
     M.cluster_tree_settings.split_threshold                        =  2;
     M.cluster_tree_settings.thread_count                           =  0; // take as many threads as there are used by SimplicialMesh M
@@ -88,7 +88,7 @@ int main(int argc, const char * argv[])
     tic("Creating ClusterTree");
     M.GetClusterTree();           // Not necessary. Will automatically called by al routines that require it.
     toc("Creating ClusterTree");
-    
+
     tic("Creating BlockClusterTree");
     M.GetBlockClusterTree();      // Not necessary. Will automatically called by al routines that require it.
     toc("Creating BlockClusterTree");
@@ -103,23 +103,23 @@ int main(int argc, const char * argv[])
 
     const REAL q = 6;
     const REAL p = 12;
-    
+
     // Again some factories.
     TangentPointEnergy_Factory<Mesh_T,2,2,3,3> TPE_factory;
     TangentPointMetric_Factory<Mesh_T,2,2,3,3> TPM_factory;
-    
+
     std::unique_ptr<Energy_T> tpe_ptr = TPE_factory.Make( dom_dim, amb_dim, q, p );
-    
+
     const auto & tpe = *tpe_ptr;
-    
+
     std::unique_ptr<Metric_T> tpm_ptr = TPM_factory.Make( dom_dim, amb_dim, q, p );
 
     const auto & tpm = *tpm_ptr;
-    
+
     double en;
     // Mesh_T::CotangentVector_T is Tensor2<REAL,INT> in this case. It is a simple container class for heap-allocated matrices.
     Mesh_T::CotangentVector_T diff;
-    
+
     tic("tpe.Energy(M)");
     en = tpe.Value(M);
     toc("tpe.Energy(M)");
@@ -131,20 +131,20 @@ int main(int argc, const char * argv[])
     toc("tpe.Differential(M)");
 
     print("");
-    
+
     TangentPointEnergy_AllPairs_Factory<Mesh_T,2,2,3,3> TPE_AllPairs_factory;
-    
+
     std::unique_ptr<Energy_T> tpe_slow_ptr = TPE_AllPairs_factory.Make( dom_dim, amb_dim, q, p );
-    
+
     const auto & tpe_slow = *tpe_slow_ptr;
-    
+
     tic("tpe_slow.Energy(M)");
     en = tpe_slow.Value(M);
     toc("tpe_slow.Energy(M)");
-    
+
     dump(en);
     print("");
-    
+
     // Mesh_T::TangentVector_T and Mesh_T::CotangentVector_T are both Tensor2<REAL,INT> in this example.
     Mesh_T::TangentVector_T   X ( M.VertexCount(), M.AmbDim() );
     Mesh_T::CotangentVector_T Y ( M.VertexCount(), M.AmbDim() );
@@ -155,11 +155,11 @@ int main(int argc, const char * argv[])
     const REAL alpha = 1.0;
     const REAL beta  = 0.0;
     //Performs generalized matrix-matrix product Y = alpha * A * X + beta * Y, where A is the tangent-point metric.
-    
+
     tic("tpm.MetricValues(M)");
     tpm.MetricValues(M);         // Not necessary. Will automatically called by al routines that require it.
     toc("tpm.MetricValues(M)");
-    
+
     tic("tpm.MultiplyMetric");
     tpm.MultiplyMetric(M, alpha, X, beta, Y);
     toc("tpm.MultiplyMetric");
@@ -167,12 +167,12 @@ int main(int argc, const char * argv[])
     tic("tpm.MultiplyMetric");
     tpm.MultiplyMetric(M, alpha, X, beta, Y);
     toc("tpm.MultiplyMetric");
-   
+
     dump(X.MaxNorm());
     dump(Y.MaxNorm());
 
     print("");
-    
+
 
     // Initialize mesh by the factory to allow runtime polymorphism.
     tic("Initialize obstacle mesh");
@@ -198,11 +198,11 @@ int main(int argc, const char * argv[])
     // Compute tangent-point energy between mesh and obstacle.
 
     TangentPointObstacleEnergy_Factory<Mesh_T,2,2,2,2,3,3> TPOE_factory;
-    
+
     std::unique_ptr<Energy_T> tpo_ptr = TPOE_factory.Make( dom_dim, dom_dim, amb_dim, q, p );
-    
+
     const auto & tpo = *tpo_ptr;
-    
+
     tic("Compute tangent-point energy between mesh and obstacle");
     en = tpo.Value(M);
     toc("Compute tangent-point energy between mesh and obstacle");
@@ -217,31 +217,31 @@ int main(int argc, const char * argv[])
 
     print("");
     print("");
-    
-    
+
+
     TangentPointEnergy0_Factory<Mesh_T,2,2,3,3> TPE0_factory;
     TangentPointMetric0_Factory<Mesh_T,2,2,3,3> TPM0_factory;
     PseudoLaplacian_Factory    <Mesh_T,2,2,3,3> Prec_factory;
-    
+
     const REAL s = (p - 2)/q;
-    
+
     dump(s);
     dump(2-s);
-    
+
     std::unique_ptr<Energy_T> tpe0_ptr = TPE0_factory.Make( dom_dim, amb_dim, q, p );
     std::unique_ptr<Metric_T> tpm0_ptr = TPM0_factory.Make( dom_dim, amb_dim, q, p );
     std::unique_ptr<Metric_T> prec_ptr = Prec_factory.Make( dom_dim, amb_dim, 2-s  );
-    
+
     const auto & tpe0 = *tpe0_ptr;
     const auto & tpm0 = *tpm0_ptr;
     const auto & prec = *prec_ptr;
-    
+
     dump(tpe0.Value(M));
-    
+
     tic("tpm0.MetricValues(M)");
     tpm0.MetricValues(M);
     toc("tpm0.MetricValues(M)");
-    
+
     tic("tpm0.MultiplyMetric");
     tpm0.MultiplyMetric(M, alpha, X, beta, Y);
     toc("tpm0.MultiplyMetric");
@@ -249,14 +249,14 @@ int main(int argc, const char * argv[])
     tic("tpm0.MultiplyMetric");
     tpm0.MultiplyMetric(M, alpha, X, beta, Y);
     toc("tpm0.MultiplyMetric");
-    
+
     dump(X.MaxNorm());
     dump(Y.MaxNorm());
-    
+
     tic("prec.MetricValues(M)");
     prec.MetricValues(M);
     toc("prec.MetricValues(M)");
-    
+
     tic("prec.MultiplyMetric");
     prec.MultiplyMetric(M, alpha, X, beta, Y);
     toc("prec.MultiplyMetric");
@@ -264,27 +264,21 @@ int main(int argc, const char * argv[])
     tic("prec.MultiplyMetric");
     prec.MultiplyMetric(M, alpha, X, beta, Y);
     toc("prec.MultiplyMetric");
-    
+
     dump(X.MaxNorm());
     dump(Y.MaxNorm());
-    
+
     print("");
     print("Testing remesher.");
-    
+
     std::unique_ptr<Mesh_T::Remesher_T> R = M_ptr->CreateRemesher();
-    
-    
-    Tensor1<INT,INT> edges (3);
-    edges[0]=1;
-    edges[1]=2;
-    edges[2]=3;
-    
-    R->LoadMesh(M);
-    
-    R->CollapseEdges(edges.data(), edges.Size());
-   
-    R->SplitEdges(   edges.data(), edges.Size());
-    
+
+    std::vector<INT> edges {1,2,3};
+
+    R->CollapseEdges( edges );
+
+    R->SplitEdges( edges );
+
 //    R->UnifyEdgeLengths(<#const Real collapse_threshold#>, <#const Real split_threshold#>)
 
     return 0;

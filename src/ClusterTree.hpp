@@ -17,80 +17,81 @@ namespace Repulsor
         
         static constexpr Int AMB_DIM = AMB_DIM_;
         
+        using Base_T            = ClusterTreeBase<Real,Int,SReal,ExtReal>;
+        
         using       Primitive_T =       PolytopeBase<AMB_DIM,GJK_Real,Int,SReal>;
         using MovingPrimitive_T = MovingPolytopeBase<AMB_DIM,GJK_Real,Int,SReal>;
         
         using BoundingVolume_T  = AABB<AMB_DIM,GJK_Real,Int,SReal>;
         
-        using ClusterTreeBase_T = ClusterTreeBase<Real,Int,SReal,ExtReal>;
         
-        using DataContainer_T   = typename ClusterTreeBase_T::DataContainer_T;
-        using BufferContainer_T = typename ClusterTreeBase_T::BufferContainer_T;
+        using DataContainer_T   = typename Base_T::DataContainer_T;
+        using BufferContainer_T = typename Base_T::BufferContainer_T;
         
         // In principle, ThreadTensor3<Real,Int> should have better scaling on multiple socket machines, because I tried to encourages that the thread-local arrays are allocated on local RAM. -- On my tiny Quad Core however, it performs a bit _WORSE_ than Tensor3<Real,Int>.
-        using DerivativeContainer_T = typename ClusterTreeBase_T::DerivativeContainer_T;
+        using DerivativeContainer_T = typename Base_T::DerivativeContainer_T;
         
     public:
         
-        using ClusterTreeBase_T::SplitThreshold;
-        using ClusterTreeBase_T::ThreadCount;
-        using ClusterTreeBase_T::PrimitiveCount;
-        using ClusterTreeBase_T::ClusterCount;
-        using ClusterTreeBase_T::LeafClusterCount;
-        //        using ClusterTreeBase_T::RequireClusterMoments;
+        using Base_T::SplitThreshold;
+        using Base_T::ThreadCount;
+        using Base_T::PrimitiveCount;
+        using Base_T::ClusterCount;
+        using Base_T::LeafClusterCount;
+        //        using Base_T::RequireClusterMoments;
         
     protected:
         
-        using ClusterTreeBase_T::P_ordering;
-        using ClusterTreeBase_T::P_inverse_ordering;
-        using ClusterTreeBase_T::P_score_buffer;
-        using ClusterTreeBase_T::P_perm_buffer;
-        using ClusterTreeBase_T::P_serialized;
-        using ClusterTreeBase_T::P_updated_serialized;
-        using ClusterTreeBase_T::P_velocities_serialized;
-        using ClusterTreeBase_T::P_near;
-        using ClusterTreeBase_T::P_D_near;
-        using ClusterTreeBase_T::P_far;
-        using ClusterTreeBase_T::P_D_far;
-        using ClusterTreeBase_T::thread_P_D_near;
-        using ClusterTreeBase_T::P_moments;
-        using ClusterTreeBase_T::P_in;
-        using ClusterTreeBase_T::P_out;
+        using Base_T::P_ordering;
+        using Base_T::P_inverse_ordering;
+        using Base_T::P_score_buffer;
+        using Base_T::P_perm_buffer;
+        using Base_T::P_serialized;
+        using Base_T::P_updated_serialized;
+        using Base_T::P_velocities_serialized;
+        using Base_T::P_near;
+        using Base_T::P_D_near;
+        using Base_T::P_far;
+        using Base_T::P_D_far;
+        using Base_T::thread_P_D_near;
+        using Base_T::P_moments;
+        using Base_T::P_in;
+        using Base_T::P_out;
         
-        using ClusterTreeBase_T::C_begin;
-        using ClusterTreeBase_T::C_end;
-        using ClusterTreeBase_T::C_depth;
-        using ClusterTreeBase_T::C_right;
-        using ClusterTreeBase_T::C_left;
-        using ClusterTreeBase_T::C_next;
-        using ClusterTreeBase_T::C_serialized;
-        using ClusterTreeBase_T::C_updated_serialized;
-        using ClusterTreeBase_T::C_thread_serialized;
-        using ClusterTreeBase_T::C_far;
-        using ClusterTreeBase_T::thread_C_D_far;
-        using ClusterTreeBase_T::C_moments;
-        using ClusterTreeBase_T::C_in;
-        using ClusterTreeBase_T::C_out;
+        using Base_T::C_begin;
+        using Base_T::C_end;
+        using Base_T::C_depth;
+        using Base_T::C_right;
+        using Base_T::C_left;
+        using Base_T::C_next;
+        using Base_T::C_serialized;
+        using Base_T::C_updated_serialized;
+        using Base_T::C_thread_serialized;
+        using Base_T::C_far;
+        using Base_T::thread_C_D_far;
+        using Base_T::C_moments;
+        using Base_T::C_in;
+        using Base_T::C_out;
         
-        using ClusterTreeBase_T::leaf_clusters;
-        using ClusterTreeBase_T::leaf_cluster_ptr;
-        using ClusterTreeBase_T::leaf_cluster_lookup;
-        using ClusterTreeBase_T::thread_cluster_counter;
+        using Base_T::leaf_clusters;
+        using Base_T::leaf_cluster_ptr;
+        using Base_T::leaf_cluster_lookup;
+        using Base_T::thread_cluster_counter;
         
-        using ClusterTreeBase_T::depth;
-        using ClusterTreeBase_T::settings;
+        using Base_T::depth;
+        using Base_T::settings;
         
-        //        using ClusterTreeBase_T::stack_array;
-        //        using ClusterTreeBase_T::queue_array;
+        //        using Base_T::stack_array;
+        //        using Base_T::queue_array;
         
-        using ClusterTreeBase_T::C_to_P;
-        using ClusterTreeBase_T::P_to_C;
-        using ClusterTreeBase_T::hi_pre;
-        using ClusterTreeBase_T::lo_pre;
-        using ClusterTreeBase_T::mixed_pre;
-        using ClusterTreeBase_T::hi_post;
-        using ClusterTreeBase_T::lo_post;
-        using ClusterTreeBase_T::mixed_post;
+        using Base_T::C_to_P;
+        using Base_T::P_to_C;
+        using Base_T::hi_pre;
+        using Base_T::lo_pre;
+        using Base_T::mixed_pre;
+        using Base_T::hi_post;
+        using Base_T::lo_post;
+        using Base_T::mixed_post;
         
     public:
         
@@ -115,7 +116,7 @@ namespace Repulsor
               const Sparse::MatrixCSR<Real,Int,Int> & AvOp,
               const ClusterTreeSettings & settings_ = ClusterTreeSettings()
               )
-        :   ClusterTreeBase_T( settings_ )
+        :   Base_T( settings_ )
         ,   P_proto      ( ThreadCount() )
         ,   C_proto      ( ThreadCount() )
         ,   P_moving     ( ThreadCount() )
@@ -171,24 +172,37 @@ namespace Repulsor
         
         virtual ~ClusterTree() override = default;
         
+        ClusterTree(const ClusterTree & rhs) = default;
+        
+        ClusterTree( ClusterTree && rhs) = default;
+        
+        const ClusterTree & operator=( const ClusterTree & rhs)
+        {
+            return ClusterTree ( rhs );
+        };
+        
+        const ClusterTree & operator=( ClusterTree && rhs)
+        {
+            return ClusterTree ( std::move(rhs) );
+        };
         
     protected:
         
         
         // Each thread gets its own primitive prototype to avoid sharing conflicts.
-        std::vector<std::unique_ptr<Primitive_T>> P_proto;
+        std::vector<std::shared_ptr<Primitive_T>> P_proto;
         // False sharing prevented by alignment of PrimitiveBase.
         
         // Each thread gets its own bounding volume prototype to avoid sharing conflicts.
-        std::vector<std::unique_ptr<BoundingVolume_T>> C_proto;
-        std::vector<std::unique_ptr<BoundingVolume_T>> C_proto_updated;
+        std::vector<std::shared_ptr<BoundingVolume_T>> C_proto;
+        std::vector<std::shared_ptr<BoundingVolume_T>> C_proto_updated;
         // False sharing prevented by alignment of PrimitiveBase.
         
-        mutable std::vector<std::unique_ptr<MovingPrimitive_T>> P_moving;
+        mutable std::vector<std::shared_ptr<MovingPrimitive_T>> P_moving;
         
     public:
         
-        //        mutable std::vector<std::unique_ptr<MultipoleMomentsBase<Real,Int>>> M_ker;
+        //        mutable std::vector<std::shared_ptr<MultipoleMomentsBase<Real,Int>>> M_ker;
         //        mutable Int moment_degree = 0;
         
         
@@ -529,7 +543,7 @@ namespace Repulsor
             ptoc(className()+"::AllocateNearFarData");
         }
         
-        void ComputePrimitiveData( ptr<Real> P_near_, ptr<Real> P_far_ )
+        void ComputePrimitiveData( ptr<Real> P_near_, ptr<Real> P_far_ ) const
         {
             ptic(className()+"::ComputePrimitiveData");
             
@@ -556,7 +570,7 @@ namespace Repulsor
         } //ComputePrimitiveData
 
         
-        void ComputeClusterData()
+        void ComputeClusterData() const
         {
             ptic(className()+"::ComputeClusterData");
             
@@ -572,7 +586,7 @@ namespace Repulsor
         }; //ComputeClusterData
 
 
-        void computeClusterData( const Int C, const Int free_thread_count ) // helper function for ComputeClusterData
+        void computeClusterData( const Int C, const Int free_thread_count ) const // helper function for ComputeClusterData
         {
             const Int far_dim = FarDim();
             const Int L = C_left [C];
@@ -688,16 +702,16 @@ namespace Repulsor
 //                    }
 //                }
 //
-//                std::unique_ptr<MultipoleMomentsBase<Real,Int>> M (ptr);
+//                std::shared_ptr<MultipoleMomentsBase<Real,Int>> M (ptr);
 //
 //                C_moments = DataContainer_T ( ClusterCount(), M->MomentCount(), static_cast<Real>(0) );
 //
-//                M_ker = std::vector<std::unique_ptr<MultipoleMomentsBase<Real,Int>>>(  ThreadCount() );
+//                M_ker = std::vector<std::shared_ptr<MultipoleMomentsBase<Real,Int>>>(  ThreadCount() );
 //
 //                #pragma omp parallel for num_threads( ThreadCount() )
 //                for( Int thread = 0; thread < ThreadCount(); ++thread )
 //                {
-//                    M_ker[thread] = std::unique_ptr<MultipoleMomentsBase<Real,Int>>( static_cast<MultipoleMomentsBase<Real,Int> *>(M->Clone().release()) );
+//                    M_ker[thread] = std::shared_ptr<MultipoleMomentsBase<Real,Int>>( static_cast<MultipoleMomentsBase<Real,Int> *>(M->Clone().release()) );
 //                }
 //
 ////                 using the already serialized cluster tree
@@ -1031,7 +1045,7 @@ namespace Repulsor
         // All data related to clustering or multipole acceptance criteria remain are unchanged, as well
         // as the preprocessor and postprocessor matrices (that are needed for matrix-vector multiplies of the BCT.)
         
-        void SemiStaticUpdate( const Tensor2<Real,Int> & P_near_, const Tensor2<Real,Int> & P_far_ ) override
+        void SemiStaticUpdate( const Tensor2<Real,Int> & P_near_, const Tensor2<Real,Int> & P_far_ ) const override
         {
             if( P_near_.Dimension(0) != PrimitiveCount() )
             {
@@ -1055,10 +1069,12 @@ namespace Repulsor
                 eprint(className()+"::SemiStaticUpdate: P_far_.Dimension(1) "+ToString(P_far_.Dimension(1))+" != "+ToString(FarDim())+" = FarDim(). Skipping update.");
                 return;
             }
+            
             SemiStaticUpdate( P_near_.data(), P_far_.data() );
+            
         } // SemiStaticUpdate
         
-        void SemiStaticUpdate( ptr<Real> P_near_, ptr<Real> P_far_ ) override
+        void SemiStaticUpdate( ptr<Real> P_near_, ptr<Real> P_far_ ) const override
         {
             // Updates only the computational data like primitive/cluster areas, centers of mass and normals. All data related to clustering or multipole acceptance criteria remain are unchanged.
             
@@ -1235,7 +1251,6 @@ namespace Repulsor
             
             const Int far_dim         = FarDim();
             const Int primitive_count = PrimitiveCount();
-            const Int thread_count    = ThreadCount();
             
             this->RequireBuffers(far_dim);
             
@@ -1252,7 +1267,7 @@ namespace Repulsor
             // Finally, permute data for the outside world.
             if( addto )
             {
-                #pragma omp parallel for num_threads( thread_count ) schedule( static )
+                #pragma omp parallel for num_threads( ThreadCount() ) schedule( static )
                 for( Int i = 0; i < primitive_count; ++i )
                 {
                     add_to_buffer( &from[far_dim * inv_ord[i]], &to[far_dim * i], far_dim );
@@ -1260,7 +1275,7 @@ namespace Repulsor
             }
             else
             {
-                #pragma omp parallel for num_threads( thread_count ) schedule( static )
+                #pragma omp parallel for num_threads( ThreadCount() ) schedule( static )
                 for( Int i = 0; i < primitive_count; ++i )
                 {
                     copy_buffer( &from[far_dim * inv_ord[i]], &to[far_dim * i], far_dim );

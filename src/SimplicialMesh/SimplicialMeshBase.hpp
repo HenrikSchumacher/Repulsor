@@ -2,11 +2,11 @@
 
 namespace Repulsor
 {
-    template<typename Real_, typename Int_, typename SReal_, typename ExtReal_>
+    template<typename Real_, typename Int_>
     class SimplicialRemesherBase;
     
     template<typename Real_, typename Int_, typename SReal_, typename ExtReal_>
-    class SimplicialMeshBase
+    class SimplicialMeshBase : public CachedObject
     {
         
         ASSERT_FLOAT(Real_);
@@ -26,7 +26,7 @@ namespace Repulsor
         using CollisionTree_T            =      CollisionTreeBase<Real,Int,SReal,ExtReal,true>;
         using ObstacleBlockClusterTree_T =   BlockClusterTreeBase<Real,Int,SReal,ExtReal,false>;
         using ObstacleCollisionTree_T    =      CollisionTreeBase<Real,Int,SReal,ExtReal,false>;
-        using Remesher_T                 = SimplicialRemesherBase<Real,Int,SReal,ExtReal>;
+        using Remesher_T                 = SimplicialRemesherBase<Real,Int>;
         
         using TangentVector_T            = Tensor2<ExtReal,Int>;
         using CotangentVector_T          = Tensor2<ExtReal,Int>;
@@ -46,9 +46,6 @@ namespace Repulsor
     protected:
         
         const Int thread_count = 1;
-        
-        mutable std::unordered_map<std::string,std::any> cache;
-        mutable std::unordered_map<std::string,std::any> persistent_cache;
             
     public:
         
@@ -77,7 +74,7 @@ namespace Repulsor
             return thread_count;
         }
         
-        virtual void SemiStaticUpdate( ptr<ExtReal> V_coords_, const bool transp_ = false ) = 0;
+        virtual void SemiStaticUpdate( ptr<ExtReal> V_coords_, const bool transp_ = false ) const = 0;
         
         virtual const ClusterTree_T & GetClusterTree() const = 0;
         
@@ -105,7 +102,7 @@ namespace Repulsor
             bool addTo = false
         ) const = 0;
         
-        virtual void LoadUpdateVectors( ptr<ExtReal> vecs, const ExtReal max_time, const bool transp_ = false ) = 0;
+        virtual void LoadUpdateVectors( ptr<ExtReal> vecs, const ExtReal max_time, const bool transp_ = false ) const = 0;
 
         virtual ExtReal MaximumSafeStepSize(
             ptr<ExtReal> vecs,
@@ -122,11 +119,11 @@ namespace Repulsor
         
     public:
         
-        virtual void  LoadObstacle( std::unique_ptr<SimplicialMeshBase> obstacle_ ) = 0;
+        virtual void  LoadObstacle( std::unique_ptr<SimplicialMeshBase> obstacle ) = 0;
 
         virtual const SimplicialMeshBase & GetObstacle() const = 0;
         
-        virtual bool  ObstacleInitialized() const = 0;
+//        virtual bool  ObstacleInitialized() const = 0;
         
         virtual const ClusterTree_T & GetObstacleClusterTree() const = 0;
         
@@ -156,70 +153,6 @@ namespace Repulsor
 //##############################################################################################
         
     public:
-        
-        bool IsCached( const std::string & s ) const
-        {
-            // For some reason gcc-12 does not allow me to return static_cast<bool>( cache.count(s) ) directly.
-            
-            bool result = false;
-            
-            #pragma omp critical (cache)
-            {
-                result = static_cast<bool>( cache.count(s) );
-            }
-            
-            return result;
-        }
-        
-        std::any & GetCache( const std::string & s ) const
-        {
-            // For some reason gcc-12 does not allow me to return cache.at(s) directly. =/
-            // Maybe because that might throw an exception.
-            
-            std::any * thing;
-            
-            #pragma omp critical (cache)
-            {
-                try
-                {
-                    thing = &cache.at(s);
-                }
-                catch( const std::out_of_range & e )
-                {
-                    eprint(ClassName()+"GetCache: Key \""+s+"\" not found!.");
-                    throw; //an internal catch block forwards the exception to its external level
-                }
-            }
-            
-            return *thing;
-        }
-        
-        // Caution! This function is destructive.
-        void SetCache( const std::string & s, std::any & thing ) const
-        {
-            #pragma omp critical (cache)
-            {
-                cache[s] = std::move(thing);
-            }
-        }
-        
-        std::string CacheKeys() const
-        {
-            std::stringstream s;
-            
-            s << "{ \n";
-            for( auto const & p : cache )
-            {
-                s << "\t" << p.first << "\n";
-            }
-            s << "}";
-            return s.str();
-        }
-        
-        void ClearCache() const
-        {
-            cache = std::unordered_map<std::string,std::any>();
-        }
         
         virtual std::string ClassName() const
         {
