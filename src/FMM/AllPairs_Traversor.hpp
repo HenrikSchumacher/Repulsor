@@ -82,19 +82,18 @@ namespace Repulsor
             
             kernel.Allocate( m * n );
 
-            Real global_sum = static_cast<Real>(0);
+            Real global_sum = Scalar::Zero<Real>;
 
             if( thread_count > 1 )
             {
-                #pragma omp parallel for num_threads( thread_count ) reduction( + : global_sum )
+                #pragma omp parallel for num_threads( thread_count )
                 for( Int thread = 0; thread < thread_count; ++thread )
                 {
                     // Initialize local kernel and feed it all the information that is going to be constant along its life time.
                     
                     Kernel_T ker ( kernel );
 
-                    
-                    Real local_sum = static_cast<Real>(0);
+                    Real local_sum = Scalar::Zero<Real>;
                     
                     // Kernel is supposed the following rows of pattern:
                     const Int i_begin = job_ptr[thread  ];
@@ -130,7 +129,10 @@ namespace Repulsor
                         
                     }
                     
-                    global_sum += local_sum;
+                    #pragma critical (AllPairs_Traversor::Compute)
+                    {
+                        global_sum += local_sum;
+                    }
                 }
             }
             else

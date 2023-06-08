@@ -254,9 +254,9 @@ namespace Repulsor
             
             P_perm_buffer = Tensor1<Int,Int>( PrimitiveCount() );
             
-#pragma omp parallel num_threads( ThreadCount() ) shared( root )
+            #pragma omp parallel num_threads( ThreadCount() ) shared( root )
             {
-#pragma omp single nowait
+                #pragma omp single nowait
                 {
                     split( root, ThreadCount() );
                 }
@@ -315,15 +315,15 @@ namespace Repulsor
                 C->right = new Cluster<Int> ( thread, right_ID, split_index, end,         C->depth+1 );
                 
                 // ... and split them in parallel
-#pragma omp task final(free_thread_count<1)
+                #pragma omp task final(free_thread_count<1)
                 {
                     split( C->left, free_thread_count/2 );
                 }
-#pragma omp task final(free_thread_count<1)
+                #pragma omp task final(free_thread_count<1)
                 {
                     split( C->right, free_thread_count - free_thread_count/2 );
                 }
-#pragma omp taskwait
+                #pragma omp taskwait
                 
                 // collecting statistics for the later serialization
                 // counting ourselves as descendant, too!

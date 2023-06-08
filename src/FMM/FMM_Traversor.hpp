@@ -90,7 +90,7 @@ namespace Repulsor
                     
                     ptr<LInt> diag = COND(is_symmetric, pattern.Diag().data(), nullptr);
                     ptr<LInt> rp   = pattern.Outer().data();
-                    ptr<Int>  ci = pattern.Inner().data();
+                    ptr<Int>  ci   = pattern.Inner().data();
                     
                     // Kernel is supposed the following rows of pattern:
                     const Int i_begin = job_ptr[thread  ];
