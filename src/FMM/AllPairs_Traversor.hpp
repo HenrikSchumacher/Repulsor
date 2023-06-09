@@ -129,7 +129,7 @@ namespace Repulsor
                         
                     }
                     
-                    #pragma critical (AllPairs_Traversor::Compute)
+                    #pragma omp critical (AllPairs_Traversor::Compute)
                     {
                         global_sum += local_sum;
                     }
