@@ -134,13 +134,15 @@ namespace Repulsor
                 P_ordering = iota<Int,Int>( P_serialized.Dimension(0) );
             }
             
-            #pragma omp parallel for num_threads( ThreadCount() )
-            for( Int thread = 0; thread < ThreadCount(); ++thread )
-            {
-                P_proto[thread] = P_proto_.Clone();
-                
-                C_proto[thread] = C_proto_.Clone();
-            }
+            ParallelDo(
+                [&,this]( const Int thread )
+                {
+                    P_proto[thread] = P_proto_.Clone();
+                    
+                    C_proto[thread] = C_proto_.Clone();
+                },
+                ThreadCount()
+            );
             
             this->ComputeClusters();
             
@@ -427,8 +429,7 @@ namespace Repulsor
             leaf_cluster_ptr = Tensor1<Int,Int> ( LeafClusterCount() + 1 );
             leaf_cluster_ptr[0] = 0;
             
-            // This loop is probably too short to be parallelized.
-            //            #pragma omp parallel for num_threads( ThreadCount() )
+            // TODO: Parallelize? This loop is probably too short to be parallelized.
             for( Int i = 0; i < LeafClusterCount(); ++i )
             {
                 leaf_cluster_ptr[ i + 1 ] = C_end[leaf_clusters[i]];
@@ -547,24 +548,21 @@ namespace Repulsor
         {
             ptic(className()+"::ComputePrimitiveData");
             
-            const Int primitive_count = PrimitiveCount();
             const Int near_dim = NearDim();
             const Int  far_dim =  FarDim();
 
-            ptr<Int> ord = P_ordering.data();
-            
-            mut<Real> P_near__ = P_near.data();
-            mut<Real> P_far__  = P_far.data();
-            
-            #pragma omp parallel for num_threads( ThreadCount() ) shared( P_near__, P_far__, P_near_, P_far_, ord ) schedule( static )
-            for( Int i = 0; i < primitive_count; ++i )
-            {
-                const Int j = ord[i];
+            ParallelDo(
+                [=]( const Int i )
+                {
+                    const Int j = P_ordering[i];
 
-                copy_buffer( &P_near_[near_dim * j], &P_near__[near_dim * i], near_dim );
+                    copy_buffer( &P_near_[near_dim * j], P_near.data(i), near_dim );
 
-                copy_buffer( &P_far_  [far_dim * j], &P_far__  [far_dim * i], far_dim  );
-            }
+                    copy_buffer( &P_far_ [ far_dim * j],  P_far.data(i), far_dim  );
+                },
+                PrimitiveCount(),
+                ThreadCount()
+            );
             
             ptoc(className()+"::ComputePrimitiveData");
         } //ComputePrimitiveData
@@ -708,7 +706,7 @@ namespace Repulsor
 //
 //                M_ker = std::vector<std::shared_ptr<MultipoleMomentsBase<Real,Int>>>(  ThreadCount() );
 //
-//                #pragma omp parallel for num_threads( ThreadCount() )
+//                // TODO: Parallelize over ThreadCount() threads.
 //                for( Int thread = 0; thread < ThreadCount(); ++thread )
 //                {
 //                    M_ker[thread] = std::shared_ptr<MultipoleMomentsBase<Real,Int>>( static_cast<MultipoleMomentsBase<Real,Int> *>(M->Clone().release()) );
@@ -785,21 +783,21 @@ namespace Repulsor
             {
                 mut<Int> inner__ = C_to_P.Inner().data();
                 
-                const Int leaf_cluster_count = LeafClusterCount();
-                
-                #pragma omp parallel for num_threads( ThreadCount() ) schedule( static )
-                for( Int i = 0; i < leaf_cluster_count; ++i )
-                {
-                    Int leaf  = leaf_clusters[i];
-                    Int begin = C_begin[leaf];
-                    Int end   = C_end  [leaf];
-//                    #pragma omp simd aligned ( inner__ : ALIGNMENT )
-                    for( Int k = begin; k < end; ++k )
+                ParallelDo(
+                    [=]( const Int i )
                     {
-                        inner__[k] = leaf;
-                    }
-                }
-                
+                        const Int leaf  = leaf_clusters[i];
+                        const Int begin = C_begin[leaf];
+                        const Int end   = C_end  [leaf];
+
+                        for( Int k = begin; k < end; ++k )
+                        {
+                            inner__[k] = leaf;
+                        }
+                    },
+                    LeafClusterCount(),
+                    ThreadCount()
+                );
             }
             
             {
@@ -871,19 +869,22 @@ namespace Repulsor
                     const Int near_dim = NearDim();
                     const Int size = DiffOp.NonzeroCount() / primitive_count;
                     
-                    #pragma omp parallel for num_threads( ThreadCount() ) schedule( static )
-                    for( Int i = 0; i < primitive_count; ++i )
-                    {
-                        const Int from = size * ord[i];
-                        const Int to   = size * i;
-                        const Real a   = near[ near_dim * i ];
-
-                        for( Int k = 0; k < size; ++k )
+                    ParallelDo(
+                        [=]( const Int i )
                         {
-                            i_output[to+k] =     i_input[from+k];
-                            r_output[to+k] = a * r_input[from+k];
-                        }
-                    }
+                            const Int from = size * ord[i];
+                            const Int to   = size * i;
+                            const Real a   = near[ near_dim * i ];
+
+                            for( Int k = 0; k < size; ++k )
+                            {
+                                i_output[to+k] =     i_input[from+k];
+                                r_output[to+k] = a * r_input[from+k];
+                            }
+                        },
+                        PrimitiveCount(),
+                        ThreadCount()
+                    );
                 }
                 ptoc("hi_pre");
                 
@@ -915,19 +916,22 @@ namespace Repulsor
                     const Int near_dim = NearDim();
                     const Int size = AvOp.NonzeroCount() / primitive_count;
                     
-                    #pragma omp parallel for num_threads( ThreadCount() ) schedule( static )
-                    for( Int i = 0; i < primitive_count; ++i )
-                    {
-                        const Int from = size * ord[i];
-                        const Int to   = size * i;
-                        const Real a   = near[ near_dim * i ];
-//                        #pragma omp simd aligned( i_input, i_output, r_input, r_output : ALIGNMENT )
-                        for( Int k = 0; k < size; ++k )
+                    ParallelDo(
+                        [=]( const Int i )
                         {
-                            i_output[to+k] =     i_input[from+k];
-                            r_output[to+k] = a * r_input[from+k];
-                        }
-                    }
+                            const Int from = size * ord[i];
+                            const Int to   = size * i;
+                            const Real a   = near[ near_dim * i ];
+    //
+                            for( Int k = 0; k < size; ++k )
+                            {
+                                i_output[to+k] =     i_input[from+k];
+                                r_output[to+k] = a * r_input[from+k];
+                            }
+                        },
+                        PrimitiveCount(),
+                        ThreadCount()
+                    );
                 }
                 ptoc("lo_pre");
                 
@@ -1112,15 +1116,13 @@ namespace Repulsor
             mut<SReal> C_up_ser = C_updated_serialized.data();
             
             ptic(className()+"::TakeUpdateVectors - Compute the primitives updated with max_time.");
-            // TODO: Potentially wastful code.
-            {
-                const JobPointers<Int> job_ptr (PrimitiveCount(), ThreadCount() );
             
-                #pragma omp parallel for num_threads( ThreadCount() )
-                for( Int thread = 0; thread < ThreadCount(); ++thread )
+            // TODO: Potentially wasteful code.
+            ParallelDo(
+                [=,&P_moving_]( const Int thread )
                 {
-                    const Int i_begin = job_ptr[thread  ];
-                    const Int i_end   = job_ptr[thread+1];
+                    const Int i_begin = JobPointer<Int>(PrimitiveCount(), ThreadCount(), thread     );
+                    const Int i_end   = JobPointer<Int>(PrimitiveCount(), ThreadCount(), thread + 1 );
                     
                     P_moving[thread] = P_moving_.Clone();
                     MovingPrimitive_T & P_mov = *P_moving[thread];
@@ -1131,32 +1133,34 @@ namespace Repulsor
                         P_mov.ReadVelocitiesSerialized  ( P_v_ser           , i );
                         P_mov.WriteDeformedSerialized   ( P_up_ser, max_time, i );
                     }
-                }
-            }
+                },
+                ThreadCount()
+            );
+            
             ptoc(className()+"::TakeUpdateVectors - Compute the primitives updated with max_time.");
             
             ptic(className()+"::TakeUpdateVectors - Compute the AABBs of the updated leaf clusters.");
-            {
-                const JobPointers<Int> job_ptr (LeafClusterCount(), ThreadCount() );
-                
-                #pragma omp parallel for num_threads(ThreadCount() )
-                for( Int thread = 0; thread <ThreadCount(); ++thread )
+            
+            ParallelDo(
+                [=]( const Int thread )
                 {
-                    const Int i_begin = job_ptr[thread  ];
-                    const Int i_end   = job_ptr[thread+1];
+                    const Int i_begin = JobPointer<Int>(LeafClusterCount(), ThreadCount(), thread     );
+                    const Int i_end   = JobPointer<Int>(LeafClusterCount(), ThreadCount(), thread + 1 );
                     
                          Primitive_T & P_   = *P_proto[thread];
                     BoundingVolume_T & C_bv = *C_proto[thread];
-                                        
+                                       
                     for( Int i = i_begin; i < i_end; ++i )
                     {
-                        const Int C = leaf_clusters[i];
-                        
-                        C_bv.SetPointer( C_up_ser, C );
-                        C_bv.FromPrimitives( P_, P_up_ser, C_begin[C], C_end[C], 1 );
+                       const Int C = leaf_clusters[i];
+                       
+                       C_bv.SetPointer( C_up_ser, C );
+                       C_bv.FromPrimitives( P_, P_up_ser, C_begin[C], C_end[C], 1 );
                     }
-                }
-            }
+                },
+                ThreadCount()
+            );
+            
             ptoc(className()+"::TakeUpdateVectors - Compute the AABBs of the updated leaf clusters.");
             
             ptic(className()+"::TakeUpdateVectors - Upward pass for AABBs.");
@@ -1169,7 +1173,7 @@ namespace Repulsor
 
                 BoundingVolume_T & C_bv = *C_proto[0];
 
-                while( 0<=stack_ptr && stack_ptr < 126 )
+                while( (0 <= stack_ptr) && (stack_ptr < 126) )
                 {
                     const Int C = stack_array[stack_ptr];
                     const Int L = C_left [C];
@@ -1210,7 +1214,6 @@ namespace Repulsor
             ptic(className()+"::CollectNearFieldDerivatives");
             
             const Int near_dim = NearDim();
-            const Int primitive_count = PrimitiveCount();
             
             mut<Real> to      = P_D_near.data();
             ptr<Int>  inv_ord = P_inverse_ordering.data();
@@ -1222,19 +1225,25 @@ namespace Repulsor
 
                 if( thread == 0 && !addto )
                 {
-                    #pragma omp parallel for num_threads( ThreadCount() ) schedule( static )
-                    for( Int i = 0; i < primitive_count; ++i )
-                    {
-                        copy_buffer( &from[near_dim * inv_ord[i]], &to[near_dim * i], near_dim );
-                    }
+                    ParallelDo(
+                        [=]( const Int i )
+                        {
+                            copy_buffer( &from[near_dim * inv_ord[i]], &to[near_dim * i], near_dim );
+                        },
+                        PrimitiveCount(),
+                        ThreadCount()
+                    );
                 }
                 else
                 {
-                    #pragma omp parallel for num_threads( ThreadCount() ) schedule( static )
-                    for( Int i = 0; i < primitive_count; ++i )
-                    {
-                        add_to_buffer( &from[near_dim * inv_ord[i]], &to[near_dim * i], near_dim );
-                    }
+                    ParallelDo(
+                        [=]( const Int i )
+                        {
+                            add_to_buffer( &from[near_dim * inv_ord[i]], &to[near_dim * i], near_dim );
+                        },
+                        PrimitiveCount(),
+                        ThreadCount()
+                    );
                 }
             }
             
@@ -1250,7 +1259,6 @@ namespace Repulsor
             ptic(className()+"::CollectFarFieldDerivatives");
             
             const Int far_dim         = FarDim();
-            const Int primitive_count = PrimitiveCount();
             
             this->RequireBuffers(far_dim);
             
@@ -1267,19 +1275,25 @@ namespace Repulsor
             // Finally, permute data for the outside world.
             if( addto )
             {
-                #pragma omp parallel for num_threads( ThreadCount() ) schedule( static )
-                for( Int i = 0; i < primitive_count; ++i )
-                {
-                    add_to_buffer( &from[far_dim * inv_ord[i]], &to[far_dim * i], far_dim );
-                }
+                ParallelDo(
+                    [=]( const Int i )
+                    {
+                        add_to_buffer( &from[far_dim * inv_ord[i]], &to[far_dim * i], far_dim );
+                    },
+                    PrimitiveCount(),
+                    ThreadCount()
+                );
             }
             else
             {
-                #pragma omp parallel for num_threads( ThreadCount() ) schedule( static )
-                for( Int i = 0; i < primitive_count; ++i )
-                {
-                    copy_buffer( &from[far_dim * inv_ord[i]], &to[far_dim * i], far_dim );
-                }
+                ParallelDo(
+                    [=]( const Int i )
+                    {
+                        copy_buffer( &from[far_dim * inv_ord[i]], &to[far_dim * i], far_dim );
+                    },
+                    PrimitiveCount(),
+                    ThreadCount()
+                );
             }
             
             ptoc(className()+"::CollectFarFieldDerivatives");

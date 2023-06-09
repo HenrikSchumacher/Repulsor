@@ -132,9 +132,9 @@ namespace Repulsor
             }
 
 //            // TODO: Here we actually want _dynamic_ / round Robin scheduling!
-
+//            // TODO: Why does this lead to segfault?
 //            ParallelDo(
-//                [&,this]( const Int thread )
+//                [this]( const Int thread )
 //                {
 //                    Kernel_T & K = kernels[thread];
 //
@@ -149,7 +149,7 @@ namespace Repulsor
 //                    }
 //                },
 //                static_cast<Int>(i_queue.size()),
-//                thread_count
+//                ThreadCount()
 //            );
             
             ptoc(className()+"::Traverse_Parallel");
