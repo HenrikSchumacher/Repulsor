@@ -75,12 +75,8 @@ namespace Repulsor
             
             const Int thread_count = job_ptr.ThreadCount();
             
-            Real global_sum = static_cast<Real>(0);
-             
-            if( thread_count > 1 )
-            {
-                #pragma omp parallel for num_threads( thread_count ) reduction( + : global_sum )
-                for( Int thread = 0; thread < thread_count; ++thread )
+            Real global_sum = ParallelDoReduce(
+                [=]( const Int thread )
                 {
                     // Initialize local kernel and feed it all the information that is going to be constant along its life time.
                     
@@ -147,90 +143,15 @@ namespace Repulsor
                     
                     const Time stop_time = Clock::now();
                     
-                    global_sum += local_sum;
-                    
-//                    #pragma omp critical (FMM_Traversor_Reduction)
-//                    {
-//                        valprint("d",thread);
-//                        kernel.Reduce( ker );
-//                        valprint("e",thread);
-//                    }
-                    
+                    // TODO: mutex needed?
                     ker.PrintReport( thread, Tools::Duration(start_time,stop_time) );
-                }
-            }
-            else
-            {
-                const Time start_time = Clock::now();
-                
-                for( Int thread = 0; thread < thread_count; ++thread )
-                {
-                    // Initialize local kernel and feed it all the information that is going to be constant along its life time.
                     
-                    Real local_sum (0);
-                    
-                    ptr<LInt> diag = COND(is_symmetric, pattern.Diag().data(), nullptr);
-                    ptr<LInt> rp   = pattern.Outer().data();
-                    ptr<Int>  ci   = pattern.Inner().data();
-                    
-                    // Kernel is supposed the following rows of pattern:
-                    const Int i_begin = job_ptr[thread  ];
-                    const Int i_end   = job_ptr[thread+1];
-                    
-                    for( Int i = i_begin; i < i_end; ++i )
-                    {
-                        // These are the corresponding nonzero blocks in i-th row.
-                        const LInt k_begin = COND( is_symmetric, diag[i], rp[i] );
-                        const LInt k_end   = rp[i+1];
-                        
-                        if( k_end > k_begin )
-                        {
-                            // Clear the local vector chunk of the kernel.
-                            kernel.LoadS(i);
-                            
-                            // Perform all but the last calculation in row with prefetch.
-                            for( LInt k = k_begin; k < k_end-1; ++k )
-                            {
-                                const Int j = ci[k];
-
-                                kernel.LoadT(j);
-
-                                kernel.Prefetch(ci[k+1]);
-
-                                local_sum += kernel.Compute(k);
-
-                                kernel.WriteT(j);
-                            }
-                            
-                            // Perform last calculation in row without prefetch.
-                            {
-                                const LInt k = k_end-1;
-                                
-                                const  Int j = ci[k];
-                                
-                                kernel.LoadT(j);
-                                
-                                local_sum += kernel.Compute(k);
-                                
-                                kernel.WriteT(j);
-                            }
-                            
-                            // Incorporate the kernel's local vector chunk into the i-th chunk if the output Y.
-                            
-                            kernel.WriteS(i);
-                        }
-                        
-                        // Incoporate the local vector chunk into the i-th chunk of the output.
-                        
-                    }
-                    
-                    global_sum += local_sum;
-                }
-                
-                const Time stop_time = Clock::now();
-                
-                kernel.PrintReport( 0, Tools::Duration(start_time,stop_time) );
-            }
+                    return local_sum; 
+                },
+                AddReducer<Real, Real>(),
+                Scalar::Zero<Real>,
+                thread_count
+            );
 
             ptoc(ClassName()+"::Compute");
 

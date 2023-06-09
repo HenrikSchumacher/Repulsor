@@ -127,20 +127,14 @@ namespace Repulsor
 
             // TODO: Here we actually want _dynamic_ / round Robin scheduling!
 
-//            ParallelDo(
-//                [this]( const Int thread, const Int k )
-//                {
-//                   Traverse_DepthFirst( thread, i_queue[k], j_queue[k] );
-//                },
-//                static_cast<Int>(i_queue.size()),
-//                thread_count
-//            );
-            
-            #pragma omp parallel for num_threads( thread_count ) schedule( dynamic )
-            for( Int k = 0; k < static_cast<Int>(i_queue.size()); ++k )
-            {
-                Traverse_DepthFirst( omp_get_thread_num(), i_queue[k], j_queue[k] );
-            }
+            ParallelDo(
+                [this]( const Int thread, const Int k )
+                {
+                   Traverse_DepthFirst( thread, i_queue[k], j_queue[k] );
+                },
+                static_cast<Int>(i_queue.size()),
+                thread_count
+            );
             
             ptoc(className()+"::Traverse_Parallel");
         }

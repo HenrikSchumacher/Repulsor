@@ -53,11 +53,14 @@ public:
         
         Int n_roots = static_cast<Int>(parallel_perc_roots.size());
         
-        #pragma omp parallel for num_threads( ThreadCount() )
-        for( Int i = 0; i < n_roots; ++i )
-        {
-            PercolateUp_DFS(parallel_perc_roots[i]);
-        }
+        ParallelDo(
+            [this]( const Int i )
+            {
+                PercolateUp_DFS(parallel_perc_roots[i]);
+            },
+            n_roots,
+            ThreadCount()
+        );
         
         PercolateUp_DFS( null, static_cast<Int>(settings.parallel_perc_depth) );
 
@@ -72,11 +75,14 @@ public:
         
         PercolateDown_DFS( null, static_cast<Int>(settings.parallel_perc_depth) );
         
-        #pragma omp parallel for num_threads( ThreadCount() )
-        for( Int i = 0; i < n_roots; ++i )
-        {
-            PercolateDown_DFS(parallel_perc_roots[i]);
-        }
+        ParallelDo(
+            [this]( const Int i )
+            {
+                PercolateDown_DFS(parallel_perc_roots[i]);
+            },
+            n_roots,
+            ThreadCount()
+        );
 
         ptoc(ClassName()+"::PercolateDown_Parallel");
         

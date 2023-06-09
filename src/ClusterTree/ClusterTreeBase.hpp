@@ -826,24 +826,25 @@ namespace Repulsor
                 ptr<Real> from = thread_C_D_far.data(thread);
                 mut<Real> to   = C_out.data();
                 
-                #pragma omp parallel for num_threads( thread_count ) schedule( static )
-                for( Int i = 0; i < cluster_count; ++i )
-                {
-                    to[i] += from[far_dim * i];
-                }
+                ParallelDo(
+                    [=]( const Int i )
+                    {
+                        to[i] += from[far_dim * i];
+                    },
+                    cluster_count,
+                    ThreadCount()
+                );
             }
             
             //Before percolating the energies down we have to transform them to densities.
-            {
-                ptr<Real> a = C_far.data();
-                mut<Real> e = C_out.data();
-                
-                #pragma omp parallel for num_threads( thread_count ) schedule( static )
-                for( Int i = 0; i < cluster_count; ++i )
+            ParallelDo(
+                [=]( const Int i )
                 {
-                    e[i] /= a[far_dim * i];
-                }
-            }
+                    C_out[i] /= C_far[i][0];
+                },
+                cluster_count,
+                ThreadCount()
+            );
             
             PercolateDown();
             
@@ -851,17 +852,15 @@ namespace Repulsor
             
             // Now the simplex far field densities are stored in P_out.
             // We have to convert them back to energies before we add the energies from thread_P_D_near.
-            {
-                ptr<Real> a = P_near.data();
-                mut<Real> e = P_out.data();
-                
-                #pragma omp parallel for num_threads( thread_count ) schedule( static )
-                for( Int i = 0; i < primitive_count; ++i )
+            
+            ParallelDo(
+                [=]( const Int i )
                 {
-                    e[i] *= a[near_dim * i];
-                }
-                
-            }
+                    P_out[i] *= P_near[i][0];
+                },
+                primitive_count,
+                thread_count
+            );
             
             // Add first entries of thread_P_D_near into P_out.
             for( Int thread = 0; thread < thread_count; ++thread )
@@ -869,11 +868,14 @@ namespace Repulsor
                 ptr<Real> from = thread_P_D_near.data(thread);
                 mut<Real> to   = P_out.data();
                 
-                #pragma omp parallel for num_threads( thread_count ) schedule( static )
-                for( Int i = 0; i < primitive_count; ++i )
-                {
-                    to[i] += from[near_dim * i];
-                }
+                ParallelDo(
+                    [=]( const Int i )
+                    {
+                        to[i] += from[near_dim * i];
+                    },
+                    primitive_count,
+                    thread_count
+                );
             }
                         
             ptoc(ClassName()+"::CollectPrimitiveEnergies");
@@ -890,17 +892,15 @@ namespace Repulsor
             const Int primitive_count = PrimitiveCount();
             
             // Copy the values to output. We must not forget reorder!
-            {
-                ptr<Int>  o    = P_inverse_ordering.data();
-                ptr<Real> from = P_out.data();
-            
-                #pragma omp parallel for num_threads( ThreadCount() ) schedule( static )
-                for( Int i = 0; i < primitive_count; ++i )
+            ParallelDo(
+                [=]( const Int i )
                 {
-                    const Int j = o[i];
-                    output[i] = static_cast<ExtReal>(from[j]);
-                }
-            }
+                    const Int j = P_inverse_ordering[i];
+                    output[i] = static_cast<ExtReal>(P_out[j]);
+                },
+                primitive_count,
+                ThreadCount()
+            );
             
             ptoc(ClassName()+"::CollectPrimitiveEnergies");
        
@@ -911,18 +911,12 @@ namespace Repulsor
             ptic(ClassName()+"::CollectDensity");
             
             // Partially using the pipeline for derivatives. Not really efficient, but also not performance critical.
-            
-            const Int near_dim        = NearDim();
-            const Int primitive_count = PrimitiveCount();
-            
             this->RequireBuffers( static_cast<Int>(1) );
             
             // Compute dual volume vectors.
-            fill_buffer( &P_in[0], primitive_count, static_cast<Real>(1) );
+            fill_buffer( &P_in[0], PrimitiveCount(), static_cast<Real>(1) );
 
-            const Int vertex_count = lo_post.RowCount();
-
-            Tensor1<ExtReal,Int> dual_volumes ( vertex_count );
+            Tensor1<ExtReal,Int> dual_volumes ( lo_post.RowCount() );
         
             lo_post.Dot(
                 static_cast<Real>(1),    P_in.data(),
@@ -930,21 +924,18 @@ namespace Repulsor
                 1
             );
         
-            
             //Collect the energies into P_out.
             CollectPrimitiveEnergies();
             
             // Divide by primitive volumes to get densities.
-            {
-                ptr<Real> a = P_near.data();
-                mut<Real> e = P_out.data();
-                
-                #pragma omp parallel for num_threads(ThreadCount()) schedule( static )
-                for( Int j = 0; j < primitive_count; ++j )
+            ParallelDo(
+                [=]( const Int j )
                 {
-                    e[j] /= a[near_dim * j];
-                }
-            }
+                    P_out[j] /= P_near[j][0];
+                },
+                PrimitiveCount(),
+                ThreadCount()
+            );
             
             // Distribute the energy densities to energies per vertex. (Note that lo_post also multiplies by the primitives' volumes!)
             lo_post.Dot(
@@ -954,16 +945,14 @@ namespace Repulsor
             );
 
             // Finally, we divide by the dual volumes to obtain the vertex densities.
-            {
-                ptr<ExtReal> a = dual_volumes.data();
-                mut<ExtReal> e = output;
-                
-                #pragma omp parallel for num_threads(ThreadCount()) schedule( static )
-                for( Int i = 0; i < vertex_count; ++i )
+            ParallelDo(
+                [=]( const Int i )
                 {
-                    e[i] /= a[i];
-                }
-            }
+                    output[i] /= dual_volumes[i];
+                },
+                lo_post.RowCount(),
+                ThreadCount()
+            );
             
             ptoc(ClassName()+"::CollectDensity");
             
