@@ -48,7 +48,7 @@ namespace Repulsor
         
     public:
 
-        __attribute__((flatten)) Real Compute()
+        force_flattening Real Compute()
         {
             ptic(ClassName()+"::Compute");
 
@@ -71,9 +71,6 @@ namespace Repulsor
             }
 
             kernel.Allocate( pattern.NonzeroCount() );
-
-            
-            const Int thread_count = job_ptr.ThreadCount();
             
             Real global_sum = ParallelDoReduce(
                 [=]( const Int thread )
@@ -92,7 +89,7 @@ namespace Repulsor
                     const Int i_begin = job_ptr[thread  ];
                     const Int i_end   = job_ptr[thread+1];
                     
-                    const Time start_time = Clock::now();
+//                    const Time start_time = Clock::now();
                     
                     for( Int i = i_begin; i < i_end; ++i )
                     {
@@ -141,16 +138,16 @@ namespace Repulsor
                         
                     }
                     
-                    const Time stop_time = Clock::now();
+//                    const Time stop_time = Clock::now();
                     
-                    // TODO: mutex needed?
-                    ker.PrintReport( thread, Tools::Duration(start_time,stop_time) );
+                    // TODO: mutex needed!!!
+//                    ker.PrintReport( thread, Tools::Duration(start_time,stop_time) );
                     
                     return local_sum; 
                 },
                 AddReducer<Real, Real>(),
                 Scalar::Zero<Real>,
-                thread_count
+                job_ptr.ThreadCount()
             );
 
             ptoc(ClassName()+"::Compute");

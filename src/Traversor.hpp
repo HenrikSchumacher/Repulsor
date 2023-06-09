@@ -110,7 +110,7 @@ namespace Repulsor
         {
             ptic(className()+"::Traverse_Sequential");
             
-            Traverse_DepthFirst( 0, 0, 0 );
+            Traverse_DepthFirst( kernels[0], 0, 0 );
             
             ptoc(className()+"::Traverse_Sequential");
         }
@@ -123,18 +123,34 @@ namespace Repulsor
         {
             ptic(className()+"::Traverse_Parallel");
 
-            Traverse_BreadthFirst( 0, 0, 0, static_cast<Int>(4) * ThreadCount() * ThreadCount() );
+            Traverse_BreadthFirst( kernels[0], 0, 0, static_cast<Int>(4) * ThreadCount() * ThreadCount() );
 
-            // TODO: Here we actually want _dynamic_ / round Robin scheduling!
+            #pragma omp parallel for num_threads( thread_count ) schedule( dynamic )
+            for( Int k = 0; k < static_cast<Int>(i_queue.size()); ++k )
+            {
+                Traverse_DepthFirst( kernels[omp_get_thread_num()], i_queue[k], j_queue[k]);
+            }
 
-            ParallelDo(
-                [this]( const Int thread, const Int k )
-                {
-                   Traverse_DepthFirst( thread, i_queue[k], j_queue[k] );
-                },
-                static_cast<Int>(i_queue.size()),
-                thread_count
-            );
+//            // TODO: Here we actually want _dynamic_ / round Robin scheduling!
+
+//            ParallelDo(
+//                [&,this]( const Int thread )
+//                {
+//                    Kernel_T & K = kernels[thread];
+//
+//                    const Int size = static_cast<Int>( i_queue.size() );
+//
+//                    const Int k_begin = JobPointer<Int>( size, thread_count, thread     );
+//                    const Int k_end   = JobPointer<Int>( size, thread_count, thread + 1 );
+//
+//                    for( Int k = k_begin; k < k_end; ++k )
+//                    {
+//                        Traverse_DepthFirst( K, i_queue[k], j_queue[k] );
+//                    }
+//                },
+//                static_cast<Int>(i_queue.size()),
+//                thread_count
+//            );
             
             ptoc(className()+"::Traverse_Parallel");
         }
