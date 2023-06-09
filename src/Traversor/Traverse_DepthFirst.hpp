@@ -1,9 +1,9 @@
 public:
 
-    __attribute__((flatten)) void Traverse_DepthFirst( const Int i0, const Int j0 )
+    __attribute__((flatten)) void Traverse_DepthFirst(
+        const Int thread, const Int i0, const Int j0
+    )
     {
-        const Int thread = omp_get_thread_num();
-        
         Kernel_T & K = kernels[thread];
         
         Int i_stack[max_depth] = {};

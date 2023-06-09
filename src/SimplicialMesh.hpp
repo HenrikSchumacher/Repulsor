@@ -299,26 +299,27 @@ namespace Repulsor
             Tensor2<SReal,Int> P_velocities_serialized ( SimplexCount(), P_moving.VelocitySize(), 0 );
             mut<SReal> P_v_ser = P_velocities_serialized.data();
             
-            
             const Tensor1<Int,Int> & P_ordering = GetClusterTree().PrimitiveOrdering();
 
             JobPointers<Int> job_ptr ( SimplexCount(), thread_count );
             
-            #pragma omp parallel for num_threads(thread_count)
-            for( Int thread = 0; thread < thread_count; ++thread )
-            {
-                MovingPrimitive_T P_mov;
-                
-                const Int i_begin = job_ptr[thread  ];
-                const Int i_end   = job_ptr[thread+1];
-                
-                for( Int i = i_begin; i < i_end; ++i )
+            ParallelDo(
+                [&]( const Int thread )
                 {
-                    const Int j = P_ordering[i];
-                    P_mov.FromVelocitiesIndexList( V_updates.data(), simplices.data(), j );
-                    P_mov.WriteVelocitiesSerialized( P_v_ser, i );
-                }
-            }
+                    MovingPrimitive_T P_mov;
+                    
+                    const Int i_begin = job_ptr[thread  ];
+                    const Int i_end   = job_ptr[thread+1];
+                    
+                    for( Int i = i_begin; i < i_end; ++i )
+                    {
+                        const Int j = P_ordering[i];
+                        P_mov.FromVelocitiesIndexList( V_updates.data(), simplices.data(), j );
+                        P_mov.WriteVelocitiesSerialized( P_v_ser, i );
+                    }
+                },
+                thread_count
+            );
             
             // P_moving and P_velocities_serialized will be swapped against potentiall empty containers.
             GetClusterTree().TakeUpdateVectors(
@@ -402,20 +403,23 @@ namespace Repulsor
                     ptic("Creating primitives");
                     const Int thread_count = job_ptr.ThreadCount();
 
-                    #pragma omp parallel for num_threads(thread_count)
-                    for( Int thread = 0; thread < thread_count; ++thread )
-                    {
-                        Primitive_T P;
-
-                        Int i_begin = job_ptr[thread];
-                        Int i_end   = job_ptr[thread+1];
-
-                        for( Int i = i_begin; i < i_end; ++i )
+                    ParallelDo(
+                        [&]( const Int thread )
                         {
-                            P.SetPointer( P_serialized.data(), i );
-                            P.FromIndexList( V_coords.data(), simplices.data(), i );
-                        }
-                    }
+                            Primitive_T P;
+
+                            const Int i_begin = job_ptr[thread];
+                            const Int i_end   = job_ptr[thread+1];
+
+                            for( Int i = i_begin; i < i_end; ++i )
+                            {
+                                P.SetPointer( P_serialized.data(), i );
+                                P.FromIndexList( V_coords.data(), simplices.data(), i );
+                            }
+                        },
+                        thread_count
+                    );
+
                     ptoc("Creating primitives");
 
                     ptic("Initializing cluster prototypes");

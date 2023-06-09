@@ -439,6 +439,126 @@
                   endingLineNumber = "138"
                   offsetFromSymbolStart = "984">
                </Location>
+               <Location
+                  uuid = "576FFB7C-071B-4749-B550-09870635B05A - 96c8f5ffeb4c0ba6"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Repulsor::Traversor&lt;Repulsor::MaximumSafeStepSize_Kernel&lt;Repulsor::ClusterTree&lt;3, double, int, float, double&gt; &gt;, false, false&gt;::Traverse_DepthFirst(int, int, int)"
+                  moduleName = "Example"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/Henrik/github/Repulsor/src/CollisionTree/MaximumSafeStepSize_Kernel.hpp"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "138"
+                  endingLineNumber = "138"
+                  offsetFromSymbolStart = "276">
+               </Location>
+               <Location
+                  uuid = "576FFB7C-071B-4749-B550-09870635B05A - a72ac970c8325fef"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Repulsor::Traversor&lt;Repulsor::MaximumSafeStepSize_Kernel&lt;Repulsor::ClusterTree&lt;3, double, int, float, double&gt; &gt;, false, false&gt;::Traverse_BreadthFirst(int, int, int, int)"
+                  moduleName = "Example"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/Henrik/github/Repulsor/src/CollisionTree/MaximumSafeStepSize_Kernel.hpp"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "138"
+                  endingLineNumber = "138"
+                  offsetFromSymbolStart = "988">
+               </Location>
+               <Location
+                  uuid = "576FFB7C-071B-4749-B550-09870635B05A - c4f0aeb4058f95f1"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Repulsor::Traversor&lt;Repulsor::MaximumSafeStepSize_Kernel&lt;Repulsor::ClusterTree&lt;3, double, int, float, double&gt; &gt;, false, true&gt;::Traverse_DepthFirst(int, int, int)"
+                  moduleName = "Example"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/Henrik/github/Repulsor/src/CollisionTree/MaximumSafeStepSize_Kernel.hpp"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "138"
+                  endingLineNumber = "138"
+                  offsetFromSymbolStart = "276">
+               </Location>
+               <Location
+                  uuid = "576FFB7C-071B-4749-B550-09870635B05A - 427cc4b8e9f960e8"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Repulsor::Traversor&lt;Repulsor::MaximumSafeStepSize_Kernel&lt;Repulsor::ClusterTree&lt;3, double, int, float, double&gt; &gt;, false, true&gt;::Traverse_BreadthFirst(int, int, int, int)"
+                  moduleName = "Example"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/Henrik/github/Repulsor/src/CollisionTree/MaximumSafeStepSize_Kernel.hpp"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "138"
+                  endingLineNumber = "138"
+                  offsetFromSymbolStart = "988">
+               </Location>
+               <Location
+                  uuid = "576FFB7C-071B-4749-B550-09870635B05A - c4f0aeb4058f95f1"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Repulsor::Traversor&lt;Repulsor::MaximumSafeStepSize_Kernel&lt;Repulsor::ClusterTree&lt;3, double, int, float, double&gt; &gt;, true, false&gt;::Traverse_DepthFirst(int, int, int)"
+                  moduleName = "Example"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/Henrik/github/Repulsor/src/CollisionTree/MaximumSafeStepSize_Kernel.hpp"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "138"
+                  endingLineNumber = "138"
+                  offsetFromSymbolStart = "276">
+               </Location>
+               <Location
+                  uuid = "576FFB7C-071B-4749-B550-09870635B05A - 427cc4b8e9f960e8"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Repulsor::Traversor&lt;Repulsor::MaximumSafeStepSize_Kernel&lt;Repulsor::ClusterTree&lt;3, double, int, float, double&gt; &gt;, true, false&gt;::Traverse_BreadthFirst(int, int, int, int)"
+                  moduleName = "Example"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/Henrik/github/Repulsor/src/CollisionTree/MaximumSafeStepSize_Kernel.hpp"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "138"
+                  endingLineNumber = "138"
+                  offsetFromSymbolStart = "988">
+               </Location>
+               <Location
+                  uuid = "576FFB7C-071B-4749-B550-09870635B05A - 229258e242ec9379"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Repulsor::Traversor&lt;Repulsor::MaximumSafeStepSize_Kernel&lt;Repulsor::ClusterTree&lt;3, double, int, float, double&gt; &gt;, true, true&gt;::Traverse_DepthFirst(int, int, int)"
+                  moduleName = "Example"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/Henrik/github/Repulsor/src/CollisionTree/MaximumSafeStepSize_Kernel.hpp"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "138"
+                  endingLineNumber = "138"
+                  offsetFromSymbolStart = "276">
+               </Location>
+               <Location
+                  uuid = "576FFB7C-071B-4749-B550-09870635B05A - 3557ed0e1fcb5c5a"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Repulsor::Traversor&lt;Repulsor::MaximumSafeStepSize_Kernel&lt;Repulsor::ClusterTree&lt;3, double, int, float, double&gt; &gt;, true, true&gt;::Traverse_BreadthFirst(int, int, int, int)"
+                  moduleName = "Example"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/Henrik/github/Repulsor/src/CollisionTree/MaximumSafeStepSize_Kernel.hpp"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "138"
+                  endingLineNumber = "138"
+                  offsetFromSymbolStart = "988">
+               </Location>
             </Locations>
          </BreakpointContent>
       </BreakpointProxy>

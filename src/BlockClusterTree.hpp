@@ -267,15 +267,17 @@ namespace Repulsor
             std::vector<PairAggregator<Int,Int,LInt>> near_idx     (thread_count);
             std::vector<PairAggregator<Int,Int,LInt>> far_idx      (thread_count);
 
-            #pragma omp parallel for num_threads(thread_count)
-            for( Int thread = 0; thread < thread_count; ++thread )
-            {
-                kernels[thread].inter_idx.Finalize();
-                kernels[thread].verynear_idx.Finalize();
-                kernels[thread].near_idx.Finalize();
-                kernels[thread].far_idx.Finalize();
-            }
             
+            ParallelDo(
+                [&kernels]( const Int thread )
+                {
+                    kernels[thread].inter_idx.Finalize();
+                    kernels[thread].verynear_idx.Finalize();
+                    kernels[thread].near_idx.Finalize();
+                    kernels[thread].far_idx.Finalize();
+                },
+                thread_count
+            );
             
             size_t intersection_count = 0;
             
