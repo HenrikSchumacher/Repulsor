@@ -127,65 +127,12 @@ namespace Repulsor
                         
                     }
                     
-<<<<<<< HEAD
-                    #pragma omp critical (AllPairs_Traversor__Compute)
-                    {
-                        global_sum += local_sum;
-                    }
-                }
-            }
-            else
-            {
-                for( Int thread = 0; thread < thread_count; ++thread )
-                {
-                    // Initialize local kernel and feed it all the information that is going to be constant along its life time.
-                    
-                    Kernel_T ker ( kernel );
-
-                    Real local_sum = static_cast<Real>(0);
-
-                    LOOP_UNROLL(4)
-                    for( Int i = 0; i < m; ++i )
-                    {
-                        // These are the corresponding nonzero blocks in i-th row.
-                        const Int j_begin = COND( is_symmetric, i+1, 0 );
-                        const Int j_end   = n;
-                        
-                        // Clear the local vector chunk of the kernel.
-                        ker.LoadS(i);
-                        
-                        const Int offset = n*i;
-                        
-                        // Perform all but the last calculation in row with prefetch.
-                        LOOP_UNROLL(4)
-                        for( Int j = j_begin; j < j_end; ++j )
-                        {
-                            ker.LoadT(j);
-                            
-                            local_sum += ker.Compute(offset+j);
-
-                            ker.WriteT(j);
-                        }
-                        
-                        // Incorporate the kernel's local vector chunk into the i-th chunk if the output Y.
-                        
-                        ker.WriteS(i);
-                        
-                        // Incoporate the local vector chunk into the i-th chunk of the output.
-                        
-                    }
-                    
-                    global_sum += local_sum;
-                }
-            }
-=======
                     return local_sum;
                 },
                 AddReducer<Real, Real>(),
                 Scalar::Zero<Real>,
                 thread_count
             );
->>>>>>> 92d002493f5c95f443158ecc17f14f67f8e01098
 
             ptoc(ClassName()+"::Compute");
 

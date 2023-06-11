@@ -3,6 +3,8 @@
 #include "ClusterTree/Cluster.hpp"
 #include "ClusterTree/ClusterTreeBase.hpp"
 
+#include <thread>
+
 namespace Repulsor
 {
     template<int AMB_DIM_, typename Real_, typename Int_, typename SReal_, typename ExtReal_>
@@ -370,44 +372,19 @@ namespace Repulsor
             C_serialized  = Tensor2<SReal,Int>( root->descendant_count, C_proto[0]->Size() );
             leaf_clusters = Tensor1<Int,Int>( root->descendant_leaf_count );
             
-            #pragma omp parallel
+            std::vector<std::thread> threads;
+            
+            threads.emplace_back( [=](){ C_left  = Tensor1<Int,Int>( ClusterCount() ); } );
+            threads.emplace_back( [=](){ C_right = Tensor1<Int,Int>( ClusterCount() ); } );
+            threads.emplace_back( [=](){ C_begin = Tensor1<Int,Int>( ClusterCount() ); } );
+            threads.emplace_back( [=](){ C_end   = Tensor1<Int,Int>( ClusterCount() ); } );
+            threads.emplace_back( [=](){ C_depth = Tensor1<Int,Int>( ClusterCount() ); } );
+            threads.emplace_back( [=](){ C_next  = Tensor1<Int,Int>( ClusterCount() ); } );
+            threads.emplace_back( [=](){ leaf_cluster_lookup = Tensor1<Int,Int>( ClusterCount(), -1 ); } );
+            
+            for( auto & thread : threads )
             {
-                #pragma omp single nowait
-                {
-                    #pragma omp task
-                    {
-                        C_left = Tensor1<Int,Int>( ClusterCount() );
-                    }
-                    #pragma omp task
-                    {
-                        C_right = Tensor1<Int,Int>( ClusterCount() );
-                    }
-                    #pragma omp task
-                    {
-                        C_begin = Tensor1<Int,Int>( ClusterCount());
-                    }
-                    #pragma omp task
-                    {
-                        C_end = Tensor1<Int,Int>( ClusterCount() );
-                    }
-                    #pragma omp task
-                    {
-                        C_depth = Tensor1<Int,Int>( ClusterCount() );
-                    }
-                    #pragma omp task
-                    {
-                        C_next = Tensor1<Int,Int>( ClusterCount() );
-                    }
-                    #pragma omp task
-                    {
-                        leaf_cluster_lookup = Tensor1<Int,Int>( ClusterCount(), -1 );
-                    }
-                    //                    #pragma omp task
-                    //                    {
-                    //                        queue_array = Tensor1<Int,Int>( ClusterCount() );
-                    //                    }
-                    #pragma omp taskwait
-                }
+                thread.join();
             }
             
             #pragma omp parallel num_threads( ThreadCount() )
@@ -662,116 +639,10 @@ namespace Repulsor
                 }
             }
         }; //computeClusterData
-
-        
         
     public:
-        
-//        void RequireClusterMoments( const Int moment_degree_ ) const override
-//        {
-//
-//            if( moment_degree_ > moment_degree )
-//            {
-//                ptic(className()+"::RequireClusterMoments");
-//
-//                MultipoleMomentsBase<Real,Int> * ptr;
-//
-//                switch (moment_degree_)
-//                {
-//                    case 0:
-//                    {
-//                        moment_degree = 0;
-//                        return;
-//                    }
-//                    case 1:
-//                    {
-//                        moment_degree = 0;
-//                        return;
-//                    }
-////                    case 2:
-////                    {
-////                        moment_degree = 2;
-////                        ptr = new MultipoleMoments<1 + AMB_DIM + (AMB_DIM*(AMB_DIM+1))/2,2,Real,Int>();
-////                        break;
-////                    }
-////                    case 4:
-////                    {
-////                        moment_degree = 4;
-////                        ptr = new MultipoleMoments<1 + AMB_DIM + (AMB_DIM*(AMB_DIM+1))/2,4,Real,Int>();
-////                        break;
-////                    }
-//                    default:
-//                    {
-//                        eprint("Degree not available.");
-//                        return;
-//                    }
-//                }
-//
-//                std::shared_ptr<MultipoleMomentsBase<Real,Int>> M (ptr);
-//
-//                C_moments = DataContainer_T ( ClusterCount(), M->MomentCount(), static_cast<Real>(0) );
-//
-//                M_ker = std::vector<std::shared_ptr<MultipoleMomentsBase<Real,Int>>>(  ThreadCount() );
-//
-//                // TODO: Parallelize over ThreadCount() threads.
-//                for( Int thread = 0; thread < ThreadCount(); ++thread )
-//                {
-//                    M_ker[thread] = std::shared_ptr<MultipoleMomentsBase<Real,Int>>( static_cast<MultipoleMomentsBase<Real,Int> *>(M->Clone().release()) );
-//                }
-//
-////                 using the already serialized cluster tree
-//                #pragma omp parallel num_threads( ThreadCount() )
-//                {
-//                    #pragma omp single nowait
-//                    {
-//                        computeClusterMoments( 0, ThreadCount() );
-//                    }
-//                }
-//
-//                ptoc(className()+"::RequireClusterMoments");
-//            }
-//
-//        }; //RequireClusterMoments
       
     protected:
-        
-//        void computeClusterMoments( const Int C, const Int free_thread_count ) const // helper function for RequireMoments
-//        {
-//            const Int thread = omp_get_thread_num();
-//            const Int L = C_left [C];
-//            const Int R = C_right[C];
-//            
-//            if( L >= 0 /*&& R >= 0*/ ){
-//                //C points to interior node.
-//                #pragma omp task final(free_thread_count<1)  shared( L )
-//                {
-//                    computeClusterMoments( L, free_thread_count/2 );
-//                }
-//                #pragma omp task final(free_thread_count<1)  shared( R )
-//                {
-//                    computeClusterMoments( R, free_thread_count-free_thread_count/2 );
-//                }
-//                #pragma omp taskwait
-//
-//                M_ker[thread]->ClusterToCluster( C_far.data(L), C_moments.data(L), C_far.data(C), C_moments.data(C) );
-//                
-//                M_ker[thread]->ClusterToCluster( C_far.data(R), C_moments.data(R), C_far.data(C), C_moments.data(C) );
-//                
-//            }
-//            else
-//            {
-//                //C points to leaf node.
-//                //compute from primitives
-//                const Int begin = C_begin[C];
-//                const Int end   = C_end  [C];
-//                
-//                for( Int i = begin; i < end; ++i )
-//                {
-//                    M_ker[thread]->PrimitiveToCluster( P_far.data(i), C_far.data(C), C_moments.data(C) );
-//                }
-//                
-//            }
-//        }; //computeClusterMoments
         
         void ComputePrimitiveToClusterMatrix()
         {
