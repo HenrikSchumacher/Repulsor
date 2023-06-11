@@ -318,8 +318,16 @@
 					"-lomp",
 				);
 				SDKROOT = macosx;
-				SYSTEM_HEADER_SEARCH_PATHS = /opt/homebrew/opt/libomp/include;
-				USER_HEADER_SEARCH_PATHS = /opt/homebrew/opt/libomp/include;
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					/opt/homebrew/opt/libomp/include,
+					/usr/include,
+					/opt/homebrew/include,
+				);
+				USER_HEADER_SEARCH_PATHS = (
+					/opt/homebrew/opt/libomp/include,
+					/opt/homebrew/include,
+					/usr/include,
+				);
 			};
 			name = Debug;
 		};
@@ -357,7 +365,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -376,6 +384,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
 					"-flto",
@@ -390,8 +399,16 @@
 					"-lomp",
 				);
 				SDKROOT = macosx;
-				SYSTEM_HEADER_SEARCH_PATHS = /opt/homebrew/opt/libomp/include;
-				USER_HEADER_SEARCH_PATHS = /opt/homebrew/opt/libomp/include;
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					/opt/homebrew/opt/libomp/include,
+					/usr/include,
+					/opt/homebrew/include,
+				);
+				USER_HEADER_SEARCH_PATHS = (
+					/opt/homebrew/opt/libomp/include,
+					/opt/homebrew/include,
+					/usr/include,
+				);
 			};
 			name = Release;
 		};

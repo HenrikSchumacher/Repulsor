@@ -16,6 +16,8 @@
 
 #define TOOLS_ENABLE_PROFILER // enable profiler
 
+//#define TOOLS_PARALLELDO_OPENMP
+
 #include "../Repulsor.hpp"
 
 int main(int argc, const char * argv[])

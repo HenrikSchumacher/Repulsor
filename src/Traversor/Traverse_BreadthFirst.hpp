@@ -1,11 +1,9 @@
 public:
 
-    __attribute__((flatten)) void Traverse_BreadthFirst( const Int i0, const Int j0, const Int max_leaves )
+    force_flattening void Traverse_BreadthFirst(
+        Kernel_T & K, const Int i0, const Int j0, const Int max_leaves
+    )
     {
-        const Int thread = omp_get_thread_num();
-        
-        Kernel_T & K = kernels[thread];
-        
         i_queue = std::deque<Int>();
         j_queue = std::deque<Int>();
         i_queue.push_back(static_cast<Int>(i0));

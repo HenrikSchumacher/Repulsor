@@ -34,27 +34,27 @@ struct BlockSize<double>
 
 #define force_inline inline
 
-using Scalar = double;
+using Scal = double;
 using Int    = int;
 
 constexpr Int n = 4;
 
 template<Int M, Int N, Int K>
 inline void dot3(
-    const Scalar * restrict A,
-    const Scalar * restrict B,
-          Scalar * restrict C
+    const Scal * restrict A,
+    const Scal * restrict B,
+          Scal * restrict C
 )
 {
-    typedef Scalar v_T __attribute__((vector_size (BlockSize<T>::rwidth/8)));
+    typedef Scal v_T __attribute__((vector_size (BlockSize<T>::rwidth/8)));
 
-    static constexpr Int vlen = BlockSize<Scalar>::vlen;
+    static constexpr Int vlen = BlockSize<Scal>::vlen;
     static constexpr Int MR   = M;
     static constexpr Int NR   = N/vlen;
 
     v_T c[MR][NR] = {};
-    A = (const Scalar * ) __builtin_assume_aligned (A, BlockSize<double>::align);
-    B = (const Scalar * ) __builtin_assume_aligned (B, BlockSize<double>::align);
+    A = (const Scal * ) __builtin_assume_aligned (A, BlockSize<double>::align);
+    B = (const Scal * ) __builtin_assume_aligned (B, BlockSize<double>::align);
 
     for( size_t k = 0; k < K; ++k )
     {
@@ -71,20 +71,20 @@ inline void dot3(
         B+=NR*vlen;
     }
 
-    std::copy_n( (Scalar *)&c[0][0], M*N, C );
+    std::copy_n( (Scal *)&c[0][0], M*N, C );
 }
 
 template<Int M, Int N, Int K>
 inline void dot2(
-    const Scalar * restrict const A_,
-    const Scalar * restrict const B_,
-          Scalar * restrict const C
+    const Scal * restrict const A_,
+    const Scal * restrict const B_,
+          Scal * restrict const C
 )
 {
-    Scalar c[M][N] = {};
+    Scal c[M][N] = {};
 
-    const Scalar * restrict A = A_;
-    const Scalar * restrict B = B_;
+    const Scal * restrict A = A_;
+    const Scal * restrict B = B_;
     
     for( Int k = 0; k < K; ++k )
     {
@@ -105,21 +105,21 @@ inline void dot2(
 
 template<int M, int N, int K>
 inline void dot(
-    const Scalar * restrict const a,
-    const Scalar * restrict const b,
-          Scalar * restrict const c
+    const Scal * restrict const a,
+    const Scal * restrict const b,
+          Scal * restrict const c
 )
 {
-    Scalar A[M][K];
-    Scalar B[N][K];
-    Scalar C[M][N] = {{}};
+    Scal A[M][K];
+    Scal B[N][K];
+    Scal C[M][N] = {{}};
 
     std::copy_n( a, M*K, &A[0][0] );
     std::copy_n( b, K*N, &B[0][0] );
 
     for( size_t i = 0; i < M; ++i )
     {
-        Scalar C_i [M] = {};
+        Scal C_i [M] = {};
         for( size_t j = 0; j < N; ++j )
         {
             for( size_t k = 0; k < K; ++k )
@@ -132,6 +132,6 @@ inline void dot(
     std::copy_n( &C[0][0], M*N, c );
 }
 
-template void dot3<n,n,n>( const Scalar * restrict const a, const Scalar * restrict const b, Scalar * restrict const c );
-template void dot2<n,n,n>( const Scalar * restrict const a, const Scalar * restrict const b, Scalar * restrict const c );
-template void dot <n,n,n>( const Scalar * restrict const a, const Scalar * restrict const b, Scalar * restrict const c );
+template void dot3<n,n,n>( const Scal * restrict const a, const Scal * restrict const b, Scal * restrict const c );
+template void dot2<n,n,n>( const Scal * restrict const a, const Scal * restrict const b, Scal * restrict const c );
+template void dot <n,n,n>( const Scal * restrict const a, const Scal * restrict const b, Scal * restrict const c );

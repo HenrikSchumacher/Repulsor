@@ -51,39 +51,41 @@ StringJoin[
 
         const JobPointers<Int> job_ptr ( simplices.Dimension(0), ThreadCount() );
         
-        #pragma omp parallel for num_threads( ThreadCount() )
-        for( Int thread = 0; thread < ThreadCount(); ++thread )
-        {
-			ptr<Real> V_coords__      = V_coords.data();	
-			ptr<Int>  simplices__     = simplices.data();
-
-			Real hull    [",s[n+1],"][",AmbDim,"];
-
-			Int simplex  [",s[n+1],"];
-			
-			const Int i_begin = job_ptr[thread];
-			const Int i_end   = job_ptr[thread+1];
-
-            for( Int i = i_begin; i < i_end; ++i )
-            {
-				mut<Real> near = P_near.data(i);                    
-				mut<Real> far  = P_far.data(i);   
+		ParallelDo(
+			[&]( const Int thread )
+			{
+				ptr<Real> V_coords__      = V_coords.data();	
+				ptr<Int>  simplices__     = simplices.data();
+	
+				Real hull    [",s[n+1],"][",AmbDim,"];
+	
+				Int simplex  [",s[n+1],"];
+				
+				const Int i_begin = job_ptr[thread];
+				const Int i_end   = job_ptr[thread+1];
+	
+	            for( Int i = i_begin; i < i_end; ++i )
+	            {
+					mut<Real> near = P_near.data(i);                    
+					mut<Real> far  = P_far.data(i);   
             
 ",
-Table[line[4,"simplex[",s[j],"] = simplices__[",s[n+1],"*i +",s[j],"]"],{j,0,n+1-1}],
+Table[line[5,"simplex[",s[j],"] = simplices__[",s[n+1],"*i +",s[j],"]"],{j,0,n+1-1}],
 "\n",
-Table[line[4,"near[",s[1+m j+k],"] = hull[",s[j],"][",s[k],"] = V_coords__[",AmbDim,"*simplex[",s[j],"]+",s[k],"]"],{j,0,n+1-1},{k,0,m-1}],
+Table[line[5,"near[",s[1+m j+k],"] = hull[",s[j],"][",s[k],"] = V_coords__[",AmbDim,"*simplex[",s[j],"]+",s[k],"]"],{j,0,n+1-1},{k,0,m-1}],
 "\n",
-Table[line[4,"far["<>s[k+1]<>"] = ",floatcast@s[1./(n+1),CForm]," * ( ",Riffle[Table[{"hull[",s[j],"][",s[k],"]"},{j,0,n+1-1}]," + "]," )"],{k,0,m-1}],
+Table[line[5,"far["<>s[k+1]<>"] = ",floatcast@s[1./(n+1),CForm]," * ( ",Riffle[Table[{"hull[",s[j],"][",s[k],"]"},{j,0,n+1-1}]," + "]," )"],{k,0,m-1}],
 "
-				near[",tostr[0],"] = far[",tostr[0],"] = static_cast<Real>(1);
+					near[",tostr[0],"] = far[",tostr[0],"] = static_cast<Real>(1);
 ",
 Module[{c=m},
-Table[line[4,"near[",tostr[++c+n m],"] = far[",tostr[c],"] = ",floatcast@s[Boole[i==j]]],{i,0,m-1},{j,i,m-1}]],
+Table[line[5,"near[",tostr[++c+n m],"] = far[",tostr[c],"] = ",floatcast@s[Boole[i==j]]],{i,0,m-1},{j,i,m-1}]],
 "
-            } // for( Int i = i_begin; i < i_end; ++i )
+	            } // for( Int i = i_begin; i < i_end; ++i )
 
-		} // #pragma omp parallel num_threads( ThreadCount() )
+			},
+			ThreadCount()
+		);
 
         ptoc(ClassName()+\"::",name,"\");
     }
@@ -120,54 +122,55 @@ StringJoin[
 
         const JobPointers<Int> job_ptr ( simplices.Dimension(0), ThreadCount() );
         
-        #pragma omp parallel for num_threads( ThreadCount() )
-        for( Int thread = 0; thread < ThreadCount(); ++thread )
-        {
-			ptr<Real> V_coords__      = V_coords.data();	
-			const Int  * restrict const simplices__     = simplices.data();
-
-			Real hull    [",s[n+1],"][",AmbDim,"];
-			Real df      [",AmbDim,"][",DomDim,"];
-			Real dfdagger[",DomDim,"][",AmbDim,"];
-			Real g       [",DomDim,"][",DomDim,"];
-			Real ginv    [",DomDim,"][",DomDim,"];
-
-			Int simplex  [",s[n+1],"];
-			
-			const Int i_begin = job_ptr[thread];
-			const Int i_end   = job_ptr[thread+1];
-
-            for( Int i = i_begin; i < i_end; ++i )
-            {
-				Real * restrict const near = P_near.data(i);                    
-				Real * restrict const far  = P_far.data(i);   
+		ParallelDo(
+			[&]( const Int thread )
+			{
+				ptr<Real> V_coords__      = V_coords.data();	
+				ptr<Int > simplices__     = simplices.data();
+	
+				Real hull    [",s[n+1],"][",AmbDim,"];
+				Real df      [",AmbDim,"][",DomDim,"];
+				Real dfdagger[",DomDim,"][",AmbDim,"];
+				Real g       [",DomDim,"][",DomDim,"];
+				Real ginv    [",DomDim,"][",DomDim,"];
+	
+				Int simplex  [",s[n+1],"];
+				
+				const Int i_begin = job_ptr[thread];
+				const Int i_end   = job_ptr[thread+1];
+	
+	            for( Int i = i_begin; i < i_end; ++i )
+	            {
+					mut<Real> near = P_near.data(i);                    
+					mut<Real> far  = P_far.data(i);   
             
 ",
-Table[line[4,"simplex[",s[j],"] = simplices__[",s[n+1],"*i +",s[j],"]"],{j,0,n+1-1}],
+Table[line[5,"simplex[",s[j],"] = simplices__[",s[n+1],"*i +",s[j],"]"],{j,0,n+1-1}],
 "\n",
-Table[line[4,"near[",s[1+m j+k],"] = hull[",s[j],"][",s[k],"] = V_coords__[",AmbDim,"*simplex[",s[j],"]+",s[k],"]"],{j,0,n+1-1},{k,0,m-1}],
+Table[line[5,"near[",s[1+m j+k],"] = hull[",s[j],"][",s[k],"] = V_coords__[",AmbDim,"*simplex[",s[j],"]+",s[k],"]"],{j,0,n+1-1},{k,0,m-1}],
 "\n",
-Table[line[4,"far["<>s[k+1]<>"] = ",floatcast@s[1./(n+1),CForm]," * ( ",Riffle[Table[{"hull[",s[j],"][",s[k],"]"},{j,0,n+1-1}]," + "]," )"],{k,0,m-1}],
+Table[line[5,"far["<>s[k+1]<>"] = ",floatcast@s[1./(n+1),CForm]," * ( ",Riffle[Table[{"hull[",s[j],"][",s[k],"]"},{j,0,n+1-1}]," + "]," )"],{k,0,m-1}],
 "\n",
-Table[line[4,"df["<>s[k],"][",s[j]<>"] = hull[",s[j+1],"][",s[k],"] - hull[0][",s[k],"]"],{k,0,m-1},{j,0,n-1}],
+Table[line[5,"df["<>s[k],"][",s[j]<>"] = hull[",s[j+1],"][",s[k],"] - hull[0][",s[k],"]"],{k,0,m-1},{j,0,n-1}],
 "\n",
-Table[line[4,"g[",s[i],"][",s[j],"] = ",Riffle[Table[{"df[",s[k],"][",s[i]<>"] * df[",s[k],"][",s[j],"]"},{k,0,m-1}]," + "]],{i,0,n-1},{j,0,n-1}],
+Table[line[5,"g[",s[i],"][",s[j],"] = ",Riffle[Table[{"df[",s[k],"][",s[i]<>"] * df[",s[k],"][",s[j],"]"},{k,0,m-1}]," + "]],{i,0,n-1},{j,0,n-1}],
 "
 
-				near[0] = far[0] = sqrt( fabs(g[0][0]) );
-
-                ginv[0][0] = static_cast<Real>(1)/g[0][0];
-                
-                //  dfdagger = g^{-1} * df^T (",DomDim," x ",AmbDim," matrix)
+					near[0] = far[0] = sqrt( fabs(g[0][0]) );
+	
+	                ginv[0][0] = static_cast<Real>(1)/g[0][0];
+	                
+	                //  dfdagger = g^{-1} * df^T (",DomDim," x ",AmbDim," matrix)
 ",
-  Table[line[4,"dfdagger[",s[j],"][",s[k],"] = ",Riffle[Table[{"ginv[",s[Min[i,j]],"][",s[Max[i,j]],"] * df[",s[k],"][",s[i],"]"},{i,0,n-1}]," + "]],{j,0,n-1},{k,0,m-1}],"            
+  Table[line[5,"dfdagger[",s[j],"][",s[k],"] = ",Riffle[Table[{"ginv[",s[Min[i,j]],"][",s[Max[i,j]],"] * df[",s[k],"][",s[i],"]"},{i,0,n-1}]," + "]],{j,0,n-1},{k,0,m-1}],"            
 ",
 Module[{c=m},
-Table[line[4,"near[",tostr[++c+n m],"] = far[",tostr[c],"]  = ",If[i==j,floatcast["1"],"  "],Table[{" - df[",s[i],"][",s[k],"] * dfdagger[",s[k],"][",s[j],"]"},{k,0,n-1}]],{i,0,m-1},{j,i,m-1}]],
+Table[line[5,"near[",tostr[++c+n m],"] = far[",tostr[c],"]  = ",If[i==j,floatcast["1"],"  "],Table[{" - df[",s[i],"][",s[k],"] * dfdagger[",s[k],"][",s[j],"]"},{k,0,n-1}]],{i,0,m-1},{j,i,m-1}]],
 "
-            } // for( Int i = i_begin; i < i_end; ++i )
-
-		} // #pragma omp parallel num_threads( ThreadCount() )
+	            } // for( Int i = i_begin; i < i_end; ++i )
+			},
+			ThreadCount()
+		);
 
         ptoc(ClassName()+\"::",name,"\");
     }
@@ -204,59 +207,60 @@ StringJoin[
 
         const JobPointers<Int> job_ptr ( simplices.Dimension(0), ThreadCount() );
         
-        #pragma omp parallel for num_threads( ThreadCount() )
-        for( Int thread = 0; thread < ThreadCount(); ++thread )
-        {
-			ptr<Real> V_coords__      = V_coords.data();	
-			ptr<Int>  simplices__     = simplices.data();
-
-			Real hull    [",s[n+1],"][",AmbDim,"];
-			Real df      [",AmbDim,"][",DomDim,"];
-			Real dfdagger[",DomDim,"][",AmbDim,"];
-			Real g       [",DomDim,"][",DomDim,"];
-			Real ginv    [",DomDim,"][",DomDim,"];
-
-			Int simplex  [",s[n+1],"];
-			
-			const Int i_begin = job_ptr[thread];
-			const Int i_end   = job_ptr[thread+1];
-
-            for( Int i = i_begin; i < i_end; ++i )
-            {
-				Real * restrict const near = P_near.data(i);                    
-				Real * restrict const far  = P_far.data(i);   
+		ParallelDo(
+			[&]( const Int thread )
+			{
+				ptr<Real> V_coords__      = V_coords.data();	
+				ptr<Int > simplices__     = simplices.data();
+	
+				Real hull    [",s[n+1],"][",AmbDim,"];
+				Real df      [",AmbDim,"][",DomDim,"];
+				Real dfdagger[",DomDim,"][",AmbDim,"];
+				Real g       [",DomDim,"][",DomDim,"];
+				Real ginv    [",DomDim,"][",DomDim,"];
+	
+				Int simplex  [",s[n+1],"];
+				
+				const Int i_begin = job_ptr[thread];
+				const Int i_end   = job_ptr[thread+1];
+	
+	            for( Int i = i_begin; i < i_end; ++i )
+	            {
+					mut<Real> near = P_near.data(i);                    
+					mut<Real> far  = P_far.data(i);   
             
 ",
-Table[line[4,"simplex[",s[j],"] = simplices__[",s[n+1],"*i +",s[j],"]"],{j,0,n+1-1}],
+Table[line[5,"simplex[",s[j],"] = simplices__[",s[n+1],"*i +",s[j],"]"],{j,0,n+1-1}],
 "\n",
-Table[line[4,"near[",s[1+m j+k],"] = hull[",s[j],"][",s[k],"] = V_coords__[",AmbDim,"*simplex[",s[j],"]+",s[k],"]"],{j,0,n+1-1},{k,0,m-1}],
+Table[line[5,"near[",s[1+m j+k],"] = hull[",s[j],"][",s[k],"] = V_coords__[",AmbDim,"*simplex[",s[j],"]+",s[k],"]"],{j,0,n+1-1},{k,0,m-1}],
 "\n",
-Table[line[4,"far["<>s[k+1]<>"] = ",floatcast@s[1./(n+1),CForm]," * ( ",Riffle[Table[{"hull[",s[j],"][",s[k],"]"},{j,0,n+1-1}]," + "]," )"],{k,0,m-1}],
+Table[line[5,"far["<>s[k+1]<>"] = ",floatcast@s[1./(n+1),CForm]," * ( ",Riffle[Table[{"hull[",s[j],"][",s[k],"]"},{j,0,n+1-1}]," + "]," )"],{k,0,m-1}],
 "\n",
-Table[line[4,"df["<>s[k],"][",s[j]<>"] = hull[",s[j+1],"][",s[k],"] - hull[0][",s[k],"]"],{k,0,m-1},{j,0,n-1}],
+Table[line[5,"df["<>s[k],"][",s[j]<>"] = hull[",s[j+1],"][",s[k],"] - hull[0][",s[k],"]"],{k,0,m-1},{j,0,n-1}],
 "\n",
-Table[line[4,"g[",s[i],"][",s[j],"] = ",Riffle[Table[{"df[",s[k],"][",s[i]<>"] * df[",s[k],"][",s[j],"]"},{k,0,m-1}]," + "]],{i,0,n-1},{j,0,n-1}],
+Table[line[5,"g[",s[i],"][",s[j],"] = ",Riffle[Table[{"df[",s[k],"][",s[i]<>"] * df[",s[k],"][",s[j],"]"},{k,0,m-1}]," + "]],{i,0,n-1},{j,0,n-1}],
 "
-                Real det = g[0][0] * g[1][1] - g[0][1] * g[0][1];
-
-				near[0] = far[0] = sqrt( fabs(det) ) * ",floatcast["0.5"],";
-
-                Real invdet = ",floatcast["1"],"/det;
-                ginv[0][0] =  g[1][1] * invdet;
-                ginv[0][1] = -g[0][1] * invdet;
-                ginv[1][1] =  g[0][0] * invdet;
-                
-                //  dfdagger = g^{-1} * df^T (",DomDim," x ",AmbDim," matrix)
+	                Real det = g[0][0] * g[1][1] - g[0][1] * g[0][1];
+	
+					near[0] = far[0] = sqrt( fabs(det) ) * ",floatcast["0.5"],";
+	
+	                Real invdet = ",floatcast["1"],"/det;
+	                ginv[0][0] =  g[1][1] * invdet;
+	                ginv[0][1] = -g[0][1] * invdet;
+	                ginv[1][1] =  g[0][0] * invdet;
+	                
+	                //  dfdagger = g^{-1} * df^T (",DomDim," x ",AmbDim," matrix)
 ",
- Table[line[4,"dfdagger[",s[j],"][",s[k],"] = ",Riffle[Table[{"ginv[",s[Min[i,j]],"][",s[Max[i,j]],"] * df[",s[k],"][",s[i],"]"},{i,0,n-1}]," + "]],{j,0,n-1},{k,0,m-1}],"            
+ Table[line[5,"dfdagger[",s[j],"][",s[k],"] = ",Riffle[Table[{"ginv[",s[Min[i,j]],"][",s[Max[i,j]],"] * df[",s[k],"][",s[i],"]"},{i,0,n-1}]," + "]],{j,0,n-1},{k,0,m-1}],"            
 ",
 Module[{c=m},
-	Table[line[4,"near[",tostr[++c+n m],"] = far[",tostr[c],"]  = ",If[i==j,floatcast["1"],"  "],Table[{" - df[",s[i],"][",s[k],"] * dfdagger[",s[k],"][",s[j],"]"},{k,0,n-1}]],{i,0,m-1},{j,i,m-1}]
+	Table[line[5,"near[",tostr[++c+n m],"] = far[",tostr[c],"]  = ",If[i==j,floatcast["1"],"  "],Table[{" - df[",s[i],"][",s[k],"] * dfdagger[",s[k],"][",s[j],"]"},{k,0,n-1}]],{i,0,m-1},{j,i,m-1}]
 ],
 "
-            } // for( Int i = i_begin; i < i_end; ++i )
-
-        } // #pragma omp parallel num_threads( ThreadCount() )
+	            } // for( Int i = i_begin; i < i_end; ++i )
+			},
+			ThreadCount()
+		);
 
         ptoc(ClassName()+\"::",name,"\");
     }

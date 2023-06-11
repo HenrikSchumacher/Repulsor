@@ -69,13 +69,13 @@ code1=code0/.scratchrules/.CAssign[symbol_,rhs_]:>CDeclareAssign["const Real",sy
 
 code1=Flatten@MapIndexed[CAssign["buffer__["<>HullSize<>"*i+"<>s[m (#2[[1]]-1)+(#2[[2]]-1)]<>"]",myCForm[#1]]&,Partition[code1,m],{2}];
 
-codestringAssign=StringCases[StringReplace[GenerateCode[CBlock[code1],Indent->4],"Sqrt("->"sqrt("],Longest["{\n"~~x___~~"\n}"]:>x][[1]];
+codestringAssign=StringCases[StringReplace[GenerateCode[CBlock[code1],Indent->5],"Sqrt("->"sqrt("],Longest["{\n"~~x___~~"\n}"]:>x][[1]];
 
 code1=code0/.scratchrules/.CAssign[symbol_,rhs_]:>CDeclareAssign["const Real",symbol,myCForm[rhs]];
 
 code1=Flatten@MapIndexed[CAddTo["buffer__["<>HullSize<>"*i+"<>s[m (#2[[1]]-1)+(#2[[2]]-1)]<>"]",myCForm[#1]]&,Partition[code1,m],{2}];
 
-codestringAddTo=StringCases[StringReplace[GenerateCode[CBlock[code1],Indent->4],"Sqrt("->"sqrt("],Longest["{\n"~~x___~~"\n}"]:>x][[1]];
+codestringAddTo=StringCases[StringReplace[GenerateCode[CBlock[code1],Indent->5],"Sqrt("->"sqrt("],Longest["{\n"~~x___~~"\n}"]:>x][[1]];
 
 
 StringJoin["
@@ -102,19 +102,25 @@ StringJoin["
         
         if( addTo )
 		{
-			#pragma omp parallel for num_threads( ThreadCount() )
-			for( Int i = 0; i < simplices.Dimension(0); ++i )
-			{
+			ParallelDo(
+				[=]( const Int i )
+				{
 "<>codestringAddTo<>"
-			}
+				},
+				simplices.Dimension(0),
+				ThreadCount()
+			);
 		}
 		else
 		{
-			#pragma omp parallel for num_threads( ThreadCount() )
-			for( Int i = 0; i < simplices.Dimension(0); ++i )
-			{
+			ParallelDo(
+				[=]( const Int i )
+				{
 "<>codestringAssign<>"
-			}
+				},
+				simplices.Dimension(0),
+				ThreadCount()
+			);
 		}
 
         ptoc(ClassName()+\"::"<>name<>"\");
@@ -166,13 +172,13 @@ code1=code0/.scratchrules/.CAssign[symbol_,rhs_]:>CDeclareAssign["const Real",sy
 
 code1[[-1]]=Flatten@MapIndexed[CAssign["buffer__["<>HullSize<>"*i+"<>s[m (#2[[1]]-1)+(#2[[2]]-1)]<>"]",myCForm[#1]]&,Partition[code1[[-1]],m],{2}];
 
-codestringAssign=StringCases[StringReplace[GenerateCode[CBlock[code1],Indent->4],"Sqrt("->"sqrt("],Longest["{\n"~~x___~~"\n}"]:>x][[1]];
+codestringAssign=StringCases[StringReplace[GenerateCode[CBlock[code1],Indent->5],"Sqrt("->"sqrt("],Longest["{\n"~~x___~~"\n}"]:>x][[1]];
 
 code1=code0/.scratchrules/.CAssign[symbol_,rhs_]:>CDeclareAssign["const Real",symbol,myCForm[rhs]];
 
 code1[[-1]]=Flatten@MapIndexed[CAddTo["buffer__["<>HullSize<>"*i+"<>s[m (#2[[1]]-1)+(#2[[2]]-1)]<>"]",myCForm[#1]]&,Partition[code1[[-1]],m],{2}];
 
-codestringAddTo=StringCases[StringReplace[GenerateCode[CBlock[code1],Indent->4],"Sqrt("->"sqrt("],Longest["{\n"~~x___~~"\n}"]:>x][[1]];
+codestringAddTo=StringCases[StringReplace[GenerateCode[CBlock[code1],Indent->5],"Sqrt("->"sqrt("],Longest["{\n"~~x___~~"\n}"]:>x][[1]];
 
 
 StringJoin["
@@ -199,19 +205,25 @@ StringJoin["
         
         if( addTo )
 		{
-			#pragma omp parallel for num_threads( ThreadCount() )
-			for( Int i = 0; i < simplices.Dimension(0); ++i )
-			{
+			ParallelDo(
+				[=]( const Int i )
+				{
 "<>codestringAddTo<>"
-			}
+				},
+				simplices.Dimension(0),
+				ThreadCount()
+			);
 		}
 		else
 		{
-			#pragma omp parallel for num_threads( ThreadCount() )
-			for( Int i = 0; i < simplices.Dimension(0); ++i )
-			{
+			ParallelDo(
+				[=]( const Int i )
+				{
 "<>codestringAssign<>"
-			}
+				},
+				simplices.Dimension(0),
+				ThreadCount()
+			);
 		}
 
         ptoc(ClassName()+\"::"<>name<>"\");
@@ -278,13 +290,13 @@ code1=code0/.scratchrules/.CAssign[symbol_,rhs_]:>CDeclareAssign["const Real",sy
 
 code1[[-1]]=Flatten@MapIndexed[CAssign["buffer__["<>HullSize<>"*i+"<>s[m (#2[[1]]-1)+(#2[[2]]-1)]<>"]",myCForm[#1]]&,Partition[code1[[-1]],m],{2}];
 
-codestringAssign=StringCases[StringReplace[GenerateCode[CBlock[code1],Indent->4],"Sqrt("->"sqrt("],Longest["{\n"~~x___~~"\n}"]:>x][[1]];
+codestringAssign=StringCases[StringReplace[GenerateCode[CBlock[code1],Indent->5],"Sqrt("->"sqrt("],Longest["{\n"~~x___~~"\n}"]:>x][[1]];
 
 code1=code0/.scratchrules/.CAssign[symbol_,rhs_]:>CDeclareAssign["const Real",symbol,myCForm[rhs]];
 
 code1[[-1]]=Flatten@MapIndexed[CAddTo["buffer__["<>HullSize<>"*i+"<>s[m (#2[[1]]-1)+(#2[[2]]-1)]<>"]",myCForm[#1]]&,Partition[code1[[-1]],m],{2}];
 
-codestringAddTo=StringCases[StringReplace[GenerateCode[CBlock[code1],Indent->4],"Sqrt("->"sqrt("],Longest["{\n"~~x___~~"\n}"]:>x][[1]];
+codestringAddTo=StringCases[StringReplace[GenerateCode[CBlock[code1],Indent->5],"Sqrt("->"sqrt("],Longest["{\n"~~x___~~"\n}"]:>x][[1]];
 
 StringJoin["
     void ",name,"( 
@@ -310,19 +322,25 @@ StringJoin["
 
 		if( addTo )
 		{
-			#pragma omp parallel for num_threads( ThreadCount() )
-			for( Int i = 0; i < simplices.Dimension(0); ++i )
-			{
+			ParallelDo(
+				[=]( const Int i )
+				{
 "<>codestringAddTo<>"
-			}
+				},
+				simplices.Dimension(0),
+				ThreadCount()
+			);
 		}
 		else
 		{
-			#pragma omp parallel for num_threads( ThreadCount() )
-			for( Int i = 0; i < simplices.Dimension(0); ++i )
-			{
+			ParallelDo(
+				[=]( const Int i )
+				{
 "<>codestringAssign<>"
-			}
+				},
+				simplices.Dimension(0),
+				ThreadCount()
+			);
 		}
 
         ptoc(ClassName()+\"::"<>name<>"\");

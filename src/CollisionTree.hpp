@@ -121,17 +121,23 @@ namespace Repulsor
                 
                 ptic(ClassName()+"::PrimitiveCollisionMatrix: Reduce kernels");
 
-                #pragma omp parallel for num_threads(thread_count)
-                for( Int thread = 0; thread < thread_count; ++thread )
-                {
-                    kernels[thread].triples.Finalize();
-                }
                 
-                #pragma omp parallel for num_threads(thread_count)
-                for( Int thread = 0; thread < thread_count; ++thread )
-                {
-                    triples[thread] = std::move( kernels[thread].triples );
-                }
+                ParallelDo(
+                    [&kernels]( const Int thread )
+                    {
+                        kernels[thread].triples.Finalize();
+                    },
+                    thread_count
+                );
+                
+                ParallelDo(
+                    [&kernels,&triples]( const Int thread )
+                    {
+                        triples[thread] = std::move( kernels[thread].triples );
+                    },
+                    thread_count
+                );
+
                 ptoc(ClassName()+"::PrimitiveCollisionMatrix: Reduce kernels");
                 
                 P_collision_matrix = CollisionMatrix_T(

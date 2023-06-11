@@ -58,62 +58,65 @@ StringJoin[
         
         const JobPointers<Int> job_ptr ( simplices.Dimension(0), ThreadCount() );
         
-        #pragma omp parallel for num_threads( ThreadCount() )
-        for( Int thread = 0; thread < ThreadCount(); ++thread )
-        {
-			mut<Int> AvOp_outer = AvOp.Outer().data();
-			mut<Int> AvOp_inner = AvOp.Inner().data();
-			AvOp.Value().Fill(static_cast<Real>(1));
-
-			mut<Int> DiffOp_outer = DiffOp.Outer().data();
-			mut<Int> DiffOp_inner = DiffOp.Inner().data();
-			DiffOp.Value().SetZero();
-
-			ptr<Real> V_coords__      = V_coords.data();
-			
-			ptr<Int>  simplices__     = simplices.data();
-			mut<Real> P_hull_coords__ = P_hull_coords.data();
-		    mut<Real> P_coords__      = P_coords.data();
-
-			Int simplex        [",s[n+1],"];
-			Int sorted_simplex [",s[n+1],"];
-
-			const Int i_begin = job_ptr[thread];
-			const Int i_end   = job_ptr[thread+1];
-
-            for( Int i = i_begin; i < i_end; ++i )
-            {
-
-				mut<Real> near = P_near.data(i);                    
-				mut<Real> far  = P_far.data(i);
+		ParallelDo(
+			[&]( const Int thread )
+			{
+				mut<Int> AvOp_outer = AvOp.Outer().data();
+				mut<Int> AvOp_inner = AvOp.Inner().data();
+				AvOp.Value().Fill(static_cast<Real>(1));
+	
+				mut<Int> DiffOp_outer = DiffOp.Outer().data();
+				mut<Int> DiffOp_inner = DiffOp.Inner().data();
+				DiffOp.Value().SetZero();
+	
+				ptr<Real> V_coords__      = V_coords.data();
+				
+				ptr<Int>  simplices__     = simplices.data();
+				mut<Real> P_hull_coords__ = P_hull_coords.data();
+			    mut<Real> P_coords__      = P_coords.data();
+	
+				Int simplex        [",s[n+1],"];
+				Int sorted_simplex [",s[n+1],"];
+	
+				const Int i_begin = job_ptr[thread];
+				const Int i_end   = job_ptr[thread+1];
+	
+	            for( Int i = i_begin; i < i_end; ++i )
+	            {
+	
+					mut<Real> near = P_near.data(i);                    
+					mut<Real> far  = P_far.data(i);
 
 ",
-Table[line[4,"simplex[",s[j],"] = sorted_simplex[",s[j],"] = simplices__[",s[n+1],"*i +",s[j],"]"],{j,0,n+1-1}],
+Table[line[5,"simplex[",s[j],"] = sorted_simplex[",s[j],"] = simplices__[",s[n+1],"*i +",s[j],"]"],{j,0,n+1-1}],
 "                  
-                // sorting simplex so that we do not have to sort the sparse arrays to achieve CSR format later
-                std::sort( sorted_simplex, sorted_simplex + ",s[n+1]," );
-
-				AvOp_outer[i+1] = (i+1) * ",s[n+1],";  
+	                // sorting simplex so that we do not have to sort the sparse arrays to achieve CSR format later
+	                std::sort( sorted_simplex, sorted_simplex + ",s[n+1]," );
+	
+					AvOp_outer[i+1] = (i+1) * ",s[n+1],";  
                       
 ",
-Table[line[4,"AvOp_inner[",s[n+1],"*i+",s[j],"] = sorted_simplex[",s[j],"]"],{j,0,n+1-1}],
+Table[line[5,"AvOp_inner[",s[n+1],"*i+",s[j],"] = sorted_simplex[",s[j],"]"],{j,0,n+1-1}],
 "\n",
-Table[line[4,"DiffOp_outer[",AmbDim,"*i+",s[k],"] = (",AmbDim," * i + ",s[k],") * ",s[n+1]],{k,0,m-1}],
+Table[line[5,"DiffOp_outer[",AmbDim,"*i+",s[k],"] = (",AmbDim," * i + ",s[k],") * ",s[n+1]],{k,0,m-1}],
 "\n",
-Table[line[4,"DiffOp_inner[(i*",AmbDim,"+",s[k],")*",s[n+1],"+",s[j],"] = sorted_simplex[",s[j],"]"],{j,0,n+1-1},{k,0,m-1}],
+Table[line[5,"DiffOp_inner[(i*",AmbDim,"+",s[k],")*",s[n+1],"+",s[j],"] = sorted_simplex[",s[j],"]"],{j,0,n+1-1},{k,0,m-1}],
 "\n",
-Table[line[4,"near[",s[1+m j+k],"] = P_hull_coords__[",HullSize,"*i+",s[m j+k],"] = V_coords__[",AmbDim,"*simplex[",s[j],"]+",s[k],"]"],{j,0,n+1-1},{k,0,m-1}],
+Table[line[5,"near[",s[1+m j+k],"] = P_hull_coords__[",HullSize,"*i+",s[m j+k],"] = V_coords__[",AmbDim,"*simplex[",s[j],"]+",s[k],"]"],{j,0,n+1-1},{k,0,m-1}],
 "\n",
-Table[line[4,"far["<>s[k+1]<>"] = P_coords__[",AmbDim,"*i+",s[k],"] = ",s[1./(n+1),CForm]," * ( ",Riffle[Table[{"P_hull_coords__[",HullSize,"*i+",s[m j+k],"]"},{j,0,n+1-1}]," + "]," )"],{k,0,m-1}],
+Table[line[5,"far["<>s[k+1]<>"] = P_coords__[",AmbDim,"*i+",s[k],"] = ",s[1./(n+1),CForm]," * ( ",Riffle[Table[{"P_hull_coords__[",HullSize,"*i+",s[m j+k],"]"},{j,0,n+1-1}]," + "]," )"],{k,0,m-1}],
 "
-                near[",tostr[0],"] = far[",tostr[0],"] = ",floatcast[s[1]],";
+	                near[",tostr[0],"] = far[",tostr[0],"] = ",floatcast[s[1]],";
 ",
 Module[{c=m},
-	Table[line[4,"near[",tostr[++c+n m],"] = far[",tostr[c],"] = ",floatcast[s[Boole[i==j]]]],{i,0,m-1},{j,i,m-1}]
+	Table[line[5,"near[",tostr[++c+n m],"] = far[",tostr[c],"] = ",floatcast[s[Boole[i==j]]]],{i,0,m-1},{j,i,m-1}]
 ],
 "
-            }
-        }
+	            }
+			},
+			ThreadCount()
+		);
+
         ptoc(ClassName()+\"::",name,"\");
     }
 "
@@ -153,87 +156,90 @@ StringJoin[
         
         const JobPointers<Int> job_ptr ( simplices.Dimension(0), ThreadCount() );
         
-        #pragma omp parallel for num_threads( ThreadCount() )
-        for( Int thread = 0; thread < ThreadCount(); ++thread )
-        {
-			mut<Int>  AvOp_outer = AvOp.Outer().data();
-			mut<Int>  AvOp_inner = AvOp.Inner().data();
-			mut<Real> AvOp_value = AvOp.Values().data();
-
-			mut<Int>  DiffOp_outer = DiffOp.Outer().data();
-			mut<Int>  DiffOp_inner = DiffOp.Inner().data();
-			mut<Real> DiffOp_value = DiffOp.Value().data();
-
-			ptr<Real> V_coords__      = V_coords.data();
-			
-			ptr<Int>  simplices__     = simplices.data();
-		    mut<Real> P_hull_coords__ = P_hull_coords.data();
-			mut<Real> P_coords__      = P_coords.data();
-
-			Real df       [",AmbDim,"][",DomDim,"];
-			Real dfdagger [",DomDim,"][",AmbDim,"];
-			Real g        [",DomDim,"][",DomDim,"];
-			Real ginv     [",DomDim,"][",DomDim,"];
-
-			Int simplex        [",s[n+1],"];
-			Int sorted_simplex [",s[n+1],"];
-
-			const Int i_begin = job_ptr[thread];
-			const Int i_end   = job_ptr[thread+1];
-
-            for( Int i = i_begin; i < i_end; ++i )
-            {
-
-				mut<Real> near = P_near.data(i);                    
-				mut<Real> far  = P_far.data(i);
+		ParallelDo(
+			[&]( const Int thread )
+			{
+				mut<Int>  AvOp_outer = AvOp.Outer().data();
+				mut<Int>  AvOp_inner = AvOp.Inner().data();
+				mut<Real> AvOp_value = AvOp.Values().data();
+	
+				mut<Int>  DiffOp_outer = DiffOp.Outer().data();
+				mut<Int>  DiffOp_inner = DiffOp.Inner().data();
+				mut<Real> DiffOp_value = DiffOp.Value().data();
+	
+				ptr<Real> V_coords__      = V_coords.data();
+				
+				ptr<Int>  simplices__     = simplices.data();
+			    mut<Real> P_hull_coords__ = P_hull_coords.data();
+				mut<Real> P_coords__      = P_coords.data();
+	
+				Real df       [",AmbDim,"][",DomDim,"];
+				Real dfdagger [",DomDim,"][",AmbDim,"];
+				Real g        [",DomDim,"][",DomDim,"];
+				Real ginv     [",DomDim,"][",DomDim,"];
+	
+				Int simplex        [",s[n+1],"];
+				Int sorted_simplex [",s[n+1],"];
+	
+				const Int i_begin = job_ptr[thread];
+				const Int i_end   = job_ptr[thread+1];
+	
+	            for( Int i = i_begin; i < i_end; ++i )
+	            {
+	
+					mut<Real> near = P_near.data(i);                    
+					mut<Real> far  = P_far.data(i);
 
 ",
-Table[line[4,"simplex[",s[j],"] = sorted_simplex[",s[j],"] = simplices__[",s[n+1],"*i +",s[j],"]"],{j,0,n+1-1}],
+Table[line[5,"simplex[",s[j],"] = sorted_simplex[",s[j],"] = simplices__[",s[n+1],"*i +",s[j],"]"],{j,0,n+1-1}],
 "                  
-                // sorting simplex so that we do not have to sort the sparse arrays to achieve CSR format later
-                std::sort( sorted_simplex, sorted_simplex + ",s[n+1]," );
-
-				AvOp_outer[i+1] = (i+1) * ",s[n+1],";  
-                      
+	                // sorting simplex so that we do not have to sort the sparse arrays to achieve CSR format later
+	                std::sort( sorted_simplex, sorted_simplex + ",s[n+1]," );
+	
+					AvOp_outer[i+1] = (i+1) * ",s[n+1],";  
+	                      
 ",
-Table[line[4,"AvOp_inner[",s[n+1],"*i+",s[j],"] = sorted_simplex[",s[j],"]"],{j,0,n+1-1}],
+Table[line[5,"AvOp_inner[",s[n+1],"*i+",s[j],"] = sorted_simplex[",s[j],"]"],{j,0,n+1-1}],
 "\n",
-Table[line[4,"AvOp_value[",s[n+1],"*i+",s[j],"] = ",s[1./(n+1),CForm]],{j,0,n+1-1}],
+Table[line[5,"AvOp_value[",s[n+1],"*i+",s[j],"] = ",s[1./(n+1),CForm]],{j,0,n+1-1}],
 "\n",
-Table[line[4,"DiffOp_outer[",AmbDim,"*i+",s[k],"] = (",AmbDim," * i + ",s[k],") * ",s[n+1]],{k,0,m-1}],
+Table[line[5,"DiffOp_outer[",AmbDim,"*i+",s[k],"] = (",AmbDim," * i + ",s[k],") * ",s[n+1]],{k,0,m-1}],
 "\n",
-Table[line[4,"DiffOp_inner[(i*",AmbDim,"+",s[k],")*",s[n+1],"+",s[j],"] = sorted_simplex[",s[j],"]"],{j,0,n+1-1},{k,0,m-1}],
+Table[line[5,"DiffOp_inner[(i*",AmbDim,"+",s[k],")*",s[n+1],"+",s[j],"] = sorted_simplex[",s[j],"]"],{j,0,n+1-1},{k,0,m-1}],
 "\n",
-Table[line[4,"near[",s[1+m j+k],"] = P_hull_coords__[",HullSize,"*i+",s[m j+k],"] = V_coords__[",AmbDim,"*simplex[",s[j],"]+",s[k],"]"],{j,0,n+1-1},{k,0,m-1}],
+Table[line[5,"near[",s[1+m j+k],"] = P_hull_coords__[",HullSize,"*i+",s[m j+k],"] = V_coords__[",AmbDim,"*simplex[",s[j],"]+",s[k],"]"],{j,0,n+1-1},{k,0,m-1}],
 "\n",
-Table[line[4,"far["<>s[k+1]<>"] = P_coords__[",AmbDim,"*i+",s[k],"] = ",s[1./(n+1),CForm]," * ( ",Riffle[Table[{"P_hull_coords__[",HullSize,"*i+",s[m j+k],"]"},{j,0,n+1-1}]," + "]," )"],{k,0,m-1}],
+Table[line[5,"far["<>s[k+1]<>"] = P_coords__[",AmbDim,"*i+",s[k],"] = ",s[1./(n+1),CForm]," * ( ",Riffle[Table[{"P_hull_coords__[",HullSize,"*i+",s[m j+k],"]"},{j,0,n+1-1}]," + "]," )"],{k,0,m-1}],
 "\n",
-Table[line[4,"df["<>s[k],"][",s[j]<>"] = V_coords__[",AmbDim,"*sorted_simplex[",s[j+1],"]+",s[k],"] - V_coords__[",AmbDim,"*sorted_simplex[0]+",s[k],"]"],{k,0,m-1},{j,0,n-1}],
+Table[line[5,"df["<>s[k],"][",s[j]<>"] = V_coords__[",AmbDim,"*sorted_simplex[",s[j+1],"]+",s[k],"] - V_coords__[",AmbDim,"*sorted_simplex[0]+",s[k],"]"],{k,0,m-1},{j,0,n-1}],
 "\n",
-Table[line[4,"g[",s[i],"][",s[j],"] = ",Riffle[Table[{"df[",s[k],"][",s[i]<>"] * df[",s[k],"][",s[j],"]"},{k,0,m-1}]," + "]],{i,0,n-1},{j,0,n-1}],
+Table[line[5,"g[",s[i],"][",s[j],"] = ",Riffle[Table[{"df[",s[k],"][",s[i]<>"] * df[",s[k],"][",s[j],"]"},{k,0,m-1}]," + "]],{i,0,n-1},{j,0,n-1}],
 "
-                near[0] = far[0] = sqrt( fabs(g[0][0]) );
-
-                ginv[0][0] =  ",floatcast["1"],"/g[0][0];
-                
-                //  dfdagger = g^{-1} * df^T (",DomDim," x ",AmbDim," matrix)
+	                near[0] = far[0] = sqrt( fabs(g[0][0]) );
+	
+	                ginv[0][0] =  ",floatcast["1"],"/g[0][0];
+	                
+	                //  dfdagger = g^{-1} * df^T (",DomDim," x ",AmbDim," matrix)
 ",
-Table[line[4,"dfdagger[",s[j],"][",s[k],"] = ",Riffle[Table[{"ginv[",s[Min[i,j]],"][",s[Max[i,j]],"] * df[",s[k],"][",s[i],"]"},{i,0,n-1}]," + "]],{j,0,n-1},{k,0,m-1}],
+Table[line[5,"dfdagger[",s[j],"][",s[k],"] = ",Riffle[Table[{"ginv[",s[Min[i,j]],"][",s[Max[i,j]],"] * df[",s[k],"][",s[i],"]"},{i,0,n-1}]," + "]],{j,0,n-1},{k,0,m-1}],
 "\n",
 Module[{c=m},
-	Table[line[4,"near[",tostr[++c+n m],"] = far[",tostr[c],"] = ",If[i==j,floatcast["1.0"],"  "],Table[{" - df[",s[i],"][",s[k],"] * dfdagger[",s[k],"][",s[j],"]"},{k,0,n-1}]],{i,0,m-1},{j,i,m-1}]
+	Table[line[5,"near[",tostr[++c+n m],"] = far[",tostr[c],"] = ",If[i==j,floatcast["1.0"],"  "],Table[{" - df[",s[i],"][",s[k],"] * dfdagger[",s[k],"][",s[j],"]"},{k,0,n-1}]],{i,0,m-1},{j,i,m-1}]
 ],
 "
-                // derivative operator  ("<>AmbDim<>" x "<>s[n+1]<>" matrix)
+	                // derivative operator  ("<>AmbDim<>" x "<>s[n+1]<>" matrix)
+	
+	                Real * Df = &DiffOp_value[ ",s[m(n+1)]," * i ];
 
-                Real * Df = &DiffOp_value[ ",s[m(n+1)]," * i ];
-
-",Table[{line[4,"Df["<>tostr[k * (n+1)]<>"] =",Table[{" - dfdagger[",s[j],"][",s[k],"]"},{j,0,n-1}]],Table[line[4,"Df["<>tostr[k * (n+1)+j+1]<>"] =   dfdagger[",s[j],"][",s[k],"]"],{j,0,n-1}]}
+",Table[{line[5,"Df["<>tostr[k * (n+1)]<>"] =",Table[{" - dfdagger[",s[j],"][",s[k],"]"},{j,0,n-1}]],Table[line[4,"Df["<>tostr[k * (n+1)+j+1]<>"] =   dfdagger[",s[j],"][",s[k],"]"],{j,0,n-1}]}
 ,
 {k,0,m-1}],
 "
-            }
-        }
+	            }
+			},
+			ThreadCount()
+		);
+
         ptoc(ClassName()+\"::",name,"\");
     }
 "
@@ -274,95 +280,98 @@ StringJoin[
 
         const JobPointers<Int> job_ptr ( simplices.Dimension(0), ThreadCount() );
 
-        #pragma omp parallel for num_threads( ThreadCount() )
-        for( Int thread = 0; thread < ThreadCount(); ++thread )
-        {
-			mut<Int>  AvOp_outer = AvOp.Outer().data();
-			mut<Int>  AvOp_inner = AvOp.Inner().data();
-			mut<Real> AvOp_value = AvOp.Values().data();
-
-			mut<Int>  DiffOp_outer = DiffOp.Outer().data();
-			mut<Int>  DiffOp_inner = DiffOp.Inner().data();
-			mut<Real> DiffOp_value = DiffOp.Values().data();
-
-			ptr<Real> V_coords__      = V_coords.data();
-			
-			ptr<Int>  simplices__     = simplices.data();
-		    mut<Real> P_hull_coords__ = P_hull_coords.data();
-			mut<Real> P_coords__      = P_coords.data();
-
-			Real df       [",AmbDim,"][",DomDim,"];
-			Real dfdagger [",DomDim,"][",AmbDim,"];
-			Real g        [",DomDim,"][",DomDim,"];
-			Real ginv     [",DomDim,"][",DomDim,"];
-
-			Int simplex        [",s[n+1],"];
-            Int sorted_simplex [",s[n+1],"];
-
-			const Int i_begin = job_ptr[thread];
-			const Int i_end   = job_ptr[thread+1];
-
-            for( Int i = i_begin; i < i_end; ++i )
-            {
-
-				mut<Real> near = P_near.data(i);                    
-				mut<Real> far  = P_far.data(i);
+		ParallelDo(
+			[&]( const Int thread )
+			{
+				mut<Int>  AvOp_outer = AvOp.Outer().data();
+				mut<Int>  AvOp_inner = AvOp.Inner().data();
+				mut<Real> AvOp_value = AvOp.Values().data();
+	
+				mut<Int>  DiffOp_outer = DiffOp.Outer().data();
+				mut<Int>  DiffOp_inner = DiffOp.Inner().data();
+				mut<Real> DiffOp_value = DiffOp.Values().data();
+	
+				ptr<Real> V_coords__      = V_coords.data();
+				
+				ptr<Int>  simplices__     = simplices.data();
+			    mut<Real> P_hull_coords__ = P_hull_coords.data();
+				mut<Real> P_coords__      = P_coords.data();
+	
+				Real df       [",AmbDim,"][",DomDim,"];
+				Real dfdagger [",DomDim,"][",AmbDim,"];
+				Real g        [",DomDim,"][",DomDim,"];
+				Real ginv     [",DomDim,"][",DomDim,"];
+	
+				Int simplex        [",s[n+1],"];
+	            Int sorted_simplex [",s[n+1],"];
+	
+				const Int i_begin = job_ptr[thread];
+				const Int i_end   = job_ptr[thread+1];
+	
+	            for( Int i = i_begin; i < i_end; ++i )
+	            {
+	
+					mut<Real> near = P_near.data(i);                    
+					mut<Real> far  = P_far.data(i);
 
 ",
-Table[line[4,"simplex[",s[j],"] = sorted_simplex[",s[j],"] = simplices__[",s[n+1],"*i +",s[j],"]"],{j,0,n+1-1}],
+Table[line[5,"simplex[",s[j],"] = sorted_simplex[",s[j],"] = simplices__[",s[n+1],"*i +",s[j],"]"],{j,0,n+1-1}],
 "                  
-                // sorting simplex so that we do not have to sort the sparse arrays to achieve CSR format later
-                std::sort( sorted_simplex, sorted_simplex + ",s[n+1]," );
+	                // sorting simplex so that we do not have to sort the sparse arrays to achieve CSR format later
+	                std::sort( sorted_simplex, sorted_simplex + ",s[n+1]," );
 ","
-				AvOp_outer[i+1] = (i+1) * ",s[n+1],";                      
+					AvOp_outer[i+1] = (i+1) * ",s[n+1],";                      
 ",
-Table[line[4,"AvOp_inner[",s[n+1],"*i+",s[j],"] = sorted_simplex[",s[j],"]"],{j,0,n+1-1}],"\n",
-Table[line[4,"AvOp_value[",s[n+1],"*i+",s[j],"] = ",s[1./(n+1),CForm]],{j,0,n+1-1}],"\n",
-Table[line[4,"DiffOp_outer[",AmbDim,"*i+",s[k],"] = (",AmbDim," * i + ",s[k],") * ",s[n+1]]
+Table[line[5,"AvOp_inner[",s[n+1],"*i+",s[j],"] = sorted_simplex[",s[j],"]"],{j,0,n+1-1}],"\n",
+Table[line[5,"AvOp_value[",s[n+1],"*i+",s[j],"] = ",s[1./(n+1),CForm]],{j,0,n+1-1}],"\n",
+Table[line[5,"DiffOp_outer[",AmbDim,"*i+",s[k],"] = (",AmbDim," * i + ",s[k],") * ",s[n+1]]
 ,{k,0,m-1}],
 "\n",
-Table[line[4,"DiffOp_inner[(i * ",AmbDim," + ",s[k],") * ",s[n+1]," + ",s[j]," ] = sorted_simplex[",s[j],"]"],{k,0,m-1},{j,0,n+1-1}],
+Table[line[5,"DiffOp_inner[(i * ",AmbDim," + ",s[k],") * ",s[n+1]," + ",s[j]," ] = sorted_simplex[",s[j],"]"],{k,0,m-1},{j,0,n+1-1}],
 "\n",
 Table[
-line[4,"near[",s[1+m j+k],"] = P_hull_coords__[",HullSize,"*i+",s[m j+k],"] = V_coords__[",AmbDim,"*simplex[",s[j],"]+",s[k],"]"],{j,0,n+1-1},{k,0,m-1}],
+line[5,"near[",s[1+m j+k],"] = P_hull_coords__[",HullSize,"*i+",s[m j+k],"] = V_coords__[",AmbDim,"*simplex[",s[j],"]+",s[k],"]"],{j,0,n+1-1},{k,0,m-1}],
 "\n",
 Table[
-line[4,"far["<>s[k+1]<>"] = P_coords__[",AmbDim,"*i+",s[k],"] = ",s[1./(n+1),CForm]," * ( ",Riffle[Table[{"P_hull_coords__[",HullSize,"*i+",s[m j+k],"]"},{j,0,n+1-1}]," + "]," )"],{k,0,m-1}],
+line[5,"far["<>s[k+1]<>"] = P_coords__[",AmbDim,"*i+",s[k],"] = ",s[1./(n+1),CForm]," * ( ",Riffle[Table[{"P_hull_coords__[",HullSize,"*i+",s[m j+k],"]"},{j,0,n+1-1}]," + "]," )"],{k,0,m-1}],
 "\n",
-Table[line[4,"df["<>s[k],"][",s[j]<>"] = V_coords__[",AmbDim,"*sorted_simplex[",s[j+1],"]+",s[k],"] - V_coords__[",AmbDim,"*sorted_simplex[0]+",s[k],"]"],{k,0,m-1},{j,0,n-1}],
+Table[line[5,"df["<>s[k],"][",s[j]<>"] = V_coords__[",AmbDim,"*sorted_simplex[",s[j+1],"]+",s[k],"] - V_coords__[",AmbDim,"*sorted_simplex[0]+",s[k],"]"],{k,0,m-1},{j,0,n-1}],
 "\n",
-Table[line[4,"g[",s[i],"][",s[j],"] = ",Riffle[Table[{"df[",s[k],"][",s[i]<>"] * df[",s[k],"][",s[j],"]"},{k,0,m-1}]," + "]],{i,0,n-1},{j,0,n-1}],
+Table[line[5,"g[",s[i],"][",s[j],"] = ",Riffle[Table[{"df[",s[k],"][",s[i]<>"] * df[",s[k],"][",s[j],"]"},{k,0,m-1}]," + "]],{i,0,n-1},{j,0,n-1}],
 "
-                Real det = g[0][0] * g[1][1] - g[0][1] * g[0][1];
-
-                near[0] = far[0] = sqrt( fabs(det) ) * ",floatcast["0.5"],";
-
-                Real invdet = ",floatcast["1.0"],"/det;
-                ginv[0][0] =  g[1][1] * invdet;
-                ginv[0][1] = -g[0][1] * invdet;
-                ginv[1][1] =  g[0][0] * invdet;
-                
-                //  dfdagger = g^{-1} * df^T ("<>DomDim<>" x "<>AmbDim<>" matrix)
+	                Real det = g[0][0] * g[1][1] - g[0][1] * g[0][1];
+	
+	                near[0] = far[0] = sqrt( fabs(det) ) * ",floatcast["0.5"],";
+	
+	                Real invdet = ",floatcast["1.0"],"/det;
+	                ginv[0][0] =  g[1][1] * invdet;
+	                ginv[0][1] = -g[0][1] * invdet;
+	                ginv[1][1] =  g[0][0] * invdet;
+	                
+	                //  dfdagger = g^{-1} * df^T ("<>DomDim<>" x "<>AmbDim<>" matrix)
 ",  
-Table[line[4,"dfdagger[",s[j],"][",s[k],"] = ",Riffle[Table[{"ginv[",s[Min[i,j]],"][",s[Max[i,j]],"] * df[",s[k],"][",s[i],"]"},{i,0,n-1}]," + "]],{j,0,n-1},{k,0,m-1}],"            
+Table[line[5,"dfdagger[",s[j],"][",s[k],"] = ",Riffle[Table[{"ginv[",s[Min[i,j]],"][",s[Max[i,j]],"] * df[",s[k],"][",s[i],"]"},{i,0,n-1}]," + "]],{j,0,n-1},{k,0,m-1}],"            
 ",
 Module[{c=m},
-	Table[line[4,"near[",tostr[++c+n m],"] = far[",tostr[c],"]  = ",If[i==j,floatcast["1.0"],"  "],Table[{" - df[",s[i],"][",s[k],"] * dfdagger[",s[k],"][",s[j],"]"},{k,0,n-1}]],{i,0,m-1},{j,i,m-1}]
+	Table[line[5,"near[",tostr[++c+n m],"] = far[",tostr[c],"]  = ",If[i==j,floatcast["1.0"],"  "],Table[{" - df[",s[i],"][",s[k],"] * dfdagger[",s[k],"][",s[j],"]"},{k,0,n-1}]],{i,0,m-1},{j,i,m-1}]
 ],
 "
-                // derivative operator  ("<>AmbDim<>" x "<>s[n+1]<>" matrix)
-
-                mut<Real> Df = &DiffOp_value[ ",s[m(n+1)]," * i ];
+	                // derivative operator  ("<>AmbDim<>" x "<>s[n+1]<>" matrix)
+	
+	                mut<Real> Df = &DiffOp_value[ ",s[m(n+1)]," * i ];
 
 ",
 StringJoin[
 	Table[{
-		line[4,"Df["<>tostr[k * (n+1)]<>"] =",Table[{" - dfdagger[",s[j],"][",s[k],"]"},{j,0,n-1}]],
-		Table[line[4,"Df["<>tostr[k * (n+1)+j+1]<>"] =   dfdagger[",s[j],"][",s[k],"]"],{j,0,n-1}]
+		line[5,"Df["<>tostr[k * (n+1)]<>"] =",Table[{" - dfdagger[",s[j],"][",s[k],"]"},{j,0,n-1}]],
+		Table[line[5,"Df["<>tostr[k * (n+1)+j+1]<>"] =   dfdagger[",s[j],"][",s[k],"]"],{j,0,n-1}]
 		},{k,0,m-1}]],
 "
-            }
-        }
+	            }
+			},
+			ThreadCount()
+		);
+
         ptoc(ClassName()+\"::",name,"\");
     }
 "]

@@ -55,7 +55,7 @@ namespace Repulsor
         
     public:
 
-        __attribute__((flatten)) Real Compute()
+        force_flattening Real Compute()
         {
             ptic(ClassName()+"::Compute");
             
@@ -84,10 +84,8 @@ namespace Repulsor
 
             Real global_sum = Scalar::Zero<Real>;
 
-            if( thread_count > 1 )
-            {
-                #pragma omp parallel for num_threads( thread_count )
-                for( Int thread = 0; thread < thread_count; ++thread )
+            global_sum = ParallelDoReduce(
+                [&,this]( const Int thread ) -> Real
                 {
                     // Initialize local kernel and feed it all the information that is going to be constant along its life time.
                     
@@ -129,6 +127,7 @@ namespace Repulsor
                         
                     }
                     
+<<<<<<< HEAD
                     #pragma omp critical (AllPairs_Traversor__Compute)
                     {
                         global_sum += local_sum;
@@ -179,6 +178,14 @@ namespace Repulsor
                     global_sum += local_sum;
                 }
             }
+=======
+                    return local_sum;
+                },
+                AddReducer<Real, Real>(),
+                Scalar::Zero<Real>,
+                thread_count
+            );
+>>>>>>> 92d002493f5c95f443158ecc17f14f67f8e01098
 
             ptoc(ClassName()+"::Compute");
 

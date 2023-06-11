@@ -47,6 +47,9 @@ namespace Repulsor
         
         using Obstacle_T         = Base_T;
         
+        static constexpr Int  FAR_DIM = 1 + AMB_DIM + (AMB_DIM * (AMB_DIM + 1)) / 2;
+        static constexpr Int NEAR_DIM = 1 + (DOM_DIM+1) * AMB_DIM + (AMB_DIM * (AMB_DIM + 1)) / 2;
+        
         SimplicialMesh() = default;
 
         SimplicialMesh(
@@ -205,14 +208,14 @@ namespace Repulsor
             return simplices;
         }
 
-        virtual Int FarDim() const override
+        virtual constexpr Int FarDim() const override
         {
-            return 1 + AMB_DIM + (AMB_DIM * (AMB_DIM + 1))/2;
+            return FAR_DIM;
         }
         
-        virtual Int NearDim() const override
+        virtual constexpr Int NearDim() const override
         {
-            return 1 + (DOM_DIM+1)*AMB_DIM + (AMB_DIM * (AMB_DIM + 1))/2;
+            return NEAR_DIM;
         }
         
         virtual Int VertexCount() const override
@@ -252,8 +255,8 @@ namespace Repulsor
             
             this->ClearCache();
             
-            Tensor2<Real,Int> P_near( SimplexCount(), NearDim() );
-            Tensor2<Real,Int> P_far ( SimplexCount(), FarDim()  );
+            Tensor2<Real,Int> P_near( SimplexCount(), NEAR_DIM );
+            Tensor2<Real,Int> P_far ( SimplexCount(), FAR_DIM  );
 
             details.ComputeNearFarData( new_V_coords, simplices, P_near, P_far );
             
@@ -299,26 +302,27 @@ namespace Repulsor
             Tensor2<SReal,Int> P_velocities_serialized ( SimplexCount(), P_moving.VelocitySize(), 0 );
             mut<SReal> P_v_ser = P_velocities_serialized.data();
             
-            
             const Tensor1<Int,Int> & P_ordering = GetClusterTree().PrimitiveOrdering();
 
             JobPointers<Int> job_ptr ( SimplexCount(), thread_count );
             
-            #pragma omp parallel for num_threads(thread_count)
-            for( Int thread = 0; thread < thread_count; ++thread )
-            {
-                MovingPrimitive_T P_mov;
-                
-                const Int i_begin = job_ptr[thread  ];
-                const Int i_end   = job_ptr[thread+1];
-                
-                for( Int i = i_begin; i < i_end; ++i )
+            ParallelDo(
+                [&]( const Int thread )
                 {
-                    const Int j = P_ordering[i];
-                    P_mov.FromVelocitiesIndexList( V_updates.data(), simplices.data(), j );
-                    P_mov.WriteVelocitiesSerialized( P_v_ser, i );
-                }
-            }
+                    MovingPrimitive_T P_mov;
+                    
+                    const Int i_begin = job_ptr[thread  ];
+                    const Int i_end   = job_ptr[thread+1];
+                    
+                    for( Int i = i_begin; i < i_end; ++i )
+                    {
+                        const Int j = P_ordering[i];
+                        P_mov.FromVelocitiesIndexList( V_updates.data(), simplices.data(), j );
+                        P_mov.WriteVelocitiesSerialized( P_v_ser, i );
+                    }
+                },
+                thread_count
+            );
             
             // P_moving and P_velocities_serialized will be swapped against potentiall empty containers.
             GetClusterTree().TakeUpdateVectors(
@@ -368,8 +372,8 @@ namespace Repulsor
                     ptic("Allocations");
                     auto P_coords      = Tensor2<Real,Int> ( SimplexCount(), AMB_DIM, static_cast<Real>(0) );
                     auto P_hull_coords = Tensor3<Real,Int> ( SimplexCount(), DOM_DIM+1, AMB_DIM );
-                    auto P_near        = Tensor2<Real,Int> ( SimplexCount(), NearDim() );
-                    auto P_far         = Tensor2<Real,Int> ( SimplexCount(), FarDim() );
+                    auto P_near        = Tensor2<Real,Int> ( SimplexCount(), NEAR_DIM );
+                    auto P_far         = Tensor2<Real,Int> ( SimplexCount(), FAR_DIM );
 
                     Tensor2<SReal,Int> P_serialized ( SimplexCount(), P_proto.Size() );
 
@@ -402,20 +406,23 @@ namespace Repulsor
                     ptic("Creating primitives");
                     const Int thread_count = job_ptr.ThreadCount();
 
-                    #pragma omp parallel for num_threads(thread_count)
-                    for( Int thread = 0; thread < thread_count; ++thread )
-                    {
-                        Primitive_T P;
-
-                        Int i_begin = job_ptr[thread];
-                        Int i_end   = job_ptr[thread+1];
-
-                        for( Int i = i_begin; i < i_end; ++i )
+                    ParallelDo(
+                        [&]( const Int thread )
                         {
-                            P.SetPointer( P_serialized.data(), i );
-                            P.FromIndexList( V_coords.data(), simplices.data(), i );
-                        }
-                    }
+                            Primitive_T P;
+
+                            const Int i_begin = job_ptr[thread];
+                            const Int i_end   = job_ptr[thread+1];
+
+                            for( Int i = i_begin; i < i_end; ++i )
+                            {
+                                P.SetPointer( P_serialized.data(), i );
+                                P.FromIndexList( V_coords.data(), simplices.data(), i );
+                            }
+                        },
+                        thread_count
+                    );
+
                     ptoc("Creating primitives");
 
                     ptic("Initializing cluster prototypes");
@@ -564,12 +571,12 @@ namespace Repulsor
             
             details.DFarToHulls ( V_coords, simplices, GetClusterTree().PrimitiveDFarFieldData(), buffer, true );
 
-            DerivativeAssembler().Dot(
+            DerivativeAssembler().template Dot<AMB_DIM>(
                 static_cast<Real>(weight),   buffer.data(),
                 static_cast<ExtReal>(addTo), output,
                 AMB_DIM
             );
-             
+
             ptoc(className()+"::Assemble_ClusterTree_Derivatives");
         }
         
