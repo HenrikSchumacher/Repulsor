@@ -1,6 +1,6 @@
 protected:
     
-    void PercolateUp_Recursive( const Int C ) const
+    void PercolateUp_Recursive( const Int C ) const override
     {
         ptic(ClassName()+"::PercolateUp_Recursive");
         switch ( buffer_dim )
@@ -10,101 +10,121 @@ protected:
                 percolateUp_Recursive<1>(C);
                 break;
             }
-            case 2:
+            case AMB_DIM:
             {
-                percolateUp_Recursive<2>(C);
+                percolateUp_Recursive<AMB_DIM>(C);
                 break;
             }
-            case 3:
+            case AMB_DIM * AMB_DIM:
             {
-                percolateUp_Recursive<3>(C);
+                percolateUp_Recursive<AMB_DIM * AMB_DIM>(C);
                 break;
             }
-            case 4:
+            case (AMB_DIM + 1) * AMB_DIM:
             {
-                percolateUp_Recursive<4>(C);
+                percolateUp_Recursive<(AMB_DIM + 1) * AMB_DIM>(C);
                 break;
             }
-            case 5:
+            case FAR_DIM:
             {
-                percolateUp_Recursive<5>(C);
+                percolateUp_Recursive<FAR_DIM>(C);
                 break;
             }
-            case 6:
-            {
-                percolateUp_Recursive<6>(C);
-                break;
-            }
-            case 7:
-            {
-                percolateUp_Recursive<7>(C);
-                break;
-            }
-            case 8:
-            {
-                percolateUp_Recursive<8>(C);
-                break;
-            }
-            case 9:
-            {
-                percolateUp_Recursive<9>(C);
-                break;
-            }
-            case 10:
-            {
-                percolateUp_Recursive<10>(C);
-                break;
-            }
-            case 11:
-            {
-                percolateUp_Recursive<11>(C);
-                break;
-            }
-            case 12:
-            {
-                percolateUp_Recursive<12>(C);
-                break;
-            }
-            case 13:
-            {
-                percolateUp_Recursive<13>(C);
-                break;
-            }
-            case 14:
-            {
-                percolateUp_Recursive<14>(C);
-                break;
-            }
-            case 15:
-            {
-                percolateUp_Recursive<15>(C);
-                break;
-            }
-            case 16:
-            {
-                percolateUp_Recursive<16>(C);
-                break;
-            }
-            case 17:
-            {
-                percolateUp_Recursive<17>(C);
-                break;
-            }
-            case 18:
-            {
-                percolateUp_Recursive<18>(C);
-                break;
-            }
-            case 19:
-            {
-                percolateUp_Recursive<19>(C);
-                break;
-            }
-            case 20:
-            {
-                percolateUp_Recursive<20>(C);
-                break;
-            }
+//            case 2:
+//            {
+//                percolateUp_Recursive<2>(C);
+//                break;
+//            }
+//            case 3:
+//            {
+//                percolateUp_Recursive<3>(C);
+//                break;
+//            }
+//            case 4:
+//            {
+//                percolateUp_Recursive<4>(C);
+//                break;
+//            }
+//            case 5:
+//            {
+//                percolateUp_Recursive<5>(C);
+//                break;
+//            }
+//            case 6:
+//            {
+//                percolateUp_Recursive<6>(C);
+//                break;
+//            }
+//            case 7:
+//            {
+//                percolateUp_Recursive<7>(C);
+//                break;
+//            }
+//            case 8:
+//            {
+//                percolateUp_Recursive<8>(C);
+//                break;
+//            }
+//            case 9:
+//            {
+//                percolateUp_Recursive<9>(C);
+//                break;
+//            }
+//            case 10:
+//            {
+//                percolateUp_Recursive<10>(C);
+//                break;
+//            }
+//            case 11:
+//            {
+//                percolateUp_Recursive<11>(C);
+//                break;
+//            }
+//            case 12:
+//            {
+//                percolateUp_Recursive<12>(C);
+//                break;
+//            }
+//            case 13:
+//            {
+//                percolateUp_Recursive<13>(C);
+//                break;
+//            }
+//            case 14:
+//            {
+//                percolateUp_Recursive<14>(C);
+//                break;
+//            }
+//            case 15:
+//            {
+//                percolateUp_Recursive<15>(C);
+//                break;
+//            }
+//            case 16:
+//            {
+//                percolateUp_Recursive<16>(C);
+//                break;
+//            }
+//            case 17:
+//            {
+//                percolateUp_Recursive<17>(C);
+//                break;
+//            }
+//            case 18:
+//            {
+//                percolateUp_Recursive<18>(C);
+//                break;
+//            }
+//            case 19:
+//            {
+//                percolateUp_Recursive<19>(C);
+//                break;
+//            }
+//            case 20:
+//            {
+//                percolateUp_Recursive<20>(C);
+//                break;
+//            }
             default:
             {
                 percolateUp_Recursive_gen(C);
@@ -178,7 +198,7 @@ protected:
 
 protected:
     
-    void PercolateDown_Recursive( const Int C ) const
+    void PercolateDown_Recursive( const Int C ) const override
     {
         ptic(ClassName()+"::PercolateDown_Recursive");
         switch ( buffer_dim )
@@ -188,101 +208,121 @@ protected:
                 percolateDown_Recursive<1>(C);
                 break;
             }
-            case 2:
+            case AMB_DIM:
             {
-                percolateDown_Recursive<2>(C);
+                percolateDown_Recursive<AMB_DIM>(C);
                 break;
             }
-            case 3:
+            case AMB_DIM * AMB_DIM:
             {
-                percolateDown_Recursive<3>(C);
+                percolateDown_Recursive<AMB_DIM * AMB_DIM>(C);
                 break;
             }
-            case 4:
+            case (AMB_DIM + 1) * AMB_DIM:
             {
-                percolateDown_Recursive<4>(C);
+                percolateDown_Recursive<(AMB_DIM + 1) * AMB_DIM>(C);
                 break;
             }
-            case 5:
+            case FAR_DIM:
             {
-                percolateDown_Recursive<5>(C);
+                percolateDown_Recursive<FAR_DIM>(C);
                 break;
             }
-            case 6:
-            {
-                percolateDown_Recursive<6>(C);
-                break;
-            }
-            case 7:
-            {
-                percolateDown_Recursive<7>(C);
-                break;
-            }
-            case 8:
-            {
-                percolateDown_Recursive<8>(C);
-                break;
-            }
-            case 9:
-            {
-                percolateDown_Recursive<9>(C);
-                break;
-            }
-            case 10:
-            {
-                percolateDown_Recursive<10>(C);
-                break;
-            }
-            case 11:
-            {
-                percolateDown_Recursive<11>(C);
-                break;
-            }
-            case 12:
-            {
-                percolateDown_Recursive<12>(C);
-                break;
-            }
-            case 13:
-            {
-                percolateDown_Recursive<13>(C);
-                break;
-            }
-            case 14:
-            {
-                percolateDown_Recursive<14>(C);
-                break;
-            }
-            case 15:
-            {
-                percolateDown_Recursive<15>(C);
-                break;
-            }
-            case 16:
-            {
-                percolateDown_Recursive<16>(C);
-                break;
-            }
-            case 17:
-            {
-                percolateDown_Recursive<17>(C);
-                break;
-            }
-            case 18:
-            {
-                percolateDown_Recursive<18>(C);
-                break;
-            }
-            case 19:
-            {
-                percolateDown_Recursive<19>(C);
-                break;
-            }
-            case 20:
-            {
-                percolateDown_Recursive<20>(C);
-                break;
-            }
+//            case 2:
+//            {
+//                percolateDown_Recursive<2>(C);
+//                break;
+//            }
+//            case 3:
+//            {
+//                percolateDown_Recursive<3>(C);
+//                break;
+//            }
+//            case 4:
+//            {
+//                percolateDown_Recursive<4>(C);
+//                break;
+//            }
+//            case 5:
+//            {
+//                percolateDown_Recursive<5>(C);
+//                break;
+//            }
+//            case 6:
+//            {
+//                percolateDown_Recursive<6>(C);
+//                break;
+//            }
+//            case 7:
+//            {
+//                percolateDown_Recursive<7>(C);
+//                break;
+//            }
+//            case 8:
+//            {
+//                percolateDown_Recursive<8>(C);
+//                break;
+//            }
+//            case 9:
+//            {
+//                percolateDown_Recursive<9>(C);
+//                break;
+//            }
+//            case 10:
+//            {
+//                percolateDown_Recursive<10>(C);
+//                break;
+//            }
+//            case 11:
+//            {
+//                percolateDown_Recursive<11>(C);
+//                break;
+//            }
+//            case 12:
+//            {
+//                percolateDown_Recursive<12>(C);
+//                break;
+//            }
+//            case 13:
+//            {
+//                percolateDown_Recursive<13>(C);
+//                break;
+//            }
+//            case 14:
+//            {
+//                percolateDown_Recursive<14>(C);
+//                break;
+//            }
+//            case 15:
+//            {
+//                percolateDown_Recursive<15>(C);
+//                break;
+//            }
+//            case 16:
+//            {
+//                percolateDown_Recursive<16>(C);
+//                break;
+//            }
+//            case 17:
+//            {
+//                percolateDown_Recursive<17>(C);
+//                break;
+//            }
+//            case 18:
+//            {
+//                percolateDown_Recursive<18>(C);
+//                break;
+//            }
+//            case 19:
+//            {
+//                percolateDown_Recursive<19>(C);
+//                break;
+//            }
+//            case 20:
+//            {
+//                percolateDown_Recursive<20>(C);
+//                break;
+//            }
             default:
             {
                 percolateDown_Recursive_gen(C);

@@ -1,7 +1,7 @@
 protected:
     
     // Sequential variant that uses a stack instead of recursion.
-    void PercolateUp_DFS( const Int C, const Int max_depth = 64 ) const
+    void PercolateUp_DFS( const Int C, const Int max_depth = 64 ) const override
     {
         switch ( buffer_dim )
         {
@@ -10,101 +10,121 @@ protected:
                 percolateUp_DFS<1>(C,max_depth);
                 break;
             }
-            case 2:
+            case AMB_DIM:
             {
-                percolateUp_DFS<2>(C,max_depth);
+                percolateUp_DFS<AMB_DIM>(C,max_depth);
                 break;
             }
-            case 3:
+            case AMB_DIM * AMB_DIM:
             {
-                percolateUp_DFS<3>(C,max_depth);
+                percolateUp_DFS<AMB_DIM * AMB_DIM>(C,max_depth);
                 break;
             }
-            case 4:
+            case (AMB_DIM + 1) * AMB_DIM:
             {
-                percolateUp_DFS<4>(C,max_depth);
+                percolateUp_DFS<(AMB_DIM + 1) * AMB_DIM>(C,max_depth);
                 break;
             }
-            case 5:
+            case FAR_DIM:
             {
-                percolateUp_DFS<5>(C,max_depth);
+                percolateUp_DFS<FAR_DIM>(C,max_depth);
                 break;
             }
-            case 6:
-            {
-                percolateUp_DFS<6>(C,max_depth);
-                break;
-            }
-            case 7:
-            {
-                percolateUp_DFS<7>(C,max_depth);
-                break;
-            }
-            case 8:
-            {
-                percolateUp_DFS<8>(C,max_depth);
-                break;
-            }
-            case 9:
-            {
-                percolateUp_DFS<9>(C,max_depth);
-                break;
-            }
-            case 10:
-            {
-                percolateUp_DFS<10>(C,max_depth);
-                break;
-            }
-            case 11:
-            {
-                percolateUp_DFS<11>(C,max_depth);
-                break;
-            }
-            case 12:
-            {
-                percolateUp_DFS<12>(C,max_depth);
-                break;
-            }
-            case 13:
-            {
-                percolateUp_DFS<13>(C,max_depth);
-                break;
-            }
-            case 14:
-            {
-                percolateUp_DFS<14>(C,max_depth);
-                break;
-            }
-            case 15:
-            {
-                percolateUp_DFS<15>(C,max_depth);
-                break;
-            }
-            case 16:
-            {
-                percolateUp_DFS<16>(C,max_depth);
-                break;
-            }
-            case 17:
-            {
-                percolateUp_DFS<17>(C,max_depth);
-                break;
-            }
-            case 18:
-            {
-                percolateUp_DFS<18>(C,max_depth);
-                break;
-            }
-            case 19:
-            {
-                percolateUp_DFS<19>(C,max_depth);
-                break;
-            }
-            case 20:
-            {
-                percolateUp_DFS<20>(C,max_depth);
-                break;
-            }
+//            case 2:
+//            {
+//                percolateUp_DFS<2>(C,max_depth);
+//                break;
+//            }
+//            case 3:
+//            {
+//                percolateUp_DFS<3>(C,max_depth);
+//                break;
+//            }
+//            case 4:
+//            {
+//                percolateUp_DFS<4>(C,max_depth);
+//                break;
+//            }
+//            case 5:
+//            {
+//                percolateUp_DFS<5>(C,max_depth);
+//                break;
+//            }
+//            case 6:
+//            {
+//                percolateUp_DFS<6>(C,max_depth);
+//                break;
+//            }
+//            case 7:
+//            {
+//                percolateUp_DFS<7>(C,max_depth);
+//                break;
+//            }
+//            case 8:
+//            {
+//                percolateUp_DFS<8>(C,max_depth);
+//                break;
+//            }
+//            case 9:
+//            {
+//                percolateUp_DFS<9>(C,max_depth);
+//                break;
+//            }
+//            case 10:
+//            {
+//                percolateUp_DFS<10>(C,max_depth);
+//                break;
+//            }
+//            case 11:
+//            {
+//                percolateUp_DFS<11>(C,max_depth);
+//                break;
+//            }
+//            case 12:
+//            {
+//                percolateUp_DFS<12>(C,max_depth);
+//                break;
+//            }
+//            case 13:
+//            {
+//                percolateUp_DFS<13>(C,max_depth);
+//                break;
+//            }
+//            case 14:
+//            {
+//                percolateUp_DFS<14>(C,max_depth);
+//                break;
+//            }
+//            case 15:
+//            {
+//                percolateUp_DFS<15>(C,max_depth);
+//                break;
+//            }
+//            case 16:
+//            {
+//                percolateUp_DFS<16>(C,max_depth);
+//                break;
+//            }
+//            case 17:
+//            {
+//                percolateUp_DFS<17>(C,max_depth);
+//                break;
+//            }
+//            case 18:
+//            {
+//                percolateUp_DFS<18>(C,max_depth);
+//                break;
+//            }
+//            case 19:
+//            {
+//                percolateUp_DFS<19>(C,max_depth);
+//                break;
+//            }
+//            case 20:
+//            {
+//                percolateUp_DFS<20>(C,max_depth);
+//                break;
+//            }
             default:
             {
                 percolateUp_DFS_gen(C,max_depth);
@@ -260,7 +280,7 @@ protected:
 
     
     // Sequential variant that uses a stack instead of recursion.
-    void PercolateDown_DFS( const Int C, const Int max_depth = 64 ) const
+    void PercolateDown_DFS( const Int C, const Int max_depth = 64 ) const override
     {
 //        ptic(ClassName()+"::PercolateDown_DFS");
         switch ( buffer_dim )
@@ -270,101 +290,121 @@ protected:
                 percolateDown_DFS<1>(C,max_depth);
                 break;
             }
-            case 2:
+            case AMB_DIM:
             {
-                percolateDown_DFS<2>(C,max_depth);
+                percolateDown_DFS<AMB_DIM>(C,max_depth);
                 break;
             }
-            case 3:
+            case AMB_DIM * AMB_DIM:
             {
-                percolateDown_DFS<3>(C,max_depth);
+                percolateDown_DFS<AMB_DIM * AMB_DIM>(C,max_depth);
                 break;
             }
-            case 4:
+            case (AMB_DIM + 1) * AMB_DIM:
             {
-                percolateDown_DFS<4>(C,max_depth);
+                percolateDown_DFS<(AMB_DIM + 1) * AMB_DIM>(C,max_depth);
                 break;
             }
-            case 5:
+            case FAR_DIM:
             {
-                percolateDown_DFS<5>(C,max_depth);
+                percolateDown_DFS<FAR_DIM>(C,max_depth);
                 break;
             }
-            case 6:
-            {
-                percolateDown_DFS<6>(C,max_depth);
-                break;
-            }
-            case 7:
-            {
-                percolateDown_DFS<7>(C,max_depth);
-                break;
-            }
-            case 8:
-            {
-                percolateDown_DFS<8>(C,max_depth);
-                break;
-            }
-            case 9:
-            {
-                percolateDown_DFS<9>(C,max_depth);
-                break;
-            }
-            case 10:
-            {
-                percolateDown_DFS<10>(C,max_depth);
-                break;
-            }
-            case 11:
-            {
-                percolateDown_DFS<11>(C,max_depth);
-                break;
-            }
-            case 12:
-            {
-                percolateDown_DFS<12>(C,max_depth);
-                break;
-            }
-            case 13:
-            {
-                percolateDown_DFS<13>(C,max_depth);
-                break;
-            }
-            case 14:
-            {
-                percolateDown_DFS<14>(C,max_depth);
-                break;
-            }
-            case 15:
-            {
-                percolateDown_DFS<15>(C,max_depth);
-                break;
-            }
-            case 16:
-            {
-                percolateDown_DFS<16>(C,max_depth);
-                break;
-            }
-            case 17:
-            {
-                percolateDown_DFS<17>(C,max_depth);
-                break;
-            }
-            case 18:
-            {
-                percolateDown_DFS<18>(C,max_depth);
-                break;
-            }
-            case 19:
-            {
-                percolateDown_DFS<19>(C,max_depth);
-                break;
-            }
-            case 20:
-            {
-                percolateDown_DFS<20>(C,max_depth);
-                break;
-            }
+//            case 2:
+//            {
+//                percolateDown_DFS<2>(C,max_depth);
+//                break;
+//            }
+//            case 3:
+//            {
+//                percolateDown_DFS<3>(C,max_depth);
+//                break;
+//            }
+//            case 4:
+//            {
+//                percolateDown_DFS<4>(C,max_depth);
+//                break;
+//            }
+//            case 5:
+//            {
+//                percolateDown_DFS<5>(C,max_depth);
+//                break;
+//            }
+//            case 6:
+//            {
+//                percolateDown_DFS<6>(C,max_depth);
+//                break;
+//            }
+//            case 7:
+//            {
+//                percolateDown_DFS<7>(C,max_depth);
+//                break;
+//            }
+//            case 8:
+//            {
+//                percolateDown_DFS<8>(C,max_depth);
+//                break;
+//            }
+//            case 9:
+//            {
+//                percolateDown_DFS<9>(C,max_depth);
+//                break;
+//            }
+//            case 10:
+//            {
+//                percolateDown_DFS<10>(C,max_depth);
+//                break;
+//            }
+//            case 11:
+//            {
+//                percolateDown_DFS<11>(C,max_depth);
+//                break;
+//            }
+//            case 12:
+//            {
+//                percolateDown_DFS<12>(C,max_depth);
+//                break;
+//            }
+//            case 13:
+//            {
+//                percolateDown_DFS<13>(C,max_depth);
+//                break;
+//            }
+//            case 14:
+//            {
+//                percolateDown_DFS<14>(C,max_depth);
+//                break;
+//            }
+//            case 15:
+//            {
+//                percolateDown_DFS<15>(C,max_depth);
+//                break;
+//            }
+//            case 16:
+//            {
+//                percolateDown_DFS<16>(C,max_depth);
+//                break;
+//            }
+//            case 17:
+//            {
+//                percolateDown_DFS<17>(C,max_depth);
+//                break;
+//            }
+//            case 18:
+//            {
+//                percolateDown_DFS<18>(C,max_depth);
+//                break;
+//            }
+//            case 19:
+//            {
+//                percolateDown_DFS<19>(C,max_depth);
+//                break;
+//            }
+//            case 20:
+//            {
+//                percolateDown_DFS<20>(C,max_depth);
+//                break;
+//            }
             default:
             {
                 percolateDown_DFS_gen(C,max_depth);

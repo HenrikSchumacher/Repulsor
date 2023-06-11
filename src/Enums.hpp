@@ -28,7 +28,6 @@ namespace Repulsor
     {
         Sequential,
         Recursive,
-        Tasks,
         Parallel
     };
 

@@ -47,6 +47,9 @@ namespace Repulsor
         
         using Obstacle_T         = Base_T;
         
+        static constexpr Int  FAR_DIM = 1 + AMB_DIM + (AMB_DIM * (AMB_DIM + 1)) / 2;
+        static constexpr Int NEAR_DIM = 1 + (DOM_DIM+1) * AMB_DIM + (AMB_DIM * (AMB_DIM + 1)) / 2;
+        
         SimplicialMesh() = default;
 
         SimplicialMesh(
@@ -205,14 +208,14 @@ namespace Repulsor
             return simplices;
         }
 
-        virtual Int FarDim() const override
+        virtual constexpr Int FarDim() const override
         {
-            return 1 + AMB_DIM + (AMB_DIM * (AMB_DIM + 1))/2;
+            return FAR_DIM;
         }
         
-        virtual Int NearDim() const override
+        virtual constexpr Int NearDim() const override
         {
-            return 1 + (DOM_DIM+1)*AMB_DIM + (AMB_DIM * (AMB_DIM + 1))/2;
+            return NEAR_DIM;
         }
         
         virtual Int VertexCount() const override
@@ -252,8 +255,8 @@ namespace Repulsor
             
             this->ClearCache();
             
-            Tensor2<Real,Int> P_near( SimplexCount(), NearDim() );
-            Tensor2<Real,Int> P_far ( SimplexCount(), FarDim()  );
+            Tensor2<Real,Int> P_near( SimplexCount(), NEAR_DIM );
+            Tensor2<Real,Int> P_far ( SimplexCount(), FAR_DIM  );
 
             details.ComputeNearFarData( new_V_coords, simplices, P_near, P_far );
             
@@ -369,8 +372,8 @@ namespace Repulsor
                     ptic("Allocations");
                     auto P_coords      = Tensor2<Real,Int> ( SimplexCount(), AMB_DIM, static_cast<Real>(0) );
                     auto P_hull_coords = Tensor3<Real,Int> ( SimplexCount(), DOM_DIM+1, AMB_DIM );
-                    auto P_near        = Tensor2<Real,Int> ( SimplexCount(), NearDim() );
-                    auto P_far         = Tensor2<Real,Int> ( SimplexCount(), FarDim() );
+                    auto P_near        = Tensor2<Real,Int> ( SimplexCount(), NEAR_DIM );
+                    auto P_far         = Tensor2<Real,Int> ( SimplexCount(), FAR_DIM );
 
                     Tensor2<SReal,Int> P_serialized ( SimplexCount(), P_proto.Size() );
 
@@ -568,12 +571,12 @@ namespace Repulsor
             
             details.DFarToHulls ( V_coords, simplices, GetClusterTree().PrimitiveDFarFieldData(), buffer, true );
 
-            DerivativeAssembler().Dot(
+            DerivativeAssembler().template Dot<AMB_DIM>(
                 static_cast<Real>(weight),   buffer.data(),
                 static_cast<ExtReal>(addTo), output,
                 AMB_DIM
             );
-             
+
             ptoc(className()+"::Assemble_ClusterTree_Derivatives");
         }
         
