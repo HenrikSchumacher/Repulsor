@@ -44,12 +44,6 @@ namespace Repulsor
 //                    logprint(className()+" using recursive percolation algorithm.");
 //                    break;
 //                }
-//                case TreePercolationAlgorithm::Tasks:
-//                {
-//                       print(className()+" using task-based percolation algorithm.");
-//                    logprint(className()+" using task-based percolation algorithm.");
-//                    break;
-//                }
 //                case TreePercolationAlgorithm::Parallel:
 //                {
 //                       print(className()+" using parallel percolation algorithm.");
@@ -190,11 +184,11 @@ namespace Repulsor
 //##        Get functions
 //##################################################################################################
         
-        virtual Int AmbDim() const = 0;
+        virtual constexpr Int AmbDim() const = 0;
         
-        virtual Int NearDim() const = 0;
+        virtual           Int NearDim() const = 0;
         
-        virtual Int FarDim() const = 0;
+        virtual constexpr Int FarDim() const = 0;
         
         Int ThreadCount() const
         {
@@ -427,14 +421,14 @@ namespace Repulsor
             return P_to_C;
         }
         
-        void RequireBuffers( const Int cols ) const
+        void RequireBuffers( const Int nrhs ) const
         {
             ptic(ClassName()+"::RequireBuffers");
             // TODO: parallelize allocation
-            if( cols > max_buffer_dim )
+            if( nrhs > max_buffer_dim )
             {
-        //        print("Reallocating buffers to max_buffer_dim = " + std::to_string(cols) + "." );
-                max_buffer_dim = cols;
+        //        print("Reallocating buffers to max_buffer_dim = " + std::to_string(nrsh) + "." );
+                max_buffer_dim = nrhs;
                 
                 P_in  = Tensor1<Real,Int> ( PrimitiveCount() * max_buffer_dim );
                 
@@ -445,7 +439,7 @@ namespace Repulsor
                 C_out = Tensor1<Real,Int> ( ClusterCount()   * max_buffer_dim );
                 
             }
-            buffer_dim = cols;
+            buffer_dim = nrhs;
             ptoc(ClassName()+"::RequireBuffers");
             
         }; // RequireBuffers
@@ -462,32 +456,6 @@ namespace Repulsor
         
             ptoc(ClassName()+"::CleanseBuffers");
         }; // CleanseBuffers
-        
-        void PrimitivesToClusters( bool add_to = false ) const
-        {
-            ptic(ClassName()+"::PrimitivesToClusters");
-            
-            P_to_C.Dot(
-                static_cast<Real>(1),      P_in.data(),
-                static_cast<Real>(add_to), C_in.data(),
-                buffer_dim
-            );
-            
-            ptoc(ClassName()+"::PrimitivesToClusters");
-        }
-
-        void ClustersToPrimitives( bool add_to = false ) const
-        {
-            ptic(ClassName()+"::ClustersToPrimitives");
-            
-            C_to_P.Dot(
-                static_cast<Real>(1),      C_out.data(),
-                static_cast<Real>(add_to), P_out.data(),
-                buffer_dim
-            );
-            
-            ptoc(ClassName()+"::ClustersToPrimitives");
-        }
 
         
         void PercolateUp() const
@@ -507,17 +475,6 @@ namespace Repulsor
                 case TreePercolationAlgorithm::Recursive:
                 {
                     PercolateUp_Recursive( 0 );
-                    break;
-                }
-                case TreePercolationAlgorithm::Tasks:
-                {
-                    #pragma omp parallel num_threads( ThreadCount() )
-                    {
-                        #pragma omp single nowait
-                        {
-                            PercolateUp_Tasks( 0 );
-                        }
-                    }
                     break;
                 }
                 case TreePercolationAlgorithm::Parallel:
@@ -551,17 +508,6 @@ namespace Repulsor
                     PercolateDown_Recursive( 0 );
                     break;
                 }
-                case TreePercolationAlgorithm::Tasks :
-                {
-                    #pragma omp parallel num_threads( ThreadCount() )
-                    {
-                        #pragma omp single nowait
-                        {
-                            PercolateDown_Tasks( 0 );
-                        }
-                    }
-                    break;
-                }
                 case TreePercolationAlgorithm::Parallel:
                 {
                     PercolateDown_Parallel();
@@ -575,138 +521,26 @@ namespace Repulsor
 //            ptoc(ClassName()+"::PercolateDown");
         }; // PercolateUp
         
+        
+        virtual void PercolateUp_DFS( const Int C, const Int max_depth = 64 ) const = 0;
+        
+        virtual void PercolateDown_DFS( const Int C, const Int max_depth = 64 ) const = 0;
+        
+        virtual void PercolateUp_Recursive( const Int C ) const = 0;
+        
+        virtual void PercolateDown_Recursive( const Int C ) const = 0;
 
-#include "Percolate_DFS.hpp"
-#include "Percolate_Recursive.hpp"
-#include "Percolate_Tasks.hpp"
 #include "Percolate_Parallel.hpp"
-
-
         
     public:
         
-        void Pre( const ExtReal * input, const Int cols, const OperatorType op_type ) const
-        {
-            ptic(ClassName()+"::Pre");
-            if( pre_post_initialized && mixed_pre_post_initialized )
-            {
-                Sparse::MatrixCSR<Real,Int,Int> * pre;
-                
-                switch( op_type )
-                {
-                    case OperatorType::FractionalOnly:
-                    {
-                        pre  = &lo_pre ;
-                        RequireBuffers( cols );
-                        break;
-                    }
-                    case OperatorType::HighOrder:
-                    {
-                        pre  = &hi_pre ;
-                        RequireBuffers( AmbDim() * cols ); // Beware: The derivative operator increases the number of columns!
-                        break;
-                    }
-                    case OperatorType::LowOrder:
-                    {
-                        pre  = &lo_pre ;
-                        RequireBuffers( cols );
-                        break;
-                    }
-                    case OperatorType::MixedOrder:
-                    {
-                        pre  = &mixed_pre ;
-                        RequireBuffers( (AmbDim()+1) *cols ); // Beware: The mixed preprocessor operator increases the number of columns!
-                        break;
-                    }
-                    default:
-                    {
-                        eprint("Unknown kernel. Doing no.");
-                        ptoc(ClassName()+"::Pre");
-                        return;
-                    }
-                }
-
-                // Caution: Some magic is going on here high order term...
-                // Apply diff/averaging operate, reorder and multiply by weights.
-                ptic(ClassName()+" pre->Dot");
-                pre->Dot(
-                    static_cast<Real>(1), input,
-                    static_cast<Real>(0), P_in.data(),
-                    cols
-                );
-                ptoc(ClassName()+" pre->Dot");
-                
-                // Accumulate into leaf clusters.
-                PrimitivesToClusters(false);
-                
-                PercolateUp();
-            }
-            else
-            {
-                eprint(ClassName()+"::Pre: Preprocessing matrices are not initialized. Doing nothing.");
-            }
-            ptoc(ClassName()+"::Pre");
-        }; // Pre
-
-
-        void Post( ExtReal * output, const ExtReal alpha, const ExtReal beta, const OperatorType op_type ) const
-        {
-            ptic(ClassName()+"::Post");
-            
-            if( pre_post_initialized )
-            {
-                Sparse::MatrixCSR<Real,Int,Int> * post;
-                
-                switch( op_type )
-                {
-                    case OperatorType::FractionalOnly:
-                    {
-                        post  = &lo_post;
-                        break;
-                    }
-                    case OperatorType::HighOrder:
-                    {
-                        post  = &hi_post;
-                        break;
-                    }
-                    case OperatorType::LowOrder:
-                    {
-                        post  = &lo_post;
-                        break;
-                    }
-                    case OperatorType::MixedOrder:
-                    {
-                        post  = &mixed_post;
-                        break;
-                    }
-                    default:
-                    {
-                        eprint("Unknown kernel. Doing nothing.");
-                        ptoc(ClassName()+"::Post");
-                        return;
-                    }
-                }
-              
-                PercolateDown();
-                
-                ClustersToPrimitives( true );
-                                
-                // Multiply by weights, restore external ordering, and apply transpose of diff/averaging operator.
-                
-                ptic(ClassName()+" post->Dot");
-                post->Dot(
-                    alpha, P_out.data(),
-                    beta,  output,
-                    ( PrimitiveCount() * buffer_dim ) / post->ColCount()
-                );
-                ptoc(ClassName()+" post->Dot");
-            }
-            else
-            {
-                eprint(ClassName()+"::Post: Postprocessing matrices are not initialized. Doing nothing.");
-            }
-            ptoc(ClassName()+"::Post");
-        }; // Post
+        virtual void Pre( const ExtReal * input, const Int nrsh, const OperatorType op_type ) const = 0;
+        
+        virtual void Post( ExtReal * output, const ExtReal alpha, const ExtReal beta, const OperatorType op_type ) const = 0;
+        
+        virtual void ClustersToPrimitives( bool add_to = false ) const = 0;
+        
+        virtual void PrimitivesToClusters( bool add_to = false ) const = 0;
         
         
 //################################################################################################
@@ -848,7 +682,7 @@ namespace Repulsor
             
             PercolateDown();
             
-            ClustersToPrimitives( false );
+            this->ClustersToPrimitives( false );
             
             // Now the simplex far field densities are stored in P_out.
             // We have to convert them back to energies before we add the energies from thread_P_D_near.
@@ -918,10 +752,10 @@ namespace Repulsor
 
             Tensor1<ExtReal,Int> dual_volumes ( lo_post.RowCount() );
         
-            lo_post.Dot(
+            lo_post.template Dot<1>(
                 static_cast<Real>(1),    P_in.data(),
                 static_cast<ExtReal>(0), dual_volumes.data(),
-                1
+                static_cast<Int>(1)
             );
         
             //Collect the energies into P_out.
@@ -938,7 +772,7 @@ namespace Repulsor
             );
             
             // Distribute the energy densities to energies per vertex. (Note that lo_post also multiplies by the primitives' volumes!)
-            lo_post.Dot(
+            lo_post.template Dot<1>(
                 static_cast<Real>(1),        P_out.data(),
                 static_cast<ExtReal>(addTo), output,
                 static_cast<Int>(1)

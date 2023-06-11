@@ -1,19 +1,19 @@
 #pragma once
 
-#define BASE BlockKernel_fixed<                                             \
-        AMB_DIM_+1,AMB_DIM_+1,MAX_RHS_COUNT_, true,                         \
-        Scalar_, Scalar_in_, Scalar_out_, Int_, LInt_,                      \
-        alpha_flag, beta_flag,                                              \
-        true, true, false, true,                                            \
-        true, true,                                                         \
-        false                                                               \
+#define BASE BlockKernel_fixed<                                       \
+        AMB_DIM_+1,AMB_DIM_+1,MAX_RHS_COUNT_, true,                   \
+        Real_, Real_in_, Real_out_, Int_, LInt_,                      \
+        alpha_flag, beta_flag,                                        \
+        true, true, false, true,                                      \
+        true, true,                                                   \
+        false                                                         \
     >
 
 namespace Repulsor
 {
     template<
         int AMB_DIM_, int MAX_RHS_COUNT_,
-        typename Scalar_, typename Scalar_in_, typename Scalar_out_, typename Int_, typename LInt_,
+        typename Real_, typename Real_in_, typename Real_out_, typename Int_, typename LInt_,
         int alpha_flag, int beta_flag
     >
     class TP0_Kernel_MultiplyMetric : public BASE
@@ -25,11 +25,11 @@ namespace Repulsor
 
     public:
 
-        using Scalar     = Scalar_;
-        using Scalar_out = Scalar_out_;
-        using Scalar_in  = Scalar_in_;
-        using Int        = Int_;
-        using LInt       = LInt_;
+        using Real     = Real_;
+        using Real_out = Real_out_;
+        using Real_in  = Real_in_;
+        using Int      = Int_;
+        using LInt     = LInt_;
         
         static constexpr Int AMB_DIM = AMB_DIM_;
         
@@ -58,17 +58,17 @@ namespace Repulsor
         
         TP0_Kernel_MultiplyMetric() = delete;
         
-        explicit TP0_Kernel_MultiplyMetric( Scalar * restrict const A_ )
+        explicit TP0_Kernel_MultiplyMetric( Real * restrict const A_ )
         :   Base_T( A_ )
         {}
         
         TP0_Kernel_MultiplyMetric(
-            const Scalar     * restrict const A_,
-            const Scalar_out                  alpha_,
-            const Scalar_in  * restrict const X_,
-            const Scalar_out                  beta_,
-                  Scalar_out * restrict const Y_,
-            const Int                         rhs_count_
+            ptr<Real>      A_,
+            const Real_out alpha_,
+            ptr<Real_in>   X_,
+            const Real_out beta_,
+            mut<Real>      Y_,
+            const Int      rhs_count_
         )
         :   Base_T( A_, alpha_, X_, beta_, Y_, rhs_count_ )
         {}
@@ -88,8 +88,8 @@ namespace Repulsor
 
         force_inline void TransposeBlock( const LInt from, const LInt to ) const
         {
-            const Scalar * restrict const a_from = &A[ BLOCK_NNZ * from];
-                  Scalar * restrict const a_to   = &A[ BLOCK_NNZ * to  ];
+            ptr<Real> a_from = &A[ BLOCK_NNZ * from];
+            mut<Real> a_to   = &A[ BLOCK_NNZ * to  ];
             
             a_to[0] = a_from[0];
             a_to[1] = a_from[1];
@@ -100,7 +100,7 @@ namespace Repulsor
         {
             ReadX( j_global );
             
-            const Scalar * restrict const a = &A_const[BLOCK_NNZ * k_global];
+            ptr<Real> a = &A_const[BLOCK_NNZ * k_global];
             
 /*            The metric block looks like this for AMB_DIM == 3:
 //
@@ -115,7 +115,7 @@ namespace Repulsor
 //              \                               /
 */
             
-            const Scalar a_0 ( a[0] );
+            const Real a_0 ( a[0] );
             
             LOOP_UNROLL_FULL
             for( Int k = 0; k < MAX_RHS_COUNT; ++k )
@@ -123,7 +123,7 @@ namespace Repulsor
                 FMA( a_0, get_x(0,k), get_y(0,k) );
             }
             
-            const Scalar a_1 ( a[1] );
+            const Real a_1 ( a[1] );
             
             LOOP_UNROLL_FULL
             for( Int j = 1; j < COLS; ++j )
@@ -143,7 +143,7 @@ namespace Repulsor
             return "TP0_Kernel_MultiplyMetric<"
                 +ToString(AMB_DIM)
             +","+ToString(MAX_RHS_COUNT)
-            +","+TypeName<Scalar>+","+TypeName<Scalar_in>+","+TypeName<Scalar_out>
+            +","+TypeName<Real>+","+TypeName<Real_in>+","+TypeName<Real_out>
             +","+TypeName<Int>+","+TypeName<LInt>
             +","+ToString(alpha_flag)
             +","+ToString(beta_flag)

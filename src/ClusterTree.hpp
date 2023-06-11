@@ -31,6 +31,9 @@ namespace Repulsor
         // In principle, ThreadTensor3<Real,Int> should have better scaling on multiple socket machines, because I tried to encourages that the thread-local arrays are allocated on local RAM. -- On my tiny Quad Core however, it performs a bit _WORSE_ than Tensor3<Real,Int>.
         using DerivativeContainer_T = typename Base_T::DerivativeContainer_T;
         
+        static constexpr Int  FAR_DIM = 1 + AMB_DIM + (AMB_DIM * (AMB_DIM + 1)) / 2;
+        static constexpr Int NEAR_DIM = 1 + AMB_DIM + (AMB_DIM * (AMB_DIM + 1)) / 2;
+        
     public:
         
         using Base_T::SplitThreshold;
@@ -41,6 +44,8 @@ namespace Repulsor
         //        using Base_T::RequireClusterMoments;
         
     protected:
+            
+        static constexpr Int null = static_cast<Int>(0);
         
         using Base_T::P_ordering;
         using Base_T::P_inverse_ordering;
@@ -80,6 +85,8 @@ namespace Repulsor
         
         using Base_T::depth;
         using Base_T::settings;
+        
+        using Base_T::buffer_dim;
         
         //        using Base_T::stack_array;
         //        using Base_T::queue_array;
@@ -495,7 +502,7 @@ namespace Repulsor
         
     public:
         
-        Int AmbDim() const override
+        constexpr Int AmbDim() const override
         {
             return AMB_DIM;
         }
@@ -522,7 +529,7 @@ namespace Repulsor
         
         Int FarDim() const override
         {
-            return 1 + AMB_DIM + (AMB_DIM*(AMB_DIM+1))/2;
+            return FAR_DIM;
         }
         
     private:
@@ -1014,8 +1021,8 @@ namespace Repulsor
                     // Copy the AMB_DIM rows of DiffOp that belong to primitive i.
                     for( Int k = 0; k < AMB_DIM; ++k )
                     {
-                        const Int read_begin        = di_row_size * (AMB_DIM * j + k);
-                        const Int write_begin       = mi_block_size * i + av_row_size + di_row_size * k;
+                        const Int read_begin  = di_row_size * (AMB_DIM * j + k);
+                        const Int write_begin = mi_block_size * i + av_row_size + di_row_size * k;
                         mi_outer[(AMB_DIM+1)*i+k+1] = write_begin + av_row_size;
                         
                         copy_buffer( &di_inner[read_begin], &mi_inner[write_begin], di_row_size );
@@ -1042,6 +1049,303 @@ namespace Repulsor
             }
             
         } // ComputeMixedPrePost
+        
+    public:
+        
+        void PrimitivesToClusters( bool add_to = false ) const override
+        {
+            ptic(ClassName()+"::PrimitivesToClusters");
+            
+            switch( buffer_dim )
+            {
+                case 1:
+                {
+                    P_to_C.template Dot<1>(
+                        static_cast<Real>(1),      P_in.data(),
+                        static_cast<Real>(add_to), C_in.data(),
+                        1
+                    );
+                    break;
+                }
+                case AMB_DIM:
+                {
+                    P_to_C.template Dot<AMB_DIM>(
+                        static_cast<Real>(1),      P_in.data(),
+                        static_cast<Real>(add_to), C_in.data(),
+                        AMB_DIM
+                    );
+                    break;
+                }
+                case AMB_DIM * AMB_DIM:
+                {
+                    P_to_C.template Dot<AMB_DIM * AMB_DIM>(
+                        static_cast<Real>(1),      P_in.data(),
+                        static_cast<Real>(add_to), C_in.data(),
+                        AMB_DIM * AMB_DIM
+                    );
+                    break;
+                }
+                case (AMB_DIM + 1) * AMB_DIM:
+                {
+                    P_to_C.template Dot<(AMB_DIM + 1) * AMB_DIM>(
+                        static_cast<Real>(1),      P_in.data(),
+                        static_cast<Real>(add_to), C_in.data(),
+                        (AMB_DIM + 1) * AMB_DIM
+                    );
+                    break;
+                }
+                default:
+                {
+                    P_to_C.template Dot<0>(
+                        static_cast<Real>(1),      P_in.data(),
+                        static_cast<Real>(add_to), C_in.data(),
+                        buffer_dim
+                    );
+                    break;
+                }
+            }
+            
+            ptoc(ClassName()+"::PrimitivesToClusters");
+        }
+
+        void ClustersToPrimitives( bool add_to = false ) const override
+        {
+            ptic(ClassName()+"::ClustersToPrimitives");
+            
+            switch ( buffer_dim )
+            {
+                case 1:
+                {
+                    C_to_P.template Dot<1>(
+                        static_cast<Real>(1),      C_out.data(),
+                        static_cast<Real>(add_to), P_out.data(),
+                        1
+                    );
+                    break;
+                }
+                case AMB_DIM:
+                {
+                    C_to_P.template Dot<AMB_DIM>(
+                        static_cast<Real>(1),      C_out.data(),
+                        static_cast<Real>(add_to), P_out.data(),
+                        AMB_DIM
+                    );
+                    break;
+                }
+                case AMB_DIM * AMB_DIM:
+                {
+                    C_to_P.template Dot<AMB_DIM * AMB_DIM>(
+                        static_cast<Real>(1),      C_out.data(),
+                        static_cast<Real>(add_to), P_out.data(),
+                        AMB_DIM * AMB_DIM
+                    );
+                    break;
+                }
+                case (AMB_DIM + 1) * AMB_DIM:
+                {
+                    C_to_P.template Dot<(AMB_DIM + 1) * AMB_DIM>(
+                        static_cast<Real>(1),      C_out.data(),
+                        static_cast<Real>(add_to), P_out.data(),
+                        (AMB_DIM + 1) * AMB_DIM
+                    );
+                    break;
+                }
+                default:
+                {
+                    C_to_P.template Dot<0>(
+                        static_cast<Real>(1),      C_out.data(),
+                        static_cast<Real>(add_to), P_out.data(),
+                        buffer_dim
+                    );
+                    break;
+                }
+            }
+
+            ptoc(ClassName()+"::ClustersToPrimitives");
+        }
+        
+        
+        void Pre( const ExtReal * input, const Int nrhs, const OperatorType op_type ) const override
+        {
+            ptic(ClassName()+"::Pre");
+            if( this->pre_post_initialized && this->mixed_pre_post_initialized )
+            {
+                Sparse::MatrixCSR<Real,Int,Int> * pre;
+                
+                switch( op_type )
+                {
+                    case OperatorType::FractionalOnly:
+                    {
+                        pre  = &lo_pre ;
+                        this->RequireBuffers( nrhs );
+                        break;
+                    }
+                    case OperatorType::HighOrder:
+                    {
+                        pre  = &hi_pre ;
+                        this->RequireBuffers( AmbDim() * nrhs ); // Beware: The derivative operator increases the number of columns!
+                        break;
+                    }
+                    case OperatorType::LowOrder:
+                    {
+                        pre  = &lo_pre ;
+                        this->RequireBuffers( nrhs );
+                        break;
+                    }
+                    case OperatorType::MixedOrder:
+                    {
+                        pre  = &mixed_pre ;
+                        this->RequireBuffers( (AmbDim()+1) * nrhs ); // Beware: The mixed preprocessor operator increases the number of columns!
+                        break;
+                    }
+                    default:
+                    {
+                        eprint("Unknown kernel. Doing no.");
+                        ptoc(ClassName()+"::Pre");
+                        return;
+                    }
+                }
+
+                // Caution: Some magic is going on here high order term...
+                // Apply diff/averaging operate, reorder and multiply by weights.
+                ptic(ClassName()+" pre->Dot");
+                
+                switch( nrhs )
+                {
+                    case 1:
+                    {
+                        pre->template Dot<1>(
+                            static_cast<Real>(1), input,
+                            static_cast<Real>(0), P_in.data(),
+                            1
+                        );
+                        break;
+                    }
+                    case AMB_DIM:
+                    {
+                        pre->template Dot<AMB_DIM>(
+                            static_cast<Real>(1), input,
+                            static_cast<Real>(0), P_in.data(),
+                                                   AMB_DIM
+                        );
+                        break;
+                    }
+                    default:
+                    {
+                        pre->template Dot<0>(
+                            static_cast<Real>(1), input,
+                            static_cast<Real>(0), P_in.data(),
+                            nrhs
+                        );
+                        break;
+                    }
+                }
+                ptoc(ClassName()+" pre->Dot");
+                
+                // Accumulate into leaf clusters.
+                PrimitivesToClusters(false);
+                
+                this->PercolateUp();
+            }
+            else
+            {
+                eprint(ClassName()+"::Pre: Preprocessing matrices are not initialized. Doing nothing.");
+            }
+            ptoc(ClassName()+"::Pre");
+        }; // Pre
+
+
+        void Post( ExtReal * output, const ExtReal alpha, const ExtReal beta, const OperatorType op_type ) const override
+        {
+            ptic(ClassName()+"::Post");
+            
+            if( this->pre_post_initialized )
+            {
+                Sparse::MatrixCSR<Real,Int,Int> * post;
+                
+                switch( op_type )
+                {
+                    case OperatorType::FractionalOnly:
+                    {
+                        post  = &lo_post;
+                        break;
+                    }
+                    case OperatorType::HighOrder:
+                    {
+                        post  = &hi_post;
+                        break;
+                    }
+                    case OperatorType::LowOrder:
+                    {
+                        post  = &lo_post;
+                        break;
+                    }
+                    case OperatorType::MixedOrder:
+                    {
+                        post  = &mixed_post;
+                        break;
+                    }
+                    default:
+                    {
+                        eprint("Unknown kernel. Doing nothing.");
+                        ptoc(ClassName()+"::Post");
+                        return;
+                    }
+                }
+              
+                this->PercolateDown();
+                
+                ClustersToPrimitives( true );
+                                
+                // Multiply by weights, restore external ordering, and apply transpose of diff/averaging operator.
+                
+                const Int nrhs = ( PrimitiveCount() * buffer_dim ) / post->ColCount();
+                
+                ptic(ClassName()+" post->Dot");
+                
+                switch( nrhs )
+                {
+                    case 1:
+                    {
+                        post->template Dot<1>(
+                            alpha, P_out.data(),
+                            beta,  output,
+                            1
+                        );
+                        break;
+                    }
+                    case AMB_DIM:
+                    {
+                        post->template Dot<AMB_DIM>(
+                            alpha, P_out.data(),
+                            beta,  output,
+                            AMB_DIM
+                        );
+                        break;
+                    }
+                    default:
+                    {
+                        post->template Dot<0>(
+                            alpha, P_out.data(),
+                            beta,  output,
+                            nrhs
+                        );
+                    }
+                }
+                
+                ptoc(ClassName()+" post->Dot");
+            }
+            else
+            {
+                eprint(ClassName()+"::Post: Postprocessing matrices are not initialized. Doing nothing.");
+            }
+            ptoc(ClassName()+"::Post");
+        }; // Post
+        
+        
+#include "ClusterTree/Percolate_DFS.hpp"
+        
+#include "ClusterTree/Percolate_Recursive.hpp"
         
     public:
         
