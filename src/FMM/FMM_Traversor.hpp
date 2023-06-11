@@ -77,7 +77,7 @@ namespace Repulsor
                 {
                     // Initialize local kernel and feed it all the information that is going to be constant along its life time.
                     
-                    Kernel_T ker ( kernel );
+                    Kernel_T ker ( kernel, thread );
 
                     Real local_sum (0);
                     

@@ -83,6 +83,7 @@ namespace Repulsor
         using Base_T::tri_i;
         using Base_T::tri_j;
         using Base_T::lin_k;
+        using Base_T::thread;
     
         static const constexpr Real S_scale = static_cast<Real>(1)/static_cast<Real>(S_DOM_DIM+1);
         static const constexpr Real T_scale = static_cast<Real>(1)/static_cast<Real>(T_DOM_DIM+1);
@@ -92,14 +93,14 @@ namespace Repulsor
         FMM_Kernel_NF() = default;
         
         // To be used for configuration of kernel.
-        explicit FMM_Kernel_NF( Configurator_T & conf )
-        :   Base_T      ( conf                                                              )
-        ,   S_data      ( GetS().PrimitiveNearFieldData().data()                            )
-        ,   S_D_data    ( GetS().ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
-        ,   S_diag      ( GetS().NF_Accumulator().data(               omp_get_thread_num()) )
-        ,   T_data      ( GetT().PrimitiveNearFieldData().data()                            )
-        ,   T_D_data    ( GetT().ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
-        ,   T_diag      ( GetT().NF_Accumulator().data(               omp_get_thread_num()) )
+        explicit FMM_Kernel_NF( Configurator_T & conf, const Int thread_ )
+        :   Base_T      ( conf, thread_                                       )
+        ,   S_data      ( GetS().PrimitiveNearFieldData().data()              )
+        ,   S_D_data    ( GetS().ThreadPrimitiveDNearFieldData().data(thread) )
+        ,   S_diag      ( GetS().NF_Accumulator().data(               thread) )
+        ,   T_data      ( GetT().PrimitiveNearFieldData().data()              )
+        ,   T_D_data    ( GetT().ThreadPrimitiveDNearFieldData().data(thread) )
+        ,   T_diag      ( GetT().NF_Accumulator().data(               thread) )
         {
             if( GetS().PrimitiveNearFieldData().Dimension(1) != S_DATA_DIM )
             {
@@ -128,15 +129,15 @@ namespace Repulsor
             }
         }
         
-        FMM_Kernel_NF( FMM_Kernel_NF & other )
-        :   Base_T      ( other                                                                 )
-        ,   metric_data ( other.OffDiag().data()                                                )
-        ,   S_data      ( other.S_data                                                          )
-        ,   S_D_data    ( other.GetS().ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
-        ,   S_diag      ( other.GetS().NF_Accumulator().data(            omp_get_thread_num())  )
-        ,   T_data      ( other.T_data                                                          )
-        ,   T_D_data    ( other.GetT().ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
-        ,   T_diag      ( other.GetT().NF_Accumulator().data(             omp_get_thread_num()) )
+        FMM_Kernel_NF( FMM_Kernel_NF & other, const Int thread_ )
+        :   Base_T      ( other, thread_                                            )
+        ,   metric_data ( other.OffDiag().data()                                    )
+        ,   S_data      ( other.S_data                                              )
+        ,   S_D_data    ( other.GetS().ThreadPrimitiveDNearFieldData().data(thread) )
+        ,   S_diag      ( other.GetS().NF_Accumulator().data(               thread) )
+        ,   T_data      ( other.T_data                                              )
+        ,   T_D_data    ( other.GetT().ThreadPrimitiveDNearFieldData().data(thread) )
+        ,   T_diag      ( other.GetT().NF_Accumulator().data(               thread) )
         {}
         
         ~FMM_Kernel_NF() = default;

@@ -49,16 +49,16 @@ namespace Repulsor
         
         PseudoLaplacian_Kernel_FF() = delete;
         
-        PseudoLaplacian_Kernel_FF( Configurator_T & conf, const Real s_ )
-        :   Base_T ( conf                            )
+        PseudoLaplacian_Kernel_FF( Configurator_T & conf, const Int thread_, const Real s_ )
+        :   Base_T ( conf, thread_                   )
         ,   s      ( s_                              )
         ,   s_exp  ( -S_DOM_DIM/two - (s-high_order) )
         {}
         
-        PseudoLaplacian_Kernel_FF( PseudoLaplacian_Kernel_FF & other )
-        :   Base_T ( other       )
-        ,   s      ( other.s     )
-        ,   s_exp  ( other.s_exp )
+        PseudoLaplacian_Kernel_FF( PseudoLaplacian_Kernel_FF & other, const Int thread_ )
+        :   Base_T ( other, thread_ )
+        ,   s      ( other.s        )
+        ,   s_exp  ( other.s_exp    )
         {}
         
         ~PseudoLaplacian_Kernel_FF() = default;

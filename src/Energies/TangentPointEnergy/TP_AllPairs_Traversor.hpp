@@ -237,7 +237,7 @@ namespace Repulsor
                 energy_flag, diff_flag, metric_flag
             >;
 
-            Kernel_T ker ( conf, q_half_, p_half_ );
+            Kernel_T ker ( conf, 0, q_half_, p_half_ );
 
             AllPairs_Traversor traversor ( S.PrimitiveCount(), T.PrimitiveCount(), ker );
 

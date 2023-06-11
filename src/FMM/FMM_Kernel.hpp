@@ -38,7 +38,10 @@ namespace Repulsor
         static constexpr Real two  = static_cast<Real>(2);
         
         static constexpr Real symmetry_factor = one / (one + !static_cast<Real>(is_symmetric) );
-                                                        
+                                            
+        
+        const Int thread;
+        
         Int tri_i [PROJ_DIM] = {};
         Int tri_j [PROJ_DIM] = {};
         Int lin_k [AMB_DIM][AMB_DIM] = {};
@@ -85,16 +88,18 @@ namespace Repulsor
 
         FMM_Kernel() = delete;
         
-        explicit FMM_Kernel( Configurator_T & conf )
-        :   S             ( conf.GetS()          )
+        explicit FMM_Kernel( Configurator_T & conf, const Int thread_ )
+        :   thread        ( thread_              )
+        ,   S             ( conf.GetS()          )
         ,   T             ( conf.GetT()          )
         ,   metric_values ( conf.MetricValues()  )   // In configure mode, kernels needs
         {
             Init();
         }
         
-        FMM_Kernel( const FMM_Kernel & other )
-        :   S             ( other.S              )
+        FMM_Kernel( const FMM_Kernel & other, const Int thread_ )
+        :   thread        ( thread_              )
+        ,   S             ( other.S              )
         ,   T             ( other.T              )
         ,   metric_values ( other.metric_values  )
         {

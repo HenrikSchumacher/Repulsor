@@ -185,7 +185,7 @@ namespace Repulsor
                 high_order
             >;
             
-            Kernel_T ker ( conf, bct.NearFieldSeparationParameter(), 20, s );
+            Kernel_T ker ( conf, 0, bct.NearFieldSeparationParameter(), 20, s );
 
             FMM_Traversor traversor ( bct.VeryNear(), ker );
             
@@ -216,7 +216,7 @@ namespace Repulsor
                 high_order
             >;
 
-            Kernel_T ker ( conf, s );
+            Kernel_T ker ( conf, 0, s );
 
             FMM_Traversor traversor ( bct.Near(), ker );
 
@@ -247,7 +247,7 @@ namespace Repulsor
                 high_order
             >;
             
-            Kernel_T ker ( conf, s );
+            Kernel_T ker ( conf, 0, s );
             
             FMM_Traversor traversor ( bct.Far(), ker );
             

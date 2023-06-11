@@ -80,19 +80,20 @@ namespace Repulsor
         using Base_T::tri_i;
         using Base_T::tri_j;
         using Base_T::lin_k;
+        using Base_T::thread;
         
     public:
         
         FMM_Kernel_FF() = default;
         
-        explicit FMM_Kernel_FF( Configurator_T & conf )
-        :   Base_T        ( conf                                                           )
-        ,   S_data      ( GetS().ClusterFarFieldData().data()                            )
-        ,   S_D_data    ( GetS().ThreadClusterDFarFieldData().data(omp_get_thread_num()) )
-        ,   S_diag      ( GetS().FF_Accumulator().data(            omp_get_thread_num()) )
-        ,   T_data      ( GetT().ClusterFarFieldData().data()                            )
-        ,   T_D_data    ( GetT().ThreadClusterDFarFieldData().data(omp_get_thread_num()) )
-        ,   T_diag      ( GetT().FF_Accumulator().data(            omp_get_thread_num()) )
+        explicit FMM_Kernel_FF( Configurator_T & conf, Int thread_ )
+        :   Base_T      ( conf, thread_                                    )
+        ,   S_data      ( GetS().ClusterFarFieldData().data()              )
+        ,   S_D_data    ( GetS().ThreadClusterDFarFieldData().data(thread) )
+        ,   S_diag      ( GetS().FF_Accumulator().data(            thread) )
+        ,   T_data      ( GetT().ClusterFarFieldData().data()              )
+        ,   T_D_data    ( GetT().ThreadClusterDFarFieldData().data(thread) )
+        ,   T_diag      ( GetT().FF_Accumulator().data(            thread) )
         {
             if( GetS().ClusterFarFieldData().Dimension(1) != S_DATA_DIM )
             {
@@ -121,15 +122,15 @@ namespace Repulsor
             }
         }
         
-        FMM_Kernel_FF( FMM_Kernel_FF & other )
-        :   Base_T      ( other                                                                )
-        ,   metric_data ( other.OffDiag().data()                                               )
-        ,   S_data      ( other.S_data                                                         )
-        ,   S_D_data    ( other.GetS().ThreadClusterDFarFieldData().data(omp_get_thread_num()) )
-        ,   S_diag      ( other.GetS().FF_Accumulator().data(            omp_get_thread_num()) )
-        ,   T_data      ( other.T_data                                                         )
-        ,   T_D_data    ( other.GetT().ThreadClusterDFarFieldData().data(omp_get_thread_num()) )
-        ,   T_diag      ( other.GetT().FF_Accumulator().data(            omp_get_thread_num()) )
+        FMM_Kernel_FF( FMM_Kernel_FF & other, Int thread_ )
+        :   Base_T      ( other, thread_                                         )
+        ,   metric_data ( other.OffDiag().data()                                 )
+        ,   S_data      ( other.S_data                                           )
+        ,   S_D_data    ( other.GetS().ThreadClusterDFarFieldData().data(thread) )
+        ,   S_diag      ( other.GetS().FF_Accumulator().data(            thread) )
+        ,   T_data      ( other.T_data                                           )
+        ,   T_D_data    ( other.GetT().ThreadClusterDFarFieldData().data(thread) )
+        ,   T_diag      ( other.GetT().FF_Accumulator().data(            thread) )
         {}
         
         ~FMM_Kernel_FF() = default;

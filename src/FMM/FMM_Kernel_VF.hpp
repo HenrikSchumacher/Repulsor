@@ -104,6 +104,7 @@ namespace Repulsor
         using Base_T::tri_i;
         using Base_T::tri_j;
         using Base_T::lin_k;
+        using Base_T::thread;
 
         
         mutable S_Tree_T S_Tree;
@@ -140,18 +141,18 @@ namespace Repulsor
 //        FMM_Kernel_VF() = default;
         FMM_Kernel_VF() = delete;
         
-        FMM_Kernel_VF( Configurator_T & conf, const Real theta_, const Int max_refinement_  )
-        :   Base_T         ( conf                                                              )
-        ,   S_data         ( GetS().PrimitiveNearFieldData().data()                            )
-        ,   S_D_data       ( GetS().ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
-        ,   S_diag         ( GetS().VF_Accumulator().data(               omp_get_thread_num()) )
-        ,   S_ser          ( GetS().PrimitiveSerialized().data()                               )
-        ,   T_data         ( GetT().PrimitiveNearFieldData().data()                            )
-        ,   T_D_data       ( GetT().ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
-        ,   T_diag         ( GetT().VF_Accumulator().data(               omp_get_thread_num()) )
-        ,   T_ser          ( GetT().PrimitiveSerialized().data()                               )
-        ,   theta          ( theta_                                                            )
-        ,   theta2         ( theta_ * theta_                                                   )
+        FMM_Kernel_VF( Configurator_T & conf, const Int thread_, const Real theta_, const Int max_refinement_  )
+        :   Base_T         ( conf, thread_                                       )
+        ,   S_data         ( GetS().PrimitiveNearFieldData().data()              )
+        ,   S_D_data       ( GetS().ThreadPrimitiveDNearFieldData().data(thread) )
+        ,   S_diag         ( GetS().VF_Accumulator().data(               thread) )
+        ,   S_ser          ( GetS().PrimitiveSerialized().data()                 )
+        ,   T_data         ( GetT().PrimitiveNearFieldData().data()              )
+        ,   T_D_data       ( GetT().ThreadPrimitiveDNearFieldData().data(thread) )
+        ,   T_diag         ( GetT().VF_Accumulator().data(               thread) )
+        ,   T_ser          ( GetT().PrimitiveSerialized().data()                 )
+        ,   theta          ( theta_                                              )
+        ,   theta2         ( theta_ * theta_                                     )
         ,   max_refinement ( std::min(
                                   int_cast<typename S_Tree_T::Child_T>(max_refinement_),
                                   std::min(S_Tree_T::MaxLevel(),S_Tree_T::MaxLevel())
@@ -173,22 +174,22 @@ namespace Repulsor
             }
         }
         
-        FMM_Kernel_VF( FMM_Kernel_VF & other )
-        :   Base_T      ( other                                                                   )
-        ,   metric_data ( other.OffDiag().data()                                                  )
-        ,   S_data      ( other.S_data                                                            )
-        ,   S_D_data    ( other.GetS().ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
-        ,   S_diag      ( other.GetS().VF_Accumulator().data(               omp_get_thread_num()) )
-        ,   S_ser       ( other.S_ser                                                             )
-        ,   T_data      ( other.T_data                                                            )
-        ,   T_D_data    ( other.GetT().ThreadPrimitiveDNearFieldData().data(omp_get_thread_num()) )
-        ,   T_diag      ( other.GetT().VF_Accumulator().data(               omp_get_thread_num()) )
-        ,   T_ser       ( other.T_ser                                                             )
-        ,   theta       ( other.theta                                                             )
-        ,   theta2      ( other.theta2                                                            )
-        ,   max_refinement      ( other.max_refinement                                            )
-        ,   max_level_reached   ( other.max_level_reached                                         )
-        ,   evaluations         ( other.evaluations                                               )
+        FMM_Kernel_VF( FMM_Kernel_VF & other, const Int thread_ )
+        :   Base_T      ( other, thread_                                            )
+        ,   metric_data ( other.OffDiag().data()                                    )
+        ,   S_data      ( other.S_data                                              )
+        ,   S_D_data    ( other.GetS().ThreadPrimitiveDNearFieldData().data(thread) )
+        ,   S_diag      ( other.GetS().VF_Accumulator().data(               thread) )
+        ,   S_ser       ( other.S_ser                                               )
+        ,   T_data      ( other.T_data                                              )
+        ,   T_D_data    ( other.GetT().ThreadPrimitiveDNearFieldData().data(thread) )
+        ,   T_diag      ( other.GetT().VF_Accumulator().data(               thread) )
+        ,   T_ser       ( other.T_ser                                               )
+        ,   theta       ( other.theta                                               )
+        ,   theta2      ( other.theta2                                              )
+        ,   max_refinement      ( other.max_refinement                              )
+        ,   max_level_reached   ( other.max_level_reached                           )
+        ,   evaluations         ( other.evaluations                                 )
         {}
         
         ~FMM_Kernel_VF()
@@ -197,7 +198,7 @@ namespace Repulsor
 //            logfile
 //            << "\n"
 //            << "Report for class                    = " << ClassName() << "\n"
-//            << "Thread ID                           = " << omp_get_thread_num() << "\n"
+//            << "Thread ID                           = " << thread << "\n"
 //            << "Number of primitive pairs processed = " << primitive_count << "\n"
 //            << "Total energy accumulated            = " << total_sum << "\n"
 //            << "Number of quadrature points         = " << block_count << "\n"
@@ -326,7 +327,7 @@ namespace Repulsor
 //#ifdef REPULSOR__PRINT_REPORTS_FOR_ADAPTIVE_KERNELS
 //
 //            logprint("Really creating log file");
-//            std:: string s = "./Repulsor__"+ClassName()+"_Report_"+ToString(omp_get_thread_num())+".txt";
+//            std:: string s = "./Repulsor__"+ClassName()+"_Report_"+ToString(thread)+".txt";
 //
 //            DUMP(s);
 //
@@ -334,16 +335,16 @@ namespace Repulsor
 //
 //            logfile << "Log file for " << ClassName() << std::endl;
 //
-//            s = "./Repulsor__"+ClassName()+"_Simplices_"+ToString(omp_get_thread_num())+".txt";
+//            s = "./Repulsor__"+ClassName()+"_Simplices_"+ToString(thread)+".txt";
 //            simplex_file.open(s, std::ios_base::app);
 //
-//            s = "./Repulsor__"+ClassName()+"_Centers_"+ToString(omp_get_thread_num())+".txt";
+//            s = "./Repulsor__"+ClassName()+"_Centers_"+ToString(thread)+".txt";
 //            center_file.open(s, std::ios_base::app);
 //
-//            s = "./Repulsor__"+ClassName()+"_EmbSimplices_"+ToString(omp_get_thread_num())+".txt";
+//            s = "./Repulsor__"+ClassName()+"_EmbSimplices_"+ToString(thread)+".txt";
 //            emb_simplex_file.open(s, std::ios_base::app);
 //
-//            s = "./Repulsor__"+ClassName()+"_EmbCenters_"+ToString(omp_get_thread_num())+".txt";
+//            s = "./Repulsor__"+ClassName()+"_EmbCenters_"+ToString(thread)+".txt";
 //            emb_center_file.open(s, std::ios_base::app);
 //
 ////            logprint("Writing to log file "+s+".");

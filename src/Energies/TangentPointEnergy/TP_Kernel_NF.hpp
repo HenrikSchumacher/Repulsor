@@ -61,8 +61,8 @@ namespace Repulsor
         
         TP_Kernel_NF() = delete;
         
-        TP_Kernel_NF( Configurator_T & conf, const T1 q_half_, const T2 p_half_ )
-        :   Base_T               (conf       )
+        TP_Kernel_NF( Configurator_T & conf, const Int thread_, const T1 q_half_, const T2 p_half_ )
+        :   Base_T               (conf,thread_)
         ,   q                    (two*q_half_)
         ,   q_half               (q_half_    )
         ,   q_half_minus_1       (q_half-1   )
@@ -72,8 +72,8 @@ namespace Repulsor
         ,   minus_p_half_minus_1 (-p_half-1  )
         {}
         
-        TP_Kernel_NF( TP_Kernel_NF & other )
-        :   Base_T               (other                     )
+        TP_Kernel_NF( TP_Kernel_NF & other, const Int thread_ )
+        :   Base_T               (other,thread_             )
         ,   q                    (other.q                   )
         ,   q_half               (other.q_half              )
         ,   q_half_minus_1       (other.q_half_minus_1      )

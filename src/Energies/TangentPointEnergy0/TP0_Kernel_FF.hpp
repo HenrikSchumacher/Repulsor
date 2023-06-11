@@ -49,13 +49,14 @@ namespace Repulsor
         using Base_T::energy_flag;
         using Base_T::diff_flag;
         using Base_T::metric_flag;
+        using Base_T::thread;
         
     public:
         
         TP0_Kernel_FF() = delete;
         
-        TP0_Kernel_FF( Configurator_T & conf, const T1 q_half_, const T2 p_half_ )
-        :   Base_T               (conf       )
+        TP0_Kernel_FF( Configurator_T & conf, const Int thread_, const T1 q_half_, const T2 p_half_ )
+        :   Base_T               (conf, thread_)
         ,   q                    (two*q_half_)
         ,   q_half               (q_half_    )
         ,   q_half_minus_1       (q_half-1   )
@@ -67,8 +68,8 @@ namespace Repulsor
         ,   s_exp                (static_cast<Real>(-0.5) * (static_cast<Real>(2) * (s - static_cast<Real>(1)) + S_DOM_DIM))
         {}
         
-        TP0_Kernel_FF( TP0_Kernel_FF & other )
-        :   Base_T               (other                     )
+        TP0_Kernel_FF( TP0_Kernel_FF & other, const Int thread_ )
+        :   Base_T               (other, thread_            )
         ,   q                    (other.q                   )
         ,   q_half               (other.q_half              )
         ,   q_half_minus_1       (other.q_half_minus_1      )

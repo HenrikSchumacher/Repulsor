@@ -247,7 +247,7 @@ namespace Repulsor
                 energy_flag, diff_flag, metric_flag
             >;
 
-            Kernel_T ker ( conf, bct.NearFieldSeparationParameter(), int_cast<Int>(bct.Settings().max_refinement), q_half_, p_half_ );
+            Kernel_T ker ( conf, 0, bct.NearFieldSeparationParameter(), int_cast<Int>(bct.Settings().max_refinement), q_half_, p_half_ );
 
             FMM_Traversor traversor ( bct.VeryNear(), ker );
             en += traversor.Compute();
@@ -282,7 +282,7 @@ namespace Repulsor
                 energy_flag, diff_flag, metric_flag
             >;
 
-            Kernel_T ker ( conf, q_half_, p_half_ );
+            Kernel_T ker ( conf, 0, q_half_, p_half_ );
 
             FMM_Traversor traversor ( bct.Near(), ker );
 
@@ -318,7 +318,7 @@ namespace Repulsor
                 energy_flag, diff_flag, metric_flag
             >;
             
-            Kernel_T ker ( conf, q_half_, p_half_ );
+            Kernel_T ker ( conf, 0, q_half_, p_half_ );
             
             FMM_Traversor traversor ( bct.Far(), ker );
             

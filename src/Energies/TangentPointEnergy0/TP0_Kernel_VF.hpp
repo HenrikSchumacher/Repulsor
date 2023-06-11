@@ -64,10 +64,10 @@ namespace Repulsor
         TP0_Kernel_VF() = delete;
         
         TP0_Kernel_VF(
-            Configurator_T & conf,
+            Configurator_T & conf, const Int thread_,
             const Real theta_, const Int max_refinement_, const T1 q_half_, const T2 p_half_
         )
-        :   Base_T               (conf, theta_, max_refinement_ )
+        :   Base_T               (conf, thread_, theta_, max_refinement_ )
         ,   q                    (two*q_half_)
         ,   q_half               (q_half_    )
         ,   q_half_minus_1       (q_half-1   )
@@ -79,8 +79,8 @@ namespace Repulsor
         ,   s_exp                (static_cast<Real>(-0.5) * (static_cast<Real>(2) * (s - static_cast<Real>(1)) + S_DOM_DIM))
         {}
         
-        TP0_Kernel_VF( TP0_Kernel_VF & other )
-        :   Base_T               (other                     )
+        TP0_Kernel_VF( TP0_Kernel_VF & other, const Int thread_ )
+        :   Base_T               (other, thread_            )
         ,   q                    (other.q                   )
         ,   q_half               (other.q_half              )
         ,   q_half_minus_1       (other.q_half_minus_1      )

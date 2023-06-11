@@ -64,18 +64,18 @@ namespace Repulsor
         PseudoLaplacian_Kernel_VF() = delete;
         
         PseudoLaplacian_Kernel_VF(
-            Configurator_T & conf,
+            Configurator_T & conf, const Int thread_,
             const Real theta_, const Int max_refinement_, const Real s_
         )
-        :   Base_T ( conf, theta_, max_refinement_   )
+        :   Base_T ( conf, thread_, theta_, max_refinement_   )
         ,   s      ( s_                              )
         ,   s_exp  ( -S_DOM_DIM/two - (s-high_order) )
         {}
         
-        PseudoLaplacian_Kernel_VF( PseudoLaplacian_Kernel_VF & other )
-        :   Base_T (other       )
-        ,   s      (other.s     )
-        ,   s_exp  (other.s_exp )
+        PseudoLaplacian_Kernel_VF( PseudoLaplacian_Kernel_VF & other, const Int thread_ )
+        :   Base_T (other, thread_  )
+        ,   s      (other.s         )
+        ,   s_exp  (other.s_exp     )
         {}
         
         ~PseudoLaplacian_Kernel_VF() = default;
