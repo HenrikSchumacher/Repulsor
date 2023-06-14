@@ -207,9 +207,7 @@ namespace Repulsor
             ptic("Allocate dummy accumulators");
 
             const Int thread_count = std::min( S.ThreadCount(), T.ThreadCount() );
-
             S.NF_Accumulator() = Accumulator_T( thread_count, 1, 1, 0 );
-
             if constexpr ( !is_symmetric )
             {
                 T.NF_Accumulator() = Accumulator_T( thread_count, 1, 1, 0 );

@@ -40,7 +40,7 @@ namespace Repulsor
         static constexpr Real symmetry_factor = one / (one + !static_cast<Real>(is_symmetric) );
                                             
         
-        const Int thread;
+        const Int thread = 0;
         
         Int tri_i [PROJ_DIM] = {};
         Int tri_j [PROJ_DIM] = {};
@@ -95,6 +95,7 @@ namespace Repulsor
         ,   metric_values ( conf.MetricValues()  )   // In configure mode, kernels needs
         {
             Init();
+            debug_print(std::string( "Initializing "+ClassName()+" from Configurator_T on thread " + ToString(thread)) );
         }
         
         FMM_Kernel( const FMM_Kernel & other, const Int thread_ )
@@ -104,6 +105,13 @@ namespace Repulsor
         ,   metric_values ( other.metric_values  )
         {
             Init();
+            debug_print(std::string( "Initializing "+ClassName()+" from "+ClassName()+" on thread " + ToString(thread)) );
+        }
+        
+        
+        Int Thread() const
+        {
+            return thread;
         }
         
         ~FMM_Kernel() = default;

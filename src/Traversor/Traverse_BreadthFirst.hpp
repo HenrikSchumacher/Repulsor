@@ -1,9 +1,13 @@
 public:
 
     force_flattening void Traverse_BreadthFirst(
-        Kernel_T & K, const Int i0, const Int j0, const Int max_leaves
+        const Int thread, const Int i0, const Int j0, const Int max_leaves
     )
     {
+        ptic(className()+"::Traverse_BreadthFirst");
+        
+        Kernel_T & K = kernels[thread];
+        
         i_queue = std::deque<Int>();
         j_queue = std::deque<Int>();
         i_queue.push_back(static_cast<Int>(i0));
@@ -252,5 +256,7 @@ public:
                 }
             }
         }
+        
+        ptoc(className()+"::Traverse_BreadthFirst");
         
     } // Traverse_BreadthFirst

@@ -110,7 +110,7 @@ namespace Repulsor
         {
             ptic(className()+"::Traverse_Sequential");
             
-            Traverse_DepthFirst( kernels[0], 0, 0 );
+            Traverse_DepthFirst( 0, 0, 0 );
             
             ptoc(className()+"::Traverse_Sequential");
         }
@@ -123,14 +123,18 @@ namespace Repulsor
         {
             ptic(className()+"::Traverse_Parallel");
 
-            Traverse_BreadthFirst( kernels[0], 0, 0, static_cast<Int>(4) * ThreadCount() * ThreadCount() );
+            dump(ThreadCount());
+            dump(kernels.size());
+            
+            Traverse_BreadthFirst( 0, 0, 0, static_cast<Int>(16) * ThreadCount() );
+            
             
             ParallelDo_Dynamic(
-                [this]( const Int thread, Int k )
+                [this]( const Int thread, const Int k )
                 {
-                    Kernel_T & K = kernels[thread];
+                    debug_print(className()+"::Traverse_Parallel: Requesting kernel "+ kernels[thread].ClassName() + " on thread " + ToString(thread) + " for task " + ToString(k) + "." );
                     
-                    Traverse_DepthFirst( K, i_queue[k], j_queue[k] );
+                    Traverse_DepthFirst( thread, i_queue[k], j_queue[k] );
                 },
                 0, static_cast<Int>( i_queue.size() ), 1,
                 ThreadCount()

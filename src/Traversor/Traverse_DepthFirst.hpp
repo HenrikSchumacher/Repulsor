@@ -1,9 +1,13 @@
 public:
 
     force_flattening void Traverse_DepthFirst(
-        Kernel_T & K, const Int i0, const Int j0
+        const Int thread, const Int i0, const Int j0
     )
     {
+        debug_print(className()+"::Traverse_DepthFirst("+ToString(thread)+")...");
+        
+        Kernel_T & K = kernels[thread];
+        
         Int i_stack[max_depth] = {};
         Int j_stack[max_depth] = {};
 
@@ -263,6 +267,9 @@ public:
                 }
             }
         }
+        
+        debug_print(className()+"::Traverse_DepthFirst("+ToString(thread)+") done.");
+        
     } // Traverse_DepthFirst
     
     

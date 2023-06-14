@@ -95,6 +95,7 @@ namespace Repulsor
                 
                 ptic(ClassName()+"::PrimitiveCollisionMatrix: Prepare kernels");
                 std::vector<Kernel_T> kernels;
+                kernels.reserve(thread_count);
                 
                 SReal t = std::min( S.UpdateTime(), T.UpdateTime() );
                 
@@ -173,6 +174,8 @@ namespace Repulsor
             (void)T.PrimitiveAdjacencyMatrix();
             
             std::vector<Kernel_T> kernels;
+            kernels.reserve( thread_count );
+            
             
             SReal t = std::min( t_, std::min( S.UpdateTime(), T.UpdateTime() ) );
             

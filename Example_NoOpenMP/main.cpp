@@ -16,7 +16,8 @@
 
 #define TOOLS_ENABLE_PROFILER // enable profiler
 
-#define TOOLS_DEACTIVATE_OPENMP
+//#define TOOLS_ENABLE_OPENMP
+//#define TOOLS_PARALLELDO_USE_OPENMP
 
 #include "../Repulsor.hpp"
 
@@ -37,13 +38,10 @@ int main(int argc, const char * argv[])
     Profiler::Clear( path );
 
     
-//    int thread_count = 8;
-    int thread_count = 2;
-    
-#ifndef TOOLS_DEACTIVATE_OPENMP
-    omp_set_num_threads(thread_count);
-#endif
-    
+    int thread_count = 8;
+
+//#define TOOLS_ENABLE_OPENMP
+//#define TOOLS_PARALLELDO_USE_OPENMP
     
 #include "Meshes.hpp"
     

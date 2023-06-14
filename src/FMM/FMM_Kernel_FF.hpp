@@ -43,7 +43,7 @@ namespace Repulsor
     protected:
         
         
-        Real * restrict const metric_data = nullptr;
+        mut<Real> metric_data = nullptr;
         
         mutable Real sum = static_cast<Real>(0);
         
@@ -69,13 +69,13 @@ namespace Repulsor
         mutable Real DX [S_DATA_DIM] = {};
         mutable Real DY [T_DATA_DIM] = {};
         
-        const  Real * restrict const S_data   = nullptr;
-               Real * restrict const S_D_data = nullptr;
-               Real * restrict const S_diag   = nullptr;
+        ptr<Real> S_data   = nullptr;
+        mut<Real> S_D_data = nullptr;
+        mut<Real> S_diag   = nullptr;
 
-        const  Real * restrict const T_data   = nullptr;
-               Real * restrict const T_D_data = nullptr;
-               Real * restrict const T_diag   = nullptr;
+        ptr<Real> T_data   = nullptr;
+        mut<Real> T_D_data = nullptr;
+        mut<Real> T_diag   = nullptr;
         
         using Base_T::tri_i;
         using Base_T::tri_j;
@@ -95,6 +95,8 @@ namespace Repulsor
         ,   T_D_data    ( GetT().ThreadClusterDFarFieldData().data(thread) )
         ,   T_diag      ( GetT().FF_Accumulator().data(            thread) )
         {
+            debug_print(std::string( "Initializing "+ClassName()+" from Configurator_T on thread " + ToString(thread)) );
+            
             if( GetS().ClusterFarFieldData().Dimension(1) != S_DATA_DIM )
             {
                 eprint(ClassName()+" Constructor: GetS().ClusterFarFieldData().Dimension(1) != S_DATA_DIM");
@@ -131,7 +133,9 @@ namespace Repulsor
         ,   T_data      ( other.T_data                                           )
         ,   T_D_data    ( other.GetT().ThreadClusterDFarFieldData().data(thread) )
         ,   T_diag      ( other.GetT().FF_Accumulator().data(            thread) )
-        {}
+        {
+            debug_print(std::string( "Initializing "+ClassName()+" from "+ClassName()+" on thread " + ToString(thread)) );
+        }
         
         ~FMM_Kernel_FF() = default;
         
@@ -151,7 +155,7 @@ namespace Repulsor
         
         force_inline void loadS( const Int i_global )
         {
-            const Real * const restrict X = &S_data[S_DATA_DIM * i_global];
+            ptr<Real> X = &S_data[S_DATA_DIM * i_global];
 
             a = X[0];
 #ifdef FarField_S_Copy
@@ -170,7 +174,7 @@ namespace Repulsor
         
         force_inline void loadT( const Int j_global )
         {
-            const Real * const restrict Y = &T_data[T_DATA_DIM * j_global];
+            ptr<Real> Y = &T_data[T_DATA_DIM * j_global];
             
             b = Y[0];
 #ifdef FarField_T_Copy
@@ -190,7 +194,7 @@ namespace Repulsor
         {
             if constexpr ( diff_flag )
             {
-                Real * restrict const to = &S_D_data[S_DATA_DIM * i_global];
+                mut<Real> to = &S_D_data[S_DATA_DIM * i_global];
                 
                 for( Int k = 0; k < S_DATA_DIM; ++k )
                 {
@@ -203,7 +207,7 @@ namespace Repulsor
         {
             if constexpr (diff_flag )
             {
-                Real * restrict const to = &T_D_data[T_DATA_DIM * j_global];
+                mut<Real> to = &T_D_data[T_DATA_DIM * j_global];
                 
                 for( Int k = 0; k < T_DATA_DIM; ++k )
                 {

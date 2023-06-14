@@ -148,7 +148,6 @@ protected:
             percolateUp_Recursive<BUFFER_DIM>(R);
             
             // Aftwards, compute the sum of the two children.
-//            Real * restrict const c = C_in.data();
             
             const Int C_offset = buffer_dim * C;
             const Int L_offset = buffer_dim * L;
@@ -179,7 +178,6 @@ protected:
             percolateUp_Recursive_gen(R);
             
             // Aftwards, compute the sum of the two children.
-//            Real * restrict const c = C_in.data();
             
             const Int C_offset = buffer_dim * C;
             const Int L_offset = buffer_dim * L;
@@ -341,7 +339,7 @@ protected:
         
         if( ( L >= null ) && ( R >= null ) )
         {
-            Real * restrict const c = C_out.data();
+            mut<Real> c = C_out.data();
             
             const Int C_offset = BUFFER_DIM * C;
             const Int L_offset = BUFFER_DIM * L;
@@ -367,7 +365,7 @@ protected:
         const Int L = C_left [C];
         const Int R = C_right[C];
         
-        Real * restrict const c = C_out.data();
+        mut<Real> c = C_out.data();
         
         if( ( L >= null ) && ( R >= null ) )
         {

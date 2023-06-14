@@ -5,6 +5,11 @@
 
 #include <thread>
 
+// TODO: Split_BreadthFirst without OpenMP
+// TODO: Split_DepthFirst without OpenMP
+
+// TODO: pre and post matrices as KernelMatrixCSR?
+
 namespace Repulsor
 {
     template<int AMB_DIM_, typename Real_, typename Int_, typename SReal_, typename ExtReal_>
@@ -373,6 +378,7 @@ namespace Repulsor
             leaf_clusters = Tensor1<Int,Int>( root->descendant_leaf_count );
             
             std::vector<std::thread> threads;
+            threads.reserve(7);
             
             threads.emplace_back( [=](){ C_left  = Tensor1<Int,Int>( ClusterCount() ); } );
             threads.emplace_back( [=](){ C_right = Tensor1<Int,Int>( ClusterCount() ); } );
@@ -399,7 +405,6 @@ namespace Repulsor
             //            stack_array = Tensor1<Int,Int>( 2 * depth + 1 );
             
             {
-                // It is quite certainly _NOT_ a good idea to parallelize this loop (false sharing!).
                 const Int last = PrimitiveCount();
                 ptr<Int> ord     = P_ordering.data();
                 mut<Int> inv_ord = P_inverse_ordering.data();
@@ -413,7 +418,6 @@ namespace Repulsor
             leaf_cluster_ptr = Tensor1<Int,Int> ( LeafClusterCount() + 1 );
             leaf_cluster_ptr[0] = 0;
             
-            // TODO: Parallelize? This loop is probably too short to be parallelized.
             for( Int i = 0; i < LeafClusterCount(); ++i )
             {
                 leaf_cluster_ptr[ i + 1 ] = C_end[leaf_clusters[i]];
@@ -434,7 +438,7 @@ namespace Repulsor
             C_depth[ID] = C->depth;
             C_next [ID] = ID + C->descendant_count;
             
-            // TODO: Potentially, some write conflicts could occur here. But they should be seldom as we use depth-first order.
+            // TODO: Potentially, some false sharing could occur during write here. But they should be seldom as we use depth-first order.
             C_proto[thread]->SetPointer( C_thread_serialized.data(C->thread), C->ID );
             C_proto[thread]->Write( C_serialized.data(), ID );
             
@@ -463,7 +467,7 @@ namespace Repulsor
                 }
                 #pragma omp taskwait
                 
-                // Cleaning up after ourselves to prevent a destructore cascade.
+                // Cleaning up after ourselves to prevent a destructor cascade.
                 delete C->left;
                 delete C->right;
             }
@@ -602,7 +606,6 @@ namespace Repulsor
                 L_weight *= C_invmass;
                 R_weight *= C_invmass;
                 
-//                #pragma omp simd
                 for( Int k = 1; k < far_dim; ++k )
                 {
                     C_C[k] = L_weight * C_L[k] + R_weight * C_R[k] ;
@@ -684,7 +687,6 @@ namespace Repulsor
                 
                 const Int primitive_count = PrimitiveCount();
                 
-//                #pragma omp simd aligned ( i, j : ALIGNMENT )
                 for( Int k = 0; k < primitive_count; ++k )
                 {
                     i[k] = k;

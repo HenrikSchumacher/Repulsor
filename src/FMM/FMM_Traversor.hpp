@@ -72,12 +72,18 @@ namespace Repulsor
 
             kernel.Allocate( pattern.NonzeroCount() );
             
+            //DEBUGGING
             Real global_sum = ParallelDoReduce(
-                [=]( const Int thread )
+                [=,&job_ptr]( const Int thread )
                 {
                     // Initialize local kernel and feed it all the information that is going to be constant along its life time.
                     
+//                    logprint( ToString(thread) + " -> kernel.Thread() = " + ToString(kernel.Thread()) );
+                    
+                    
                     Kernel_T ker ( kernel, thread );
+                    
+//                    logprint( ToString(thread) + " -> ker.Thread() = " + ToString(ker.Thread()) );
 
                     Real local_sum (0);
                     
@@ -89,7 +95,7 @@ namespace Repulsor
                     const Int i_begin = job_ptr[thread  ];
                     const Int i_end   = job_ptr[thread+1];
                     
-//                    const Time start_time = Clock::now();
+                    const Time start_time = Clock::now();
                     
                     for( Int i = i_begin; i < i_end; ++i )
                     {
@@ -138,10 +144,9 @@ namespace Repulsor
                         
                     }
                     
-//                    const Time stop_time = Clock::now();
+                    const Time stop_time = Clock::now();
                     
-                    // TODO: mutex needed!!!
-//                    ker.PrintReport( thread, Tools::Duration(start_time,stop_time) );
+                    ker.PrintReport( thread, Tools::Duration(start_time,stop_time) );
                     
                     return local_sum; 
                 },

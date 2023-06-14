@@ -51,14 +51,12 @@ public:
     {
         ptic(ClassName()+"::PercolateUp_Parallel");
         
-        Int n_roots = static_cast<Int>(parallel_perc_roots.size());
-        
         ParallelDo(
             [this]( const Int i )
             {
                 PercolateUp_DFS(parallel_perc_roots[i]);
             },
-            n_roots,
+            static_cast<Int>(parallel_perc_roots.size()),
             ThreadCount()
         );
         
@@ -71,8 +69,6 @@ public:
     {
         ptic(ClassName()+"::PercolateDown_Parallel");
         
-        Int n_roots = static_cast<Int>(parallel_perc_roots.size());
-        
         PercolateDown_DFS( null, static_cast<Int>(settings.parallel_perc_depth) );
         
         ParallelDo(
@@ -80,7 +76,7 @@ public:
             {
                 PercolateDown_DFS(parallel_perc_roots[i]);
             },
-            n_roots,
+            static_cast<Int>(parallel_perc_roots.size()),
             ThreadCount()
         );
 
