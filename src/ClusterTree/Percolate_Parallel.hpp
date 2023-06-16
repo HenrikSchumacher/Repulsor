@@ -1,12 +1,18 @@
-public:
+protected:
 
-    void RequireParallelPercolationRoots() const
+    using PercolationRoots_T = std::vector<Int>;
+
+    const PercolationRoots_T & ParallelPercolationRoots() const
     {
-        if( ! parallel_perc_roots_initialized )
+        static std::string tag ( "ParallelPercolationRoots" );
+        
+        if( !this->InPersistentCacheQ( tag ) )
         {
-            ptic(ClassName()+"::RequireParallelPercolationRoots");
-
+            ptic(ClassName()+"::" + tag );
+            
             const Int max_depth = static_cast<Int>(settings.parallel_perc_depth);
+            
+            PercolationRoots_T parallel_perc_roots;
             
             Tensor1<Int,Int> stack  ( 2*max_depth+2 );
             Tensor1<Int,Int> depths ( 2*max_depth+2 );
@@ -41,18 +47,25 @@ public:
                 }
             }
             
-            parallel_perc_roots_initialized = true;
+            this->SetPersistentCache( tag, std::any( std::move(parallel_perc_roots) ) );
             
-            ptoc(ClassName()+"::RequireParallelPercolationRoots");
+            ptoc( ClassName()+"::" + tag );
         }
+        
+        return std::any_cast<const PercolationRoots_T &>( this->GetPersistentCache( tag ) );
     }
 
-    void PercolateUp_Parallel() const
+public:
+
+    void PercolateUp_Parallel() const override
     {
         ptic(ClassName()+"::PercolateUp_Parallel");
         
+        const PercolationRoots_T & parallel_perc_roots = ParallelPercolationRoots();
+        
+        // TODO: Add thread balancing.
         ParallelDo(
-            [this]( const Int i )
+            [this,&parallel_perc_roots]( const Int i )
             {
                 PercolateUp_DFS(parallel_perc_roots[i]);
             },
@@ -65,14 +78,17 @@ public:
         ptoc(ClassName()+"::PercolateUp_Parallel");
     } // PercolateUp_Parallel
 
-    void PercolateDown_Parallel() const
+    void PercolateDown_Parallel() const override
     {
         ptic(ClassName()+"::PercolateDown_Parallel");
         
+        const PercolationRoots_T & parallel_perc_roots = ParallelPercolationRoots();
+        
         PercolateDown_DFS( null, static_cast<Int>(settings.parallel_perc_depth) );
         
+        // TODO: Add thread balancing.
         ParallelDo(
-            [this]( const Int i )
+            [this,&parallel_perc_roots]( const Int i )
             {
                 PercolateDown_DFS(parallel_perc_roots[i]);
             },

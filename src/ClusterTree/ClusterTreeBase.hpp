@@ -3,7 +3,7 @@
 namespace Repulsor
 {
     template<typename Real_, typename Int_, typename SReal_, typename ExtReal_>
-    class ClusterTreeBase
+    class ClusterTreeBase : public CachedObject
     {
         ASSERT_FLOAT(Real_   );
         ASSERT_INT  (Int_    );
@@ -13,15 +13,18 @@ namespace Repulsor
         
     public:
         
-        using Real              = Real_;
-        using Int               = Int_;
-        using SReal             = SReal_;
-        using ExtReal           = ExtReal_;
+        using Real                  = Real_;
+        using Int                   = Int_;
+        using SReal                 = SReal_;
+        using ExtReal               = ExtReal_;
         
-        using DataContainer_T   = Tensor2<Real,Int>;
-        using BufferContainer_T = Tensor1<Real,Int>;
+        using LInt                  = Size_T;
+        using SparseMatrix_T        = Sparse::MatrixCSR      <Real,Int,LInt>;
+        using SparseBinaryMatrix_T  = Sparse::BinaryMatrixCSR<     Int,LInt>;
         
-        // In principle, ThreadTensor3<Real,Int> should have better scaling on multiple socket machines, because I tried to encourages that the thread-local arrays are allocated on local RAM. -- On my tiny Quad Core however, it performs a bit _WORSE_ than Tensor3<Real,Int>.
+        using DataContainer_T       = Tensor2<Real,Int>;
+        using BufferContainer_T     = Tensor1<Real,Int>;
+
         using DerivativeContainer_T = ThreadTensor3<Real,Int>;
         using Accumulator_T         = ThreadTensor3<Real,Int>;
         
@@ -29,44 +32,7 @@ namespace Repulsor
             const ClusterTreeSettings & settings_ = ClusterTreeSettings()
         )
         :   settings ( settings_ )
-        {
-//            switch( settings.tree_perc_alg )
-//            {
-//                case TreePercolationAlgorithm::Sequential:
-//                {
-//                       print(className()+" using sequential percolation algorithm.");
-//                    logprint(className()+" using sequential percolation algorithm.");
-//                    break;
-//                }
-//                case TreePercolationAlgorithm::Recursive:
-//                {
-//                       print(className()+" using recursive percolation algorithm.");
-//                    logprint(className()+" using recursive percolation algorithm.");
-//                    break;
-//                }
-//                case TreePercolationAlgorithm::Parallel:
-//                {
-//                       print(className()+" using parallel percolation algorithm.");
-//                    logprint(className()+" using parallel percolation algorithm.");
-//                    break;
-//                }
-//                default:
-//                {
-//                       print(className()+" using sequential percolation algorithm.");
-//                    logprint(className()+" using sequential percolation algorithm.");
-//                }
-//            }
-        }
-        
-//        ClusterTreeBase( const ClusterTreeBase & other )
-//        :   settings ( other.settings)
-//        ,   P_near   ( other.P_near)
-//        ,   P_D_near   ( other.P_D_near)
-//        ,   P_far   ( other.P_far)
-//        ,   P_D_far   ( other.P_D_far)
-//        ,   P_moments   ( other.P_moments)
-//        ,   P_in   ( other.P_in)
-//        {}
+        {}
         
         virtual ~ClusterTreeBase() = default;
         
@@ -116,6 +82,7 @@ namespace Repulsor
         Tensor1<Int,Int> C_begin;
         Tensor1<Int,Int> C_end;
         Tensor1<Int,Int> C_depth;
+        Tensor1<Int,Int> C_desc_count;
         Tensor1<Int,Int> C_next;
         Tensor1<Int,Int> C_left;  // list of index of left  child; entry is -1 if no child is present
         Tensor1<Int,Int> C_right; // list of index of right child; entry is -1 if no child is present
@@ -140,17 +107,17 @@ namespace Repulsor
         mutable bool pre_post_initialized = false;
         mutable bool mixed_pre_post_initialized = false;
         
-        mutable Sparse::MatrixCSR<Real,Int,Int>  hi_pre;
-        mutable Sparse::MatrixCSR<Real,Int,Int>  hi_post;
+        mutable SparseMatrix_T  hi_pre;
+        mutable SparseMatrix_T  hi_post;
 
-        mutable Sparse::MatrixCSR<Real,Int,Int>  lo_pre;
-        mutable Sparse::MatrixCSR<Real,Int,Int>  lo_post;
+        mutable SparseMatrix_T  lo_pre;
+        mutable SparseMatrix_T  lo_post;
         
-        mutable Sparse::MatrixCSR<Real,Int,Int>  mixed_pre;
-        mutable Sparse::MatrixCSR<Real,Int,Int>  mixed_post;
+        mutable SparseMatrix_T  mixed_pre;
+        mutable SparseMatrix_T  mixed_post;
 
-        mutable Sparse::BinaryMatrixCSR<Int,Int> P_to_C;
-        mutable Sparse::BinaryMatrixCSR<Int,Int> C_to_P;
+        mutable SparseBinaryMatrix_T P_to_C;
+        mutable SparseBinaryMatrix_T C_to_P;
         
         // Container for storing the serialized data of the primitives. Only meant to be accessed by primitive prototypes.
         // TODO: Make this private somehow?
@@ -165,18 +132,11 @@ namespace Repulsor
         
         mutable SReal update_time = static_cast<SReal>(0);
         
-        mutable bool P_adjacency_matrix_initialized = false;
-
-        mutable Sparse::BinaryMatrixCSR<Int,Int> P_adjacency_matrix;
-        
         // Some temproray shared data that is required for the parallel construction and serialization of the tree.
         
         Tensor3<SReal,Int> C_thread_serialized;          // False sharing is unlikely as each thread's slice should already be quite large...
         
         Tensor2<Int,Int> thread_cluster_counter;                          // TODO: Avoid false sharing!
-        
-        mutable bool parallel_perc_roots_initialized = false;
-        mutable std::vector<Int> parallel_perc_roots;
         
     public:
 
@@ -301,6 +261,11 @@ namespace Repulsor
             return C_right;
         }
 
+        const Tensor1<Int,Int> & ClusterNext() const
+        {
+            return C_next;
+        }
+        
         const Tensor1<Int,Int> & ClusterDepths() const
         {
             return C_depth;
@@ -378,45 +343,45 @@ namespace Repulsor
         }
         
 
-        const Sparse::MatrixCSR<Real,Int,Int> & LowOrderPreProcessor() const
+        const SparseMatrix_T & LowOrderPreProcessor() const
         {
             return lo_pre;
         }
         
 
-        const Sparse::MatrixCSR<Real,Int,Int> & LowOrderPostProcessor() const
+        const SparseMatrix_T & LowOrderPostProcessor() const
         {
             return lo_post;
         }
         
         
-        const Sparse::MatrixCSR<Real,Int,Int> & HighOrderPreProcessor() const
+        const SparseMatrix_T & HighOrderPreProcessor() const
         {
             return hi_pre;
         }
         
-        const Sparse::MatrixCSR<Real,Int,Int> & HighOrderPostProcessor() const
+        const SparseMatrix_T & HighOrderPostProcessor() const
         {
             return hi_post;
         }
         
-        const Sparse::MatrixCSR<Real,Int,Int> & MixedOrderPreProcessor() const
+        const SparseMatrix_T & MixedOrderPreProcessor() const
         {
             return mixed_pre;
         }
         
-        const Sparse::MatrixCSR<Real,Int,Int> & MixedOrderPostProcessor() const
+        const SparseMatrix_T & MixedOrderPostProcessor() const
         {
             return mixed_post;
         }
 
         
-        const Sparse::BinaryMatrixCSR<Int,Int> & ClusterToPrimitiveMatrix() const
+        const SparseBinaryMatrix_T & ClusterToPrimitiveMatrix() const
         {
             return C_to_P;
         }
         
-        const Sparse::BinaryMatrixCSR<Int,Int> & PrimitiveToClusterMatrix() const
+        const SparseBinaryMatrix_T & PrimitiveToClusterMatrix() const
         {
             return P_to_C;
         }
@@ -461,7 +426,6 @@ namespace Repulsor
         void PercolateUp() const
         {
 //            ptic(ClassName()+"::PercolateUp");
-            RequireParallelPercolationRoots();
             
             switch (settings.tree_perc_alg)
             {
@@ -529,9 +493,11 @@ namespace Repulsor
         virtual void PercolateUp_Recursive( const Int C ) const = 0;
         
         virtual void PercolateDown_Recursive( const Int C ) const = 0;
-
-#include "Percolate_Parallel.hpp"
         
+        virtual void PercolateUp_Parallel() const = 0;
+        
+        virtual void PercolateDown_Parallel() const = 0;
+
     public:
         
         virtual void Pre( const ExtReal * input, const Int nrsh, const OperatorType op_type ) const = 0;
@@ -543,29 +509,29 @@ namespace Repulsor
         virtual void PrimitivesToClusters( bool add_to = false ) const = 0;
         
         
-//################################################################################################
+//#############################################################################################
 //##        Neighbors
-//################################################################################################
+//#############################################################################################
         
         
     public:
         
-        const Sparse::BinaryMatrixCSR<Int,Int> & PrimitiveAdjacencyMatrix() const
+        const SparseBinaryMatrix_T & PrimitiveAdjacencyMatrix() const
         {
-            if( !P_adjacency_matrix_initialized )
+            std::string tag ("PrimitiveAdjacencyMatrix");
+            if( !InPersistentCacheQ(tag))
             {
-                ptic(ClassName()+"::PrimitiveAdjacencyMatrix");
+                ptic(ClassName()+"::" + tag );
                 // We compute product of S->lo_pre and  S->lo_post because it is basically the primitive-primitive adjacency matrix, we two primitives are supposed to be adjacencent if they share a common degree of freedom.
+//
+                SparseBinaryMatrix_T P_adjacency_matrix = lo_pre.DotBinary(lo_post);
 
-                P_adjacency_matrix = lo_pre.DotBinary(lo_post);
+                ptoc(ClassName()+"::" + tag );
                 
-                P_adjacency_matrix_initialized = true;
-
-                ptoc(ClassName()+"::PrimitiveAdjacencyMatrix");
-
-            } // if( !P_adjacency_matrix_initialized )
+                this->SetPersistentCache(tag, std::any( std::move(P_adjacency_matrix) ) );
+            }
             
-            return P_adjacency_matrix;
+            return std::any_cast<const SparseBinaryMatrix_T & >(this->GetPersistentCache(tag));
         }
         
         
@@ -801,15 +767,15 @@ namespace Repulsor
         
         virtual void SemiStaticUpdate( ptr<Real> P_near_, ptr<Real> P_far_ ) const = 0;
         
-//##################################################################################################
+//################################################################################################
 //##        Moments
-//##################################################################################################
+//################################################################################################
         
 //        virtual void RequireClusterMoments( const Int moment_degree_ ) const = 0;
         
-//##################################################################################################
+//################################################################################################
 //##        General reports
-//##################################################################################################
+//################################################################################################
         
         virtual std::string Stats() const = 0;
         
