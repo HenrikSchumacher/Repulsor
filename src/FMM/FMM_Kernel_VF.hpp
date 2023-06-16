@@ -126,7 +126,7 @@ namespace Repulsor
         mutable Int primitive_count = 0;
         mutable Real total_sum = static_cast<Real>(0);
         
-        mutable size_t evaluations = 0;
+        mutable Size_T evaluations = 0;
         
 //#ifdef REPULSOR__PRINT_REPORTS_FOR_ADAPTIVE_KERNELS
 //        mutable std::ofstream logfile;
@@ -363,7 +363,7 @@ namespace Repulsor
             return max_level_reached;
         }
         
-        size_t EvaluationCount() const
+        Size_T EvaluationCount() const
         {
             return evaluations;
         }

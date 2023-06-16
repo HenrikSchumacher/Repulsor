@@ -7,13 +7,13 @@ namespace Repulsor
     {
     public:
         
-        using ClusterTree_T       = ClusterTree_T_;
+        using ClusterTree_T      = ClusterTree_T_;
         
-        using Real                = typename ClusterTree_T::Real;
-        using SReal               = typename ClusterTree_T::SReal;
-        using ExtReal             = typename ClusterTree_T::ExtReal;
-        using Int                 = typename ClusterTree_T::Int;
-        using LInt                = size_t;
+        using Real               = typename ClusterTree_T::Real;
+        using SReal              = typename ClusterTree_T::SReal;
+        using ExtReal            = typename ClusterTree_T::ExtReal;
+        using Int                = typename ClusterTree_T::Int;
+        using LInt               = Size_T;
         
         using Values_T           = Tensor2<Real,LInt>;
         using ValueContainer_T   = std::unordered_map<std::string,Values_T>;

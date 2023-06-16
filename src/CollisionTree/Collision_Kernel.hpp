@@ -3,11 +3,11 @@
 namespace Repulsor
 {
     template<typename ClusterTree_T_>
-    class Collision_Kernel : public Traversor_Kernel<ClusterTree_T_>
+    class Collision_Kernel : public ClusterTreePairTraversor_Kernel<ClusterTree_T_>
     {
     private:
         
-        using Base_T = Traversor_Kernel<ClusterTree_T_>;
+        using Base_T = ClusterTreePairTraversor_Kernel<ClusterTree_T_>;
         
     public:
         
@@ -16,8 +16,7 @@ namespace Repulsor
         using Int     = typename Base_T::Int;
         using SReal   = typename Base_T::SReal;
         using ExtReal = typename Base_T::ExtReal;
-        
-        using LInt    = size_t;
+        using LInt    = typename Base_T::LInt;
         
     public:
         
@@ -122,7 +121,7 @@ namespace Repulsor
         const Tensor2<SReal,Int> & T_P_ser;
         const Tensor2<SReal,Int> & T_P_v_ser;
         
-        const Sparse::BinaryMatrixCSR<Int,Int> & A;
+        const typename ClusterTree_T::SparseBinaryMatrix_T & A;
         
         CollisionFinder<ClusterTree_T::AMB_DIM,Real,Int,SReal> C;
         

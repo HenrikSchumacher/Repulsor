@@ -21,6 +21,10 @@ namespace Repulsor
         using SReal   = SReal_;
         using ExtReal = ExtReal_;
         
+        using LInt                       = Size_T;
+        using SparseMatrix_T             = Sparse::MatrixCSR      <Real,Int,LInt>;
+        using SparseBinaryMatrix_T       = Sparse::BinaryMatrixCSR<     Int,LInt>;
+        
         using ClusterTree_T              =        ClusterTreeBase<Real,Int,SReal,ExtReal>;
         using BlockClusterTree_T         =   BlockClusterTreeBase<Real,Int,SReal,ExtReal,true>;
         using CollisionTree_T            =      CollisionTreeBase<Real,Int,SReal,ExtReal,true>;
@@ -82,7 +86,7 @@ namespace Repulsor
         
         virtual const CollisionTree_T & GetCollisionTree() const = 0;
                 
-        virtual const Sparse::BinaryMatrixCSR<Int,Int> & DerivativeAssembler() const = 0;
+        virtual const SparseBinaryMatrix_T & DerivativeAssembler() const = 0;
         
         virtual void Assemble_ClusterTree_Derivatives(
             mut<ExtReal> output,

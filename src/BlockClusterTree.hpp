@@ -35,7 +35,7 @@ namespace Repulsor
         using Far_Pattern_T       = typename BlockClusterTreeBase_T::Far_Pattern_T;
         
         using ClusterTree_T     = ClusterTree<AMB_DIM,Real,Int,SReal,ExtReal>;
-        using BlockSplitter_T   = BlockSplit_Kernel<ClusterTree_T, LInt>;
+        using BlockSplitter_T   = BlockSplit_Kernel<ClusterTree_T>;
         
         using Primitive_T       = typename ClusterTree_T::Primitive_T;
         using BoundingVolume_T  = typename ClusterTree_T::BoundingVolume_T;
@@ -247,13 +247,13 @@ namespace Repulsor
             ptic(className()+"::ComputeBlocks: traversal");
             if( (S.SplitThreshold()==1) && (T.SplitThreshold()==1) )
             {
-                Traversor<BlockSplitter_T,is_symmetric,true> traversor ( S, T, kernels );
+                ClusterTreePairTraversor<BlockSplitter_T,is_symmetric,true> traversor ( S, T, kernels );
 
                 traversor.Traverse();
             }
             else
             {
-                Traversor<BlockSplitter_T,is_symmetric,false> traversor ( S, T, kernels );
+                ClusterTreePairTraversor<BlockSplitter_T,is_symmetric,false> traversor ( S, T, kernels );
 
                 traversor.Traverse();
             }
@@ -279,7 +279,7 @@ namespace Repulsor
                 thread_count
             );
             
-            size_t intersection_count = 0;
+            Size_T intersection_count = 0;
             
             for( Int thread = 0; thread < thread_count; ++thread )
             {

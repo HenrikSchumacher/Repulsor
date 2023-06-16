@@ -226,9 +226,6 @@ namespace Repulsor
 
             const Int thread_count = bct.ThreadCount();
             
-            dump(thread_count);
-            dump(!is_symmetric);
-
             bct.GetS().VF_Accumulator() = Accumulator_T( thread_count, 1, 1, 0 );
             bct.GetS().NF_Accumulator() = Accumulator_T( thread_count, 1, 1, 0 );
             bct.GetS().FF_Accumulator() = Accumulator_T( thread_count, 1, 1, 0 );

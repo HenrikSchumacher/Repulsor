@@ -17,7 +17,7 @@ namespace Repulsor
         using SReal              = typename ClusterTree_T::SReal;
         using ExtReal            = typename ClusterTree_T::ExtReal;
         using Int                = typename ClusterTree_T::Int;
-        using LInt               = size_t;
+        using LInt               = Size_T;
 
         using Configurator_T     = FMM_Configurator<ClusterTree_T>;
         using Values_T           = typename Configurator_T::Values_T;

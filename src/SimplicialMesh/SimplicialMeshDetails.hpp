@@ -7,7 +7,12 @@ namespace Repulsor
 	template<int DOM_DIM, int AMB_DIM, typename Real, typename Int>
     struct SimplicialMeshDetails
     {
-		inline std::string ClassName() const
+	public:
+
+		using LInt           = Size_T;
+		using SparseMatrix_T = Sparse::MatrixCSR<Real,Int,LInt>;
+
+		std::string ClassName() const
         {
             return std::string("SimplicialMeshDetails<")+ToString(DOM_DIM)+","+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+">";
         }
@@ -32,8 +37,8 @@ namespace Repulsor
 		      Tensor3<Real,Int> & P_hull_coords,
 		      Tensor2<Real,Int> & P_near,
 		      Tensor2<Real,Int> & P_far,
-		Sparse::MatrixCSR<Real,Int,Int> & DiffOp,
-		Sparse::MatrixCSR<Real,Int,Int> & AvOp 
+		SparseMatrix_T & DiffOp,
+		SparseMatrix_T & AvOp 
 	) const
     {
         ptic(ClassName()+"::ComputeNearFarDataOps");
@@ -87,6 +92,11 @@ namespace Repulsor
     template<typename Real, typename Int>
     struct SimplicialMeshDetails<0,1,Real,Int>
     {
+	public:
+
+		using LInt           = Size_T;
+		using SparseMatrix_T = Sparse::MatrixCSR<Real,Int,LInt>;
+
 	private:
 
 		const Int thread_count = 1;
@@ -98,12 +108,12 @@ namespace Repulsor
 			thread_count(std::max(static_cast<Int>(1),thread_count_))
 		{}
 	
-		inline Int ThreadCount() const
+		Int ThreadCount() const
 		{
 			return thread_count;
 		}
 	
-		inline std::string ClassName() const
+		std::string ClassName() const
         {
             return std::string("SimplicialMeshDetails<0,1,")+TypeName<Real>+","+TypeName<Int>+">";
         }
@@ -166,8 +176,8 @@ namespace Repulsor
 		      Tensor3<Real,Int> & P_hull_coords,
 		      Tensor2<Real,Int> & P_near,
 		      Tensor2<Real,Int> & P_far,
-		Sparse::MatrixCSR<Real,Int,Int> & DiffOp,
-		Sparse::MatrixCSR<Real,Int,Int> & AvOp 
+		SparseMatrix_T & DiffOp,
+		SparseMatrix_T & AvOp 
 	) const
     {
         ptic(ClassName()+"::ComputeNearFarDataOps");
@@ -181,12 +191,12 @@ namespace Repulsor
 		ParallelDo(
 			[&]( const Int thread )
 			{
-				mut<Int> AvOp_outer = AvOp.Outer().data();
-				mut<Int> AvOp_inner = AvOp.Inner().data();
+				mut<LInt> AvOp_outer = AvOp.Outer().data();
+				mut< Int> AvOp_inner = AvOp.Inner().data();
 				AvOp.Value().Fill(static_cast<Real>(1));
 	
-				mut<Int> DiffOp_outer = DiffOp.Outer().data();
-				mut<Int> DiffOp_inner = DiffOp.Inner().data();
+				mut<LInt> DiffOp_outer = DiffOp.Outer().data();
+				mut< Int> DiffOp_inner = DiffOp.Inner().data();
 				DiffOp.Value().SetZero();
 	
 				ptr<Real> V_coords__      = V_coords.data();
@@ -338,6 +348,11 @@ namespace Repulsor
     template<typename Real, typename Int>
     struct SimplicialMeshDetails<0,2,Real,Int>
     {
+	public:
+
+		using LInt           = Size_T;
+		using SparseMatrix_T = Sparse::MatrixCSR<Real,Int,LInt>;
+
 	private:
 
 		const Int thread_count = 1;
@@ -349,12 +364,12 @@ namespace Repulsor
 			thread_count(std::max(static_cast<Int>(1),thread_count_))
 		{}
 	
-		inline Int ThreadCount() const
+		Int ThreadCount() const
 		{
 			return thread_count;
 		}
 	
-		inline std::string ClassName() const
+		std::string ClassName() const
         {
             return std::string("SimplicialMeshDetails<0,2,")+TypeName<Real>+","+TypeName<Int>+">";
         }
@@ -421,8 +436,8 @@ namespace Repulsor
 		      Tensor3<Real,Int> & P_hull_coords,
 		      Tensor2<Real,Int> & P_near,
 		      Tensor2<Real,Int> & P_far,
-		Sparse::MatrixCSR<Real,Int,Int> & DiffOp,
-		Sparse::MatrixCSR<Real,Int,Int> & AvOp 
+		SparseMatrix_T & DiffOp,
+		SparseMatrix_T & AvOp 
 	) const
     {
         ptic(ClassName()+"::ComputeNearFarDataOps");
@@ -436,12 +451,12 @@ namespace Repulsor
 		ParallelDo(
 			[&]( const Int thread )
 			{
-				mut<Int> AvOp_outer = AvOp.Outer().data();
-				mut<Int> AvOp_inner = AvOp.Inner().data();
+				mut<LInt> AvOp_outer = AvOp.Outer().data();
+				mut< Int> AvOp_inner = AvOp.Inner().data();
 				AvOp.Value().Fill(static_cast<Real>(1));
 	
-				mut<Int> DiffOp_outer = DiffOp.Outer().data();
-				mut<Int> DiffOp_inner = DiffOp.Inner().data();
+				mut<LInt> DiffOp_outer = DiffOp.Outer().data();
+				mut< Int> DiffOp_inner = DiffOp.Inner().data();
 				DiffOp.Value().SetZero();
 	
 				ptr<Real> V_coords__      = V_coords.data();
@@ -603,6 +618,11 @@ namespace Repulsor
     template<typename Real, typename Int>
     struct SimplicialMeshDetails<0,3,Real,Int>
     {
+	public:
+
+		using LInt           = Size_T;
+		using SparseMatrix_T = Sparse::MatrixCSR<Real,Int,LInt>;
+
 	private:
 
 		const Int thread_count = 1;
@@ -614,12 +634,12 @@ namespace Repulsor
 			thread_count(std::max(static_cast<Int>(1),thread_count_))
 		{}
 	
-		inline Int ThreadCount() const
+		Int ThreadCount() const
 		{
 			return thread_count;
 		}
 	
-		inline std::string ClassName() const
+		std::string ClassName() const
         {
             return std::string("SimplicialMeshDetails<0,3,")+TypeName<Real>+","+TypeName<Int>+">";
         }
@@ -691,8 +711,8 @@ namespace Repulsor
 		      Tensor3<Real,Int> & P_hull_coords,
 		      Tensor2<Real,Int> & P_near,
 		      Tensor2<Real,Int> & P_far,
-		Sparse::MatrixCSR<Real,Int,Int> & DiffOp,
-		Sparse::MatrixCSR<Real,Int,Int> & AvOp 
+		SparseMatrix_T & DiffOp,
+		SparseMatrix_T & AvOp 
 	) const
     {
         ptic(ClassName()+"::ComputeNearFarDataOps");
@@ -706,12 +726,12 @@ namespace Repulsor
 		ParallelDo(
 			[&]( const Int thread )
 			{
-				mut<Int> AvOp_outer = AvOp.Outer().data();
-				mut<Int> AvOp_inner = AvOp.Inner().data();
+				mut<LInt> AvOp_outer = AvOp.Outer().data();
+				mut< Int> AvOp_inner = AvOp.Inner().data();
 				AvOp.Value().Fill(static_cast<Real>(1));
 	
-				mut<Int> DiffOp_outer = DiffOp.Outer().data();
-				mut<Int> DiffOp_inner = DiffOp.Inner().data();
+				mut<LInt> DiffOp_outer = DiffOp.Outer().data();
+				mut< Int> DiffOp_inner = DiffOp.Inner().data();
 				DiffOp.Value().SetZero();
 	
 				ptr<Real> V_coords__      = V_coords.data();
@@ -884,6 +904,11 @@ namespace Repulsor
     template<typename Real, typename Int>
     struct SimplicialMeshDetails<0,4,Real,Int>
     {
+	public:
+
+		using LInt           = Size_T;
+		using SparseMatrix_T = Sparse::MatrixCSR<Real,Int,LInt>;
+
 	private:
 
 		const Int thread_count = 1;
@@ -895,12 +920,12 @@ namespace Repulsor
 			thread_count(std::max(static_cast<Int>(1),thread_count_))
 		{}
 	
-		inline Int ThreadCount() const
+		Int ThreadCount() const
 		{
 			return thread_count;
 		}
 	
-		inline std::string ClassName() const
+		std::string ClassName() const
         {
             return std::string("SimplicialMeshDetails<0,4,")+TypeName<Real>+","+TypeName<Int>+">";
         }
@@ -978,8 +1003,8 @@ namespace Repulsor
 		      Tensor3<Real,Int> & P_hull_coords,
 		      Tensor2<Real,Int> & P_near,
 		      Tensor2<Real,Int> & P_far,
-		Sparse::MatrixCSR<Real,Int,Int> & DiffOp,
-		Sparse::MatrixCSR<Real,Int,Int> & AvOp 
+		SparseMatrix_T & DiffOp,
+		SparseMatrix_T & AvOp 
 	) const
     {
         ptic(ClassName()+"::ComputeNearFarDataOps");
@@ -993,12 +1018,12 @@ namespace Repulsor
 		ParallelDo(
 			[&]( const Int thread )
 			{
-				mut<Int> AvOp_outer = AvOp.Outer().data();
-				mut<Int> AvOp_inner = AvOp.Inner().data();
+				mut<LInt> AvOp_outer = AvOp.Outer().data();
+				mut< Int> AvOp_inner = AvOp.Inner().data();
 				AvOp.Value().Fill(static_cast<Real>(1));
 	
-				mut<Int> DiffOp_outer = DiffOp.Outer().data();
-				mut<Int> DiffOp_inner = DiffOp.Inner().data();
+				mut<LInt> DiffOp_outer = DiffOp.Outer().data();
+				mut< Int> DiffOp_inner = DiffOp.Inner().data();
 				DiffOp.Value().SetZero();
 	
 				ptr<Real> V_coords__      = V_coords.data();
@@ -1183,6 +1208,11 @@ namespace Repulsor
     template<typename Real, typename Int>
     struct SimplicialMeshDetails<1,2,Real,Int>
     {
+	public:
+
+		using LInt           = Size_T;
+		using SparseMatrix_T = Sparse::MatrixCSR<Real,Int,LInt>;
+
 	private:
 
 		const Int thread_count = 1;
@@ -1194,12 +1224,12 @@ namespace Repulsor
 			thread_count(std::max(static_cast<Int>(1),thread_count_))
 		{}
 	
-		inline Int ThreadCount() const
+		Int ThreadCount() const
 		{
 			return thread_count;
 		}
 	
-		inline std::string ClassName() const
+		std::string ClassName() const
         {
             return std::string("SimplicialMeshDetails<1,2,")+TypeName<Real>+","+TypeName<Int>+">";
         }
@@ -1285,8 +1315,8 @@ namespace Repulsor
 		      Tensor3<Real,Int> & P_hull_coords,
 		      Tensor2<Real,Int> & P_near,
 		      Tensor2<Real,Int> & P_far,
-		Sparse::MatrixCSR<Real,Int,Int> & DiffOp,
-		Sparse::MatrixCSR<Real,Int,Int> & AvOp 
+		SparseMatrix_T & DiffOp,
+		SparseMatrix_T & AvOp 
 	) const
     {
         ptic(ClassName()+"::ComputeNearFarDataOps");
@@ -1300,12 +1330,12 @@ namespace Repulsor
 		ParallelDo(
 			[&]( const Int thread )
 			{
-				mut<Int>  AvOp_outer = AvOp.Outer().data();
-				mut<Int>  AvOp_inner = AvOp.Inner().data();
+				mut<LInt> AvOp_outer = AvOp.Outer().data();
+				mut< Int> AvOp_inner = AvOp.Inner().data();
 				mut<Real> AvOp_value = AvOp.Values().data();
 	
-				mut<Int>  DiffOp_outer = DiffOp.Outer().data();
-				mut<Int>  DiffOp_inner = DiffOp.Inner().data();
+				mut<LInt> DiffOp_outer = DiffOp.Outer().data();
+				mut< Int> DiffOp_inner = DiffOp.Inner().data();
 				mut<Real> DiffOp_value = DiffOp.Value().data();
 	
 				ptr<Real> V_coords__      = V_coords.data();
@@ -1640,6 +1670,11 @@ namespace Repulsor
     template<typename Real, typename Int>
     struct SimplicialMeshDetails<1,3,Real,Int>
     {
+	public:
+
+		using LInt           = Size_T;
+		using SparseMatrix_T = Sparse::MatrixCSR<Real,Int,LInt>;
+
 	private:
 
 		const Int thread_count = 1;
@@ -1651,12 +1686,12 @@ namespace Repulsor
 			thread_count(std::max(static_cast<Int>(1),thread_count_))
 		{}
 	
-		inline Int ThreadCount() const
+		Int ThreadCount() const
 		{
 			return thread_count;
 		}
 	
-		inline std::string ClassName() const
+		std::string ClassName() const
         {
             return std::string("SimplicialMeshDetails<1,3,")+TypeName<Real>+","+TypeName<Int>+">";
         }
@@ -1750,8 +1785,8 @@ namespace Repulsor
 		      Tensor3<Real,Int> & P_hull_coords,
 		      Tensor2<Real,Int> & P_near,
 		      Tensor2<Real,Int> & P_far,
-		Sparse::MatrixCSR<Real,Int,Int> & DiffOp,
-		Sparse::MatrixCSR<Real,Int,Int> & AvOp 
+		SparseMatrix_T & DiffOp,
+		SparseMatrix_T & AvOp 
 	) const
     {
         ptic(ClassName()+"::ComputeNearFarDataOps");
@@ -1765,12 +1800,12 @@ namespace Repulsor
 		ParallelDo(
 			[&]( const Int thread )
 			{
-				mut<Int>  AvOp_outer = AvOp.Outer().data();
-				mut<Int>  AvOp_inner = AvOp.Inner().data();
+				mut<LInt> AvOp_outer = AvOp.Outer().data();
+				mut< Int> AvOp_inner = AvOp.Inner().data();
 				mut<Real> AvOp_value = AvOp.Values().data();
 	
-				mut<Int>  DiffOp_outer = DiffOp.Outer().data();
-				mut<Int>  DiffOp_inner = DiffOp.Inner().data();
+				mut<LInt> DiffOp_outer = DiffOp.Outer().data();
+				mut< Int> DiffOp_inner = DiffOp.Inner().data();
 				mut<Real> DiffOp_value = DiffOp.Value().data();
 	
 				ptr<Real> V_coords__      = V_coords.data();
@@ -2202,6 +2237,11 @@ namespace Repulsor
     template<typename Real, typename Int>
     struct SimplicialMeshDetails<1,4,Real,Int>
     {
+	public:
+
+		using LInt           = Size_T;
+		using SparseMatrix_T = Sparse::MatrixCSR<Real,Int,LInt>;
+
 	private:
 
 		const Int thread_count = 1;
@@ -2213,12 +2253,12 @@ namespace Repulsor
 			thread_count(std::max(static_cast<Int>(1),thread_count_))
 		{}
 	
-		inline Int ThreadCount() const
+		Int ThreadCount() const
 		{
 			return thread_count;
 		}
 	
-		inline std::string ClassName() const
+		std::string ClassName() const
         {
             return std::string("SimplicialMeshDetails<1,4,")+TypeName<Real>+","+TypeName<Int>+">";
         }
@@ -2321,8 +2361,8 @@ namespace Repulsor
 		      Tensor3<Real,Int> & P_hull_coords,
 		      Tensor2<Real,Int> & P_near,
 		      Tensor2<Real,Int> & P_far,
-		Sparse::MatrixCSR<Real,Int,Int> & DiffOp,
-		Sparse::MatrixCSR<Real,Int,Int> & AvOp 
+		SparseMatrix_T & DiffOp,
+		SparseMatrix_T & AvOp 
 	) const
     {
         ptic(ClassName()+"::ComputeNearFarDataOps");
@@ -2336,12 +2376,12 @@ namespace Repulsor
 		ParallelDo(
 			[&]( const Int thread )
 			{
-				mut<Int>  AvOp_outer = AvOp.Outer().data();
-				mut<Int>  AvOp_inner = AvOp.Inner().data();
+				mut<LInt> AvOp_outer = AvOp.Outer().data();
+				mut< Int> AvOp_inner = AvOp.Inner().data();
 				mut<Real> AvOp_value = AvOp.Values().data();
 	
-				mut<Int>  DiffOp_outer = DiffOp.Outer().data();
-				mut<Int>  DiffOp_inner = DiffOp.Inner().data();
+				mut<LInt> DiffOp_outer = DiffOp.Outer().data();
+				mut< Int> DiffOp_inner = DiffOp.Inner().data();
 				mut<Real> DiffOp_value = DiffOp.Value().data();
 	
 				ptr<Real> V_coords__      = V_coords.data();
@@ -2859,6 +2899,11 @@ namespace Repulsor
     template<typename Real, typename Int>
     struct SimplicialMeshDetails<2,3,Real,Int>
     {
+	public:
+
+		using LInt           = Size_T;
+		using SparseMatrix_T = Sparse::MatrixCSR<Real,Int,LInt>;
+
 	private:
 
 		const Int thread_count = 1;
@@ -2870,12 +2915,12 @@ namespace Repulsor
 			thread_count(std::max(static_cast<Int>(1),thread_count_))
 		{}
 	
-		inline Int ThreadCount() const
+		Int ThreadCount() const
 		{
 			return thread_count;
 		}
 	
-		inline std::string ClassName() const
+		std::string ClassName() const
         {
             return std::string("SimplicialMeshDetails<2,3,")+TypeName<Real>+","+TypeName<Int>+">";
         }
@@ -2986,8 +3031,8 @@ namespace Repulsor
 		      Tensor3<Real,Int> & P_hull_coords,
 		      Tensor2<Real,Int> & P_near,
 		      Tensor2<Real,Int> & P_far,
-		Sparse::MatrixCSR<Real,Int,Int> & DiffOp,
-		Sparse::MatrixCSR<Real,Int,Int> & AvOp 
+		SparseMatrix_T & DiffOp,
+		SparseMatrix_T & AvOp 
 	) const
     {
         ptic(ClassName()+"::ComputeNearFarDataOps");
@@ -3001,17 +3046,17 @@ namespace Repulsor
 		ParallelDo(
 			[&]( const Int thread )
 			{
-				mut<Int>  AvOp_outer = AvOp.Outer().data();
-				mut<Int>  AvOp_inner = AvOp.Inner().data();
+				mut<LInt> AvOp_outer = AvOp.Outer().data();
+				mut< Int> AvOp_inner = AvOp.Inner().data();
 				mut<Real> AvOp_value = AvOp.Values().data();
 	
-				mut<Int>  DiffOp_outer = DiffOp.Outer().data();
-				mut<Int>  DiffOp_inner = DiffOp.Inner().data();
+				mut<LInt> DiffOp_outer = DiffOp.Outer().data();
+				mut< Int> DiffOp_inner = DiffOp.Inner().data();
 				mut<Real> DiffOp_value = DiffOp.Values().data();
 	
 				ptr<Real> V_coords__      = V_coords.data();
 				
-				ptr<Int>  simplices__     = simplices.data();
+				ptr< Int> simplices__     = simplices.data();
 			    mut<Real> P_hull_coords__ = P_hull_coords.data();
 				mut<Real> P_coords__      = P_coords.data();
 	
@@ -3699,6 +3744,11 @@ namespace Repulsor
     template<typename Real, typename Int>
     struct SimplicialMeshDetails<2,4,Real,Int>
     {
+	public:
+
+		using LInt           = Size_T;
+		using SparseMatrix_T = Sparse::MatrixCSR<Real,Int,LInt>;
+
 	private:
 
 		const Int thread_count = 1;
@@ -3710,12 +3760,12 @@ namespace Repulsor
 			thread_count(std::max(static_cast<Int>(1),thread_count_))
 		{}
 	
-		inline Int ThreadCount() const
+		Int ThreadCount() const
 		{
 			return thread_count;
 		}
 	
-		inline std::string ClassName() const
+		std::string ClassName() const
         {
             return std::string("SimplicialMeshDetails<2,4,")+TypeName<Real>+","+TypeName<Int>+">";
         }
@@ -3838,8 +3888,8 @@ namespace Repulsor
 		      Tensor3<Real,Int> & P_hull_coords,
 		      Tensor2<Real,Int> & P_near,
 		      Tensor2<Real,Int> & P_far,
-		Sparse::MatrixCSR<Real,Int,Int> & DiffOp,
-		Sparse::MatrixCSR<Real,Int,Int> & AvOp 
+		SparseMatrix_T & DiffOp,
+		SparseMatrix_T & AvOp 
 	) const
     {
         ptic(ClassName()+"::ComputeNearFarDataOps");
@@ -3853,17 +3903,17 @@ namespace Repulsor
 		ParallelDo(
 			[&]( const Int thread )
 			{
-				mut<Int>  AvOp_outer = AvOp.Outer().data();
-				mut<Int>  AvOp_inner = AvOp.Inner().data();
+				mut<LInt> AvOp_outer = AvOp.Outer().data();
+				mut< Int> AvOp_inner = AvOp.Inner().data();
 				mut<Real> AvOp_value = AvOp.Values().data();
 	
-				mut<Int>  DiffOp_outer = DiffOp.Outer().data();
-				mut<Int>  DiffOp_inner = DiffOp.Inner().data();
+				mut<LInt> DiffOp_outer = DiffOp.Outer().data();
+				mut< Int> DiffOp_inner = DiffOp.Inner().data();
 				mut<Real> DiffOp_value = DiffOp.Values().data();
 	
 				ptr<Real> V_coords__      = V_coords.data();
 				
-				ptr<Int>  simplices__     = simplices.data();
+				ptr< Int> simplices__     = simplices.data();
 			    mut<Real> P_hull_coords__ = P_hull_coords.data();
 				mut<Real> P_coords__      = P_coords.data();
 	

@@ -2,12 +2,12 @@
 
 namespace Repulsor
 {
-    template<typename ClusterTree_T_, typename LInt_>
-    class BlockSplit_Kernel : public Traversor_Kernel<ClusterTree_T_>
+    template<typename ClusterTree_T_>
+    class BlockSplit_Kernel : public ClusterTreePairTraversor_Kernel<ClusterTree_T_>
     {
     private:
         
-        using Base_T = Traversor_Kernel<ClusterTree_T_>;
+        using Base_T = ClusterTreePairTraversor_Kernel<ClusterTree_T_>;
         
     public:
         
@@ -16,7 +16,7 @@ namespace Repulsor
         using SReal   = typename Base_T::SReal;
         using ExtReal = typename Base_T::ExtReal;
         using Int     = typename Base_T::Int;
-        using LInt    = LInt_;
+        using LInt    = typename Base_T::LInt;
         
     public:
         
@@ -122,7 +122,7 @@ namespace Repulsor
         mut<SReal> S_P_serialized = nullptr;
         mut<SReal> T_P_serialized = nullptr;
         
-        const Sparse::BinaryMatrixCSR<Int,Int> & A;
+        const typename ClusterTree_T::SparseBinaryMatrix_T & A;
         
         Int C_i = -1;
         Int C_j = -1;

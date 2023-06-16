@@ -1,11 +1,9 @@
 #pragma once
 
-#define CLASS Traversor_Kernel
-
 namespace Repulsor
 {
     template<typename ClusterTree_T_>
-    class alignas(OBJECT_ALIGNMENT) CLASS
+    class alignas(OBJECT_ALIGNMENT) ClusterTreePairTraversor_Kernel
     {
     public:
         
@@ -15,28 +13,29 @@ namespace Repulsor
         using SReal   = typename ClusterTree_T::SReal;
         using ExtReal = typename ClusterTree_T::ExtReal;
         using Int     = typename ClusterTree_T::Int;
+        using LInt    = typename ClusterTree_T::LInt;
         
     public:
         
-        CLASS() = default;
+        ClusterTreePairTraversor_Kernel() = default;
         
-        CLASS(
+        ClusterTreePairTraversor_Kernel(
             const ClusterTree_T & S_,
             const ClusterTree_T & T_
         )
         :   tree_string( S_.ClassName() )
         {}
         
-        CLASS(
-            const CLASS & other
+        ClusterTreePairTraversor_Kernel(
+            const ClusterTreePairTraversor_Kernel & other
         )
         :   tree_string ( other.tree_string                )
         {}
         
-        ~CLASS() = default;
+        ~ClusterTreePairTraversor_Kernel() = default;
         
         
-        friend void swap(CLASS &A, CLASS &B)
+        friend void swap(ClusterTreePairTraversor_Kernel &A, ClusterTreePairTraversor_Kernel &B)
         {
             // see https://stackoverflow.com/questions/5695548/public-friend-swap-member-function for details
             using std::swap;
@@ -45,7 +44,7 @@ namespace Repulsor
         }
         
 //        // Copy assignment
-//        CLASS & operator=(CLASS other) // Intentionally no pass-by-reference here!
+//        ClusterTreePairTraversor_Kernel & operator=(ClusterTreePairTraversor_Kernel other) // Intentionally no pass-by-reference here!
 //        {
 //            swap(*this, other);
 //
@@ -53,14 +52,14 @@ namespace Repulsor
 //        }
         
         // Move constructor
-        CLASS( CLASS && other ) noexcept
-        :   CLASS()
+        ClusterTreePairTraversor_Kernel( ClusterTreePairTraversor_Kernel && other ) noexcept
+        :   ClusterTreePairTraversor_Kernel()
         {
             swap(*this, other);
         }
 
         /* Move assignment operator */
-        CLASS & operator=( CLASS && other ) noexcept
+        ClusterTreePairTraversor_Kernel & operator=( ClusterTreePairTraversor_Kernel && other ) noexcept
         {
             if( this != &other )
             {
@@ -77,13 +76,11 @@ namespace Repulsor
         
         std::string ClassName() const
         {
-            return TO_STD_STRING(CLASS) + "<"+tree_string+">";
+            return std::string("ClusterTreePairTraversor_Kernel") + "<"+tree_string+">";
         }
       
         
-    };
+    }; // class ClusterTreePairTraversor_Kernel
     
 } //namespace Repulsor
-
-#undef CLASS
 

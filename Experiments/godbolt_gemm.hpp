@@ -56,12 +56,12 @@ inline void dot3(
     A = (const Scal * ) __builtin_assume_aligned (A, BlockSize<double>::align);
     B = (const Scal * ) __builtin_assume_aligned (B, BlockSize<double>::align);
 
-    for( size_t k = 0; k < K; ++k )
+    for( std::size_t k = 0; k < K; ++k )
     {
         const v_T * b = (const v_T * ) B;
-        for( size_t i = 0; i < MR; ++i )
+        for( std::size_t i = 0; i < MR; ++i )
         {
-            for( size_t j = 0; j < NR; ++j )
+            for( std::size_t j = 0; j < NR; ++j )
             {
    
                 c[i][j] += A[i] * b[j];
@@ -117,12 +117,12 @@ inline void dot(
     std::copy_n( a, M*K, &A[0][0] );
     std::copy_n( b, K*N, &B[0][0] );
 
-    for( size_t i = 0; i < M; ++i )
+    for( std::size_t i = 0; i < M; ++i )
     {
         Scal C_i [M] = {};
-        for( size_t j = 0; j < N; ++j )
+        for( std::size_t j = 0; j < N; ++j )
         {
-            for( size_t k = 0; k < K; ++k )
+            for( std::size_t k = 0; k < K; ++k )
             {
                 C[i][j] += A[i][k] * B[j][k];
             }

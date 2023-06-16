@@ -12,12 +12,12 @@ namespace Repulsor
     struct PairHasher
     {
         template <class T1, class T2>
-        size_t operator()( const std::pair<T1, T2> & p ) const
+        Size_T operator()( const std::pair<T1, T2> & p ) const
         {
             // See https://stackoverflow.com/a/23860042/8248900
             
-            size_t hash_1 = std::hash<T1>{}(p.first);
-            size_t hash_2 = std::hash<T2>{}(p.second);
+            Size_T hash_1 = std::hash<T1>{}(p.first);
+            Size_T hash_2 = std::hash<T2>{}(p.second);
      
             hash_1 ^= hash_2 + 0x9e3779b9 + (hash_1<<6) + (hash_1>>2);
             return hash_1;

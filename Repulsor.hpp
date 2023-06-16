@@ -23,7 +23,7 @@
     //#include "src/MultipoleMoments.hpp"
     #include "src/SimplexHierarchy.hpp"
     #include "src/ClusterTree.hpp"
-    #include "src/Traversor.hpp"
+    #include "src/ClusterTreePairTraversor.hpp"
 
     #include "src/BlockClusterTree.hpp"
     #include "src/CollisionTree.hpp"

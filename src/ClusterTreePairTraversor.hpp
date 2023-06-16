@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Traversor/Traversor_Kernel.hpp"
+#include "ClusterTreePairTraversor/ClusterTreePairTraversor_Kernel.hpp"
 
 namespace Repulsor
 {
-    template<typename Kernel_T, bool is_symmetric, bool leaves_are_singletons >
-    class Traversor
+    template<typename Kernel_T, bool is_symmetric, bool leaves_are_singletons>
+    class ClusterTreePairTraversor
     {
     public:
         
@@ -19,7 +19,7 @@ namespace Repulsor
 
         // In order to prevent GetS() and GetT() shooting a segfault, we have to initialize S and T here. This is the only case in which Traversor owns these raw pointers.
         
-        Traversor(
+        ClusterTreePairTraversor(
             const ClusterTree_T & S_,
             const ClusterTree_T & T_,
             std::vector<Kernel_T> & kernels_
@@ -44,7 +44,7 @@ namespace Repulsor
             }
         } // Constructor
         
-        ~Traversor() = default;
+        ~ClusterTreePairTraversor() = default;
         
     protected:
 
@@ -104,7 +104,7 @@ namespace Repulsor
         
     protected:
         
-#include "Traversor/Traverse_DepthFirst.hpp"
+#include "ClusterTreePairTraversor/Traverse_DepthFirst.hpp"
         
         void Traverse_Sequential()
         {
@@ -117,14 +117,11 @@ namespace Repulsor
         
     protected:
         
-#include "Traversor/Traverse_BreadthFirst.hpp"
+#include "ClusterTreePairTraversor/Traverse_BreadthFirst.hpp"
         
         void Traverse_Parallel()
         {
             ptic(className()+"::Traverse_Parallel");
-
-            dump(ThreadCount());
-            dump(kernels.size());
             
             Traverse_BreadthFirst( 0, 0, 0, static_cast<Int>(16) * ThreadCount() );
             
@@ -154,10 +151,10 @@ namespace Repulsor
         
         std::string className() const
         {
-            return "Traversor<"+kernels[0].ClassName()+">";
+            return "ClusterTreePairTraversor<"+kernels[0].ClassName()+">";
         }
       
         
-    }; // class Traversor
+    }; // class ClusterTreePairTraversor
     
 } //namespace Repulsor

@@ -15,7 +15,7 @@ namespace Repulsor
         
         using MeshBase_T         = SimplicialMeshBase<Real,Int,SReal,ExtReal>;
         using BlockClusterTree_T = typename MeshBase_T::BlockClusterTree_T;
-        using LInt               = size_t;
+        using LInt               = Size_T;
         using TangentVector_T    = typename MeshBase_T::TangentVector_T;
         using CotangentVector_T  = typename MeshBase_T::CotangentVector_T;
         

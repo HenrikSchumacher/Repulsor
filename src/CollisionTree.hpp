@@ -107,13 +107,13 @@ namespace Repulsor
                 
                 if( S.SplitThreshold()==1 && T.SplitThreshold()==1 )
                 {
-                    Traversor<Kernel_T, is_symmetric, true > traversor (S, T, kernels);
+                    ClusterTreePairTraversor<Kernel_T, is_symmetric, true > traversor (S, T, kernels);
                     
                     traversor.Traverse();
                 }
                 else
                 {
-                    Traversor<Kernel_T, is_symmetric, false> traversor (S, T, kernels);
+                    ClusterTreePairTraversor<Kernel_T, is_symmetric, false> traversor (S, T, kernels);
                     
                     traversor.Traverse();
                 }
@@ -188,13 +188,13 @@ namespace Repulsor
             
             if( S.SplitThreshold()==1 && T.SplitThreshold()==1 )
             {
-                Traversor<Kernel_T, is_symmetric, true>  traversor (S, T, kernels);
+                ClusterTreePairTraversor<Kernel_T, is_symmetric, true>  traversor (S, T, kernels);
                 
                 traversor.Traverse();
             }
             else
             {
-                Traversor<Kernel_T, is_symmetric, false> traversor (S, T, kernels);
+                ClusterTreePairTraversor<Kernel_T, is_symmetric, false> traversor (S, T, kernels);
                 
                 traversor.Traverse();
             }

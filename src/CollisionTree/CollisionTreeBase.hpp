@@ -19,7 +19,9 @@ namespace Repulsor
         
         using ClusterTreeBase_T = ClusterTreeBase<Real,Int,SReal,ExtReal>;
         
-        using CollisionMatrix_T = Sparse::MatrixCSR<SReal,Int,size_t>;
+        using LInt              = typename ClusterTreeBase_T::LInt;
+        using CollisionMatrix_T = Sparse::MatrixCSR<SReal,Int,LInt>;
+        
         
         CollisionTreeBase () = default;
         

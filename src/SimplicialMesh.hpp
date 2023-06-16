@@ -26,20 +26,25 @@ namespace Repulsor
         using Int     = Int_;
         using SReal   = SReal_;
         using ExtReal = ExtReal_;
+        using LInt    = typename Base_T::LInt;
         
-        using TangentVector_T    = typename Base_T::TangentVector_T;
-        using CotangentVector_T  = typename Base_T::CotangentVector_T;
+        using TangentVector_T      = typename Base_T::TangentVector_T;
+        using CotangentVector_T    = typename Base_T::CotangentVector_T;
         
-        using       Primitive_T  =        Polytope<DOM_DIM+1,AMB_DIM,GJK_Real,Int,SReal,Real,Int>;
-        using MovingPrimitive_T  =  MovingPolytope<DOM_DIM+1,AMB_DIM,GJK_Real,Int,SReal,Real,Int>;
-        using BoundingVolume_T   =           AABB<           AMB_DIM,GJK_Real,Int,SReal>;
+        using SparseMatrix_T       = typename Base_T::SparseMatrix_T;
+        using SparseBinaryMatrix_T = typename Base_T::SparseBinaryMatrix_T;
+        
+        using Primitive_T = Polytope<DOM_DIM+1,AMB_DIM,GJK_Real,Int,SReal,Real,Int>;
+        using MovingPrimitive_T = MovingPolytope<DOM_DIM+1,AMB_DIM,GJK_Real,Int,SReal,Real,Int>;
+        using BoundingVolume_T = AABB<AMB_DIM,GJK_Real,Int,SReal>;
         
         
-        using ClusterTree_T              =            ClusterTree<AMB_DIM,Real,Int,SReal,ExtReal>;
-        using BlockClusterTree_T         =       BlockClusterTree<AMB_DIM,Real,Int,SReal,ExtReal,true>;
-        using ObstacleBlockClusterTree_T =       BlockClusterTree<AMB_DIM,Real,Int,SReal,ExtReal,false>;
-        using CollisionTree_T            =          CollisionTree<AMB_DIM,Real,Int,SReal,ExtReal,true>;
-        using ObstacleCollisionTree_T    =          CollisionTree<AMB_DIM,Real,Int,SReal,ExtReal,false>;
+        using ClusterTree_T           = ClusterTree<AMB_DIM,Real,Int,SReal,ExtReal>;
+        using BlockClusterTree_T      = BlockClusterTree<AMB_DIM,Real,Int,SReal,ExtReal,true>;
+        using ObstacleBlockClusterTree_T
+                                      = BlockClusterTree<AMB_DIM,Real,Int,SReal,ExtReal,false>;
+        using CollisionTree_T         = CollisionTree<AMB_DIM,Real,Int,SReal,ExtReal,true>;
+        using ObstacleCollisionTree_T = CollisionTree<AMB_DIM,Real,Int,SReal,ExtReal,false>;
 
         using Remesher_T         = SimplicialRemesher<DOM_DIM,AMB_DIM,Real,Int>;
         
@@ -57,7 +62,7 @@ namespace Repulsor
             // vertex coordinates; assumed to be of size vertex_count_ x AMB_DIM
             const Tensor2<Int,Int> & simplices_,
             // simplices; assumed to be of size simplex_count_ x (DOM_DIM+1)
-            const std::size_t thread_count_ = 1
+            const Size_T thread_count_ = 1
         )
         :   SimplicialMesh(
                   V_coords_.data(),
@@ -121,10 +126,10 @@ namespace Repulsor
         template<typename ExtReal_2, typename ExtInt>
         SimplicialMesh(
             const ExtReal_2 * V_coords_, // vertex coordinates; assumed to be of size vertex_count_ x AMB_DIM
-            const std::size_t vertex_count_,
+            const Size_T vertex_count_,
             const ExtInt * simplices_, // simplices; assumed to be of size simplex_count_ x (DOM_DIM+1)
-            const std::size_t simplex_count_,
-            const std::size_t thread_count_ = 1
+            const Size_T simplex_count_,
+            const Size_T thread_count_ = 1
         )
         :   SimplicialMesh( V_coords_, vertex_count_, false, simplices_, simplex_count_, false, thread_count_)
         {}
@@ -132,12 +137,12 @@ namespace Repulsor
         template<typename ExtReal_2, typename ExtInt>
         SimplicialMesh(
             const ExtReal_2 * vertex_coords_, // vertex coordinates; assumed to be of size vertex_count_ x AMB_DIM
-            const std::size_t vertex_count_,
+            const Size_T vertex_count_,
             const bool vertex_coords_transpose,
             const ExtInt * simplices_, // simplices; assumed to be of size simplex_count_ x (DOM_DIM+1)
-            const std::size_t simplex_count_,
+            const Size_T simplex_count_,
             const bool simplices_transpose,
-            const std::size_t thread_count_ = 1
+            const Size_T thread_count_ = 1
         )
         :   Base_T    ( static_cast<Int>(thread_count_) )
         ,   V_coords  ( ToTensor2<Real,Int>(
@@ -377,7 +382,7 @@ namespace Repulsor
 
                     Tensor2<SReal,Int> P_serialized ( SimplexCount(), P_proto.Size() );
 
-                    auto DiffOp = Sparse::MatrixCSR<Real,Int,Int>(
+                    auto DiffOp = SparseMatrix_T(
                         SimplexCount() * AMB_DIM,
                         VertexCount(),
                         SimplexCount() * AMB_DIM * (DOM_DIM+1),
@@ -386,7 +391,7 @@ namespace Repulsor
 
                     DiffOp.Outer()[SimplexCount() * AMB_DIM] = SimplexCount() * AMB_DIM * (DOM_DIM+1);
 
-                    auto AvOp = Sparse::MatrixCSR<Real,Int,Int>(
+                    auto AvOp = SparseMatrix_T(
                         SimplexCount(),
                         VertexCount(),
                         SimplexCount() * (DOM_DIM+1),
@@ -530,7 +535,7 @@ namespace Repulsor
             return std::any_cast<CollisionTree_T &>( this->GetCache(tag) );
         }
         
-        const Sparse::BinaryMatrixCSR<Int,Int> & DerivativeAssembler() const override
+        const SparseBinaryMatrix_T & DerivativeAssembler() const override
         {
             
             static std::string tag ( "DerivativeAssembler" );
@@ -539,7 +544,7 @@ namespace Repulsor
             {
                 ptic(className()+"::DerivativeAssembler");
             
-                auto A = Sparse::BinaryMatrixCSR<Int,Int>(
+                auto A = SparseBinaryMatrix_T(
                     SimplexCount() * (DOM_DIM+1),
                     VertexCount(),
                     SimplexCount() * (DOM_DIM+1),
@@ -554,7 +559,7 @@ namespace Repulsor
                 ptoc(className()+"::DerivativeAssembler");
             }
             
-            return std::any_cast<Sparse::BinaryMatrixCSR<Int,Int> &>( this->GetCache(tag) );
+            return std::any_cast<SparseBinaryMatrix_T &>( this->GetCache(tag) );
             
         } // DerivativeAssembler
         
