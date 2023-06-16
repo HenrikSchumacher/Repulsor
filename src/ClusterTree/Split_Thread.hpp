@@ -16,65 +16,30 @@ private:
         
         tree_rows_ptr[0].push_back(root);
 
+        // TODO: The distribution of threads is still not optimal.
         
-        Split_Cluster<false>( 0, tree_rows_ptr[0][0], ThreadCount() );
+        std::mutex tree_rows_ptr_mutex;
         
-        {
-            std::vector<Cluster_T *> & row = tree_rows_ptr[1];
-
-            const Int row_size  = static_cast<Int>(row.size());
-            
-            // TODO: The distribution of threads is still not optimal.
-            
-            ParallelDo_Dynamic(
-                [=,&row]( const Int thread, const Int i )
-                {
-                    Split_Cluster<false>(
-                        thread, row[i],
-                        std::max( one, ThreadCount()/row_size )
-                    );
-                },
-                null, row_size, one,
-                std::min( row_size, ThreadCount() )
-            );
-        }
+        Split_Cluster<false>( 0, tree_rows_ptr[0][0], tree_rows_ptr_mutex, ThreadCount() );
         
-//        {
-//            std::vector<Cluster_T *> & row = tree_rows_ptr[2];
-//
-//            const Int row_size  = static_cast<Int>(row.size());
-//
-//            ParallelDo_Dynamic(
-//                [=,&row]( const Int thread, const Int i )
-//                {
-//                    Split_Cluster<false>(
-//                        thread,
-//                        row[i],
-//                        one
-//                    );
-//                },
-//                null, row_size, one,
-//                std::min( row_size, ThreadCount() )
-//            );
-//        }
-        
-        for( Int level = 2; level < top_level_count; ++level )
+        for( Int level = 1; level < top_level_count; ++level )
         {
             std::vector<Cluster_T *> & row = tree_rows_ptr[level];
 
             const Int row_size  = static_cast<Int>(row.size());
 
             ParallelDo_Dynamic(
-                [=,&row]( const Int thread, const Int i )
+                [=,&row,&tree_rows_ptr_mutex]( const Int thread, const Int i )
                 {
                     Split_Cluster<false>(
                         thread,
                         row[i],
-                        one
+                        tree_rows_ptr_mutex,
+                        std::max( one, ThreadCount()/row_size )
                     );
                 },
                 null, row_size, one,
-                std::min( row_size, ThreadCount() )
+                std::min(row_size, ThreadCount() )
            );
         }
             
@@ -95,9 +60,9 @@ private:
         std::vector<Cluster_T *> & tree_row = tree_rows_ptr[top_level_count];
         
         ParallelDo_Dynamic(
-            [=,&tree_row]( const Int thread, const Int i )
+            [=,&tree_row,&tree_rows_ptr_mutex]( const Int thread, const Int i )
             {
-                Split_Cluster<true>( thread, tree_row[i], one );
+                Split_Cluster<true>( thread, tree_row[i], tree_rows_ptr_mutex, one );
             },
             null, static_cast<Int>(tree_row.size()), one,
             ThreadCount()
@@ -123,7 +88,7 @@ private:
 
 
     template<bool recursive>
-    void Split_Cluster( const Int thread, Cluster_T * C, const Int thread_count )
+    void Split_Cluster( const Int thread, Cluster_T * C, std::mutex & tree_rows_ptr_mutex, const Int thread_count )
     {
         
         const Int begin = C->begin;
@@ -172,13 +137,15 @@ private:
             
             if constexpr( recursive )
             {
-                Split_Cluster<recursive>( thread, C->left,  1 );
-                Split_Cluster<recursive>( thread, C->right, 1 );
+                Split_Cluster<recursive>( thread, C->left,  tree_rows_ptr_mutex, one );
+                Split_Cluster<recursive>( thread, C->right, tree_rows_ptr_mutex, one );
                 
                 Split_Cluster_Post(C);
             }
             else
             {
+                const std::lock_guard<std::mutex> lock( tree_rows_ptr_mutex );
+                
                 tree_rows_ptr[next_depth].push_back( C->left  );
                 tree_rows_ptr[next_depth].push_back( C->right );
             }
@@ -187,8 +154,8 @@ private:
         {
             // count cluster as leaf cluster
             // counting ourselves as descendant, too!
-            C->descendant_count      = 1;
-            C->descendant_leaf_count = 1;
+            C->descendant_count      = one;
+            C->descendant_leaf_count = one;
         }
 
     }
