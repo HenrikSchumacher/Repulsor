@@ -55,6 +55,10 @@ namespace Repulsor
         static constexpr Int  FAR_DIM = 1 + AMB_DIM + (AMB_DIM * (AMB_DIM + 1)) / 2;
         static constexpr Int NEAR_DIM = 1 + (DOM_DIM+1) * AMB_DIM + (AMB_DIM * (AMB_DIM + 1)) / 2;
         
+        static constexpr Int  SIZE      = DOM_DIM + 1;
+        static constexpr Int  HULL_SIZE = AMB_DIM * SIZE;
+        static constexpr Real nth       = Scalar::Inv<Real>( static_cast<Real>(SIZE));
+        
         SimplicialMesh() = default;
 
         SimplicialMesh(
@@ -191,6 +195,368 @@ namespace Repulsor
         SimplicialMeshDetails<DOM_DIM,AMB_DIM,Real_,Int_> details;
 
         
+    protected:
+        
+        void ComputeNearFarDataOps(
+            const Tensor2<Real,Int> & V_coords,
+            const Tensor2<Int ,Int> & simplices,
+                  Tensor2<Real,Int> & P_coords,
+                  Tensor3<Real,Int> & P_hull_coords,
+                  Tensor2<Real,Int> & P_near,
+                  Tensor2<Real,Int> & P_far,
+            SparseMatrix_T & DiffOp,
+            SparseMatrix_T & AvOp
+        ) const
+        {
+            ptic(ClassName()+"::ComputeNearFarDataOps_new");
+            
+            ParallelDo(
+                [&]( const Int thread )
+                {
+                    
+                    mut<LInt> Av_outer = AvOp.Outer().data();
+                    mut< Int> Av_inner = AvOp.Inner().data();
+                    mut<Real> Av_value = AvOp.Values().data();
+        
+                    mut<LInt> Diff_outer = DiffOp.Outer().data();
+                    mut< Int> Diff_inner = DiffOp.Inner().data();
+                    mut<Real> Diff_value = DiffOp.Values().data();
+        
+                    Tiny::Vector<AMB_DIM,Real,Int> center;
+                    
+                    Tiny::Matrix<SIZE,   AMB_DIM,Real,Int> hull;
+                    Tiny::Matrix<AMB_DIM,SIZE,   Real,Int> Df;
+                    
+                    Tiny::Matrix<AMB_DIM,DOM_DIM,Real,Int> df;
+                    Tiny::Matrix<DOM_DIM,AMB_DIM,Real,Int> dfdagger;
+                    Tiny::Matrix<AMB_DIM,AMB_DIM,Real,Int> P;
+                    
+                    Tiny::SelfAdjointMatrix    <DOM_DIM,Real,Int> g;
+                    
+                    Tiny::Vector<SIZE,Int,Int> simplex;
+                    Tiny::Vector<SIZE,Int,Int> s_simplex;   // Sorted simplex.
+        
+                    Real std_simplex_volume = 1;
+                    for( Int l = 2; l < SIZE; ++l )
+                    {
+                        std_simplex_volume *= l;
+                    }
+                    std_simplex_volume = Scalar::Inv<Real>(std_simplex_volume);
+                    
+//                    dump(std_simplex_volume);
+                    
+                    const Int simplex_count = simplices.Dimension(0);
+                    const Int i_begin = JobPointer<Int>(simplex_count, ThreadCount(), thread  );
+                    const Int i_end   = JobPointer<Int>(simplex_count, ThreadCount(), thread+1);
+        
+                    for( Int i = i_begin; i < i_end; ++i )
+                    {
+                        mut<Real> near   = P_near.data(i);
+                        mut<Real> far    = P_far.data(i);
+                        
+                          simplex.Read( simplices.data(i) );
+                        s_simplex.Read( simplex.data() );
+                        
+//                        dump(simplex);
+                      
+                        // sorting simplex so that we do not have to sort the sparse arrays to achieve CSR format later
+                        std::sort( &s_simplex[0], &s_simplex[SIZE] );
+
+//                        dump(s_simplex);
+                        
+                        Av_outer[i+1] = (i+1) * SIZE;
+                        
+                        s_simplex.Write( &Av_inner[SIZE * i] );
+                        fill_buffer<SIZE>( &Av_value[SIZE * i], nth );
+                        
+                        for( Int k = 0; k < AMB_DIM; ++k )
+                        {
+                            const Int row = AMB_DIM * i + k;
+                            
+                            const Int rp = row * SIZE;
+                            
+                            Diff_outer[row+1] = rp + SIZE;
+                            
+                            s_simplex.Write( &Diff_inner[rp] );
+                        }
+           
+                        for( Int l = 0; l < SIZE; ++l )
+                        {
+                            copy_buffer<AMB_DIM>( V_coords.data(simplex[l]), hull[l] );
+                        }
+                        
+//                        dump(hull);
+
+                        hull.Write( P_hull_coords.data(i) );
+                        hull.Write( &near[1]              );
+                        
+                        
+                        copy_buffer<AMB_DIM>(hull[0],center.data());
+                        for( Int l = 1; l < SIZE; ++l )
+                        {
+                            add_to_buffer<AMB_DIM>( hull[l], center.data() );
+                        }
+                        center *= nth;
+                        
+                        center.Write( &far[1] );
+                        center.Write( P_coords.data(i) );
+                        
+                        for( Int l = 0; l < DOM_DIM; ++l )
+                        {
+                            for( Int k = 0; k < AMB_DIM; ++k )
+                            {
+                                df[k][l] =
+                                    V_coords[s_simplex[l+1]][k]
+                                    -
+                                    V_coords[s_simplex[0  ]][k];
+                            }
+                        }
+                        
+//                        dump(df);
+                        
+                        df.Transpose( dfdagger );
+                        
+//                        dump(dfdagger);
+                        
+                        // g = df^T * df.
+                        // At the moment dfdagger is just the transpose of df.
+                        Tiny::gemm<Op::Id,Op::Id,DOM_DIM,DOM_DIM,AMB_DIM,
+                            Scalar::Flag::Plus,Scalar::Flag::Zero
+                        >(
+                            Scalar::One<Real>,  dfdagger.data(), AMB_DIM,
+                                                df.data(),       DOM_DIM,
+                            Scalar::Zero<Real>, g.data(),        DOM_DIM
+                        );
+                        
+//                        dump(g);
+                        
+                        // Factorize g in place.
+                        g.Cholesky();
+                        
+//                        dump(g);
+                        
+                        Real a = g[0][0];
+                        
+                        for( Int l = 1; l < DOM_DIM; ++l )
+                        {
+                            a *= g[l][l];
+                        }
+                        
+                        far[0] = near[0] = a * std_simplex_volume;
+                        
+//                        dump(near[0]);
+                        
+                        //  dfdagger = g^{-1} * df^T
+                        g.CholeskySolve( dfdagger );
+                        
+//                        dump(dfdagger);
+
+                        // P = id - df * dfdagger
+                        Tiny::gemm<Op::Id,Op::Id,AMB_DIM,AMB_DIM,DOM_DIM,
+                            Scalar::Flag::Minus,Scalar::Flag::Zero
+                        >(
+                            -Scalar::One<Real>, df.data(),       DOM_DIM,
+                                                dfdagger.data(), AMB_DIM,
+                            Scalar::Zero<Real>, P.data(),        AMB_DIM
+                        );
+                        
+                        for( Int k = 0; k < AMB_DIM; ++k )
+                        {
+                            P[k][k] += Scalar::One<Real>;
+                        }
+                        
+//                        dump(P);
+                        
+                        {
+                            // TODO: variable pos introduces a bad dependency in loop.
+                            
+                            Int pos = 0;
+                            
+                            for( Int k = 0; k < AMB_DIM; ++k )
+                            {
+                                for( Int l = k; l < AMB_DIM; ++l )
+                                {
+                                    ++pos;
+                                    near[AMB_DIM * SIZE + pos] = far[AMB_DIM + pos] = P[k][l];
+                                }
+                            }
+                        }
+//
+//                        for( Int k = 0; k < NearDim(); ++k )
+//                        {
+//                            valprint("near["+ToString(k)+"]",near[k]);
+//                        }
+//
+//                        for( Int k = 0; k < FAR_DIM; ++k )
+//                        {
+//                            valprint("far["+ToString(k)+"]",far[k]);
+//                        }
+                        
+
+                        // Create derivative operator  (AMB_DIM x SIZE matrix).
+                        for( Int k = 0; k < AMB_DIM; ++k )
+                        {
+                            Df[k][0] = 0;
+                            
+                            for( Int l = 0; l < DOM_DIM; ++l )
+                            {
+                                Df[k][0  ] -= dfdagger[l][k];
+                                Df[k][l+1]  = dfdagger[l][k];
+                            }
+                        }
+                        
+//                        dump(Df)
+                        
+                        Df.Write( &Diff_value[ HULL_SIZE * i ] );
+
+                    }
+                },
+                ThreadCount()
+            );
+        
+            ptoc(ClassName()+"::ComputeNearFarDataOps_new");
+        };
+        
+        void ComputeNearFarData(
+            const Tensor2<Real,Int> & V_coords,
+            const Tensor2<Int ,Int> & simplices,
+                  Tensor2<Real,Int> & P_near,
+                  Tensor2<Real,Int> & P_far
+        ) const
+        {
+            ptic(ClassName()+"::ComputeNearFarData_new");
+            
+            ParallelDo(
+                [&]( const Int thread )
+                {
+                    Tiny::Vector<AMB_DIM,Real,Int> center;
+                    
+                    Tiny::Matrix<SIZE,   AMB_DIM,Real,Int> hull;
+                    
+                    Tiny::Matrix<AMB_DIM,DOM_DIM,Real,Int> df;
+                    Tiny::Matrix<DOM_DIM,AMB_DIM,Real,Int> dfdagger;
+                    Tiny::Matrix<AMB_DIM,AMB_DIM,Real,Int> P;
+                    
+                    Tiny::SelfAdjointMatrix<DOM_DIM,Real,Int> g;
+                    
+                    Tiny::Vector<SIZE,Int,Int> simplex;
+                    Tiny::Vector<SIZE,Int,Int> s_simplex;   // Sorted simplex.
+        
+                    Real std_simplex_volume = 1;
+                    for( Int l = 2; l < SIZE; ++l )
+                    {
+                        std_simplex_volume *= l;
+                    }
+                    std_simplex_volume = Scalar::Inv<Real>(std_simplex_volume);
+                    
+                    const Int simplex_count = simplices.Dimension(0);
+                    const Int i_begin = JobPointer<Int>(simplex_count, ThreadCount(), thread  );
+                    const Int i_end   = JobPointer<Int>(simplex_count, ThreadCount(), thread+1);
+        
+                    for( Int i = i_begin; i < i_end; ++i )
+                    {
+                        mut<Real> near   = P_near.data(i);
+                        mut<Real> far    = P_far.data(i);
+                        
+                          simplex.Read( simplices.data(i) );
+                        s_simplex.Read( simplex.data() );
+                      
+                        // sorting simplex so that we do not have to sort the sparse arrays to achieve CSR format later
+                        std::sort( &s_simplex[0], &s_simplex[SIZE] );
+
+                        for( Int l = 0; l < SIZE; ++l )
+                        {
+                            copy_buffer<AMB_DIM>( V_coords.data(simplex[l]), hull[l] );
+                        }
+
+                        hull.Write( &near[1]              );
+                        
+                        
+                        copy_buffer<AMB_DIM>(hull[0],center.data());
+                        for( Int l = 1; l < SIZE; ++l )
+                        {
+                            add_to_buffer<AMB_DIM>( hull[l], center.data() );
+                        }
+                        center *= nth;
+                        
+                        center.Write( &far[1] );
+                        
+                        for( Int l = 0; l < DOM_DIM; ++l )
+                        {
+                            for( Int k = 0; k < AMB_DIM; ++k )
+                            {
+                                df[k][l] =
+                                    V_coords[s_simplex[l+1]][k]
+                                    -
+                                    V_coords[s_simplex[0  ]][k];
+                            }
+                        }
+                        
+                        df.Transpose( dfdagger );
+                        
+                        // g = df^T * df.
+                        // At the moment dfdagger is just the transpose of df.
+                        Tiny::gemm<Op::Id,Op::Id,DOM_DIM,DOM_DIM,AMB_DIM,
+                            Scalar::Flag::Plus,Scalar::Flag::Zero
+                        >(
+                            Scalar::One<Real>,  dfdagger.data(), AMB_DIM,
+                                                df.data(),       DOM_DIM,
+                            Scalar::Zero<Real>, g.data(),        DOM_DIM
+                        );
+                        
+                        // Factorize g in place.
+                        g.Cholesky();
+                        
+                        Real a = g[0][0];
+                        
+                        for( Int l = 1; l < DOM_DIM; ++l )
+                        {
+                            a *= g[l][l];
+                        }
+                        
+                        far[0] = near[0] = a * std_simplex_volume;
+                        
+                        //  dfdagger = g^{-1} * df^T
+                        g.CholeskySolve( dfdagger );
+
+                        // P = id - df * dfdagger
+                        Tiny::gemm<Op::Id,Op::Id,AMB_DIM,AMB_DIM,DOM_DIM,
+                            Scalar::Flag::Minus,Scalar::Flag::Zero
+                        >(
+                            -Scalar::One<Real>, df.data(),       DOM_DIM,
+                                                dfdagger.data(), AMB_DIM,
+                            Scalar::Zero<Real>, P.data(),        AMB_DIM
+                        );
+                        
+                        for( Int k = 0; k < AMB_DIM; ++k )
+                        {
+                            P[k][k] += Scalar::One<Real>;
+                        }
+                        
+                        {
+                            // TODO: variable pos introduces a bad dependency in loop.
+                            
+                            Int pos = 0;
+                            
+                            for( Int k = 0; k < AMB_DIM; ++k )
+                            {
+                                for( Int l = k; l < AMB_DIM; ++l )
+                                {
+                                    ++pos;
+                                    near[AMB_DIM * SIZE + pos] = far[AMB_DIM + pos] = P[k][l];
+                                }
+                            }
+                        }
+
+                    }
+                },
+                ThreadCount()
+            );
+        
+            ptoc(ClassName()+"::ComputeNearFarData_new");
+    };
+        
+        
     public:
         
         virtual Int DomDim() const override
@@ -263,7 +629,8 @@ namespace Repulsor
             Tensor2<Real,Int> P_near( SimplexCount(), NEAR_DIM );
             Tensor2<Real,Int> P_far ( SimplexCount(), FAR_DIM  );
 
-            details.ComputeNearFarData( new_V_coords, simplices, P_near, P_far );
+//            details.ComputeNearFarData( new_V_coords, simplices, P_near, P_far );
+            ComputeNearFarData( new_V_coords, simplices, P_near, P_far );
             
             GetClusterTree().SemiStaticUpdate( P_near, P_far );
             
@@ -376,7 +743,7 @@ namespace Repulsor
                 {
                     ptic("Allocations");
                     auto P_coords      = Tensor2<Real,Int> ( SimplexCount(), AMB_DIM, static_cast<Real>(0) );
-                    auto P_hull_coords = Tensor3<Real,Int> ( SimplexCount(), DOM_DIM+1, AMB_DIM );
+                    auto P_hull_coords = Tensor3<Real,Int> ( SimplexCount(), SIZE, AMB_DIM );
                     auto P_near        = Tensor2<Real,Int> ( SimplexCount(), NEAR_DIM );
                     auto P_far         = Tensor2<Real,Int> ( SimplexCount(), FAR_DIM );
 
@@ -385,25 +752,27 @@ namespace Repulsor
                     auto DiffOp = SparseMatrix_T(
                         SimplexCount() * AMB_DIM,
                         VertexCount(),
-                        SimplexCount() * AMB_DIM * (DOM_DIM+1),
+                        SimplexCount() * HULL_SIZE,
                         ThreadCount()
                     );
 
-                    DiffOp.Outer()[SimplexCount() * AMB_DIM] = SimplexCount() * AMB_DIM * (DOM_DIM+1);
+                    DiffOp.Outer()[SimplexCount() * AMB_DIM] = SimplexCount() * HULL_SIZE;
 
                     auto AvOp = SparseMatrix_T(
                         SimplexCount(),
                         VertexCount(),
-                        SimplexCount() * (DOM_DIM+1),
+                        SimplexCount() * SIZE,
                         ThreadCount()
                     );
 
-                    AvOp.Outer()[SimplexCount()] = SimplexCount() * (DOM_DIM+1);
+                    AvOp.Outer()[SimplexCount()] = SimplexCount() * SIZE;
 
                     ptoc("Allocations");
 
                     // What remains is to compute P_coords, P_hull_coords, P_near and P_far and the nonzero values of DiffOp.
-                    details.ComputeNearFarDataOps( V_coords, simplices, P_coords, P_hull_coords, P_near, P_far, DiffOp, AvOp );
+//                    details.ComputeNearFarDataOps( V_coords, simplices, P_coords, P_hull_coords, P_near, P_far, DiffOp, AvOp );
+                    
+                    ComputeNearFarDataOps( V_coords, simplices, P_coords, P_hull_coords, P_near, P_far, DiffOp, AvOp );
 
 
                     const JobPointers<Int> job_ptr ( SimplexCount(), ThreadCount() );
@@ -545,9 +914,9 @@ namespace Repulsor
                 ptic(className()+"::DerivativeAssembler");
             
                 auto A = SparseBinaryMatrix_T(
-                    SimplexCount() * (DOM_DIM+1),
+                    SimplexCount() * SIZE,
                     VertexCount(),
-                    SimplexCount() * (DOM_DIM+1),
+                    SimplexCount() * SIZE,
                     ThreadCount()
                 );
                 
@@ -567,7 +936,7 @@ namespace Repulsor
         {
             ptic(className()+"::Assemble_ClusterTree_Derivatives");
             
-            Tensor3<Real,Int> buffer ( SimplexCount(), DOM_DIM+1, AMB_DIM, static_cast<Real>(0) );
+            Tensor3<Real,Int> buffer ( SimplexCount(), SIZE, AMB_DIM, static_cast<Real>(0) );
             
             GetClusterTree().CollectDerivatives();
             
@@ -713,8 +1082,6 @@ namespace Repulsor
             const Int vertex_count = VertexCount();
             const Int simplex_count = SimplexCount();
             
-            constexpr Int simplex_size = DOM_DIM+1;
-            
             ptr<Real> V = V_coords.data();
             ptr<Int>  S = simplices.data();
             
@@ -734,9 +1101,9 @@ namespace Repulsor
             
             for( Int i = 0; i < simplex_count; ++i )
             {
-                for( Int k = 0; k < simplex_size; ++k )
+                for( Int k = 0; k < SIZE; ++k )
                 {
-                    s << S[simplex_size * i + k] << "\t";
+                    s << S[SIZE * i + k] << "\t";
                 }
                 s <<"\n";
             }
