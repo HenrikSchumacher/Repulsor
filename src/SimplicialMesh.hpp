@@ -208,7 +208,7 @@ namespace Repulsor
             SparseMatrix_T & AvOp
         ) const
         {
-            ptic(ClassName()+"::ComputeNearFarDataOps_new");
+            ptic(ClassName()+"::ComputeNearFarDataOps");
             
             ParallelDo(
                 [&]( const Int thread )
@@ -414,7 +414,7 @@ namespace Repulsor
                 ThreadCount()
             );
         
-            ptoc(ClassName()+"::ComputeNearFarDataOps_new");
+            ptoc(ClassName()+"::ComputeNearFarDataOps");
         };
         
         void ComputeNearFarData(
@@ -424,7 +424,7 @@ namespace Repulsor
                   Tensor2<Real,Int> & P_far
         ) const
         {
-            ptic(ClassName()+"::ComputeNearFarData_new");
+            ptic(ClassName()+"::ComputeNearFarData");
             
             ParallelDo(
                 [&]( const Int thread )
@@ -553,7 +553,7 @@ namespace Repulsor
                 ThreadCount()
             );
         
-            ptoc(ClassName()+"::ComputeNearFarData_new");
+            ptoc(ClassName()+"::ComputeNearFarData");
     };
         
         
