@@ -176,18 +176,18 @@ namespace Repulsor
                 const Real K_xy = factor * rCosPhi_q_minus_2;
                 // K_yx = q * |Q*(y-x)|^(q-2) / |y-x|^p
                 const Real K_yx = factor * rCosPsi_q_minus_2;
-
+                // H    = p * ( |P*(y-x)|^q + |Q*(y-x)|^q) / |y-x|^(p+2)
+                const Real H = p * r_minus_p_minus_2 * Num;
+                
                 if constexpr ( diff_flag )
                 {
-                    // H = - p * ( |P*(y-x)|^q + |Q*(y-x)|^q) / |y-x|^(p+2)
-                    const Real H = - p * r_minus_p_minus_2 * Num;
                     
                     Real dEdvx = zero;
                     Real dEdvy = zero;
                     
                     for( Int l = 0; l < AMB_DIM; ++l )
                     {
-                        dEdv[l] = K_xy * Pv[l] + K_yx * Qv[l] + H * v[l];
+                        dEdv[l] = K_xy * Pv[l] + K_yx * Qv[l] - H * v[l];
                         dEdvx += dEdv[l] * x[l];
                         dEdvy += dEdv[l] * y[l];
                         
@@ -213,7 +213,7 @@ namespace Repulsor
 /*
 // ij_block
 //    /                                                                 \
-//    |   - K_xy - K_yx    K_yx * v[0]    K_yx * v[1]    K_yx * v[2]    |
+//    |       - C_xy       K_yx * v[0]    K_yx * v[1]    K_yx * v[2]    |
 //    |                                                                 |
 //    |   - K_xy * v[0]         0              0              0         |
 //    |                                                                 |
@@ -229,7 +229,7 @@ namespace Repulsor
 //
 // ii block
 //    /                                                                                 \
-//    |     K_xy + K_yx      K_xy * v[0]         K_xy * v[1]         K_xy * v[2]        |
+//    |         C_xy          K_xy * v[0]         K_xy * v[1]         K_xy * v[2]       |
 //    |                                                                                 |
 //    |     K_xy * v[0]   K_xy * v[0] * v[0]  K_xy * v[0] * v[1]  K_xy * v[0] * v[2]    |
 //    |                                                                                 |
@@ -241,7 +241,7 @@ namespace Repulsor
 // jj block
 //
 //    /                                                                                 \
-//    |     K_xy + K_yx     - K_yx * v[0]       - K_yx * v[1]       - K_yx * v[2]       |
+//    |        C_xy         - K_yx * v[0]       - K_yx * v[1]       - K_yx * v[2]       |
 //    |                                                                                 |
 //    |   - K_yx * v[0]   K_yx * v[0] * v[0]  K_yx * v[0] * v[1]  K_yx * v[0] * v[2]    |
 //    |                                                                                 |
@@ -250,8 +250,7 @@ namespace Repulsor
 //    |   - K_yx * v[2]   K_yx * v[2] * v[0]  K_yx * v[2] * v[1]  K_yx * v[2] * v[2]    |
 //    \                                                                                 /
 */
-                    
-                    const Real K_sym = K_xy + K_yx;
+                    const Real C_xy = K_xy + K_yx + H;
                     
                     const Real b_over_a   = b/a;
                     const Real a_over_b   = a/b;
@@ -259,9 +258,9 @@ namespace Repulsor
                     const Real b_over_a_K_xy = b_over_a * K_xy;
                     const Real a_over_b_K_yx = a_over_b * K_yx;
                     
-                    ij_block[0]     = - K_sym;
-                    ii_block[0][0] +=   b_over_a * K_sym;
-                    jj_block[0][0]  =   a_over_b * K_sym;
+                    ij_block[0]     = - C_xy;
+                    ii_block[0][0] +=   b_over_a * C_xy;
+                    jj_block[0][0]  =   a_over_b * C_xy;
                     
                     for( Int i = 1; i < COLS; ++i )
                     {
