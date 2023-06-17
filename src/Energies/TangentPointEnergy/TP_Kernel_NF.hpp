@@ -52,6 +52,8 @@ namespace Repulsor
         static constexpr Int BLOCK_NNZ = 1 + 2 * AMB_DIM;
         static constexpr Int DIAG_NNZ  = ROWS * COLS;
         
+        static constexpr Real half     = 0.5;
+        
         using Base_T::zero;
         using Base_T::one;
         using Base_T::two;
@@ -176,19 +178,21 @@ namespace Repulsor
             
             const Real Num = ( rCosPhi_q + rCosPsi_q );
 
+            // E = ( |P*(y-x)|^q + |Q*(y-x)|^q) / |y-x|^p
             const Real E = Num * r_minus_p;
 
             if constexpr ( diff_flag || metric_flag )
             {
-                // Needed for both the differential and the metric.
-                
-                const Real factor = q_half * r_minus_p;         // = q / |y-x|^p
-                
-                const Real K_xy = factor * rCosPhi_q_minus_2;   // = q/2 * |P*(y-x)|^(q-2) / |y-x|^p
-                const Real K_yx = factor * rCosPsi_q_minus_2;   // = q/2 * |Q*(y-x)|^(q-2) / |y-x|^p
+                // factor = q / |y-x|^p
+                const Real factor = q * r_minus_p;
+                // K_xy = q * |P*(y-x)|^(q-2) / |y-x|^p
+                const Real K_xy = factor * rCosPhi_q_minus_2;
+                // K_yx = q * |Q*(y-x)|^(q-2) / |y-x|^p
+                const Real K_yx = factor * rCosPsi_q_minus_2;
                 
                 if constexpr ( diff_flag )
                 {
+                    // H = - p * ( |P*(y-x)|^q + |Q*(y-x)|^q) / |y-x|^(p+2)
                     const Real H = - p * r_minus_p_minus_2 * Num;
                     
                     Real dEdvx = zero;
@@ -196,7 +200,7 @@ namespace Repulsor
                     
                     for( Int i = 0; i < AMB_DIM; ++i )
                     {
-                        dEdv[i] = two * ( K_xy * Pv[i] + K_yx * Qv[i] ) + H * v[i];
+                        dEdv[i] = K_xy * Pv[i] + K_yx * Qv[i] + H * v[i];
                         dEdvx += dEdv[i] * x[i];
                         dEdvy += dEdv[i] * y[i];
                         
@@ -211,16 +215,16 @@ namespace Repulsor
                         }
                     }
                     
-                    DX[0] +=  b * ( E - factor * rCosPhi_q + dEdvx );
-                    DY[0] +=  a * ( E - factor * rCosPsi_q - dEdvy );
+                    DX[0] +=  b * ( E - half * factor * rCosPhi_q + dEdvx );
+                    DY[0] +=  a * ( E - half * factor * rCosPsi_q - dEdvy );
                     
-                    const Real  b_K_xy =  b * K_xy;
-                    const Real  a_K_yx =  a * K_yx;
+                    const Real half_b_K_xy = half * b * K_xy;
+                    const Real half_a_K_yx = half * a * K_yx;
                     
                     for( Int k = 0; k < PROJ_DIM; ++k )
                     {
-                        DX[1+S_COORD_DIM+k] +=  b_K_xy * V[k];
-                        DY[1+T_COORD_DIM+k] +=  a_K_yx * V[k];
+                        DX[1+S_COORD_DIM+k] += half_b_K_xy * V[k];
+                        DY[1+T_COORD_DIM+k] += half_a_K_yx * V[k];
                     }
                 }
 
@@ -283,11 +287,11 @@ namespace Repulsor
                     {
                         ij_block[i]         =   K_yx * v[i-1];
                         ij_block[AMB_DIM+i] = - K_xy * v[i-1];
-                        
+
                         // store only upper triangle
                         ii_block[0][i] +=   b_over_a_K_xy * v[i-1];
                         jj_block[0][i]  = - a_over_b_K_yx * v[i-1];
-                        
+
                         // store also lower triangle
                         ii_block[i][0] +=   b_over_a_K_xy * v[i-1];
                         jj_block[i][0]  = - a_over_b_K_yx * v[i-1];
@@ -303,16 +307,17 @@ namespace Repulsor
                         for( Int j = i+1; j < COLS; ++j )
                         {
                             const Real vv = v[i-1] * v[j-1];
-                            
+
                             // store only upper triangle
                             ii_block[i][j] += b_over_a_K_xy * vv;
                             jj_block[i][j]  = a_over_b_K_yx * vv;
-                            
+
                             // store also lower triangle
                             ii_block[j][i] += b_over_a_K_xy * vv;
                             jj_block[j][i]  = a_over_b_K_yx * vv;
                         }
                     }
+                    
                     copy_buffer<BLOCK_NNZ>( &ij_block[0], &metric_data[BLOCK_NNZ * k_global] );
                 }
             }
