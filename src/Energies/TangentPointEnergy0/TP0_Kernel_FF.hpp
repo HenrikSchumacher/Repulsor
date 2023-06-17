@@ -37,10 +37,12 @@ namespace Repulsor
         using Base_T::T_DATA_DIM;
         using Base_T::S_DATA_DIM;
         
-        static constexpr Int ROWS      = 1 + AMB_DIM;
-        static constexpr Int COLS      = 1 + AMB_DIM;
-        static constexpr Int BLOCK_NNZ = 2;
-        static constexpr Int DIAG_NNZ  = 2;
+        static constexpr  Int ROWS      = 1 + AMB_DIM;
+        static constexpr  Int COLS      = 1 + AMB_DIM;
+        static constexpr  Int BLOCK_NNZ = 2;
+        static constexpr  Int DIAG_NNZ  = 2;
+        
+        static constexpr Real half      = 0.5;
 
         using Base_T::zero;
         using Base_T::one;
@@ -56,27 +58,27 @@ namespace Repulsor
         TP0_Kernel_FF() = delete;
         
         TP0_Kernel_FF( Configurator_T & conf, const Int thread_, const T1 q_half_, const T2 p_half_ )
-        :   Base_T               (conf, thread_)
-        ,   q                    (two*q_half_)
-        ,   q_half               (q_half_    )
-        ,   q_half_minus_1       (q_half-1   )
-        ,   p                    (two*p_half_)
-        ,   p_half               (p_half_    )
-        ,   minus_p_half         (-p_half    )
-        ,   minus_p_half_minus_1 (-p_half-1  )
+        :   Base_T               (conf, thread_ )
+        ,   q                    (two*q_half_   )
+        ,   q_half               (q_half_       )
+        ,   q_half_minus_1       (q_half-1      )
+        ,   p                    (two*p_half_   )
+        ,   p_half               (p_half_       )
+        ,   minus_p_half         (-p_half       )
+        ,   minus_p_half_minus_1 (-p_half-1     )
         ,   s                    ((p - S_DOM_DIM) / q)
         ,   s_exp                (static_cast<Real>(-0.5) * (static_cast<Real>(2) * (s - static_cast<Real>(1)) + S_DOM_DIM))
         {}
         
         TP0_Kernel_FF( TP0_Kernel_FF & other, const Int thread_ )
-        :   Base_T               (other, thread_            )
-        ,   q                    (other.q                   )
-        ,   q_half               (other.q_half              )
-        ,   q_half_minus_1       (other.q_half_minus_1      )
-        ,   p                    (other.p                   )
-        ,   p_half               (other.p_half              )
-        ,   minus_p_half         (other.minus_p_half        )
-        ,   minus_p_half_minus_1 (other.minus_p_half_minus_1)
+        :   Base_T               (other, thread_                )
+        ,   q                    (other.q                       )
+        ,   q_half               (other.q_half                  )
+        ,   q_half_minus_1       (other.q_half_minus_1          )
+        ,   p                    (other.p                       )
+        ,   p_half               (other.p_half                  )
+        ,   minus_p_half         (other.minus_p_half            )
+        ,   minus_p_half_minus_1 (other.minus_p_half_minus_1    )
         ,   s                    ((p - S_DOM_DIM) / q)
         ,   s_exp                (static_cast<Real>(-0.5) * (static_cast<Real>(2) * (s - static_cast<Real>(1)) + S_DOM_DIM))
         {}
@@ -166,7 +168,7 @@ namespace Repulsor
                 const Real rCosPhi_q_minus_2 = MyMath::pow<Real,T1>( fabs(rCosPhi_2), q_half_minus_1);
                 // |Q*(y-x)|^{q-2}
                 const Real rCosPsi_q_minus_2 = MyMath::pow<Real,T1>( fabs(rCosPsi_2), q_half_minus_1);
-                // r^{2-p}
+                // r^{-p-2}
                 const Real r_minus_p_minus_2 = MyMath::pow<Real,T2>( r2, minus_p_half_minus_1 );
                 // |y-x|^-p
                 const Real r_minus_p = r_minus_p_minus_2 * r2;
@@ -177,6 +179,7 @@ namespace Repulsor
                 
                 const Real Num = ( rCosPhi_q + rCosPsi_q );
                 
+                // E = ( |P*(y-x)|^q + |Q*(y-x)|^q) / |y-x|^p
                 const Real E = Num * r_minus_p;
                 
                 if constexpr ( energy_flag )
@@ -186,21 +189,21 @@ namespace Repulsor
                 
                 if constexpr ( diff_flag )
                 {
-                    // Needed for both the differential and the metric.
-                    
-                    const Real factor = q_half * r_minus_p;         // = q / |y-x|^p
-                    
-                    const Real K_xy = factor * rCosPhi_q_minus_2;   // = |P*(y-x)|^(q-2) / |y-x|^p
-                    const Real K_yx = factor * rCosPsi_q_minus_2;   // = |Q*(y-x)|^(q-2) / |y-x|^p
-                    
-                    const Real H = - p * r_minus_p_minus_2 * Num;
+                    // factor = q / |y-x|^p
+                    const Real factor = q * r_minus_p;
+                    // K_xy = q * |P*(y-x)|^(q-2) / |y-x|^p
+                    const Real K_xy = factor * rCosPhi_q_minus_2;
+                    // K_yx = q * |Q*(y-x)|^(q-2) / |y-x|^p
+                    const Real K_yx = factor * rCosPsi_q_minus_2;
+                    // H    = p * ( |P*(y-x)|^q + |Q*(y-x)|^q) / |y-x|^(p+2)
+                    const Real H = p * r_minus_p_minus_2 * Num;
                     
                     Real dEdvx = zero;
                     Real dEdvy = zero;
                     
                     for( Int l = 0; l < AMB_DIM; ++l )
                     {
-                        dEdv[l] = static_cast<Real>(2) * ( K_xy * Pv[l] + K_yx * Qv[l] ) + H * v[l];
+                        dEdv[l] = K_xy * Pv[l] + K_yx * Qv[l] - H * v[l];
                         dEdvx += dEdv[l] * x[l];
                         dEdvy += dEdv[l] * y[l];
                         
@@ -208,18 +211,17 @@ namespace Repulsor
                         DY[1+l] += a * dEdv[l];
                     }
                     
-                    DX[0] +=  b * ( E - factor * rCosPhi_q + dEdvx );
-                    DY[0] +=  a * ( E - factor * rCosPsi_q - dEdvy );
+                    DX[0] += b * ( E - half * factor * rCosPhi_q + dEdvx );
+                    DY[0] += a * ( E - half * factor * rCosPsi_q - dEdvy );
                     
-                    const Real  b_K_xy =  b * K_xy;
-                    const Real  a_K_yx =  a * K_yx;
+                    const Real half_b_K_xy = half * b * K_xy;
+                    const Real half_a_K_yx = half * a * K_yx;
                     
                     for( Int k = 0; k < PROJ_DIM; ++k )
                     {
-                        DX[1+AMB_DIM+k] +=  b_K_xy * V[k];
-                        DY[1+AMB_DIM+k] +=  a_K_yx * V[k];
+                        DX[1+AMB_DIM+k] += half_b_K_xy * V[k];
+                        DY[1+AMB_DIM+k] += half_a_K_yx * V[k];
                     }
-                    
                 }
             }
             
@@ -323,6 +325,8 @@ namespace Repulsor
 
         force_inline void WriteT( const Int j_global )
         {
+            this->writeT( j_global );
+            
             if constexpr ( metric_flag )
             {
                 add_to_buffer<DIAG_NNZ>( &jj_block[0], &T_diag[DIAG_NNZ * j_global] );

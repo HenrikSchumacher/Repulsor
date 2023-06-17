@@ -66,14 +66,14 @@ namespace Repulsor
         {}
         
         TP_Kernel_FF( TP_Kernel_FF & other, const Int thread_ )
-        :   Base_T               (other, thread_            )
-        ,   q                    (other.q                   )
-        ,   q_half               (other.q_half              )
-        ,   q_half_minus_1       (other.q_half_minus_1      )
-        ,   p                    (other.p                   )
-        ,   p_half               (other.p_half              )
-        ,   minus_p_half         (other.minus_p_half        )
-        ,   minus_p_half_minus_1 (other.minus_p_half_minus_1)
+        :   Base_T               (other, thread_                )
+        ,   q                    (other.q                       )
+        ,   q_half               (other.q_half                  )
+        ,   q_half_minus_1       (other.q_half_minus_1          )
+        ,   p                    (other.p                       )
+        ,   p_half               (other.p_half                  )
+        ,   minus_p_half         (other.minus_p_half            )
+        ,   minus_p_half_minus_1 (other.minus_p_half_minus_1    )
         {}
         
         ~TP_Kernel_FF() = default;
@@ -154,7 +154,7 @@ namespace Repulsor
             const Real rCosPhi_q_minus_2 = MyMath::pow<Real,T1>( fabs(rCosPhi_2), q_half_minus_1);
             // |Q*(y-x)|^{q-2}
             const Real rCosPsi_q_minus_2 = MyMath::pow<Real,T1>( fabs(rCosPsi_2), q_half_minus_1);
-            // r^{2-p}
+            // r^{-p-2}
             const Real r_minus_p_minus_2 = MyMath::pow<Real,T2>( r2, minus_p_half_minus_1 );
             // |y-x|^-p
             const Real r_minus_p = r_minus_p_minus_2 * r2;
@@ -181,7 +181,6 @@ namespace Repulsor
                 
                 if constexpr ( diff_flag )
                 {
-                    
                     Real dEdvx = zero;
                     Real dEdvy = zero;
                     
@@ -195,8 +194,8 @@ namespace Repulsor
                         DY[1+l] += a * dEdv[l];
                     }
                     
-                    DX[0] +=  b * ( E - half * factor * rCosPhi_q + dEdvx );
-                    DY[0] +=  a * ( E - half * factor * rCosPsi_q - dEdvy );
+                    DX[0] += b * ( E - half * factor * rCosPhi_q + dEdvx );
+                    DY[0] += a * ( E - half * factor * rCosPsi_q - dEdvy );
                     
                     const Real half_b_K_xy = half * b * K_xy;
                     const Real half_a_K_yx = half * a * K_yx;
