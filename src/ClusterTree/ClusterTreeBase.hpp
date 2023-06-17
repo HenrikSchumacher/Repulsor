@@ -105,7 +105,7 @@ namespace Repulsor
     
         
         mutable bool pre_post_initialized = false;
-        mutable bool mixed_pre_post_initialized = false;
+        mutable bool mi_pre_post_initialized = false;
         
         mutable SparseMatrix_T  hi_pre;
         mutable SparseMatrix_T  hi_post;
@@ -113,8 +113,8 @@ namespace Repulsor
         mutable SparseMatrix_T  lo_pre;
         mutable SparseMatrix_T  lo_post;
         
-        mutable SparseMatrix_T  mixed_pre;
-        mutable SparseMatrix_T  mixed_post;
+        mutable SparseMatrix_T  mi_pre;
+        mutable SparseMatrix_T  mi_post;
 
         mutable SparseBinaryMatrix_T P_to_C;
         mutable SparseBinaryMatrix_T C_to_P;
@@ -367,12 +367,12 @@ namespace Repulsor
         
         const SparseMatrix_T & MixedOrderPreProcessor() const
         {
-            return mixed_pre;
+            return mi_pre;
         }
         
         const SparseMatrix_T & MixedOrderPostProcessor() const
         {
-            return mixed_post;
+            return mi_post;
         }
 
         

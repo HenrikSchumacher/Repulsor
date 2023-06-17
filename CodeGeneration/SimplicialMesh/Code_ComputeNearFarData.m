@@ -156,7 +156,7 @@ Table[line[5,"df["<>s[k],"][",s[j]<>"] = hull[",s[j+1],"][",s[k],"] - hull[0][",
 Table[line[5,"g[",s[i],"][",s[j],"] = ",Riffle[Table[{"df[",s[k],"][",s[i]<>"] * df[",s[k],"][",s[j],"]"},{k,0,m-1}]," + "]],{i,0,n-1},{j,0,n-1}],
 "
 
-					near[0] = far[0] = sqrt( fabs(g[0][0]) );
+					near[0] = far[0] = std::sqrt( std::fabs(g[0][0]) );
 	
 	                ginv[0][0] = static_cast<Real>(1)/g[0][0];
 	                
@@ -242,7 +242,7 @@ Table[line[5,"g[",s[i],"][",s[j],"] = ",Riffle[Table[{"df[",s[k],"][",s[i]<>"] *
 "
 	                Real det = g[0][0] * g[1][1] - g[0][1] * g[0][1];
 	
-					near[0] = far[0] = sqrt( fabs(det) ) * ",floatcast["0.5"],";
+					near[0] = far[0] = std::sqrt( std::fabs(det) ) * ",floatcast["0.5"],";
 	
 	                Real invdet = ",floatcast["1"],"/det;
 	                ginv[0][0] =  g[1][1] * invdet;

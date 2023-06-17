@@ -107,10 +107,10 @@ namespace Repulsor
         using Base_T::P_to_C;
         using Base_T::hi_pre;
         using Base_T::lo_pre;
-        using Base_T::mixed_pre;
+        using Base_T::mi_pre;
         using Base_T::hi_post;
         using Base_T::lo_post;
-        using Base_T::mixed_post;
+        using Base_T::mi_post;
         
     public:
         
@@ -549,15 +549,15 @@ namespace Repulsor
         
         void RequireMixedPrePost()
         {
-            if( !this->mixed_pre_post_initialized )
+            if( !this->mi_pre_post_initialized )
             {
                 ptic(className()+"::RequireMixedPrePost");
                 
                 const Int primitive_count = PrimitiveCount();
                 
-                ptic("mixed_pre");
+                ptic("mi_pre");
                 
-                mixed_pre = SparseMatrix_T(
+                mi_pre = SparseMatrix_T(
                     lo_pre.RowCount()     + hi_pre.RowCount(),
                     lo_pre.ColCount(),
                     lo_pre.NonzeroCount() + hi_pre.NonzeroCount(),
@@ -571,17 +571,17 @@ namespace Repulsor
                     
     //                ptr<LInt> lo_outer  = lo_pre.Outer().data();
     //                ptr<LInt> hi_outer  = hi_pre.Outer().data();
-                    mut<LInt> mi_outer  = mixed_pre.Outer().data();
+                    mut<LInt> mi_outer  = mi_pre.Outer().data();
 
                     ptr< Int> lo_inner  = lo_pre.Inner().data();
                     ptr< Int> hi_inner  = hi_pre.Inner().data();
-                    mut< Int> mi_inner  = mixed_pre.Inner().data();
+                    mut< Int> mi_inner  = mi_pre.Inner().data();
 
                     ptr<Real> lo_values = lo_pre.Values().data();
                     ptr<Real> hi_values = hi_pre.Values().data();
-                    mut<Real> mi_values = mixed_pre.Values().data();
+                    mut<Real> mi_values = mi_pre.Values().data();
                     
-                    mi_outer[mixed_pre.RowCount()] = mixed_pre.RowCount() * row_size;
+                    mi_outer[mi_pre.RowCount()] = mi_pre.RowCount() * row_size;
 
                     ParallelDo(
                         [=]( const Int i )
@@ -616,15 +616,15 @@ namespace Repulsor
                         ThreadCount()
                     );
                 }
-                ptoc("mixed_pre");
+                ptoc("mi_pre");
 
-                pdump(mixed_pre.Stats());
+                pdump(mi_pre.Stats());
                 
-                ptic("mixed_post");
+                ptic("mi_post");
 
-//                mixed_post = mixed_pre.Transpose();
+//                mi_post = mi_pre.Transpose();
                 
-                mixed_post = SparseMatrix_T(
+                mi_post = SparseMatrix_T(
                     lo_post.RowCount(),
                     lo_post.ColCount()     + hi_post.ColCount(),
                     lo_post.NonzeroCount() + hi_post.NonzeroCount(),
@@ -634,20 +634,20 @@ namespace Repulsor
                 {
                     ptr<LInt> lo_outer  = lo_post.Outer().data();
                     ptr<LInt> hi_outer  = hi_post.Outer().data();
-                    mut<LInt> mi_outer  = mixed_post.Outer().data();
+                    mut<LInt> mi_outer  = mi_post.Outer().data();
 
                     ptr< Int> lo_inner  = lo_post.Inner().data();
-                    ptr< Int> hi_inner  = hi_post.Inner().data();
-                    mut< Int> mi_inner  = mixed_post.Inner().data();
+//                    ptr< Int> hi_inner  = hi_post.Inner().data();
+                    mut< Int> mi_inner  = mi_post.Inner().data();
 
                     ptr<Real> lo_values = lo_post.Values().data();
                     ptr<Real> hi_values = hi_post.Values().data();
-                    mut<Real> mi_values = mixed_post.Values().data();
+                    mut<Real> mi_values = mi_post.Values().data();
                     
                     ParallelDo(
                         [=]( const Int i )
                         {
-                            const LInt lo_begin = lo_outer[i]  ;
+                            const LInt lo_begin = lo_outer[i  ];
                             const LInt lo_end   = lo_outer[i+1];
 //                            const LInt hi_begin = hi_outer[i]  ;
                             const LInt hi_end   = hi_outer[i+1];
@@ -658,15 +658,17 @@ namespace Repulsor
                             
                             for( LInt k = lo_begin; k < lo_end; ++k )
                             {
+                                
                                 const LInt offset = (AMB_DIM + 1) * k;
+
+                                const Int c = (AMB_DIM + 1) * lo_inner [k];
                                 
-                                mi_inner [offset] = lo_inner [k];
+                                for( Int l = 0; l < (AMB_DIM + 1); ++l )
+                                {
+                                    mi_inner [offset + l] = c + l;
+                                }
+                                
                                 mi_values[offset] = lo_values[k];
-                                
-                                copy_buffer<AMB_DIM>(
-                                    &hi_inner [AMB_DIM * k], &mi_inner [offset + 1]
-                                );
-                                
                                 copy_buffer<AMB_DIM>(
                                     &hi_values[AMB_DIM * k], &mi_values[offset + 1]
                                 );
@@ -677,11 +679,11 @@ namespace Repulsor
                     );
                 }
                 
-                ptoc("mixed_post");
+                ptoc("mi_post");
                 
-                pdump(mixed_post.Stats());
+                pdump(mi_post.Stats());
                 
-                this->mixed_pre_post_initialized = true;
+                this->mi_pre_post_initialized = true;
                 
                 ptoc(className()+"::RequireMixedPrePost");
             }
@@ -830,7 +832,7 @@ namespace Repulsor
                 }
                 case OperatorType::MixedOrder:
                 {
-                    pre  = &mixed_pre ;
+                    pre  = &mi_pre ;
                     this->RequireBuffers( (AmbDim()+1) * nrhs ); // Beware: The mixed preprocessor operator increases the number of columns!
                     break;
                 }
@@ -912,7 +914,7 @@ namespace Repulsor
                 }
                 case OperatorType::MixedOrder:
                 {
-                    post  = &mixed_post;
+                    post  = &mi_post;
                     break;
                 }
                 default:
