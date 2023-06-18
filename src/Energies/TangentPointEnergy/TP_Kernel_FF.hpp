@@ -341,7 +341,7 @@ namespace Repulsor
 //                zerofy_buffer<BLOCK_NNZ>( &ij_block[0] );
                 
                 // We can do an overwrite here.
-//                zerofy_buffer<DIAG_NNZ>( &jj_block[0][0] );
+//                zerofy_buffer< DIAG_NNZ>( &jj_block[0][0] );
             }
         }
 

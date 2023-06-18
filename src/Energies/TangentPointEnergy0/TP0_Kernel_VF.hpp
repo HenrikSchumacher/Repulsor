@@ -347,7 +347,7 @@ namespace Repulsor
             
             if constexpr ( metric_flag )
             {
-                ii_block[0] = 0;
+                zerofy_buffer<DIAG_NNZ>( &ii_block[0] );
             }
         }
         
@@ -357,7 +357,7 @@ namespace Repulsor
             
             if constexpr ( metric_flag )
             {
-                S_diag[DIAG_NNZ * i_global] += ii_block[0];
+                add_to_buffer<DIAG_NNZ>( &ii_block[0], &S_diag[DIAG_NNZ * i_global] );
             }
         }
         
@@ -367,6 +367,9 @@ namespace Repulsor
             
             if constexpr ( metric_flag )
             {
+                zerofy_buffer<BLOCK_NNZ>( &ij_block[0] );
+                
+                zerofy_buffer< DIAG_NNZ>( &jj_block[0] );
             }
         }
 
@@ -376,7 +379,7 @@ namespace Repulsor
             
             if constexpr ( metric_flag )
             {
-                T_diag[DIAG_NNZ * j_global] += jj_block[0];
+                add_to_buffer<DIAG_NNZ>( &jj_block[0], &T_diag[DIAG_NNZ * j_global] );
             }
         }
         

@@ -144,6 +144,8 @@ namespace Repulsor
         force_inline void LoadS( const Int i_global )
         {
             this->loadS( i_global );
+            
+            ii_block[0] = 0;
         }
         
         force_inline void WriteS( const Int i_global )
@@ -156,12 +158,12 @@ namespace Repulsor
         force_inline void LoadT( const Int j_global )
         {
             this->loadT( j_global );
+            
+            jj_block[0] = 0;
         }
 
         force_inline void WriteT( const Int j_global )
         {
-            this->writeT( j_global );
-            
             T_diag[DIAG_NNZ * j_global] += jj_block[0];
         }
         
@@ -180,4 +182,3 @@ namespace Repulsor
 } // namespace Repulsor
 
 #undef BASE
-
