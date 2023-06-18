@@ -12,12 +12,11 @@
 #define SREAL   float
 #define EXTREAL double
 
-//#define REMESHER_VERBATIM
-
 #define TOOLS_ENABLE_PROFILER // enable profiler
 
-//#define TOOLS_ENABLE_OPENMP
-//#define TOOLS_PARALLELDO_USE_OPENMP
+#define TOOLS_ENABLE_OPENMP
+
+#define TOOLS_PARALLELDO_USE_OPENMP
 
 #include "../Repulsor.hpp"
 
@@ -39,9 +38,6 @@ int main(int argc, const char * argv[])
 
     
     int thread_count = 8;
-
-//#define TOOLS_ENABLE_OPENMP
-//#define TOOLS_PARALLELDO_USE_OPENMP
     
 #include "Meshes.hpp"
     

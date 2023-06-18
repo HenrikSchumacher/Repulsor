@@ -45,7 +45,7 @@
 		AF88401028ECEEBA0040A2FC /* Repulsor.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Repulsor.hpp; sourceTree = "<group>"; };
 		AF98B21F28EF0DDC00413977 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		AFA60FCE2906739700CF0C41 /* Meshes.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Meshes.hpp; sourceTree = "<group>"; };
-		AFB9A50B2A0D1726008E5520 /* Example_NoOpenMP */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Example_NoOpenMP; sourceTree = BUILT_PRODUCTS_DIR; };
+		AFB9A50B2A0D1726008E5520 /* Example_OpenMP */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Example_OpenMP; sourceTree = BUILT_PRODUCTS_DIR; };
 		AFB9A50D2A0D1726008E5520 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		AFB9A5122A0D175E008E5520 /* Meshes.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Meshes.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -97,7 +97,7 @@
 				AF88401028ECEEBA0040A2FC /* Repulsor.hpp */,
 				AF98B21F28EF0DDC00413977 /* README.md */,
 				AF3DADB628ECF0470089476A /* Example */,
-				AFB9A50C2A0D1726008E5520 /* Example_NoOpenMP */,
+				AFB9A50C2A0D1726008E5520 /* Example_OpenMP */,
 				AF47B00428ECEE8800A5FCEA /* Products */,
 				AF83C2E7293B426000A23318 /* Frameworks */,
 			);
@@ -107,7 +107,7 @@
 			isa = PBXGroup;
 			children = (
 				AF3DADB528ECF0470089476A /* Example */,
-				AFB9A50B2A0D1726008E5520 /* Example_NoOpenMP */,
+				AFB9A50B2A0D1726008E5520 /* Example_OpenMP */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -120,13 +120,13 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		AFB9A50C2A0D1726008E5520 /* Example_NoOpenMP */ = {
+		AFB9A50C2A0D1726008E5520 /* Example_OpenMP */ = {
 			isa = PBXGroup;
 			children = (
 				AFB9A5122A0D175E008E5520 /* Meshes.hpp */,
 				AFB9A50D2A0D1726008E5520 /* main.cpp */,
 			);
-			path = Example_NoOpenMP;
+			path = Example_OpenMP;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -149,9 +149,9 @@
 			productReference = AF3DADB528ECF0470089476A /* Example */;
 			productType = "com.apple.product-type.tool";
 		};
-		AFB9A50A2A0D1726008E5520 /* Example_NoOpenMP */ = {
+		AFB9A50A2A0D1726008E5520 /* Example_OpenMP */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = AFB9A5112A0D1726008E5520 /* Build configuration list for PBXNativeTarget "Example_NoOpenMP" */;
+			buildConfigurationList = AFB9A5112A0D1726008E5520 /* Build configuration list for PBXNativeTarget "Example_OpenMP" */;
 			buildPhases = (
 				AFB9A5072A0D1726008E5520 /* Sources */,
 				AFB9A5082A0D1726008E5520 /* Frameworks */,
@@ -161,9 +161,9 @@
 			);
 			dependencies = (
 			);
-			name = Example_NoOpenMP;
+			name = Example_OpenMP;
 			productName = Example_NoOpenMP;
-			productReference = AFB9A50B2A0D1726008E5520 /* Example_NoOpenMP */;
+			productReference = AFB9A50B2A0D1726008E5520 /* Example_OpenMP */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -197,7 +197,7 @@
 			projectRoot = "";
 			targets = (
 				AF3DADB428ECF0470089476A /* Example */,
-				AFB9A50A2A0D1726008E5520 /* Example_NoOpenMP */,
+				AFB9A50A2A0D1726008E5520 /* Example_OpenMP */,
 			);
 		};
 /* End PBXProject section */
@@ -282,7 +282,6 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -309,13 +308,10 @@
 					"-flto",
 					"-ffast-math",
 					"-fno-math-errno",
-					"-Xpreprocessor",
-					"-fopenmp",
 				);
 				OTHER_LDFLAGS = (
 					"-ldl",
 					"-lm",
-					"-lomp",
 				);
 				SDKROOT = macosx;
 				SYSTEM_HEADER_SEARCH_PATHS = (
@@ -368,7 +364,6 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = fast;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -390,13 +385,10 @@
 					"-flto",
 					"-ffast-math",
 					"-fno-math-errno",
-					"-Xpreprocessor",
-					"-fopenmp",
 				);
 				OTHER_LDFLAGS = (
 					"-ldl",
 					"-lm",
-					"-lomp",
 				);
 				SDKROOT = macosx;
 				SYSTEM_HEADER_SEARCH_PATHS = (
@@ -419,15 +411,19 @@
 				DEVELOPMENT_TEAM = Y6DQ749ZRT;
 				ENABLE_HARDENED_RUNTIME = YES;
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
+				OTHER_CFLAGS = "";
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
 					"-flto",
 					"-ffast-math",
 					"-fno-math-errno",
+					"-Xpreprocessor",
+					"-fopenmp",
 				);
 				OTHER_LDFLAGS = (
 					"-ldl",
 					"-lm",
+					"-lomp",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -440,15 +436,19 @@
 				DEVELOPMENT_TEAM = Y6DQ749ZRT;
 				ENABLE_HARDENED_RUNTIME = YES;
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
+				OTHER_CFLAGS = "";
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
 					"-flto",
 					"-ffast-math",
 					"-fno-math-errno",
+					"-Xpreprocessor",
+					"-fopenmp",
 				);
 				OTHER_LDFLAGS = (
 					"-ldl",
 					"-lm",
+					"-lomp",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -475,7 +475,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		AFB9A5112A0D1726008E5520 /* Build configuration list for PBXNativeTarget "Example_NoOpenMP" */ = {
+		AFB9A5112A0D1726008E5520 /* Build configuration list for PBXNativeTarget "Example_OpenMP" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AFB9A50F2A0D1726008E5520 /* Debug */,
