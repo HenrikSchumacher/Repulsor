@@ -814,24 +814,28 @@ namespace Repulsor
             {
                 case OperatorType::FractionalOnly:
                 {
+                    ptic(ClassName()+" pre->Dot (lo)");
                     pre  = &lo_pre ;
                     this->RequireBuffers( nrhs );
                     break;
                 }
                 case OperatorType::HighOrder:
                 {
+                    ptic(ClassName()+" pre->Dot (hi)");
                     pre  = &hi_pre ;
                     this->RequireBuffers( AmbDim() * nrhs ); // Beware: The derivative operator increases the number of columns!
                     break;
                 }
                 case OperatorType::LowOrder:
                 {
+                    ptic(ClassName()+" pre->Dot (lo)");
                     pre  = &lo_pre ;
                     this->RequireBuffers( nrhs );
                     break;
                 }
                 case OperatorType::MixedOrder:
                 {
+                    ptic(ClassName()+" pre->Dot (mi)");
                     pre  = &mi_pre ;
                     this->RequireBuffers( (AmbDim()+1) * nrhs ); // Beware: The mixed preprocessor operator increases the number of columns!
                     break;
@@ -846,7 +850,6 @@ namespace Repulsor
 
             // Caution: Some magic is going on here high order term...
             // Apply diff/averaging operate, reorder and multiply by weights.
-            ptic(ClassName()+" pre->Dot");
             
             switch( nrhs )
             {
@@ -878,7 +881,37 @@ namespace Repulsor
                     break;
                 }
             }
-            ptoc(ClassName()+" pre->Dot");
+            
+            switch( op_type )
+            {
+                case OperatorType::FractionalOnly:
+                {
+                    ptoc(ClassName()+" pre->Dot (lo)");
+                    break;
+                }
+                case OperatorType::HighOrder:
+                {
+                    ptoc(ClassName()+" pre->Dot (hi)");
+                    break;
+                }
+                case OperatorType::LowOrder:
+                {
+                    ptoc(ClassName()+" pre->Dot (lo)");
+                    break;
+                }
+                case OperatorType::MixedOrder:
+                {
+                    ptoc(ClassName()+" pre->Dot (mi)");
+                    break;
+                }
+                default:
+                {
+                    eprint("Unknown kernel. Doing no.");
+                    ptoc(ClassName()+"::Pre");
+                    return;
+                }
+            }
+            
             
             // Accumulate into leaf clusters.
             PrimitivesToClusters(false);
@@ -899,21 +932,25 @@ namespace Repulsor
             {
                 case OperatorType::FractionalOnly:
                 {
+                    ptic(ClassName()+" post->Dot (lo)");
                     post  = &lo_post;
                     break;
                 }
                 case OperatorType::HighOrder:
                 {
+                    ptic(ClassName()+" post->Dot (hi)");
                     post  = &hi_post;
                     break;
                 }
                 case OperatorType::LowOrder:
                 {
+                    ptic(ClassName()+" post->Dot (lo)");
                     post  = &lo_post;
                     break;
                 }
                 case OperatorType::MixedOrder:
                 {
+                    ptic(ClassName()+" post->Dot (mi)");
                     post  = &mi_post;
                     break;
                 }
@@ -932,8 +969,6 @@ namespace Repulsor
             // Multiply by weights, restore external ordering, and apply transpose of diff/averaging operator.
             
             const Int nrhs = ( PrimitiveCount() * buffer_dim ) / post->ColCount();
-            
-            ptic(ClassName()+" post->Dot");
             
             switch( nrhs )
             {
@@ -965,7 +1000,36 @@ namespace Repulsor
                 }
             }
             
-            ptoc(ClassName()+" post->Dot");
+            
+            switch( op_type )
+            {
+                case OperatorType::FractionalOnly:
+                {
+                    ptoc(ClassName()+" post->Dot (lo)");
+                    break;
+                }
+                case OperatorType::HighOrder:
+                {
+                    ptoc(ClassName()+" post->Dot (hi)");
+                    break;
+                }
+                case OperatorType::LowOrder:
+                {
+                    ptoc(ClassName()+" post->Dot (lo)");
+                    break;
+                }
+                case OperatorType::MixedOrder:
+                {
+                    ptoc(ClassName()+" post->Dot (mi)");
+                    break;
+                }
+                default:
+                {
+                    eprint("Unknown kernel. Doing no.");
+                    ptoc(ClassName()+"::Post");
+                    return;
+                }
+            }
                 
             ptoc(ClassName()+"::Post");
         }; // Post

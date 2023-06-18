@@ -170,20 +170,14 @@ namespace Repulsor
         {
             this->loadS( i_global );
             
-            if constexpr ( metric_flag )
-            {
-                zerofy_buffer<DIAG_NNZ>( &ii_block[0] );
-            }
+            zerofy_buffer<DIAG_NNZ>( &ii_block[0] );
         }
         
         force_inline void WriteS( const Int i_global )
         {
             this->writeS( i_global );
             
-            if constexpr ( metric_flag )
-            {
-                add_to_buffer<DIAG_NNZ>( &ii_block[0], &S_diag[DIAG_NNZ * i_global] );
-            }
+            add_to_buffer<DIAG_NNZ>( &ii_block[0], &S_diag[DIAG_NNZ * i_global] );
         }
         
         force_inline void LoadT( const Int j_global )
@@ -202,10 +196,7 @@ namespace Repulsor
         {
             this->writeT( j_global );
             
-            if constexpr ( metric_flag )
-            {
-                add_to_buffer<DIAG_NNZ>( &jj_block[0], &T_diag[DIAG_NNZ * j_global] );
-            }
+            add_to_buffer<DIAG_NNZ>( &jj_block[0], &T_diag[DIAG_NNZ * j_global] );
         }
         
         

@@ -160,6 +160,8 @@ namespace Repulsor
 
         force_inline void WriteT( const Int j_global )
         {
+            this->writeT( j_global );
+            
             T_diag[DIAG_NNZ * j_global] += jj_block[0];
         }
         
