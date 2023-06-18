@@ -18,6 +18,11 @@
 
 #include "../Repulsor.hpp"
 
+//#include <Accelerate/Accelerate.h>
+//#include "../Tensors/ConjugateGradient.hpp"
+//#include "../Tensors/GMRES.hpp"
+//#include "../Tensors/Sparse.hpp"
+
 int main(int argc, const char * argv[])
 {
     using namespace Repulsor;
