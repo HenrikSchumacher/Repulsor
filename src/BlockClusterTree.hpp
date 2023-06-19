@@ -124,12 +124,12 @@ namespace Repulsor
         
         Real FarFieldSeparationParameter() const override
         {
-            return sqrt(far_theta2);
+            return std::sqrt(far_theta2);
         }
                         
         Real NearFieldSeparationParameter() const override
         {
-            return sqrt(near_theta2);
+            return std::sqrt(near_theta2);
         }
         
         LInt PrimitiveIntersectionCount() const override
