@@ -734,7 +734,7 @@ namespace Repulsor
                 
                 // Single-threaded is actually faster here.
                 // TODO: Maybe this is just because of the mutex?
-                constexpr Int thread_count = 1;
+                constexpr Int local_thread_count = 1;
                 
                 const Int m = VertexCount();
                 const Int n = SimplexCount();
@@ -817,7 +817,7 @@ namespace Repulsor
                                 }
                             }
                         },
-                        static_cast<Int>(queue_0.size()), thread_count
+                        static_cast<Int>(queue_0.size()), local_thread_count
                     );
                         
 
@@ -903,7 +903,7 @@ namespace Repulsor
                                 }
                             }
                         },
-                        static_cast<Int>(queue_0.size()), thread_count
+                        static_cast<Int>(queue_0.size()), local_thread_count
                     );
                 
                     debug_print("Swapping.");
@@ -1037,8 +1037,6 @@ namespace Repulsor
             }
             // ATTENTION: We reorder already here outside of the cluster tree to save a copy operation of a big Tensor2!
             
-            const Int thread_count = GetClusterTree().ThreadCount();
-            
             MovingPrimitive_T P_moving;
             
             Tensor2<SReal,Int> P_velocities_serialized ( SimplexCount(), P_moving.VelocitySize(), 0 );
@@ -1046,7 +1044,7 @@ namespace Repulsor
             
             const Tensor1<Int,Int> & P_ordering = GetClusterTree().PrimitiveOrdering();
 
-            JobPointers<Int> job_ptr ( SimplexCount(), thread_count );
+            JobPointers<Int> job_ptr ( SimplexCount(), GetClusterTree().ThreadCount() );
             
             ParallelDo(
                 [&]( const Int thread )
@@ -1063,7 +1061,7 @@ namespace Repulsor
                         P_mov.WriteVelocitiesSerialized( P_v_ser, i );
                     }
                 },
-                thread_count
+                job_ptr.ThreadCount()
             );
             
             // P_moving and P_velocities_serialized will be swapped against potentiall empty containers.
@@ -1148,8 +1146,6 @@ namespace Repulsor
                     const JobPointers<Int> job_ptr ( SimplexCount(), ThreadCount() );
 
                     ptic("Creating primitives");
-                    const Int thread_count = job_ptr.ThreadCount();
-
                     ParallelDo(
                         [&]( const Int thread )
                         {
@@ -1164,7 +1160,7 @@ namespace Repulsor
                                 P.FromIndexList( V_coords.data(), simplices.data(), i );
                             }
                         },
-                        thread_count
+                        job_ptr.ThreadCount()
                     );
 
                     ptoc("Creating primitives");
