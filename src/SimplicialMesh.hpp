@@ -557,7 +557,7 @@ namespace Repulsor
     
     protected:
         
-        SparseMatrix_T H1Metric( const Real c_1, const Real c_0 ) const
+        virtual SparseMatrix_T H1Metric( const Real c_1, const Real c_0 ) const override
         {
             Tensor2<Int, Int> ilist ( SimplexCount(), SIZE * SIZE );
             Tensor2<Int, Int> jlist ( SimplexCount(), SIZE * SIZE );

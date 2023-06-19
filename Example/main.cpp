@@ -6,6 +6,7 @@
 // We have to toggle which domain dimensions and ambient dimensions shall be supported by runtime polymorphism before we load Repulsor.hpp
 // You can activate everything you want, but compile times might increase substatially.
 #define INT     int32_t
+#define LINT    std::size_t
 //#define INT     int64_t
 #define EXTINT  int64_t
 #define REAL    double
@@ -16,9 +17,15 @@
 
 #define TOOLS_ENABLE_PROFILER // enable profiler
 
-#include "../Repulsor.hpp"
-
 //#include <Accelerate/Accelerate.h>
+#include <cblas.h>
+#include <lapacke.h>
+
+#include "../Repulsor.hpp"
+#include "../Tensors/MyBLAS.hpp"
+#include "../Tensors/Sparse.hpp"
+
+
 //#include "../Tensors/ConjugateGradient.hpp"
 //#include "../Tensors/GMRES.hpp"
 //#include "../Tensors/Sparse.hpp"
@@ -272,14 +279,26 @@ int main(int argc, const char * argv[])
     dump(Y.MaxNorm());
     
     
-    M.StiffnessMatrix();
+    auto A = M.H1Metric(1,1);
     
-    M.MassMatrix();
+//    M.StiffnessMatrix();
+//    
+//    M.MassMatrix();
     
-    M.NestedDissectionOrdering();
+    auto perm = M.NestedDissectionOrdering();
     
+    print( perm.ToString() );
     
+    Sparse::CholeskyDecomposition<REAL, INT, LINT> S (
+        A.Outer().data(), A.Inner().data(), perm.data(), A.RowCount(),
+        A.ThreadCount(), static_cast<INT>(4)
+    );
     
+    S.SN_SymbolicFactorization();
+    
+    S.SN_NumericFactorization( A.Values().data(), Scalar::Zero<REAL> );
+    
+    print( S.GetPermutation().GetPermutation().ToString() );
 
     print("");
     print("Testing remesher.");
@@ -292,7 +311,7 @@ int main(int argc, const char * argv[])
 
     R->SplitEdges( edges );
 
-//    R->UnifyEdgeLengths(<#const Real collapse_threshold#>, <#const Real split_threshold#>)
+//    R->UnifyEdgeLengths(<#const Real collapse_threshold#>, <#const Real split_threshold#>);
 
     return 0;
 }

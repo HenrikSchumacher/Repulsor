@@ -116,6 +116,8 @@ namespace Repulsor
         ) = 0;
         
         
+        virtual       SparseMatrix_T   H1Metric( const Real c_1, const Real c_0 ) const = 0;
+        
         virtual const SparseMatrix_T & StiffnessMatrix() const = 0;
         
         virtual const SparseMatrix_T & MassMatrix() const = 0;

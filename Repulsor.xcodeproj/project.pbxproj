@@ -298,7 +298,10 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = /opt/homebrew/opt/libomp/include;
-				LIBRARY_SEARCH_PATHS = /opt/homebrew/opt/libomp/lib;
+				LIBRARY_SEARCH_PATHS = (
+					/opt/homebrew/opt/libomp/lib,
+					/opt/homebrew/Cellar/openblas/0.3.23/lib,
+				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -312,12 +315,15 @@
 				OTHER_LDFLAGS = (
 					"-ldl",
 					"-lm",
+					"-lopenblas",
 				);
 				SDKROOT = macosx;
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					/opt/homebrew/opt/libomp/include,
 					/usr/include,
 					/opt/homebrew/include,
+					/opt/homebrew/Cellar/openblas/0.3.23/include,
+					/opt/homebrew/opt/libomp/include,
 				);
 				USER_HEADER_SEARCH_PATHS = (
 					/opt/homebrew/opt/libomp/include,
@@ -375,7 +381,10 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = /opt/homebrew/opt/libomp/include;
-				LIBRARY_SEARCH_PATHS = /opt/homebrew/opt/libomp/lib;
+				LIBRARY_SEARCH_PATHS = (
+					/opt/homebrew/opt/libomp/lib,
+					/opt/homebrew/Cellar/openblas/0.3.23/lib,
+				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -389,12 +398,15 @@
 				OTHER_LDFLAGS = (
 					"-ldl",
 					"-lm",
+					"-lopenblas",
 				);
 				SDKROOT = macosx;
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					/opt/homebrew/opt/libomp/include,
 					/usr/include,
 					/opt/homebrew/include,
+					/opt/homebrew/Cellar/openblas/0.3.23/include,
+					/opt/homebrew/opt/libomp/include,
 				);
 				USER_HEADER_SEARCH_PATHS = (
 					/opt/homebrew/opt/libomp/include,
