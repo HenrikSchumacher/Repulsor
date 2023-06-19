@@ -164,11 +164,11 @@ namespace Repulsor
             }
 
             // |P*(y-x)|^{q-2}
-            const Real rCosPhi_q_minus_2 = MyMath::pow<Real,T1>( fabs(rCosPhi_2), q_half_minus_1);
+            const Real rCosPhi_q_minus_2 = Power<Real,T1>( std::abs(rCosPhi_2), q_half_minus_1);
             // |Q*(y-x)|^{q-2}
-            const Real rCosPsi_q_minus_2 = MyMath::pow<Real,T1>( fabs(rCosPsi_2), q_half_minus_1);
+            const Real rCosPsi_q_minus_2 = Power<Real,T1>( std::abs(rCosPsi_2), q_half_minus_1);
             // r^{-p-2}
-            const Real r_minus_p_minus_2 = MyMath::pow<Real,T2>( r2, minus_p_half_minus_1 );
+            const Real r_minus_p_minus_2 = Power<Real,T2>( r2, minus_p_half_minus_1 );
             // |y-x|^-p
             const Real r_minus_p = r_minus_p_minus_2 * r2;
             // |P*(y-x)|^q

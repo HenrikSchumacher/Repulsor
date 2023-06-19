@@ -206,11 +206,11 @@ namespace Repulsor
             if constexpr ( energy_flag || diff_flag )
             {
                 // |P*(y-x)|^{q-2}
-                const Real rCosPhi_q_minus_2 = MyMath::pow<Real,T1>( fabs(rCosPhi_2), q_half_minus_1);
+                const Real rCosPhi_q_minus_2 = Power<Real,T1>( std::abs(rCosPhi_2), q_half_minus_1);
                 // |Q*(y-x)|^{q-2}
-                const Real rCosPsi_q_minus_2 = MyMath::pow<Real,T1>( fabs(rCosPsi_2), q_half_minus_1);
+                const Real rCosPsi_q_minus_2 = Power<Real,T1>( std::abs(rCosPsi_2), q_half_minus_1);
                 // r^{-p-2}
-                const Real r_minus_p_minus_2 = MyMath::pow<Real,T2>( r2, minus_p_half_minus_1 );
+                const Real r_minus_p_minus_2 = Power<Real,T2>( r2, minus_p_half_minus_1 );
                 // |y-x|^-p
                 const Real r_minus_p = r_minus_p_minus_2 * r2;
                 // |P*(y-x)|^q
@@ -316,10 +316,10 @@ namespace Repulsor
                 
                 const Real r4 = r2 * r2;
 
-                // The following line makes up approx 2/3 of this function's runtime! This is why we avoid pow as much as possible and replace it with MyMath::pow.;
+                // The following line makes up approx 2/3 of this function's runtime! This is why we avoid pow as much as possible and replace it with Power.;
                 // I got it down to this single call to pow. We might want to generate a lookup table for it...;
                 // The factor of (-2.) is here, because we assemble the _metric_, not the kernel.;
-                const Real a_1 = w * static_cast<Real>(-2) * MyMath::pow(r2, s_exp);
+                const Real a_1 = w * static_cast<Real>(-2) * Power(r2, s_exp);
                 
                 const Real a_0 = w * static_cast<Real>(0.5) * (rCosPhi_2 + rCosPsi_2) / r4 * a_1;
                 
