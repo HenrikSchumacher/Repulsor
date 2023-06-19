@@ -270,6 +270,16 @@ int main(int argc, const char * argv[])
 
     dump(X.MaxNorm());
     dump(Y.MaxNorm());
+    
+    
+    M.StiffnessMatrix();
+    
+    M.MassMatrix();
+    
+    M.NestedDissectionOrdering();
+    
+    
+    
 
     print("");
     print("Testing remesher.");

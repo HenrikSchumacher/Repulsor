@@ -115,6 +115,13 @@ namespace Repulsor
             const bool transp_ = false
         ) = 0;
         
+        
+        virtual const SparseMatrix_T & StiffnessMatrix() const = 0;
+        
+        virtual const SparseMatrix_T & MassMatrix() const = 0;
+        
+        virtual const Tensor1<Int,Int> & NestedDissectionOrdering() const = 0;
+        
 //#######################################################################################
 //      Obstacle
 //#######################################################################################
