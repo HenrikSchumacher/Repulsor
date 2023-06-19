@@ -151,7 +151,7 @@ namespace Repulsor
                 r2  += v[i] * v[i];
             }
             
-            const Real val = - w * MyMath::pow(r2, s_exp);
+            const Real val = - w * Power(r2, s_exp);
             
             const Real b_over_a = b/a;
             const Real a_over_b = a/b;
