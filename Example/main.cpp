@@ -279,11 +279,8 @@ int main(int argc, const char * argv[])
     dump(Y.MaxNorm());
     
     
+    // A = M.StiffnessMatrix() + M.MassMatrix()
     auto A = M.H1Metric(1,1);
-    
-//    M.StiffnessMatrix();
-//    
-//    M.MassMatrix();
     
     auto perm = M.NestedDissectionOrdering();
     
@@ -300,6 +297,13 @@ int main(int argc, const char * argv[])
     
     print( S.GetPermutation().GetPermutation().ToString() );
 
+    Tensor1<REAL,INT> b ( M.VertexCount(), 1 );
+    Tensor1<REAL,INT> x ( M.VertexCount(), 0 );
+    
+    S.Solve( b.data(), x.data() );
+    
+    print( x.ToString() );
+    
     print("");
     print("Testing remesher.");
 
