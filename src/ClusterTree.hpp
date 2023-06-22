@@ -700,7 +700,7 @@ namespace Repulsor
                 case 1:
                 {
                     P_to_C.template Dot<1>(
-                        static_cast<Real>(1),      P_in.data(),
+                        Scalar::One<Real>,         P_in.data(),
                         static_cast<Real>(add_to), C_in.data(),
                         1
                     );
@@ -709,7 +709,7 @@ namespace Repulsor
                 case AMB_DIM:
                 {
                     P_to_C.template Dot<AMB_DIM>(
-                        static_cast<Real>(1),      P_in.data(),
+                        Scalar::One<Real>,         P_in.data(),
                         static_cast<Real>(add_to), C_in.data(),
                         AMB_DIM
                     );
@@ -718,7 +718,7 @@ namespace Repulsor
                 case AMB_DIM * AMB_DIM:
                 {
                     P_to_C.template Dot<AMB_DIM * AMB_DIM>(
-                        static_cast<Real>(1),      P_in.data(),
+                        Scalar::One<Real>,         P_in.data(),
                         static_cast<Real>(add_to), C_in.data(),
                         AMB_DIM * AMB_DIM
                     );
@@ -727,7 +727,7 @@ namespace Repulsor
                 case (AMB_DIM + 1) * AMB_DIM:
                 {
                     P_to_C.template Dot<(AMB_DIM + 1) * AMB_DIM>(
-                        static_cast<Real>(1),      P_in.data(),
+                        Scalar::One<Real>,         P_in.data(),
                         static_cast<Real>(add_to), C_in.data(),
                         (AMB_DIM + 1) * AMB_DIM
                     );
@@ -736,7 +736,7 @@ namespace Repulsor
                 default:
                 {
                     P_to_C.template Dot<0>(
-                        static_cast<Real>(1),      P_in.data(),
+                        Scalar::One<Real>,         P_in.data(),
                         static_cast<Real>(add_to), C_in.data(),
                         buffer_dim
                     );
@@ -756,7 +756,7 @@ namespace Repulsor
                 case 1:
                 {
                     C_to_P.template Dot<1>(
-                        static_cast<Real>(1),      C_out.data(),
+                        Scalar::One<Real>,         C_out.data(),
                         static_cast<Real>(add_to), P_out.data(),
                         1
                     );
@@ -765,7 +765,7 @@ namespace Repulsor
                 case AMB_DIM:
                 {
                     C_to_P.template Dot<AMB_DIM>(
-                        static_cast<Real>(1),      C_out.data(),
+                        Scalar::One<Real>,         C_out.data(),
                         static_cast<Real>(add_to), P_out.data(),
                         AMB_DIM
                     );
@@ -774,7 +774,7 @@ namespace Repulsor
                 case AMB_DIM * AMB_DIM:
                 {
                     C_to_P.template Dot<AMB_DIM * AMB_DIM>(
-                        static_cast<Real>(1),      C_out.data(),
+                        Scalar::One<Real>,         C_out.data(),
                         static_cast<Real>(add_to), P_out.data(),
                         AMB_DIM * AMB_DIM
                     );
@@ -783,7 +783,7 @@ namespace Repulsor
                 case (AMB_DIM + 1) * AMB_DIM:
                 {
                     C_to_P.template Dot<(AMB_DIM + 1) * AMB_DIM>(
-                        static_cast<Real>(1),      C_out.data(),
+                        Scalar::One<Real>,         C_out.data(),
                         static_cast<Real>(add_to), P_out.data(),
                         (AMB_DIM + 1) * AMB_DIM
                     );
@@ -792,7 +792,7 @@ namespace Repulsor
                 default:
                 {
                     C_to_P.template Dot<0>(
-                        static_cast<Real>(1),      C_out.data(),
+                        Scalar::One<Real>,         C_out.data(),
                         static_cast<Real>(add_to), P_out.data(),
                         buffer_dim
                     );
@@ -856,8 +856,8 @@ namespace Repulsor
                 case 1:
                 {
                     pre->template Dot<1>(
-                        static_cast<Real>(1), input,
-                        static_cast<Real>(0), P_in.data(),
+                        Scalar::One<Real>,  input,
+                        Scalar::Zero<Real>, P_in.data(),
                         1
                     );
                     break;
@@ -865,8 +865,8 @@ namespace Repulsor
                 case AMB_DIM:
                 {
                     pre->template Dot<AMB_DIM>(
-                        static_cast<Real>(1), input,
-                        static_cast<Real>(0), P_in.data(),
+                        Scalar::One<Real>,  input,
+                        Scalar::Zero<Real>, P_in.data(),
                         AMB_DIM
                     );
                     break;
@@ -874,8 +874,8 @@ namespace Repulsor
                 default:
                 {
                     pre->template Dot<0>(
-                        static_cast<Real>(1), input,
-                        static_cast<Real>(0), P_in.data(),
+                        Scalar::One<Real>,  input,
+                        Scalar::Zero<Real>, P_in.data(),
                         nrhs
                     );
                     break;

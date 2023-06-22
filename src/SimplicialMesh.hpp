@@ -773,7 +773,7 @@ namespace Repulsor
                 queue_1.reserve( tree.ClusterCount() );
                 
                 // Push root cluster.
-                queue_0.push_back( 0 );
+                queue_0.push_back( Scalar::Zero<Int> );
                 
                 Int level = 0;
                 
@@ -855,7 +855,7 @@ namespace Repulsor
                                 const Int i_begin = V_begin[C];
                                 const Int i_end   = V_end  [C];
                                 
-                                Tiny::Vector<3,Int,Int> ctr (0);
+                                Tiny::Vector<3,Int,Int> ctr ( Scalar::Zero<Int> );
                                 
                                 // Compute counters;
                                 for( Int i = i_begin; i < i_end; ++i )

@@ -432,13 +432,13 @@ namespace Repulsor
                 case TreePercolationAlgorithm::Sequential:
                 {
                     ptic(ClassName()+"::PercolateUp_DFS");
-                    PercolateUp_DFS( 0 );
+                    PercolateUp_DFS( Scalar::Zero<Int> );
                     ptoc(ClassName()+"::PercolateUp_DFS");
                     break;
                 }
                 case TreePercolationAlgorithm::Recursive:
                 {
-                    PercolateUp_Recursive( 0 );
+                    PercolateUp_Recursive( Scalar::Zero<Int> );
                     break;
                 }
                 case TreePercolationAlgorithm::Parallel:
@@ -448,7 +448,7 @@ namespace Repulsor
                 }
                 default:
                 {
-                    PercolateUp_DFS( 0 );
+                    PercolateUp_DFS( Scalar::Zero<Int> );
                     break;
                 }
             }
@@ -463,13 +463,13 @@ namespace Repulsor
                 case TreePercolationAlgorithm::Sequential:
                 {
                     ptic(ClassName()+"::PercolateDown_DFS");
-                    PercolateDown_DFS( 0 );
+                    PercolateDown_DFS( Scalar::Zero<Int> );
                     ptoc(ClassName()+"::PercolateDown_DFS");
                     break;
                 }
                 case TreePercolationAlgorithm::Recursive:
                 {
-                    PercolateDown_Recursive( 0 );
+                    PercolateDown_Recursive( Scalar::Zero<Int> );
                     break;
                 }
                 case TreePercolationAlgorithm::Parallel:
@@ -479,7 +479,7 @@ namespace Repulsor
                 }
                 default:
                 {
-                    PercolateDown_DFS( 0 );
+                    PercolateDown_DFS( Scalar::Zero<Int> );
                 }
             }
 //            ptoc(ClassName()+"::PercolateDown");
