@@ -1085,12 +1085,15 @@ namespace Repulsor
             
             ExtReal t = max_time;
 
-            GetObstacle().LoadUpdateVectors( static_cast<ExtReal *>(nullptr), max_time );
-
-            t = GetObstacleCollisionTree().MaximumSafeStepSize(t,TOL);
-
-            logprint("GetObstacleCollisionTree().MaximumSafeStepSize(t) = "+ToString(t));
-            
+            if( this->InCacheQ("Obstacle") )
+            {
+                GetObstacle().LoadUpdateVectors( static_cast<ExtReal *>(nullptr), max_time );
+                
+                t = GetObstacleCollisionTree().MaximumSafeStepSize(t,TOL);
+                
+                logprint("GetObstacleCollisionTree().MaximumSafeStepSize(t) = "+ToString(t));
+            }
+                
             t = GetCollisionTree().MaximumSafeStepSize(t,TOL);
             
             logprint("GetCollisionTree().MaximumSafeStepSize(t)         = "+ToString(t));
@@ -1375,7 +1378,7 @@ namespace Repulsor
             {
                 wprint( ClassName()+"::GetObstacle: Obstacle not initialized.");
                 
-                // We have to construct an empy SimplicialMesh because Obstacle_T is abstract.
+                // We have to construct an empty SimplicialMesh because Obstacle_T is abstract.
                 this->SetCache(tag, std::any(std::make_shared<SimplicialMesh>()) );
             }
             

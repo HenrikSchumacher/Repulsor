@@ -43,24 +43,34 @@ namespace Repulsor
         
         virtual ExtReal value( const Mesh_T & M ) const override
         {
-            // Create some dummies.
-            ValueContainer_T metric_values;
-            
-            TP_Traversor<DOM_DIM_S,DOM_DIM_T,BlockClusterTree_T,true,false,false>
+            if( M.InCachQ("Obstacle") )
+            {
+                // Create some dummies.
+                ValueContainer_T metric_values;
+                
+                TP_Traversor<DOM_DIM_S,DOM_DIM_T,BlockClusterTree_T,true,false,false>
                 traversor( M.GetObstacleBlockClusterTree(), metric_values, q, p );
-            
-            return traversor.Compute();
+                
+                return traversor.Compute();
+            }
+            else
+            {
+                return Scalar::Zero<ExtReal>;
+            }
         }
         
         virtual void differential( const Mesh_T & M ) const override
         {
-            // Create some dummies.
-            ValueContainer_T metric_values;
-            
-            TP_Traversor<DOM_DIM_S,DOM_DIM_T,BlockClusterTree_T,false,true,false>
+            if( M.InCachQ("Obstacle") )
+            {
+                // Create some dummies.
+                ValueContainer_T metric_values;
+                
+                TP_Traversor<DOM_DIM_S,DOM_DIM_T,BlockClusterTree_T,false,true,false>
                 traversor( M.GetObstacleBlockClusterTree(), metric_values, q, p );
-            
-            (void)traversor.Compute();
+                
+                (void)traversor.Compute();
+            }
         }
         
     public:
