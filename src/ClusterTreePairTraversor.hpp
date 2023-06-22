@@ -133,7 +133,7 @@ namespace Repulsor
                     
                     Traverse_DepthFirst( thread, i_queue[k], j_queue[k] );
                 },
-                0, static_cast<Int>( i_queue.size() ), 1,
+                Scalar::Zero<Int>, static_cast<Int>( i_queue.size() ), Scalar::One<Int>,
                 ThreadCount()
             );
             
