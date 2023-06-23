@@ -259,6 +259,8 @@ namespace Repulsor
                     const Int i_begin = JobPointer<Int>(simplex_count, ThreadCount(), thread  );
                     const Int i_end   = JobPointer<Int>(simplex_count, ThreadCount(), thread+1);
         
+                    Sorter<SIZE,Int> sort;
+                    
                     for( Int i = i_begin; i < i_end; ++i )
                     {
                         mut<Real> near   = P_near.data(i);
@@ -270,7 +272,7 @@ namespace Repulsor
 //                        dump(simplex);
                       
                         // sorting simplex so that we do not have to sort the sparse arrays to achieve CSR format later
-                        std::sort( &s_simplex[0], &s_simplex[SIZE] );
+                        sort( &s_simplex[0] );
 
 //                        dump(s_simplex);
                         
@@ -454,6 +456,8 @@ namespace Repulsor
                     const Int i_begin = JobPointer<Int>(simplex_count, ThreadCount(), thread  );
                     const Int i_end   = JobPointer<Int>(simplex_count, ThreadCount(), thread+1);
         
+                    Sorter<SIZE,Int> sort;
+                    
                     for( Int i = i_begin; i < i_end; ++i )
                     {
                         mut<Real> near   = P_near.data(i);
@@ -463,7 +467,7 @@ namespace Repulsor
                         s_simplex.Read( simplex.data() );
                       
                         // sorting simplex so that we do not have to sort the sparse arrays to achieve CSR format later
-                        std::sort( &s_simplex[0], &s_simplex[SIZE] );
+                        sort( &s_simplex[0] );
 
                         for( Int l = 0; l < SIZE; ++l )
                         {
