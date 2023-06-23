@@ -43,7 +43,7 @@ namespace Repulsor
         
         virtual ExtReal value( const Mesh_T & M ) const override
         {
-            if( M.InCachQ("Obstacle") )
+            if( M.InCacheQ("Obstacle") )
             {
                 // Create some dummies.
                 ValueContainer_T metric_values;
@@ -61,7 +61,7 @@ namespace Repulsor
         
         virtual void differential( const Mesh_T & M ) const override
         {
-            if( M.InCachQ("Obstacle") )
+            if( M.InCacheQ("Obstacle") )
             {
                 // Create some dummies.
                 ValueContainer_T metric_values;
