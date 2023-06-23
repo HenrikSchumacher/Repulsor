@@ -118,6 +118,133 @@ namespace Repulsor
             return std::string("SimplicialMeshDetails<0,1,")+TypeName<Real>+","+TypeName<Int>+">";
         }
 		
+	void ComputeNearFarData( 
+		const Tensor2<Real,Int> & V_coords,
+		const Tensor2<Int ,Int> & simplices,
+			  Tensor2<Real,Int> & P_near,
+			  Tensor2<Real,Int> & P_far
+	) const
+    {
+        ptic(ClassName()+"::ComputeNearFarData");
+        
+        //Int size       = 1;
+        //Int amb_dim    = 1;
+        //Int dom_dim    = 0;
+
+        const JobPointers<Int> job_ptr ( simplices.Dimension(0), ThreadCount() );
+        
+		ParallelDo(
+			[&]( const Int thread )
+			{
+				ptr<Real> V_coords__      = V_coords.data();	
+				ptr<Int>  simplices__     = simplices.data();
+	
+				Real hull    [1][1];
+	
+				Int simplex  [1];
+				
+				const Int i_begin = job_ptr[thread];
+				const Int i_end   = job_ptr[thread+1];
+	
+	            for( Int i = i_begin; i < i_end; ++i )
+	            {
+					mut<Real> near = P_near.data(i);                    
+					mut<Real> far  = P_far.data(i);   
+            
+					simplex[0] = simplices__[1*i +0];
+
+					near[1] = hull[0][0] = V_coords__[1*simplex[0]+0];
+
+					far[1] = static_cast<Real>(1.) * ( hull[0][0] );
+
+					near[0] = far[0] = static_cast<Real>(1);
+					near[2] = far[2] = static_cast<Real>(1);
+
+	            } // for( Int i = i_begin; i < i_end; ++i )
+
+			},
+			ThreadCount()
+		);
+
+        ptoc(ClassName()+"::ComputeNearFarData");
+    }
+
+    void ComputeNearFarDataOps( 
+		const Tensor2<Real,Int> & V_coords,
+        const Tensor2<Int ,Int> & simplices,
+		      Tensor2<Real,Int> & P_coords,
+		      Tensor3<Real,Int> & P_hull_coords,
+		      Tensor2<Real,Int> & P_near,
+		      Tensor2<Real,Int> & P_far,
+		SparseMatrix_T & DiffOp,
+		SparseMatrix_T & AvOp 
+	) const
+    {
+        ptic(ClassName()+"::ComputeNearFarDataOps");
+        
+        //Int size       = 1;
+        //Int amb_dim    = 1;
+        //Int dom_dim    = 0;
+        
+        const JobPointers<Int> job_ptr ( simplices.Dimension(0), ThreadCount() );
+        
+		ParallelDo(
+			[&]( const Int thread )
+			{
+				mut<LInt> AvOp_outer = AvOp.Outer().data();
+				mut< Int> AvOp_inner = AvOp.Inner().data();
+				AvOp.Value().Fill(static_cast<Real>(1));
+	
+				mut<LInt> DiffOp_outer = DiffOp.Outer().data();
+				mut< Int> DiffOp_inner = DiffOp.Inner().data();
+				DiffOp.Value().SetZero();
+	
+				ptr<Real> V_coords__      = V_coords.data();
+				
+				ptr<Int>  simplices__     = simplices.data();
+				mut<Real> P_hull_coords__ = P_hull_coords.data();
+			    mut<Real> P_coords__      = P_coords.data();
+	
+				Int simplex        [1];
+				Int sorted_simplex [1];
+	
+				const Int i_begin = job_ptr[thread];
+				const Int i_end   = job_ptr[thread+1];
+	
+	            for( Int i = i_begin; i < i_end; ++i )
+	            {
+	
+					mut<Real> near = P_near.data(i);                    
+					mut<Real> far  = P_far.data(i);
+
+					simplex[0] = sorted_simplex[0] = simplices__[1*i +0];
+                  
+	                // sorting simplex so that we do not have to sort the sparse arrays to achieve CSR format later
+	                std::sort( sorted_simplex, sorted_simplex + 1 );
+	
+					AvOp_outer[i+1] = (i+1) * 1;  
+                      
+					AvOp_inner[1*i+0] = sorted_simplex[0];
+
+					DiffOp_outer[1*i+0] = (1 * i + 0) * 1;
+
+					DiffOp_inner[(i*1+0)*1+0] = sorted_simplex[0];
+
+					near[1] = P_hull_coords__[1*i+0] = V_coords__[1*simplex[0]+0];
+
+					far[1] = P_coords__[1*i+0] = 1. * ( P_hull_coords__[1*i+0] );
+
+	                near[0] = far[0] = static_cast<Real>(1);
+					near[2] = far[2] = static_cast<Real>(1);
+
+	            }
+			},
+			ThreadCount()
+		);
+
+        ptoc(ClassName()+"::ComputeNearFarDataOps");
+    }
+
 	void DNearToHulls( 
 		const Tensor2<Real,Int> & V_coords, 
 		const Tensor2<Int ,Int> & simplices, 
@@ -247,6 +374,143 @@ namespace Repulsor
             return std::string("SimplicialMeshDetails<0,2,")+TypeName<Real>+","+TypeName<Int>+">";
         }
 		
+	void ComputeNearFarData( 
+		const Tensor2<Real,Int> & V_coords,
+		const Tensor2<Int ,Int> & simplices,
+			  Tensor2<Real,Int> & P_near,
+			  Tensor2<Real,Int> & P_far
+	) const
+    {
+        ptic(ClassName()+"::ComputeNearFarData");
+        
+        //Int size       = 1;
+        //Int amb_dim    = 2;
+        //Int dom_dim    = 0;
+
+        const JobPointers<Int> job_ptr ( simplices.Dimension(0), ThreadCount() );
+        
+		ParallelDo(
+			[&]( const Int thread )
+			{
+				ptr<Real> V_coords__      = V_coords.data();	
+				ptr<Int>  simplices__     = simplices.data();
+	
+				Real hull    [1][2];
+	
+				Int simplex  [1];
+				
+				const Int i_begin = job_ptr[thread];
+				const Int i_end   = job_ptr[thread+1];
+	
+	            for( Int i = i_begin; i < i_end; ++i )
+	            {
+					mut<Real> near = P_near.data(i);                    
+					mut<Real> far  = P_far.data(i);   
+            
+					simplex[0] = simplices__[1*i +0];
+
+					near[1] = hull[0][0] = V_coords__[2*simplex[0]+0];
+					near[2] = hull[0][1] = V_coords__[2*simplex[0]+1];
+
+					far[1] = static_cast<Real>(1.) * ( hull[0][0] );
+					far[2] = static_cast<Real>(1.) * ( hull[0][1] );
+
+					near[0] = far[0] = static_cast<Real>(1);
+					near[3] = far[3] = static_cast<Real>(1);
+					near[4] = far[4] = static_cast<Real>(0);
+					near[5] = far[5] = static_cast<Real>(1);
+
+	            } // for( Int i = i_begin; i < i_end; ++i )
+
+			},
+			ThreadCount()
+		);
+
+        ptoc(ClassName()+"::ComputeNearFarData");
+    }
+
+    void ComputeNearFarDataOps( 
+		const Tensor2<Real,Int> & V_coords,
+        const Tensor2<Int ,Int> & simplices,
+		      Tensor2<Real,Int> & P_coords,
+		      Tensor3<Real,Int> & P_hull_coords,
+		      Tensor2<Real,Int> & P_near,
+		      Tensor2<Real,Int> & P_far,
+		SparseMatrix_T & DiffOp,
+		SparseMatrix_T & AvOp 
+	) const
+    {
+        ptic(ClassName()+"::ComputeNearFarDataOps");
+        
+        //Int size       = 1;
+        //Int amb_dim    = 2;
+        //Int dom_dim    = 0;
+        
+        const JobPointers<Int> job_ptr ( simplices.Dimension(0), ThreadCount() );
+        
+		ParallelDo(
+			[&]( const Int thread )
+			{
+				mut<LInt> AvOp_outer = AvOp.Outer().data();
+				mut< Int> AvOp_inner = AvOp.Inner().data();
+				AvOp.Value().Fill(static_cast<Real>(1));
+	
+				mut<LInt> DiffOp_outer = DiffOp.Outer().data();
+				mut< Int> DiffOp_inner = DiffOp.Inner().data();
+				DiffOp.Value().SetZero();
+	
+				ptr<Real> V_coords__      = V_coords.data();
+				
+				ptr<Int>  simplices__     = simplices.data();
+				mut<Real> P_hull_coords__ = P_hull_coords.data();
+			    mut<Real> P_coords__      = P_coords.data();
+	
+				Int simplex        [1];
+				Int sorted_simplex [1];
+	
+				const Int i_begin = job_ptr[thread];
+				const Int i_end   = job_ptr[thread+1];
+	
+	            for( Int i = i_begin; i < i_end; ++i )
+	            {
+	
+					mut<Real> near = P_near.data(i);                    
+					mut<Real> far  = P_far.data(i);
+
+					simplex[0] = sorted_simplex[0] = simplices__[1*i +0];
+                  
+	                // sorting simplex so that we do not have to sort the sparse arrays to achieve CSR format later
+	                std::sort( sorted_simplex, sorted_simplex + 1 );
+	
+					AvOp_outer[i+1] = (i+1) * 1;  
+                      
+					AvOp_inner[1*i+0] = sorted_simplex[0];
+
+					DiffOp_outer[2*i+0] = (2 * i + 0) * 1;
+					DiffOp_outer[2*i+1] = (2 * i + 1) * 1;
+
+					DiffOp_inner[(i*2+0)*1+0] = sorted_simplex[0];
+					DiffOp_inner[(i*2+1)*1+0] = sorted_simplex[0];
+
+					near[1] = P_hull_coords__[2*i+0] = V_coords__[2*simplex[0]+0];
+					near[2] = P_hull_coords__[2*i+1] = V_coords__[2*simplex[0]+1];
+
+					far[1] = P_coords__[2*i+0] = 1. * ( P_hull_coords__[2*i+0] );
+					far[2] = P_coords__[2*i+1] = 1. * ( P_hull_coords__[2*i+1] );
+
+	                near[0] = far[0] = static_cast<Real>(1);
+					near[3] = far[3] = static_cast<Real>(1);
+					near[4] = far[4] = static_cast<Real>(0);
+					near[5] = far[5] = static_cast<Real>(1);
+
+	            }
+			},
+			ThreadCount()
+		);
+
+        ptoc(ClassName()+"::ComputeNearFarDataOps");
+    }
+
 	void DNearToHulls( 
 		const Tensor2<Real,Int> & V_coords, 
 		const Tensor2<Int ,Int> & simplices, 
@@ -380,6 +644,155 @@ namespace Repulsor
             return std::string("SimplicialMeshDetails<0,3,")+TypeName<Real>+","+TypeName<Int>+">";
         }
 		
+	void ComputeNearFarData( 
+		const Tensor2<Real,Int> & V_coords,
+		const Tensor2<Int ,Int> & simplices,
+			  Tensor2<Real,Int> & P_near,
+			  Tensor2<Real,Int> & P_far
+	) const
+    {
+        ptic(ClassName()+"::ComputeNearFarData");
+        
+        //Int size       = 1;
+        //Int amb_dim    = 3;
+        //Int dom_dim    = 0;
+
+        const JobPointers<Int> job_ptr ( simplices.Dimension(0), ThreadCount() );
+        
+		ParallelDo(
+			[&]( const Int thread )
+			{
+				ptr<Real> V_coords__      = V_coords.data();	
+				ptr<Int>  simplices__     = simplices.data();
+	
+				Real hull    [1][3];
+	
+				Int simplex  [1];
+				
+				const Int i_begin = job_ptr[thread];
+				const Int i_end   = job_ptr[thread+1];
+	
+	            for( Int i = i_begin; i < i_end; ++i )
+	            {
+					mut<Real> near = P_near.data(i);                    
+					mut<Real> far  = P_far.data(i);   
+            
+					simplex[0] = simplices__[1*i +0];
+
+					near[1] = hull[0][0] = V_coords__[3*simplex[0]+0];
+					near[2] = hull[0][1] = V_coords__[3*simplex[0]+1];
+					near[3] = hull[0][2] = V_coords__[3*simplex[0]+2];
+
+					far[1] = static_cast<Real>(1.) * ( hull[0][0] );
+					far[2] = static_cast<Real>(1.) * ( hull[0][1] );
+					far[3] = static_cast<Real>(1.) * ( hull[0][2] );
+
+					near[ 0] = far[ 0] = static_cast<Real>(1);
+					near[ 4] = far[ 4] = static_cast<Real>(1);
+					near[ 5] = far[ 5] = static_cast<Real>(0);
+					near[ 6] = far[ 6] = static_cast<Real>(0);
+					near[ 7] = far[ 7] = static_cast<Real>(1);
+					near[ 8] = far[ 8] = static_cast<Real>(0);
+					near[ 9] = far[ 9] = static_cast<Real>(1);
+
+	            } // for( Int i = i_begin; i < i_end; ++i )
+
+			},
+			ThreadCount()
+		);
+
+        ptoc(ClassName()+"::ComputeNearFarData");
+    }
+
+    void ComputeNearFarDataOps( 
+		const Tensor2<Real,Int> & V_coords,
+        const Tensor2<Int ,Int> & simplices,
+		      Tensor2<Real,Int> & P_coords,
+		      Tensor3<Real,Int> & P_hull_coords,
+		      Tensor2<Real,Int> & P_near,
+		      Tensor2<Real,Int> & P_far,
+		SparseMatrix_T & DiffOp,
+		SparseMatrix_T & AvOp 
+	) const
+    {
+        ptic(ClassName()+"::ComputeNearFarDataOps");
+        
+        //Int size       = 1;
+        //Int amb_dim    = 3;
+        //Int dom_dim    = 0;
+        
+        const JobPointers<Int> job_ptr ( simplices.Dimension(0), ThreadCount() );
+        
+		ParallelDo(
+			[&]( const Int thread )
+			{
+				mut<LInt> AvOp_outer = AvOp.Outer().data();
+				mut< Int> AvOp_inner = AvOp.Inner().data();
+				AvOp.Value().Fill(static_cast<Real>(1));
+	
+				mut<LInt> DiffOp_outer = DiffOp.Outer().data();
+				mut< Int> DiffOp_inner = DiffOp.Inner().data();
+				DiffOp.Value().SetZero();
+	
+				ptr<Real> V_coords__      = V_coords.data();
+				
+				ptr<Int>  simplices__     = simplices.data();
+				mut<Real> P_hull_coords__ = P_hull_coords.data();
+			    mut<Real> P_coords__      = P_coords.data();
+	
+				Int simplex        [1];
+				Int sorted_simplex [1];
+	
+				const Int i_begin = job_ptr[thread];
+				const Int i_end   = job_ptr[thread+1];
+	
+	            for( Int i = i_begin; i < i_end; ++i )
+	            {
+	
+					mut<Real> near = P_near.data(i);                    
+					mut<Real> far  = P_far.data(i);
+
+					simplex[0] = sorted_simplex[0] = simplices__[1*i +0];
+                  
+	                // sorting simplex so that we do not have to sort the sparse arrays to achieve CSR format later
+	                std::sort( sorted_simplex, sorted_simplex + 1 );
+	
+					AvOp_outer[i+1] = (i+1) * 1;  
+                      
+					AvOp_inner[1*i+0] = sorted_simplex[0];
+
+					DiffOp_outer[3*i+0] = (3 * i + 0) * 1;
+					DiffOp_outer[3*i+1] = (3 * i + 1) * 1;
+					DiffOp_outer[3*i+2] = (3 * i + 2) * 1;
+
+					DiffOp_inner[(i*3+0)*1+0] = sorted_simplex[0];
+					DiffOp_inner[(i*3+1)*1+0] = sorted_simplex[0];
+					DiffOp_inner[(i*3+2)*1+0] = sorted_simplex[0];
+
+					near[1] = P_hull_coords__[3*i+0] = V_coords__[3*simplex[0]+0];
+					near[2] = P_hull_coords__[3*i+1] = V_coords__[3*simplex[0]+1];
+					near[3] = P_hull_coords__[3*i+2] = V_coords__[3*simplex[0]+2];
+
+					far[1] = P_coords__[3*i+0] = 1. * ( P_hull_coords__[3*i+0] );
+					far[2] = P_coords__[3*i+1] = 1. * ( P_hull_coords__[3*i+1] );
+					far[3] = P_coords__[3*i+2] = 1. * ( P_hull_coords__[3*i+2] );
+
+	                near[ 0] = far[ 0] = static_cast<Real>(1);
+					near[ 4] = far[ 4] = static_cast<Real>(1);
+					near[ 5] = far[ 5] = static_cast<Real>(0);
+					near[ 6] = far[ 6] = static_cast<Real>(0);
+					near[ 7] = far[ 7] = static_cast<Real>(1);
+					near[ 8] = far[ 8] = static_cast<Real>(0);
+					near[ 9] = far[ 9] = static_cast<Real>(1);
+
+	            }
+			},
+			ThreadCount()
+		);
+
+        ptoc(ClassName()+"::ComputeNearFarDataOps");
+    }
+
 	void DNearToHulls( 
 		const Tensor2<Real,Int> & V_coords, 
 		const Tensor2<Int ,Int> & simplices, 
@@ -517,6 +930,169 @@ namespace Repulsor
             return std::string("SimplicialMeshDetails<0,4,")+TypeName<Real>+","+TypeName<Int>+">";
         }
 		
+	void ComputeNearFarData( 
+		const Tensor2<Real,Int> & V_coords,
+		const Tensor2<Int ,Int> & simplices,
+			  Tensor2<Real,Int> & P_near,
+			  Tensor2<Real,Int> & P_far
+	) const
+    {
+        ptic(ClassName()+"::ComputeNearFarData");
+        
+        //Int size       = 1;
+        //Int amb_dim    = 4;
+        //Int dom_dim    = 0;
+
+        const JobPointers<Int> job_ptr ( simplices.Dimension(0), ThreadCount() );
+        
+		ParallelDo(
+			[&]( const Int thread )
+			{
+				ptr<Real> V_coords__      = V_coords.data();	
+				ptr<Int>  simplices__     = simplices.data();
+	
+				Real hull    [1][4];
+	
+				Int simplex  [1];
+				
+				const Int i_begin = job_ptr[thread];
+				const Int i_end   = job_ptr[thread+1];
+	
+	            for( Int i = i_begin; i < i_end; ++i )
+	            {
+					mut<Real> near = P_near.data(i);                    
+					mut<Real> far  = P_far.data(i);   
+            
+					simplex[0] = simplices__[1*i +0];
+
+					near[1] = hull[0][0] = V_coords__[4*simplex[0]+0];
+					near[2] = hull[0][1] = V_coords__[4*simplex[0]+1];
+					near[3] = hull[0][2] = V_coords__[4*simplex[0]+2];
+					near[4] = hull[0][3] = V_coords__[4*simplex[0]+3];
+
+					far[1] = static_cast<Real>(1.) * ( hull[0][0] );
+					far[2] = static_cast<Real>(1.) * ( hull[0][1] );
+					far[3] = static_cast<Real>(1.) * ( hull[0][2] );
+					far[4] = static_cast<Real>(1.) * ( hull[0][3] );
+
+					near[ 0] = far[ 0] = static_cast<Real>(1);
+					near[ 5] = far[ 5] = static_cast<Real>(1);
+					near[ 6] = far[ 6] = static_cast<Real>(0);
+					near[ 7] = far[ 7] = static_cast<Real>(0);
+					near[ 8] = far[ 8] = static_cast<Real>(0);
+					near[ 9] = far[ 9] = static_cast<Real>(1);
+					near[10] = far[10] = static_cast<Real>(0);
+					near[11] = far[11] = static_cast<Real>(0);
+					near[12] = far[12] = static_cast<Real>(1);
+					near[13] = far[13] = static_cast<Real>(0);
+					near[14] = far[14] = static_cast<Real>(1);
+
+	            } // for( Int i = i_begin; i < i_end; ++i )
+
+			},
+			ThreadCount()
+		);
+
+        ptoc(ClassName()+"::ComputeNearFarData");
+    }
+
+    void ComputeNearFarDataOps( 
+		const Tensor2<Real,Int> & V_coords,
+        const Tensor2<Int ,Int> & simplices,
+		      Tensor2<Real,Int> & P_coords,
+		      Tensor3<Real,Int> & P_hull_coords,
+		      Tensor2<Real,Int> & P_near,
+		      Tensor2<Real,Int> & P_far,
+		SparseMatrix_T & DiffOp,
+		SparseMatrix_T & AvOp 
+	) const
+    {
+        ptic(ClassName()+"::ComputeNearFarDataOps");
+        
+        //Int size       = 1;
+        //Int amb_dim    = 4;
+        //Int dom_dim    = 0;
+        
+        const JobPointers<Int> job_ptr ( simplices.Dimension(0), ThreadCount() );
+        
+		ParallelDo(
+			[&]( const Int thread )
+			{
+				mut<LInt> AvOp_outer = AvOp.Outer().data();
+				mut< Int> AvOp_inner = AvOp.Inner().data();
+				AvOp.Value().Fill(static_cast<Real>(1));
+	
+				mut<LInt> DiffOp_outer = DiffOp.Outer().data();
+				mut< Int> DiffOp_inner = DiffOp.Inner().data();
+				DiffOp.Value().SetZero();
+	
+				ptr<Real> V_coords__      = V_coords.data();
+				
+				ptr<Int>  simplices__     = simplices.data();
+				mut<Real> P_hull_coords__ = P_hull_coords.data();
+			    mut<Real> P_coords__      = P_coords.data();
+	
+				Int simplex        [1];
+				Int sorted_simplex [1];
+	
+				const Int i_begin = job_ptr[thread];
+				const Int i_end   = job_ptr[thread+1];
+	
+	            for( Int i = i_begin; i < i_end; ++i )
+	            {
+	
+					mut<Real> near = P_near.data(i);                    
+					mut<Real> far  = P_far.data(i);
+
+					simplex[0] = sorted_simplex[0] = simplices__[1*i +0];
+                  
+	                // sorting simplex so that we do not have to sort the sparse arrays to achieve CSR format later
+	                std::sort( sorted_simplex, sorted_simplex + 1 );
+	
+					AvOp_outer[i+1] = (i+1) * 1;  
+                      
+					AvOp_inner[1*i+0] = sorted_simplex[0];
+
+					DiffOp_outer[4*i+0] = (4 * i + 0) * 1;
+					DiffOp_outer[4*i+1] = (4 * i + 1) * 1;
+					DiffOp_outer[4*i+2] = (4 * i + 2) * 1;
+					DiffOp_outer[4*i+3] = (4 * i + 3) * 1;
+
+					DiffOp_inner[(i*4+0)*1+0] = sorted_simplex[0];
+					DiffOp_inner[(i*4+1)*1+0] = sorted_simplex[0];
+					DiffOp_inner[(i*4+2)*1+0] = sorted_simplex[0];
+					DiffOp_inner[(i*4+3)*1+0] = sorted_simplex[0];
+
+					near[1] = P_hull_coords__[4*i+0] = V_coords__[4*simplex[0]+0];
+					near[2] = P_hull_coords__[4*i+1] = V_coords__[4*simplex[0]+1];
+					near[3] = P_hull_coords__[4*i+2] = V_coords__[4*simplex[0]+2];
+					near[4] = P_hull_coords__[4*i+3] = V_coords__[4*simplex[0]+3];
+
+					far[1] = P_coords__[4*i+0] = 1. * ( P_hull_coords__[4*i+0] );
+					far[2] = P_coords__[4*i+1] = 1. * ( P_hull_coords__[4*i+1] );
+					far[3] = P_coords__[4*i+2] = 1. * ( P_hull_coords__[4*i+2] );
+					far[4] = P_coords__[4*i+3] = 1. * ( P_hull_coords__[4*i+3] );
+
+	                near[ 0] = far[ 0] = static_cast<Real>(1);
+					near[ 5] = far[ 5] = static_cast<Real>(1);
+					near[ 6] = far[ 6] = static_cast<Real>(0);
+					near[ 7] = far[ 7] = static_cast<Real>(0);
+					near[ 8] = far[ 8] = static_cast<Real>(0);
+					near[ 9] = far[ 9] = static_cast<Real>(1);
+					near[10] = far[10] = static_cast<Real>(0);
+					near[11] = far[11] = static_cast<Real>(0);
+					near[12] = far[12] = static_cast<Real>(1);
+					near[13] = far[13] = static_cast<Real>(0);
+					near[14] = far[14] = static_cast<Real>(1);
+
+	            }
+			},
+			ThreadCount()
+		);
+
+        ptoc(ClassName()+"::ComputeNearFarDataOps");
+    }
+
 	void DNearToHulls( 
 		const Tensor2<Real,Int> & V_coords, 
 		const Tensor2<Int ,Int> & simplices, 
@@ -658,6 +1234,197 @@ namespace Repulsor
             return std::string("SimplicialMeshDetails<1,2,")+TypeName<Real>+","+TypeName<Int>+">";
         }
 		
+	void ComputeNearFarData( 
+		const Tensor2<Real,Int> & V_coords,
+		const Tensor2<Int ,Int> & simplices,
+			  Tensor2<Real,Int> & P_near,
+			  Tensor2<Real,Int> & P_far
+	) const
+    {
+        ptic(ClassName()+"::ComputeNearFarData");
+        
+        //Int size       = 2;
+        //Int amb_dim    = 2;
+        //Int dom_dim    = 1;
+
+        const JobPointers<Int> job_ptr ( simplices.Dimension(0), ThreadCount() );
+        
+		ParallelDo(
+			[&]( const Int thread )
+			{
+				ptr<Real> V_coords__      = V_coords.data();	
+				ptr<Int > simplices__     = simplices.data();
+	
+				Real hull    [2][2];
+				Real df      [2][1];
+				Real dfdagger[1][2];
+				Real g       [1][1];
+				Real ginv    [1][1];
+	
+				Int simplex  [2];
+				
+				const Int i_begin = job_ptr[thread];
+				const Int i_end   = job_ptr[thread+1];
+	
+	            for( Int i = i_begin; i < i_end; ++i )
+	            {
+					mut<Real> near = P_near.data(i);                    
+					mut<Real> far  = P_far.data(i);   
+            
+					simplex[0] = simplices__[2*i +0];
+					simplex[1] = simplices__[2*i +1];
+
+					near[1] = hull[0][0] = V_coords__[2*simplex[0]+0];
+					near[2] = hull[0][1] = V_coords__[2*simplex[0]+1];
+					near[3] = hull[1][0] = V_coords__[2*simplex[1]+0];
+					near[4] = hull[1][1] = V_coords__[2*simplex[1]+1];
+
+					far[1] = static_cast<Real>(0.5) * ( hull[0][0] + hull[1][0] );
+					far[2] = static_cast<Real>(0.5) * ( hull[0][1] + hull[1][1] );
+
+					df[0][0] = hull[1][0] - hull[0][0];
+					df[1][0] = hull[1][1] - hull[0][1];
+
+					g[0][0] = df[0][0] * df[0][0] + df[1][0] * df[1][0];
+
+
+					near[0] = far[0] = std::sqrt( std::fabs(g[0][0]) );
+	
+	                ginv[0][0] = static_cast<Real>(1)/g[0][0];
+	                
+	                //  dfdagger = g^{-1} * df^T (1 x 2 matrix)
+					dfdagger[0][0] = ginv[0][0] * df[0][0];
+					dfdagger[0][1] = ginv[0][0] * df[1][0];
+            
+					near[5] = far[3]  = static_cast<Real>(1) - df[0][0] * dfdagger[0][0];
+					near[6] = far[4]  =    - df[0][0] * dfdagger[0][1];
+					near[7] = far[5]  = static_cast<Real>(1) - df[1][0] * dfdagger[0][1];
+
+	            } // for( Int i = i_begin; i < i_end; ++i )
+			},
+			ThreadCount()
+		);
+
+        ptoc(ClassName()+"::ComputeNearFarData");
+    }
+
+    void ComputeNearFarDataOps( 
+		const Tensor2<Real,Int> & V_coords,
+        const Tensor2<Int ,Int> & simplices,
+		      Tensor2<Real,Int> & P_coords,
+		      Tensor3<Real,Int> & P_hull_coords,
+		      Tensor2<Real,Int> & P_near,
+		      Tensor2<Real,Int> & P_far,
+		SparseMatrix_T & DiffOp,
+		SparseMatrix_T & AvOp 
+	) const
+    {
+        ptic(ClassName()+"::ComputeNearFarDataOps");
+        
+        //Int size       = 2;
+        //Int amb_dim    = 2;
+        //Int dom_dim    = 1;
+        
+        const JobPointers<Int> job_ptr ( simplices.Dimension(0), ThreadCount() );
+        
+		ParallelDo(
+			[&]( const Int thread )
+			{
+				mut<LInt> AvOp_outer = AvOp.Outer().data();
+				mut< Int> AvOp_inner = AvOp.Inner().data();
+				mut<Real> AvOp_value = AvOp.Values().data();
+	
+				mut<LInt> DiffOp_outer = DiffOp.Outer().data();
+				mut< Int> DiffOp_inner = DiffOp.Inner().data();
+				mut<Real> DiffOp_value = DiffOp.Value().data();
+	
+				ptr<Real> V_coords__      = V_coords.data();
+				
+				ptr<Int>  simplices__     = simplices.data();
+			    mut<Real> P_hull_coords__ = P_hull_coords.data();
+				mut<Real> P_coords__      = P_coords.data();
+	
+				Real df       [2][1];
+				Real dfdagger [1][2];
+				Real g        [1][1];
+				Real ginv     [1][1];
+	
+				Int simplex        [2];
+				Int sorted_simplex [2];
+	
+				const Int i_begin = job_ptr[thread];
+				const Int i_end   = job_ptr[thread+1];
+	
+	            for( Int i = i_begin; i < i_end; ++i )
+	            {
+	
+					mut<Real> near = P_near.data(i);                    
+					mut<Real> far  = P_far.data(i);
+
+					simplex[0] = sorted_simplex[0] = simplices__[2*i +0];
+					simplex[1] = sorted_simplex[1] = simplices__[2*i +1];
+                  
+	                // sorting simplex so that we do not have to sort the sparse arrays to achieve CSR format later
+	                std::sort( sorted_simplex, sorted_simplex + 2 );
+	
+					AvOp_outer[i+1] = (i+1) * 2;  
+	                      
+					AvOp_inner[2*i+0] = sorted_simplex[0];
+					AvOp_inner[2*i+1] = sorted_simplex[1];
+
+					AvOp_value[2*i+0] = 0.5;
+					AvOp_value[2*i+1] = 0.5;
+
+					DiffOp_outer[2*i+0] = (2 * i + 0) * 2;
+					DiffOp_outer[2*i+1] = (2 * i + 1) * 2;
+
+					DiffOp_inner[(i*2+0)*2+0] = sorted_simplex[0];
+					DiffOp_inner[(i*2+1)*2+0] = sorted_simplex[0];
+					DiffOp_inner[(i*2+0)*2+1] = sorted_simplex[1];
+					DiffOp_inner[(i*2+1)*2+1] = sorted_simplex[1];
+
+					near[1] = P_hull_coords__[4*i+0] = V_coords__[2*simplex[0]+0];
+					near[2] = P_hull_coords__[4*i+1] = V_coords__[2*simplex[0]+1];
+					near[3] = P_hull_coords__[4*i+2] = V_coords__[2*simplex[1]+0];
+					near[4] = P_hull_coords__[4*i+3] = V_coords__[2*simplex[1]+1];
+
+					far[1] = P_coords__[2*i+0] = 0.5 * ( P_hull_coords__[4*i+0] + P_hull_coords__[4*i+2] );
+					far[2] = P_coords__[2*i+1] = 0.5 * ( P_hull_coords__[4*i+1] + P_hull_coords__[4*i+3] );
+
+					df[0][0] = V_coords__[2*sorted_simplex[1]+0] - V_coords__[2*sorted_simplex[0]+0];
+					df[1][0] = V_coords__[2*sorted_simplex[1]+1] - V_coords__[2*sorted_simplex[0]+1];
+
+					g[0][0] = df[0][0] * df[0][0] + df[1][0] * df[1][0];
+
+	                near[0] = far[0] = std::sqrt( std::fabs(g[0][0]) );
+	
+	                ginv[0][0] =  static_cast<Real>(1)/g[0][0];
+	                
+	                //  dfdagger = g^{-1} * df^T (1 x 2 matrix)
+					dfdagger[0][0] = ginv[0][0] * df[0][0];
+					dfdagger[0][1] = ginv[0][0] * df[1][0];
+
+					near[5] = far[3] = static_cast<Real>(1.0) - df[0][0] * dfdagger[0][0];
+					near[6] = far[4] =    - df[0][0] * dfdagger[0][1];
+					near[7] = far[5] = static_cast<Real>(1.0) - df[1][0] * dfdagger[0][1];
+
+	                // derivative operator  (2 x 2 matrix)
+	
+	                Real * Df = &DiffOp_value[ 4 * i ];
+
+					Df[0] = - dfdagger[0][0];
+				Df[1] =   dfdagger[0][0];
+					Df[2] = - dfdagger[0][1];
+				Df[3] =   dfdagger[0][1];
+
+	            }
+			},
+			ThreadCount()
+		);
+
+        ptoc(ClassName()+"::ComputeNearFarDataOps");
+    }
+
 	void DNearToHulls( 
 		const Tensor2<Real,Int> & V_coords, 
 		const Tensor2<Int ,Int> & simplices, 
@@ -929,6 +1696,218 @@ namespace Repulsor
             return std::string("SimplicialMeshDetails<1,3,")+TypeName<Real>+","+TypeName<Int>+">";
         }
 		
+	void ComputeNearFarData( 
+		const Tensor2<Real,Int> & V_coords,
+		const Tensor2<Int ,Int> & simplices,
+			  Tensor2<Real,Int> & P_near,
+			  Tensor2<Real,Int> & P_far
+	) const
+    {
+        ptic(ClassName()+"::ComputeNearFarData");
+        
+        //Int size       = 2;
+        //Int amb_dim    = 3;
+        //Int dom_dim    = 1;
+
+        const JobPointers<Int> job_ptr ( simplices.Dimension(0), ThreadCount() );
+        
+		ParallelDo(
+			[&]( const Int thread )
+			{
+				ptr<Real> V_coords__      = V_coords.data();	
+				ptr<Int > simplices__     = simplices.data();
+	
+				Real hull    [2][3];
+				Real df      [3][1];
+				Real dfdagger[1][3];
+				Real g       [1][1];
+				Real ginv    [1][1];
+	
+				Int simplex  [2];
+				
+				const Int i_begin = job_ptr[thread];
+				const Int i_end   = job_ptr[thread+1];
+	
+	            for( Int i = i_begin; i < i_end; ++i )
+	            {
+					mut<Real> near = P_near.data(i);                    
+					mut<Real> far  = P_far.data(i);   
+            
+					simplex[0] = simplices__[2*i +0];
+					simplex[1] = simplices__[2*i +1];
+
+					near[1] = hull[0][0] = V_coords__[3*simplex[0]+0];
+					near[2] = hull[0][1] = V_coords__[3*simplex[0]+1];
+					near[3] = hull[0][2] = V_coords__[3*simplex[0]+2];
+					near[4] = hull[1][0] = V_coords__[3*simplex[1]+0];
+					near[5] = hull[1][1] = V_coords__[3*simplex[1]+1];
+					near[6] = hull[1][2] = V_coords__[3*simplex[1]+2];
+
+					far[1] = static_cast<Real>(0.5) * ( hull[0][0] + hull[1][0] );
+					far[2] = static_cast<Real>(0.5) * ( hull[0][1] + hull[1][1] );
+					far[3] = static_cast<Real>(0.5) * ( hull[0][2] + hull[1][2] );
+
+					df[0][0] = hull[1][0] - hull[0][0];
+					df[1][0] = hull[1][1] - hull[0][1];
+					df[2][0] = hull[1][2] - hull[0][2];
+
+					g[0][0] = df[0][0] * df[0][0] + df[1][0] * df[1][0] + df[2][0] * df[2][0];
+
+
+					near[0] = far[0] = std::sqrt( std::fabs(g[0][0]) );
+	
+	                ginv[0][0] = static_cast<Real>(1)/g[0][0];
+	                
+	                //  dfdagger = g^{-1} * df^T (1 x 3 matrix)
+					dfdagger[0][0] = ginv[0][0] * df[0][0];
+					dfdagger[0][1] = ginv[0][0] * df[1][0];
+					dfdagger[0][2] = ginv[0][0] * df[2][0];
+            
+					near[ 7] = far[ 4]  = static_cast<Real>(1) - df[0][0] * dfdagger[0][0];
+					near[ 8] = far[ 5]  =    - df[0][0] * dfdagger[0][1];
+					near[ 9] = far[ 6]  =    - df[0][0] * dfdagger[0][2];
+					near[10] = far[ 7]  = static_cast<Real>(1) - df[1][0] * dfdagger[0][1];
+					near[11] = far[ 8]  =    - df[1][0] * dfdagger[0][2];
+					near[12] = far[ 9]  = static_cast<Real>(1) - df[2][0] * dfdagger[0][2];
+
+	            } // for( Int i = i_begin; i < i_end; ++i )
+			},
+			ThreadCount()
+		);
+
+        ptoc(ClassName()+"::ComputeNearFarData");
+    }
+
+    void ComputeNearFarDataOps( 
+		const Tensor2<Real,Int> & V_coords,
+        const Tensor2<Int ,Int> & simplices,
+		      Tensor2<Real,Int> & P_coords,
+		      Tensor3<Real,Int> & P_hull_coords,
+		      Tensor2<Real,Int> & P_near,
+		      Tensor2<Real,Int> & P_far,
+		SparseMatrix_T & DiffOp,
+		SparseMatrix_T & AvOp 
+	) const
+    {
+        ptic(ClassName()+"::ComputeNearFarDataOps");
+        
+        //Int size       = 2;
+        //Int amb_dim    = 3;
+        //Int dom_dim    = 1;
+        
+        const JobPointers<Int> job_ptr ( simplices.Dimension(0), ThreadCount() );
+        
+		ParallelDo(
+			[&]( const Int thread )
+			{
+				mut<LInt> AvOp_outer = AvOp.Outer().data();
+				mut< Int> AvOp_inner = AvOp.Inner().data();
+				mut<Real> AvOp_value = AvOp.Values().data();
+	
+				mut<LInt> DiffOp_outer = DiffOp.Outer().data();
+				mut< Int> DiffOp_inner = DiffOp.Inner().data();
+				mut<Real> DiffOp_value = DiffOp.Value().data();
+	
+				ptr<Real> V_coords__      = V_coords.data();
+				
+				ptr<Int>  simplices__     = simplices.data();
+			    mut<Real> P_hull_coords__ = P_hull_coords.data();
+				mut<Real> P_coords__      = P_coords.data();
+	
+				Real df       [3][1];
+				Real dfdagger [1][3];
+				Real g        [1][1];
+				Real ginv     [1][1];
+	
+				Int simplex        [2];
+				Int sorted_simplex [2];
+	
+				const Int i_begin = job_ptr[thread];
+				const Int i_end   = job_ptr[thread+1];
+	
+	            for( Int i = i_begin; i < i_end; ++i )
+	            {
+	
+					mut<Real> near = P_near.data(i);                    
+					mut<Real> far  = P_far.data(i);
+
+					simplex[0] = sorted_simplex[0] = simplices__[2*i +0];
+					simplex[1] = sorted_simplex[1] = simplices__[2*i +1];
+                  
+	                // sorting simplex so that we do not have to sort the sparse arrays to achieve CSR format later
+	                std::sort( sorted_simplex, sorted_simplex + 2 );
+	
+					AvOp_outer[i+1] = (i+1) * 2;  
+	                      
+					AvOp_inner[2*i+0] = sorted_simplex[0];
+					AvOp_inner[2*i+1] = sorted_simplex[1];
+
+					AvOp_value[2*i+0] = 0.5;
+					AvOp_value[2*i+1] = 0.5;
+
+					DiffOp_outer[3*i+0] = (3 * i + 0) * 2;
+					DiffOp_outer[3*i+1] = (3 * i + 1) * 2;
+					DiffOp_outer[3*i+2] = (3 * i + 2) * 2;
+
+					DiffOp_inner[(i*3+0)*2+0] = sorted_simplex[0];
+					DiffOp_inner[(i*3+1)*2+0] = sorted_simplex[0];
+					DiffOp_inner[(i*3+2)*2+0] = sorted_simplex[0];
+					DiffOp_inner[(i*3+0)*2+1] = sorted_simplex[1];
+					DiffOp_inner[(i*3+1)*2+1] = sorted_simplex[1];
+					DiffOp_inner[(i*3+2)*2+1] = sorted_simplex[1];
+
+					near[1] = P_hull_coords__[6*i+0] = V_coords__[3*simplex[0]+0];
+					near[2] = P_hull_coords__[6*i+1] = V_coords__[3*simplex[0]+1];
+					near[3] = P_hull_coords__[6*i+2] = V_coords__[3*simplex[0]+2];
+					near[4] = P_hull_coords__[6*i+3] = V_coords__[3*simplex[1]+0];
+					near[5] = P_hull_coords__[6*i+4] = V_coords__[3*simplex[1]+1];
+					near[6] = P_hull_coords__[6*i+5] = V_coords__[3*simplex[1]+2];
+
+					far[1] = P_coords__[3*i+0] = 0.5 * ( P_hull_coords__[6*i+0] + P_hull_coords__[6*i+3] );
+					far[2] = P_coords__[3*i+1] = 0.5 * ( P_hull_coords__[6*i+1] + P_hull_coords__[6*i+4] );
+					far[3] = P_coords__[3*i+2] = 0.5 * ( P_hull_coords__[6*i+2] + P_hull_coords__[6*i+5] );
+
+					df[0][0] = V_coords__[3*sorted_simplex[1]+0] - V_coords__[3*sorted_simplex[0]+0];
+					df[1][0] = V_coords__[3*sorted_simplex[1]+1] - V_coords__[3*sorted_simplex[0]+1];
+					df[2][0] = V_coords__[3*sorted_simplex[1]+2] - V_coords__[3*sorted_simplex[0]+2];
+
+					g[0][0] = df[0][0] * df[0][0] + df[1][0] * df[1][0] + df[2][0] * df[2][0];
+
+	                near[0] = far[0] = std::sqrt( std::fabs(g[0][0]) );
+	
+	                ginv[0][0] =  static_cast<Real>(1)/g[0][0];
+	                
+	                //  dfdagger = g^{-1} * df^T (1 x 3 matrix)
+					dfdagger[0][0] = ginv[0][0] * df[0][0];
+					dfdagger[0][1] = ginv[0][0] * df[1][0];
+					dfdagger[0][2] = ginv[0][0] * df[2][0];
+
+					near[ 7] = far[ 4] = static_cast<Real>(1.0) - df[0][0] * dfdagger[0][0];
+					near[ 8] = far[ 5] =    - df[0][0] * dfdagger[0][1];
+					near[ 9] = far[ 6] =    - df[0][0] * dfdagger[0][2];
+					near[10] = far[ 7] = static_cast<Real>(1.0) - df[1][0] * dfdagger[0][1];
+					near[11] = far[ 8] =    - df[1][0] * dfdagger[0][2];
+					near[12] = far[ 9] = static_cast<Real>(1.0) - df[2][0] * dfdagger[0][2];
+
+	                // derivative operator  (3 x 2 matrix)
+	
+	                Real * Df = &DiffOp_value[ 6 * i ];
+
+					Df[ 0] = - dfdagger[0][0];
+				Df[ 1] =   dfdagger[0][0];
+					Df[ 2] = - dfdagger[0][1];
+				Df[ 3] =   dfdagger[0][1];
+					Df[ 4] = - dfdagger[0][2];
+				Df[ 5] =   dfdagger[0][2];
+
+	            }
+			},
+			ThreadCount()
+		);
+
+        ptoc(ClassName()+"::ComputeNearFarDataOps");
+    }
+
 	void DNearToHulls( 
 		const Tensor2<Real,Int> & V_coords, 
 		const Tensor2<Int ,Int> & simplices, 
@@ -1284,6 +2263,241 @@ namespace Repulsor
             return std::string("SimplicialMeshDetails<1,4,")+TypeName<Real>+","+TypeName<Int>+">";
         }
 		
+	void ComputeNearFarData( 
+		const Tensor2<Real,Int> & V_coords,
+		const Tensor2<Int ,Int> & simplices,
+			  Tensor2<Real,Int> & P_near,
+			  Tensor2<Real,Int> & P_far
+	) const
+    {
+        ptic(ClassName()+"::ComputeNearFarData");
+        
+        //Int size       = 2;
+        //Int amb_dim    = 4;
+        //Int dom_dim    = 1;
+
+        const JobPointers<Int> job_ptr ( simplices.Dimension(0), ThreadCount() );
+        
+		ParallelDo(
+			[&]( const Int thread )
+			{
+				ptr<Real> V_coords__      = V_coords.data();	
+				ptr<Int > simplices__     = simplices.data();
+	
+				Real hull    [2][4];
+				Real df      [4][1];
+				Real dfdagger[1][4];
+				Real g       [1][1];
+				Real ginv    [1][1];
+	
+				Int simplex  [2];
+				
+				const Int i_begin = job_ptr[thread];
+				const Int i_end   = job_ptr[thread+1];
+	
+	            for( Int i = i_begin; i < i_end; ++i )
+	            {
+					mut<Real> near = P_near.data(i);                    
+					mut<Real> far  = P_far.data(i);   
+            
+					simplex[0] = simplices__[2*i +0];
+					simplex[1] = simplices__[2*i +1];
+
+					near[1] = hull[0][0] = V_coords__[4*simplex[0]+0];
+					near[2] = hull[0][1] = V_coords__[4*simplex[0]+1];
+					near[3] = hull[0][2] = V_coords__[4*simplex[0]+2];
+					near[4] = hull[0][3] = V_coords__[4*simplex[0]+3];
+					near[5] = hull[1][0] = V_coords__[4*simplex[1]+0];
+					near[6] = hull[1][1] = V_coords__[4*simplex[1]+1];
+					near[7] = hull[1][2] = V_coords__[4*simplex[1]+2];
+					near[8] = hull[1][3] = V_coords__[4*simplex[1]+3];
+
+					far[1] = static_cast<Real>(0.5) * ( hull[0][0] + hull[1][0] );
+					far[2] = static_cast<Real>(0.5) * ( hull[0][1] + hull[1][1] );
+					far[3] = static_cast<Real>(0.5) * ( hull[0][2] + hull[1][2] );
+					far[4] = static_cast<Real>(0.5) * ( hull[0][3] + hull[1][3] );
+
+					df[0][0] = hull[1][0] - hull[0][0];
+					df[1][0] = hull[1][1] - hull[0][1];
+					df[2][0] = hull[1][2] - hull[0][2];
+					df[3][0] = hull[1][3] - hull[0][3];
+
+					g[0][0] = df[0][0] * df[0][0] + df[1][0] * df[1][0] + df[2][0] * df[2][0] + df[3][0] * df[3][0];
+
+
+					near[0] = far[0] = std::sqrt( std::fabs(g[0][0]) );
+	
+	                ginv[0][0] = static_cast<Real>(1)/g[0][0];
+	                
+	                //  dfdagger = g^{-1} * df^T (1 x 4 matrix)
+					dfdagger[0][0] = ginv[0][0] * df[0][0];
+					dfdagger[0][1] = ginv[0][0] * df[1][0];
+					dfdagger[0][2] = ginv[0][0] * df[2][0];
+					dfdagger[0][3] = ginv[0][0] * df[3][0];
+            
+					near[ 9] = far[ 5]  = static_cast<Real>(1) - df[0][0] * dfdagger[0][0];
+					near[10] = far[ 6]  =    - df[0][0] * dfdagger[0][1];
+					near[11] = far[ 7]  =    - df[0][0] * dfdagger[0][2];
+					near[12] = far[ 8]  =    - df[0][0] * dfdagger[0][3];
+					near[13] = far[ 9]  = static_cast<Real>(1) - df[1][0] * dfdagger[0][1];
+					near[14] = far[10]  =    - df[1][0] * dfdagger[0][2];
+					near[15] = far[11]  =    - df[1][0] * dfdagger[0][3];
+					near[16] = far[12]  = static_cast<Real>(1) - df[2][0] * dfdagger[0][2];
+					near[17] = far[13]  =    - df[2][0] * dfdagger[0][3];
+					near[18] = far[14]  = static_cast<Real>(1) - df[3][0] * dfdagger[0][3];
+
+	            } // for( Int i = i_begin; i < i_end; ++i )
+			},
+			ThreadCount()
+		);
+
+        ptoc(ClassName()+"::ComputeNearFarData");
+    }
+
+    void ComputeNearFarDataOps( 
+		const Tensor2<Real,Int> & V_coords,
+        const Tensor2<Int ,Int> & simplices,
+		      Tensor2<Real,Int> & P_coords,
+		      Tensor3<Real,Int> & P_hull_coords,
+		      Tensor2<Real,Int> & P_near,
+		      Tensor2<Real,Int> & P_far,
+		SparseMatrix_T & DiffOp,
+		SparseMatrix_T & AvOp 
+	) const
+    {
+        ptic(ClassName()+"::ComputeNearFarDataOps");
+        
+        //Int size       = 2;
+        //Int amb_dim    = 4;
+        //Int dom_dim    = 1;
+        
+        const JobPointers<Int> job_ptr ( simplices.Dimension(0), ThreadCount() );
+        
+		ParallelDo(
+			[&]( const Int thread )
+			{
+				mut<LInt> AvOp_outer = AvOp.Outer().data();
+				mut< Int> AvOp_inner = AvOp.Inner().data();
+				mut<Real> AvOp_value = AvOp.Values().data();
+	
+				mut<LInt> DiffOp_outer = DiffOp.Outer().data();
+				mut< Int> DiffOp_inner = DiffOp.Inner().data();
+				mut<Real> DiffOp_value = DiffOp.Value().data();
+	
+				ptr<Real> V_coords__      = V_coords.data();
+				
+				ptr<Int>  simplices__     = simplices.data();
+			    mut<Real> P_hull_coords__ = P_hull_coords.data();
+				mut<Real> P_coords__      = P_coords.data();
+	
+				Real df       [4][1];
+				Real dfdagger [1][4];
+				Real g        [1][1];
+				Real ginv     [1][1];
+	
+				Int simplex        [2];
+				Int sorted_simplex [2];
+	
+				const Int i_begin = job_ptr[thread];
+				const Int i_end   = job_ptr[thread+1];
+	
+	            for( Int i = i_begin; i < i_end; ++i )
+	            {
+	
+					mut<Real> near = P_near.data(i);                    
+					mut<Real> far  = P_far.data(i);
+
+					simplex[0] = sorted_simplex[0] = simplices__[2*i +0];
+					simplex[1] = sorted_simplex[1] = simplices__[2*i +1];
+                  
+	                // sorting simplex so that we do not have to sort the sparse arrays to achieve CSR format later
+	                std::sort( sorted_simplex, sorted_simplex + 2 );
+	
+					AvOp_outer[i+1] = (i+1) * 2;  
+	                      
+					AvOp_inner[2*i+0] = sorted_simplex[0];
+					AvOp_inner[2*i+1] = sorted_simplex[1];
+
+					AvOp_value[2*i+0] = 0.5;
+					AvOp_value[2*i+1] = 0.5;
+
+					DiffOp_outer[4*i+0] = (4 * i + 0) * 2;
+					DiffOp_outer[4*i+1] = (4 * i + 1) * 2;
+					DiffOp_outer[4*i+2] = (4 * i + 2) * 2;
+					DiffOp_outer[4*i+3] = (4 * i + 3) * 2;
+
+					DiffOp_inner[(i*4+0)*2+0] = sorted_simplex[0];
+					DiffOp_inner[(i*4+1)*2+0] = sorted_simplex[0];
+					DiffOp_inner[(i*4+2)*2+0] = sorted_simplex[0];
+					DiffOp_inner[(i*4+3)*2+0] = sorted_simplex[0];
+					DiffOp_inner[(i*4+0)*2+1] = sorted_simplex[1];
+					DiffOp_inner[(i*4+1)*2+1] = sorted_simplex[1];
+					DiffOp_inner[(i*4+2)*2+1] = sorted_simplex[1];
+					DiffOp_inner[(i*4+3)*2+1] = sorted_simplex[1];
+
+					near[1] = P_hull_coords__[8*i+0] = V_coords__[4*simplex[0]+0];
+					near[2] = P_hull_coords__[8*i+1] = V_coords__[4*simplex[0]+1];
+					near[3] = P_hull_coords__[8*i+2] = V_coords__[4*simplex[0]+2];
+					near[4] = P_hull_coords__[8*i+3] = V_coords__[4*simplex[0]+3];
+					near[5] = P_hull_coords__[8*i+4] = V_coords__[4*simplex[1]+0];
+					near[6] = P_hull_coords__[8*i+5] = V_coords__[4*simplex[1]+1];
+					near[7] = P_hull_coords__[8*i+6] = V_coords__[4*simplex[1]+2];
+					near[8] = P_hull_coords__[8*i+7] = V_coords__[4*simplex[1]+3];
+
+					far[1] = P_coords__[4*i+0] = 0.5 * ( P_hull_coords__[8*i+0] + P_hull_coords__[8*i+4] );
+					far[2] = P_coords__[4*i+1] = 0.5 * ( P_hull_coords__[8*i+1] + P_hull_coords__[8*i+5] );
+					far[3] = P_coords__[4*i+2] = 0.5 * ( P_hull_coords__[8*i+2] + P_hull_coords__[8*i+6] );
+					far[4] = P_coords__[4*i+3] = 0.5 * ( P_hull_coords__[8*i+3] + P_hull_coords__[8*i+7] );
+
+					df[0][0] = V_coords__[4*sorted_simplex[1]+0] - V_coords__[4*sorted_simplex[0]+0];
+					df[1][0] = V_coords__[4*sorted_simplex[1]+1] - V_coords__[4*sorted_simplex[0]+1];
+					df[2][0] = V_coords__[4*sorted_simplex[1]+2] - V_coords__[4*sorted_simplex[0]+2];
+					df[3][0] = V_coords__[4*sorted_simplex[1]+3] - V_coords__[4*sorted_simplex[0]+3];
+
+					g[0][0] = df[0][0] * df[0][0] + df[1][0] * df[1][0] + df[2][0] * df[2][0] + df[3][0] * df[3][0];
+
+	                near[0] = far[0] = std::sqrt( std::fabs(g[0][0]) );
+	
+	                ginv[0][0] =  static_cast<Real>(1)/g[0][0];
+	                
+	                //  dfdagger = g^{-1} * df^T (1 x 4 matrix)
+					dfdagger[0][0] = ginv[0][0] * df[0][0];
+					dfdagger[0][1] = ginv[0][0] * df[1][0];
+					dfdagger[0][2] = ginv[0][0] * df[2][0];
+					dfdagger[0][3] = ginv[0][0] * df[3][0];
+
+					near[ 9] = far[ 5] = static_cast<Real>(1.0) - df[0][0] * dfdagger[0][0];
+					near[10] = far[ 6] =    - df[0][0] * dfdagger[0][1];
+					near[11] = far[ 7] =    - df[0][0] * dfdagger[0][2];
+					near[12] = far[ 8] =    - df[0][0] * dfdagger[0][3];
+					near[13] = far[ 9] = static_cast<Real>(1.0) - df[1][0] * dfdagger[0][1];
+					near[14] = far[10] =    - df[1][0] * dfdagger[0][2];
+					near[15] = far[11] =    - df[1][0] * dfdagger[0][3];
+					near[16] = far[12] = static_cast<Real>(1.0) - df[2][0] * dfdagger[0][2];
+					near[17] = far[13] =    - df[2][0] * dfdagger[0][3];
+					near[18] = far[14] = static_cast<Real>(1.0) - df[3][0] * dfdagger[0][3];
+
+	                // derivative operator  (4 x 2 matrix)
+	
+	                Real * Df = &DiffOp_value[ 8 * i ];
+
+					Df[ 0] = - dfdagger[0][0];
+				Df[ 1] =   dfdagger[0][0];
+					Df[ 2] = - dfdagger[0][1];
+				Df[ 3] =   dfdagger[0][1];
+					Df[ 4] = - dfdagger[0][2];
+				Df[ 5] =   dfdagger[0][2];
+					Df[ 6] = - dfdagger[0][3];
+				Df[ 7] =   dfdagger[0][3];
+
+	            }
+			},
+			ThreadCount()
+		);
+
+        ptoc(ClassName()+"::ComputeNearFarDataOps");
+    }
+
 	void DNearToHulls( 
 		const Tensor2<Real,Int> & V_coords, 
 		const Tensor2<Int ,Int> & simplices, 
@@ -1711,6 +2925,260 @@ namespace Repulsor
             return std::string("SimplicialMeshDetails<2,3,")+TypeName<Real>+","+TypeName<Int>+">";
         }
 		
+	void ComputeNearFarData( 
+		const Tensor2<Real,Int> & V_coords,
+		const Tensor2<Int ,Int> & simplices,
+			  Tensor2<Real,Int> & P_near,
+			  Tensor2<Real,Int> & P_far
+	) const
+    {
+        ptic(ClassName()+"::ComputeNearFarData");
+        
+        //Int size       = 3;
+        //Int amb_dim    = 3;
+        //Int dom_dim    = 2;
+
+        const JobPointers<Int> job_ptr ( simplices.Dimension(0), ThreadCount() );
+        
+		ParallelDo(
+			[&]( const Int thread )
+			{
+				ptr<Real> V_coords__      = V_coords.data();	
+				ptr<Int > simplices__     = simplices.data();
+	
+				Real hull    [3][3];
+				Real df      [3][2];
+				Real dfdagger[2][3];
+				Real g       [2][2];
+				Real ginv    [2][2];
+	
+				Int simplex  [3];
+				
+				const Int i_begin = job_ptr[thread];
+				const Int i_end   = job_ptr[thread+1];
+	
+	            for( Int i = i_begin; i < i_end; ++i )
+	            {
+					mut<Real> near = P_near.data(i);                    
+					mut<Real> far  = P_far.data(i);   
+            
+					simplex[0] = simplices__[3*i +0];
+					simplex[1] = simplices__[3*i +1];
+					simplex[2] = simplices__[3*i +2];
+
+					near[1] = hull[0][0] = V_coords__[3*simplex[0]+0];
+					near[2] = hull[0][1] = V_coords__[3*simplex[0]+1];
+					near[3] = hull[0][2] = V_coords__[3*simplex[0]+2];
+					near[4] = hull[1][0] = V_coords__[3*simplex[1]+0];
+					near[5] = hull[1][1] = V_coords__[3*simplex[1]+1];
+					near[6] = hull[1][2] = V_coords__[3*simplex[1]+2];
+					near[7] = hull[2][0] = V_coords__[3*simplex[2]+0];
+					near[8] = hull[2][1] = V_coords__[3*simplex[2]+1];
+					near[9] = hull[2][2] = V_coords__[3*simplex[2]+2];
+
+					far[1] = static_cast<Real>(0.3333333333333333) * ( hull[0][0] + hull[1][0] + hull[2][0] );
+					far[2] = static_cast<Real>(0.3333333333333333) * ( hull[0][1] + hull[1][1] + hull[2][1] );
+					far[3] = static_cast<Real>(0.3333333333333333) * ( hull[0][2] + hull[1][2] + hull[2][2] );
+
+					df[0][0] = hull[1][0] - hull[0][0];
+					df[0][1] = hull[2][0] - hull[0][0];
+					df[1][0] = hull[1][1] - hull[0][1];
+					df[1][1] = hull[2][1] - hull[0][1];
+					df[2][0] = hull[1][2] - hull[0][2];
+					df[2][1] = hull[2][2] - hull[0][2];
+
+					g[0][0] = df[0][0] * df[0][0] + df[1][0] * df[1][0] + df[2][0] * df[2][0];
+					g[0][1] = df[0][0] * df[0][1] + df[1][0] * df[1][1] + df[2][0] * df[2][1];
+					g[1][0] = df[0][1] * df[0][0] + df[1][1] * df[1][0] + df[2][1] * df[2][0];
+					g[1][1] = df[0][1] * df[0][1] + df[1][1] * df[1][1] + df[2][1] * df[2][1];
+
+	                Real det = g[0][0] * g[1][1] - g[0][1] * g[0][1];
+	
+					near[0] = far[0] = std::sqrt( std::fabs(det) ) * static_cast<Real>(0.5);
+	
+	                Real invdet = static_cast<Real>(1)/det;
+	                ginv[0][0] =  g[1][1] * invdet;
+	                ginv[0][1] = -g[0][1] * invdet;
+	                ginv[1][1] =  g[0][0] * invdet;
+	                
+	                //  dfdagger = g^{-1} * df^T (2 x 3 matrix)
+					dfdagger[0][0] = ginv[0][0] * df[0][0] + ginv[0][1] * df[0][1];
+					dfdagger[0][1] = ginv[0][0] * df[1][0] + ginv[0][1] * df[1][1];
+					dfdagger[0][2] = ginv[0][0] * df[2][0] + ginv[0][1] * df[2][1];
+					dfdagger[1][0] = ginv[0][1] * df[0][0] + ginv[1][1] * df[0][1];
+					dfdagger[1][1] = ginv[0][1] * df[1][0] + ginv[1][1] * df[1][1];
+					dfdagger[1][2] = ginv[0][1] * df[2][0] + ginv[1][1] * df[2][1];
+            
+					near[10] = far[ 4]  = static_cast<Real>(1) - df[0][0] * dfdagger[0][0] - df[0][1] * dfdagger[1][0];
+					near[11] = far[ 5]  =    - df[0][0] * dfdagger[0][1] - df[0][1] * dfdagger[1][1];
+					near[12] = far[ 6]  =    - df[0][0] * dfdagger[0][2] - df[0][1] * dfdagger[1][2];
+					near[13] = far[ 7]  = static_cast<Real>(1) - df[1][0] * dfdagger[0][1] - df[1][1] * dfdagger[1][1];
+					near[14] = far[ 8]  =    - df[1][0] * dfdagger[0][2] - df[1][1] * dfdagger[1][2];
+					near[15] = far[ 9]  = static_cast<Real>(1) - df[2][0] * dfdagger[0][2] - df[2][1] * dfdagger[1][2];
+
+	            } // for( Int i = i_begin; i < i_end; ++i )
+			},
+			ThreadCount()
+		);
+
+        ptoc(ClassName()+"::ComputeNearFarData");
+    }
+
+	void ComputeNearFarDataOps(
+		const Tensor2<Real,Int> & V_coords,
+        const Tensor2<Int ,Int> & simplices,
+		      Tensor2<Real,Int> & P_coords,
+		      Tensor3<Real,Int> & P_hull_coords,
+		      Tensor2<Real,Int> & P_near,
+		      Tensor2<Real,Int> & P_far,
+		SparseMatrix_T & DiffOp,
+		SparseMatrix_T & AvOp 
+	) const
+    {
+        ptic(ClassName()+"::ComputeNearFarDataOps");
+
+        //Int size       = 3;
+        //Int amb_dim    = 3;
+        //Int dom_dim    = 2;
+
+        const JobPointers<Int> job_ptr ( simplices.Dimension(0), ThreadCount() );
+
+		ParallelDo(
+			[&]( const Int thread )
+			{
+				mut<LInt> AvOp_outer = AvOp.Outer().data();
+				mut< Int> AvOp_inner = AvOp.Inner().data();
+				mut<Real> AvOp_value = AvOp.Values().data();
+	
+				mut<LInt> DiffOp_outer = DiffOp.Outer().data();
+				mut< Int> DiffOp_inner = DiffOp.Inner().data();
+				mut<Real> DiffOp_value = DiffOp.Values().data();
+	
+				ptr<Real> V_coords__      = V_coords.data();
+				
+				ptr< Int> simplices__     = simplices.data();
+			    mut<Real> P_hull_coords__ = P_hull_coords.data();
+				mut<Real> P_coords__      = P_coords.data();
+	
+				Real df       [3][2];
+				Real dfdagger [2][3];
+				Real g        [2][2];
+				Real ginv     [2][2];
+	
+				Int simplex        [3];
+	            Int sorted_simplex [3];
+	
+				const Int i_begin = job_ptr[thread];
+				const Int i_end   = job_ptr[thread+1];
+	
+	            for( Int i = i_begin; i < i_end; ++i )
+	            {
+	
+					mut<Real> near = P_near.data(i);                    
+					mut<Real> far  = P_far.data(i);
+
+					simplex[0] = sorted_simplex[0] = simplices__[3*i +0];
+					simplex[1] = sorted_simplex[1] = simplices__[3*i +1];
+					simplex[2] = sorted_simplex[2] = simplices__[3*i +2];
+                  
+	                // sorting simplex so that we do not have to sort the sparse arrays to achieve CSR format later
+	                std::sort( sorted_simplex, sorted_simplex + 3 );
+
+					AvOp_outer[i+1] = (i+1) * 3;                      
+					AvOp_inner[3*i+0] = sorted_simplex[0];
+					AvOp_inner[3*i+1] = sorted_simplex[1];
+					AvOp_inner[3*i+2] = sorted_simplex[2];
+
+					AvOp_value[3*i+0] = 0.3333333333333333;
+					AvOp_value[3*i+1] = 0.3333333333333333;
+					AvOp_value[3*i+2] = 0.3333333333333333;
+
+					DiffOp_outer[3*i+0] = (3 * i + 0) * 3;
+					DiffOp_outer[3*i+1] = (3 * i + 1) * 3;
+					DiffOp_outer[3*i+2] = (3 * i + 2) * 3;
+
+					DiffOp_inner[(i * 3 + 0) * 3 + 0 ] = sorted_simplex[0];
+					DiffOp_inner[(i * 3 + 0) * 3 + 1 ] = sorted_simplex[1];
+					DiffOp_inner[(i * 3 + 0) * 3 + 2 ] = sorted_simplex[2];
+					DiffOp_inner[(i * 3 + 1) * 3 + 0 ] = sorted_simplex[0];
+					DiffOp_inner[(i * 3 + 1) * 3 + 1 ] = sorted_simplex[1];
+					DiffOp_inner[(i * 3 + 1) * 3 + 2 ] = sorted_simplex[2];
+					DiffOp_inner[(i * 3 + 2) * 3 + 0 ] = sorted_simplex[0];
+					DiffOp_inner[(i * 3 + 2) * 3 + 1 ] = sorted_simplex[1];
+					DiffOp_inner[(i * 3 + 2) * 3 + 2 ] = sorted_simplex[2];
+
+					near[1] = P_hull_coords__[9*i+0] = V_coords__[3*simplex[0]+0];
+					near[2] = P_hull_coords__[9*i+1] = V_coords__[3*simplex[0]+1];
+					near[3] = P_hull_coords__[9*i+2] = V_coords__[3*simplex[0]+2];
+					near[4] = P_hull_coords__[9*i+3] = V_coords__[3*simplex[1]+0];
+					near[5] = P_hull_coords__[9*i+4] = V_coords__[3*simplex[1]+1];
+					near[6] = P_hull_coords__[9*i+5] = V_coords__[3*simplex[1]+2];
+					near[7] = P_hull_coords__[9*i+6] = V_coords__[3*simplex[2]+0];
+					near[8] = P_hull_coords__[9*i+7] = V_coords__[3*simplex[2]+1];
+					near[9] = P_hull_coords__[9*i+8] = V_coords__[3*simplex[2]+2];
+
+					far[1] = P_coords__[3*i+0] = 0.3333333333333333 * ( P_hull_coords__[9*i+0] + P_hull_coords__[9*i+3] + P_hull_coords__[9*i+6] );
+					far[2] = P_coords__[3*i+1] = 0.3333333333333333 * ( P_hull_coords__[9*i+1] + P_hull_coords__[9*i+4] + P_hull_coords__[9*i+7] );
+					far[3] = P_coords__[3*i+2] = 0.3333333333333333 * ( P_hull_coords__[9*i+2] + P_hull_coords__[9*i+5] + P_hull_coords__[9*i+8] );
+
+					df[0][0] = V_coords__[3*sorted_simplex[1]+0] - V_coords__[3*sorted_simplex[0]+0];
+					df[0][1] = V_coords__[3*sorted_simplex[2]+0] - V_coords__[3*sorted_simplex[0]+0];
+					df[1][0] = V_coords__[3*sorted_simplex[1]+1] - V_coords__[3*sorted_simplex[0]+1];
+					df[1][1] = V_coords__[3*sorted_simplex[2]+1] - V_coords__[3*sorted_simplex[0]+1];
+					df[2][0] = V_coords__[3*sorted_simplex[1]+2] - V_coords__[3*sorted_simplex[0]+2];
+					df[2][1] = V_coords__[3*sorted_simplex[2]+2] - V_coords__[3*sorted_simplex[0]+2];
+
+					g[0][0] = df[0][0] * df[0][0] + df[1][0] * df[1][0] + df[2][0] * df[2][0];
+					g[0][1] = df[0][0] * df[0][1] + df[1][0] * df[1][1] + df[2][0] * df[2][1];
+					g[1][0] = df[0][1] * df[0][0] + df[1][1] * df[1][0] + df[2][1] * df[2][0];
+					g[1][1] = df[0][1] * df[0][1] + df[1][1] * df[1][1] + df[2][1] * df[2][1];
+
+	                Real det = g[0][0] * g[1][1] - g[0][1] * g[0][1];
+	
+	                near[0] = far[0] = std::sqrt( std::fabs(det) ) * static_cast<Real>(0.5);
+	
+	                Real invdet = static_cast<Real>(1.0)/det;
+	                ginv[0][0] =  g[1][1] * invdet;
+	                ginv[0][1] = -g[0][1] * invdet;
+	                ginv[1][1] =  g[0][0] * invdet;
+	                
+	                //  dfdagger = g^{-1} * df^T (2 x 3 matrix)
+					dfdagger[0][0] = ginv[0][0] * df[0][0] + ginv[0][1] * df[0][1];
+					dfdagger[0][1] = ginv[0][0] * df[1][0] + ginv[0][1] * df[1][1];
+					dfdagger[0][2] = ginv[0][0] * df[2][0] + ginv[0][1] * df[2][1];
+					dfdagger[1][0] = ginv[0][1] * df[0][0] + ginv[1][1] * df[0][1];
+					dfdagger[1][1] = ginv[0][1] * df[1][0] + ginv[1][1] * df[1][1];
+					dfdagger[1][2] = ginv[0][1] * df[2][0] + ginv[1][1] * df[2][1];
+            
+					near[10] = far[ 4]  = static_cast<Real>(1.0) - df[0][0] * dfdagger[0][0] - df[0][1] * dfdagger[1][0];
+					near[11] = far[ 5]  =    - df[0][0] * dfdagger[0][1] - df[0][1] * dfdagger[1][1];
+					near[12] = far[ 6]  =    - df[0][0] * dfdagger[0][2] - df[0][1] * dfdagger[1][2];
+					near[13] = far[ 7]  = static_cast<Real>(1.0) - df[1][0] * dfdagger[0][1] - df[1][1] * dfdagger[1][1];
+					near[14] = far[ 8]  =    - df[1][0] * dfdagger[0][2] - df[1][1] * dfdagger[1][2];
+					near[15] = far[ 9]  = static_cast<Real>(1.0) - df[2][0] * dfdagger[0][2] - df[2][1] * dfdagger[1][2];
+
+	                // derivative operator  (3 x 3 matrix)
+	
+	                mut<Real> Df = &DiffOp_value[ 9 * i ];
+
+					Df[ 0] = - dfdagger[0][0] - dfdagger[1][0];
+					Df[ 1] =   dfdagger[0][0];
+					Df[ 2] =   dfdagger[1][0];
+					Df[ 3] = - dfdagger[0][1] - dfdagger[1][1];
+					Df[ 4] =   dfdagger[0][1];
+					Df[ 5] =   dfdagger[1][1];
+					Df[ 6] = - dfdagger[0][2] - dfdagger[1][2];
+					Df[ 7] =   dfdagger[0][2];
+					Df[ 8] =   dfdagger[1][2];
+
+	            }
+			},
+			ThreadCount()
+		);
+
+        ptoc(ClassName()+"::ComputeNearFarDataOps");
+    }
+
     void DNearToHulls( 
 		const Tensor2<Real,Int> & V_coords, 
 		const Tensor2<Int ,Int> & simplices, 
@@ -2302,6 +3770,291 @@ namespace Repulsor
             return std::string("SimplicialMeshDetails<2,4,")+TypeName<Real>+","+TypeName<Int>+">";
         }
 		
+	void ComputeNearFarData( 
+		const Tensor2<Real,Int> & V_coords,
+		const Tensor2<Int ,Int> & simplices,
+			  Tensor2<Real,Int> & P_near,
+			  Tensor2<Real,Int> & P_far
+	) const
+    {
+        ptic(ClassName()+"::ComputeNearFarData");
+        
+        //Int size       = 3;
+        //Int amb_dim    = 4;
+        //Int dom_dim    = 2;
+
+        const JobPointers<Int> job_ptr ( simplices.Dimension(0), ThreadCount() );
+        
+		ParallelDo(
+			[&]( const Int thread )
+			{
+				ptr<Real> V_coords__      = V_coords.data();	
+				ptr<Int > simplices__     = simplices.data();
+	
+				Real hull    [3][4];
+				Real df      [4][2];
+				Real dfdagger[2][4];
+				Real g       [2][2];
+				Real ginv    [2][2];
+	
+				Int simplex  [3];
+				
+				const Int i_begin = job_ptr[thread];
+				const Int i_end   = job_ptr[thread+1];
+	
+	            for( Int i = i_begin; i < i_end; ++i )
+	            {
+					mut<Real> near = P_near.data(i);                    
+					mut<Real> far  = P_far.data(i);   
+            
+					simplex[0] = simplices__[3*i +0];
+					simplex[1] = simplices__[3*i +1];
+					simplex[2] = simplices__[3*i +2];
+
+					near[1] = hull[0][0] = V_coords__[4*simplex[0]+0];
+					near[2] = hull[0][1] = V_coords__[4*simplex[0]+1];
+					near[3] = hull[0][2] = V_coords__[4*simplex[0]+2];
+					near[4] = hull[0][3] = V_coords__[4*simplex[0]+3];
+					near[5] = hull[1][0] = V_coords__[4*simplex[1]+0];
+					near[6] = hull[1][1] = V_coords__[4*simplex[1]+1];
+					near[7] = hull[1][2] = V_coords__[4*simplex[1]+2];
+					near[8] = hull[1][3] = V_coords__[4*simplex[1]+3];
+					near[9] = hull[2][0] = V_coords__[4*simplex[2]+0];
+					near[10] = hull[2][1] = V_coords__[4*simplex[2]+1];
+					near[11] = hull[2][2] = V_coords__[4*simplex[2]+2];
+					near[12] = hull[2][3] = V_coords__[4*simplex[2]+3];
+
+					far[1] = static_cast<Real>(0.3333333333333333) * ( hull[0][0] + hull[1][0] + hull[2][0] );
+					far[2] = static_cast<Real>(0.3333333333333333) * ( hull[0][1] + hull[1][1] + hull[2][1] );
+					far[3] = static_cast<Real>(0.3333333333333333) * ( hull[0][2] + hull[1][2] + hull[2][2] );
+					far[4] = static_cast<Real>(0.3333333333333333) * ( hull[0][3] + hull[1][3] + hull[2][3] );
+
+					df[0][0] = hull[1][0] - hull[0][0];
+					df[0][1] = hull[2][0] - hull[0][0];
+					df[1][0] = hull[1][1] - hull[0][1];
+					df[1][1] = hull[2][1] - hull[0][1];
+					df[2][0] = hull[1][2] - hull[0][2];
+					df[2][1] = hull[2][2] - hull[0][2];
+					df[3][0] = hull[1][3] - hull[0][3];
+					df[3][1] = hull[2][3] - hull[0][3];
+
+					g[0][0] = df[0][0] * df[0][0] + df[1][0] * df[1][0] + df[2][0] * df[2][0] + df[3][0] * df[3][0];
+					g[0][1] = df[0][0] * df[0][1] + df[1][0] * df[1][1] + df[2][0] * df[2][1] + df[3][0] * df[3][1];
+					g[1][0] = df[0][1] * df[0][0] + df[1][1] * df[1][0] + df[2][1] * df[2][0] + df[3][1] * df[3][0];
+					g[1][1] = df[0][1] * df[0][1] + df[1][1] * df[1][1] + df[2][1] * df[2][1] + df[3][1] * df[3][1];
+
+	                Real det = g[0][0] * g[1][1] - g[0][1] * g[0][1];
+	
+					near[0] = far[0] = std::sqrt( std::fabs(det) ) * static_cast<Real>(0.5);
+	
+	                Real invdet = static_cast<Real>(1)/det;
+	                ginv[0][0] =  g[1][1] * invdet;
+	                ginv[0][1] = -g[0][1] * invdet;
+	                ginv[1][1] =  g[0][0] * invdet;
+	                
+	                //  dfdagger = g^{-1} * df^T (2 x 4 matrix)
+					dfdagger[0][0] = ginv[0][0] * df[0][0] + ginv[0][1] * df[0][1];
+					dfdagger[0][1] = ginv[0][0] * df[1][0] + ginv[0][1] * df[1][1];
+					dfdagger[0][2] = ginv[0][0] * df[2][0] + ginv[0][1] * df[2][1];
+					dfdagger[0][3] = ginv[0][0] * df[3][0] + ginv[0][1] * df[3][1];
+					dfdagger[1][0] = ginv[0][1] * df[0][0] + ginv[1][1] * df[0][1];
+					dfdagger[1][1] = ginv[0][1] * df[1][0] + ginv[1][1] * df[1][1];
+					dfdagger[1][2] = ginv[0][1] * df[2][0] + ginv[1][1] * df[2][1];
+					dfdagger[1][3] = ginv[0][1] * df[3][0] + ginv[1][1] * df[3][1];
+            
+					near[13] = far[ 5]  = static_cast<Real>(1) - df[0][0] * dfdagger[0][0] - df[0][1] * dfdagger[1][0];
+					near[14] = far[ 6]  =    - df[0][0] * dfdagger[0][1] - df[0][1] * dfdagger[1][1];
+					near[15] = far[ 7]  =    - df[0][0] * dfdagger[0][2] - df[0][1] * dfdagger[1][2];
+					near[16] = far[ 8]  =    - df[0][0] * dfdagger[0][3] - df[0][1] * dfdagger[1][3];
+					near[17] = far[ 9]  = static_cast<Real>(1) - df[1][0] * dfdagger[0][1] - df[1][1] * dfdagger[1][1];
+					near[18] = far[10]  =    - df[1][0] * dfdagger[0][2] - df[1][1] * dfdagger[1][2];
+					near[19] = far[11]  =    - df[1][0] * dfdagger[0][3] - df[1][1] * dfdagger[1][3];
+					near[20] = far[12]  = static_cast<Real>(1) - df[2][0] * dfdagger[0][2] - df[2][1] * dfdagger[1][2];
+					near[21] = far[13]  =    - df[2][0] * dfdagger[0][3] - df[2][1] * dfdagger[1][3];
+					near[22] = far[14]  = static_cast<Real>(1) - df[3][0] * dfdagger[0][3] - df[3][1] * dfdagger[1][3];
+
+	            } // for( Int i = i_begin; i < i_end; ++i )
+			},
+			ThreadCount()
+		);
+
+        ptoc(ClassName()+"::ComputeNearFarData");
+    }
+
+	void ComputeNearFarDataOps(
+		const Tensor2<Real,Int> & V_coords,
+        const Tensor2<Int ,Int> & simplices,
+		      Tensor2<Real,Int> & P_coords,
+		      Tensor3<Real,Int> & P_hull_coords,
+		      Tensor2<Real,Int> & P_near,
+		      Tensor2<Real,Int> & P_far,
+		SparseMatrix_T & DiffOp,
+		SparseMatrix_T & AvOp 
+	) const
+    {
+        ptic(ClassName()+"::ComputeNearFarDataOps");
+
+        //Int size       = 3;
+        //Int amb_dim    = 4;
+        //Int dom_dim    = 2;
+
+        const JobPointers<Int> job_ptr ( simplices.Dimension(0), ThreadCount() );
+
+		ParallelDo(
+			[&]( const Int thread )
+			{
+				mut<LInt> AvOp_outer = AvOp.Outer().data();
+				mut< Int> AvOp_inner = AvOp.Inner().data();
+				mut<Real> AvOp_value = AvOp.Values().data();
+	
+				mut<LInt> DiffOp_outer = DiffOp.Outer().data();
+				mut< Int> DiffOp_inner = DiffOp.Inner().data();
+				mut<Real> DiffOp_value = DiffOp.Values().data();
+	
+				ptr<Real> V_coords__      = V_coords.data();
+				
+				ptr< Int> simplices__     = simplices.data();
+			    mut<Real> P_hull_coords__ = P_hull_coords.data();
+				mut<Real> P_coords__      = P_coords.data();
+	
+				Real df       [4][2];
+				Real dfdagger [2][4];
+				Real g        [2][2];
+				Real ginv     [2][2];
+	
+				Int simplex        [3];
+	            Int sorted_simplex [3];
+	
+				const Int i_begin = job_ptr[thread];
+				const Int i_end   = job_ptr[thread+1];
+	
+	            for( Int i = i_begin; i < i_end; ++i )
+	            {
+	
+					mut<Real> near = P_near.data(i);                    
+					mut<Real> far  = P_far.data(i);
+
+					simplex[0] = sorted_simplex[0] = simplices__[3*i +0];
+					simplex[1] = sorted_simplex[1] = simplices__[3*i +1];
+					simplex[2] = sorted_simplex[2] = simplices__[3*i +2];
+                  
+	                // sorting simplex so that we do not have to sort the sparse arrays to achieve CSR format later
+	                std::sort( sorted_simplex, sorted_simplex + 3 );
+
+					AvOp_outer[i+1] = (i+1) * 3;                      
+					AvOp_inner[3*i+0] = sorted_simplex[0];
+					AvOp_inner[3*i+1] = sorted_simplex[1];
+					AvOp_inner[3*i+2] = sorted_simplex[2];
+
+					AvOp_value[3*i+0] = 0.3333333333333333;
+					AvOp_value[3*i+1] = 0.3333333333333333;
+					AvOp_value[3*i+2] = 0.3333333333333333;
+
+					DiffOp_outer[4*i+0] = (4 * i + 0) * 3;
+					DiffOp_outer[4*i+1] = (4 * i + 1) * 3;
+					DiffOp_outer[4*i+2] = (4 * i + 2) * 3;
+					DiffOp_outer[4*i+3] = (4 * i + 3) * 3;
+
+					DiffOp_inner[(i * 4 + 0) * 3 + 0 ] = sorted_simplex[0];
+					DiffOp_inner[(i * 4 + 0) * 3 + 1 ] = sorted_simplex[1];
+					DiffOp_inner[(i * 4 + 0) * 3 + 2 ] = sorted_simplex[2];
+					DiffOp_inner[(i * 4 + 1) * 3 + 0 ] = sorted_simplex[0];
+					DiffOp_inner[(i * 4 + 1) * 3 + 1 ] = sorted_simplex[1];
+					DiffOp_inner[(i * 4 + 1) * 3 + 2 ] = sorted_simplex[2];
+					DiffOp_inner[(i * 4 + 2) * 3 + 0 ] = sorted_simplex[0];
+					DiffOp_inner[(i * 4 + 2) * 3 + 1 ] = sorted_simplex[1];
+					DiffOp_inner[(i * 4 + 2) * 3 + 2 ] = sorted_simplex[2];
+					DiffOp_inner[(i * 4 + 3) * 3 + 0 ] = sorted_simplex[0];
+					DiffOp_inner[(i * 4 + 3) * 3 + 1 ] = sorted_simplex[1];
+					DiffOp_inner[(i * 4 + 3) * 3 + 2 ] = sorted_simplex[2];
+
+					near[1] = P_hull_coords__[12*i+0] = V_coords__[4*simplex[0]+0];
+					near[2] = P_hull_coords__[12*i+1] = V_coords__[4*simplex[0]+1];
+					near[3] = P_hull_coords__[12*i+2] = V_coords__[4*simplex[0]+2];
+					near[4] = P_hull_coords__[12*i+3] = V_coords__[4*simplex[0]+3];
+					near[5] = P_hull_coords__[12*i+4] = V_coords__[4*simplex[1]+0];
+					near[6] = P_hull_coords__[12*i+5] = V_coords__[4*simplex[1]+1];
+					near[7] = P_hull_coords__[12*i+6] = V_coords__[4*simplex[1]+2];
+					near[8] = P_hull_coords__[12*i+7] = V_coords__[4*simplex[1]+3];
+					near[9] = P_hull_coords__[12*i+8] = V_coords__[4*simplex[2]+0];
+					near[10] = P_hull_coords__[12*i+9] = V_coords__[4*simplex[2]+1];
+					near[11] = P_hull_coords__[12*i+10] = V_coords__[4*simplex[2]+2];
+					near[12] = P_hull_coords__[12*i+11] = V_coords__[4*simplex[2]+3];
+
+					far[1] = P_coords__[4*i+0] = 0.3333333333333333 * ( P_hull_coords__[12*i+0] + P_hull_coords__[12*i+4] + P_hull_coords__[12*i+8] );
+					far[2] = P_coords__[4*i+1] = 0.3333333333333333 * ( P_hull_coords__[12*i+1] + P_hull_coords__[12*i+5] + P_hull_coords__[12*i+9] );
+					far[3] = P_coords__[4*i+2] = 0.3333333333333333 * ( P_hull_coords__[12*i+2] + P_hull_coords__[12*i+6] + P_hull_coords__[12*i+10] );
+					far[4] = P_coords__[4*i+3] = 0.3333333333333333 * ( P_hull_coords__[12*i+3] + P_hull_coords__[12*i+7] + P_hull_coords__[12*i+11] );
+
+					df[0][0] = V_coords__[4*sorted_simplex[1]+0] - V_coords__[4*sorted_simplex[0]+0];
+					df[0][1] = V_coords__[4*sorted_simplex[2]+0] - V_coords__[4*sorted_simplex[0]+0];
+					df[1][0] = V_coords__[4*sorted_simplex[1]+1] - V_coords__[4*sorted_simplex[0]+1];
+					df[1][1] = V_coords__[4*sorted_simplex[2]+1] - V_coords__[4*sorted_simplex[0]+1];
+					df[2][0] = V_coords__[4*sorted_simplex[1]+2] - V_coords__[4*sorted_simplex[0]+2];
+					df[2][1] = V_coords__[4*sorted_simplex[2]+2] - V_coords__[4*sorted_simplex[0]+2];
+					df[3][0] = V_coords__[4*sorted_simplex[1]+3] - V_coords__[4*sorted_simplex[0]+3];
+					df[3][1] = V_coords__[4*sorted_simplex[2]+3] - V_coords__[4*sorted_simplex[0]+3];
+
+					g[0][0] = df[0][0] * df[0][0] + df[1][0] * df[1][0] + df[2][0] * df[2][0] + df[3][0] * df[3][0];
+					g[0][1] = df[0][0] * df[0][1] + df[1][0] * df[1][1] + df[2][0] * df[2][1] + df[3][0] * df[3][1];
+					g[1][0] = df[0][1] * df[0][0] + df[1][1] * df[1][0] + df[2][1] * df[2][0] + df[3][1] * df[3][0];
+					g[1][1] = df[0][1] * df[0][1] + df[1][1] * df[1][1] + df[2][1] * df[2][1] + df[3][1] * df[3][1];
+
+	                Real det = g[0][0] * g[1][1] - g[0][1] * g[0][1];
+	
+	                near[0] = far[0] = std::sqrt( std::fabs(det) ) * static_cast<Real>(0.5);
+	
+	                Real invdet = static_cast<Real>(1.0)/det;
+	                ginv[0][0] =  g[1][1] * invdet;
+	                ginv[0][1] = -g[0][1] * invdet;
+	                ginv[1][1] =  g[0][0] * invdet;
+	                
+	                //  dfdagger = g^{-1} * df^T (2 x 4 matrix)
+					dfdagger[0][0] = ginv[0][0] * df[0][0] + ginv[0][1] * df[0][1];
+					dfdagger[0][1] = ginv[0][0] * df[1][0] + ginv[0][1] * df[1][1];
+					dfdagger[0][2] = ginv[0][0] * df[2][0] + ginv[0][1] * df[2][1];
+					dfdagger[0][3] = ginv[0][0] * df[3][0] + ginv[0][1] * df[3][1];
+					dfdagger[1][0] = ginv[0][1] * df[0][0] + ginv[1][1] * df[0][1];
+					dfdagger[1][1] = ginv[0][1] * df[1][0] + ginv[1][1] * df[1][1];
+					dfdagger[1][2] = ginv[0][1] * df[2][0] + ginv[1][1] * df[2][1];
+					dfdagger[1][3] = ginv[0][1] * df[3][0] + ginv[1][1] * df[3][1];
+            
+					near[13] = far[ 5]  = static_cast<Real>(1.0) - df[0][0] * dfdagger[0][0] - df[0][1] * dfdagger[1][0];
+					near[14] = far[ 6]  =    - df[0][0] * dfdagger[0][1] - df[0][1] * dfdagger[1][1];
+					near[15] = far[ 7]  =    - df[0][0] * dfdagger[0][2] - df[0][1] * dfdagger[1][2];
+					near[16] = far[ 8]  =    - df[0][0] * dfdagger[0][3] - df[0][1] * dfdagger[1][3];
+					near[17] = far[ 9]  = static_cast<Real>(1.0) - df[1][0] * dfdagger[0][1] - df[1][1] * dfdagger[1][1];
+					near[18] = far[10]  =    - df[1][0] * dfdagger[0][2] - df[1][1] * dfdagger[1][2];
+					near[19] = far[11]  =    - df[1][0] * dfdagger[0][3] - df[1][1] * dfdagger[1][3];
+					near[20] = far[12]  = static_cast<Real>(1.0) - df[2][0] * dfdagger[0][2] - df[2][1] * dfdagger[1][2];
+					near[21] = far[13]  =    - df[2][0] * dfdagger[0][3] - df[2][1] * dfdagger[1][3];
+					near[22] = far[14]  = static_cast<Real>(1.0) - df[3][0] * dfdagger[0][3] - df[3][1] * dfdagger[1][3];
+
+	                // derivative operator  (4 x 3 matrix)
+	
+	                mut<Real> Df = &DiffOp_value[ 12 * i ];
+
+					Df[ 0] = - dfdagger[0][0] - dfdagger[1][0];
+					Df[ 1] =   dfdagger[0][0];
+					Df[ 2] =   dfdagger[1][0];
+					Df[ 3] = - dfdagger[0][1] - dfdagger[1][1];
+					Df[ 4] =   dfdagger[0][1];
+					Df[ 5] =   dfdagger[1][1];
+					Df[ 6] = - dfdagger[0][2] - dfdagger[1][2];
+					Df[ 7] =   dfdagger[0][2];
+					Df[ 8] =   dfdagger[1][2];
+					Df[ 9] = - dfdagger[0][3] - dfdagger[1][3];
+					Df[10] =   dfdagger[0][3];
+					Df[11] =   dfdagger[1][3];
+
+	            }
+			},
+			ThreadCount()
+		);
+
+        ptoc(ClassName()+"::ComputeNearFarDataOps");
+    }
+
     void DNearToHulls( 
 		const Tensor2<Real,Int> & V_coords, 
 		const Tensor2<Int ,Int> & simplices, 

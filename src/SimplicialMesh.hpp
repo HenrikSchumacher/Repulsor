@@ -999,7 +999,7 @@ namespace Repulsor
             Tensor2<Real,Int> P_near( SimplexCount(), NEAR_DIM );
             Tensor2<Real,Int> P_far ( SimplexCount(), FAR_DIM  );
 
-//            details.ComputeNearFarData( new_V_coords, simplices, P_near, P_far );
+            details.ComputeNearFarData( new_V_coords, simplices, P_near, P_far );
             ComputeNearFarData( new_V_coords, simplices, P_near, P_far );
             
             GetClusterTree().SemiStaticUpdate( P_near, P_far );
