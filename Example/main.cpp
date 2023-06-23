@@ -284,7 +284,7 @@ int main(int argc, const char * argv[])
     
     auto perm = M.NestedDissectionOrdering();
     
-    print( perm.ToString() );
+//    print( perm.ToString() );
     
     Sparse::CholeskyDecomposition<REAL, INT, LINT> S (
         A.Outer().data(), A.Inner().data(), perm.data(), A.RowCount(),
@@ -295,14 +295,14 @@ int main(int argc, const char * argv[])
     
     S.SN_NumericFactorization( A.Values().data(), Scalar::Zero<REAL> );
     
-    print( S.GetPermutation().GetPermutation().ToString() );
+//    print( S.GetPermutation().GetPermutation().ToString() );
 
     Tensor1<REAL,INT> b ( M.VertexCount(), 1 );
     Tensor1<REAL,INT> x ( M.VertexCount(), 0 );
     
     S.Solve( b.data(), x.data() );
     
-    print( x.ToString() );
+//    print( x.ToString() );
     
     print("");
     print("Testing remesher.");
@@ -316,6 +316,7 @@ int main(int argc, const char * argv[])
     R->SplitEdges( edges );
 
 //    R->UnifyEdgeLengths(<#const Real collapse_threshold#>, <#const Real split_threshold#>);
-
+    
+    
     return 0;
 }

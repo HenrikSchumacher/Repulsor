@@ -156,6 +156,7 @@ namespace Repulsor
                             vertex_coords_transpose
                         )
                       )
+        ,   V_coords_frozen ( V_coords )
         ,   simplices ( ToTensor2<Int,Int>(
                             simplices_,
                             static_cast<Int>(simplex_count_),
@@ -189,7 +190,12 @@ namespace Repulsor
         
         mutable SReal max_update_step_size = 0;
         
-        Tensor2<Real,Int> V_coords;
+        // Current vertex coordinates; will be updated by SemiStaticUpdate.
+        mutable Tensor2<Real,Int> V_coords;
+        // Frozen vertex coordinates to be used for the clustering, but not for the energy computation.
+        // Won't be updated by SemiStaticUpdate so that energies that depend on the `cluster_tree` will look differentiable.
+        Tensor2<Real,Int> V_coords_frozen;
+        
         Tensor2<Int,Int>  simplices;
                 
         mutable Primitive_T P_proto;
@@ -203,8 +209,6 @@ namespace Repulsor
     protected:
         
         void ComputeNearFarDataOps(
-            const Tensor2<Real,Int> & V_coords,
-            const Tensor2<Int ,Int> & simplices,
                   Tensor2<Real,Int> & P_coords,
                   Tensor3<Real,Int> & P_hull_coords,
                   Tensor2<Real,Int> & P_near,
@@ -216,7 +220,7 @@ namespace Repulsor
             ptic(ClassName()+"::ComputeNearFarDataOps");
             
             ParallelDo(
-                [&]( const Int thread )
+                [&,this]( const Int thread )
                 {
                     
                     mut<LInt> Av_outer = AvOp.Outer().data();
@@ -424,10 +428,8 @@ namespace Repulsor
         };
         
         void ComputeNearFarData(
-            const Tensor2<Real,Int> & V_coords,
-            const Tensor2<Int ,Int> & simplices,
-                  Tensor2<Real,Int> & P_near,
-                  Tensor2<Real,Int> & P_far
+            Tensor2<Real,Int> & P_near,
+            Tensor2<Real,Int> & P_far
         ) const
         {
             ptic(ClassName()+"::ComputeNearFarData");
@@ -726,7 +728,7 @@ namespace Repulsor
         {
             std::string tag ("NestedDissectionOrdering");
             
-            if( !this->InCacheQ(tag))
+            if( !this->InPersistentCacheQ(tag))
             {
                 ptic(ClassName()+"::"+tag);
                 
@@ -917,14 +919,14 @@ namespace Repulsor
                     ++level;
                 }
                 
-                this->SetCache( tag,
+                this->SetPersistentCache( tag,
                    std::any( std::move(perm_0) )
                 );
                 
                 ptoc(ClassName()+"::"+tag);
             }
             
-            return std::any_cast<Tensor1<Int,Int> &>( this->GetCache(tag) );
+            return std::any_cast<Tensor1<Int,Int> &>( this->GetPersistentCache(tag) );
         }
         
     public:
@@ -979,19 +981,18 @@ namespace Repulsor
             return V_coords.data();
         }
         
-        virtual void SemiStaticUpdate( ptr<ExtReal> new_V_coords_, const bool transp_ = false ) const override
+        virtual void SemiStaticUpdate( ptr<ExtReal> V_coords_, const bool transp_ = false ) const override
         {
             ptic(className()+"::SemiStaticUpdate");
             
-            Tensor2<Real,Int> new_V_coords (VertexCount(),AmbDim());
-            
+            // We read the new coordinates onto V_coords, but not into C_coords_frozen!
             if( transp_ )
             {
-                new_V_coords.ReadTransposed(new_V_coords_);
+                V_coords.ReadTransposed(V_coords_);
             }
             else
             {
-                new_V_coords.Read(new_V_coords_);
+                V_coords.Read(V_coords_);
             }
             
             this->ClearCache();
@@ -999,8 +1000,8 @@ namespace Repulsor
             Tensor2<Real,Int> P_near( SimplexCount(), NEAR_DIM );
             Tensor2<Real,Int> P_far ( SimplexCount(), FAR_DIM  );
 
-            details.ComputeNearFarData( new_V_coords, simplices, P_near, P_far );
-            ComputeNearFarData( new_V_coords, simplices, P_near, P_far );
+//            details.ComputeNearFarData( new_V_coords, simplices, P_near, P_far );
+            ComputeNearFarData( P_near, P_far );
             
             GetClusterTree().SemiStaticUpdate( P_near, P_far );
             
@@ -1107,7 +1108,7 @@ namespace Repulsor
         {
             static std::string tag ( "ClusterTree" );
             
-            if( !this->InCacheQ( tag ) )
+            if( !this->InPersistentCacheQ( tag ) )
             {
                 ptic(className()+"::GetClusterTree");
                 if( (V_coords.Dimension(0) > 0) && (simplices.Dimension(0) > 0) )
@@ -1143,7 +1144,7 @@ namespace Repulsor
                     // What remains is to compute P_coords, P_hull_coords, P_near and P_far and the nonzero values of DiffOp.
 //                    details.ComputeNearFarDataOps( V_coords, simplices, P_coords, P_hull_coords, P_near, P_far, DiffOp, AvOp );
                     
-                    ComputeNearFarDataOps( V_coords, simplices, P_coords, P_hull_coords, P_near, P_far, DiffOp, AvOp );
+                    ComputeNearFarDataOps( P_coords, P_hull_coords, P_near, P_far, DiffOp, AvOp );
 
 
                     const JobPointers<Int> job_ptr ( SimplexCount(), ThreadCount() );
@@ -1160,7 +1161,8 @@ namespace Repulsor
                             for( Int i = i_begin; i < i_end; ++i )
                             {
                                 P.SetPointer( P_serialized.data(), i );
-                                P.FromIndexList( V_coords.data(), simplices.data(), i );
+                                // Beware, we use the frozen coordinates for clustering!
+                                P.FromIndexList( V_coords_frozen.data(), simplices.data(), i );
                             }
                         },
                         job_ptr.ThreadCount()
@@ -1206,7 +1208,7 @@ namespace Repulsor
                         cluster_tree_settings.thread_count = ThreadCount();
                     }
 
-                    this->SetCache( tag,
+                    this->SetPersistentCache( tag,
                         std::make_any<ClusterTree_T>(
                             P_proto, P_serialized, *C_proto, Tensor1<Int,Int>(0),
                             P_near, P_far,
@@ -1219,20 +1221,20 @@ namespace Repulsor
                 {
                     eprint(ClassName()+"(V_coords.Dimension(0) <= 0) || (simplices.Dimension(0) <= 0)");
 
-                    this->SetCache( tag, std::make_any<ClusterTree_T>() );
+                    this->SetPersistentCache( tag, std::make_any<ClusterTree_T>() );
                 }
 
                 ptoc(className()+"::GetClusterTree");
             }
 
-            return std::any_cast<ClusterTree_T &>( this->GetCache(tag) );
+            return std::any_cast<ClusterTree_T &>( this->GetPersistentCache(tag) );
         }
 
         virtual const BlockClusterTree_T & GetBlockClusterTree() const override
         {
             static std::string tag ( "BlockClusterTree" );
             
-            if( !this->InCacheQ( tag ) )
+            if( !this->InPersistentCacheQ( tag ) )
             {
                 ptic(className()+"::GetBlockClusterTree");
                 
@@ -1241,7 +1243,7 @@ namespace Repulsor
                 
                 block_cluster_tree_settings.max_refinement = adaptivity_settings.max_refinement;
                 
-                this->SetCache( tag,
+                this->SetPersistentCache( tag,
                     std::make_any<BlockClusterTree_T>(
                         GetClusterTree(),
                         GetClusterTree(),
@@ -1252,7 +1254,7 @@ namespace Repulsor
                 ptoc(className()+"::GetBlockClusterTree");
             }
             
-            return std::any_cast<BlockClusterTree_T &>( this->GetCache(tag) );
+            return std::any_cast<BlockClusterTree_T &>( this->GetPersistentCache(tag) );
         }
         
         virtual const CollisionTree_T & GetCollisionTree() const override
@@ -1278,7 +1280,7 @@ namespace Repulsor
             
             static std::string tag ( "DerivativeAssembler" );
             
-            if( !this->InCacheQ( tag ) )
+            if( !this->InPersistentCacheQ( tag ) )
             {
                 ptic(className()+"::DerivativeAssembler");
             
@@ -1292,12 +1294,12 @@ namespace Repulsor
                 A.Outer().iota();
                 A.Inner().Read(simplices.data());
                 
-                this->SetCache( tag, std::any( std::move(A.Transpose()) ) );
+                this->SetPersistentCache( tag, std::any( std::move(A.Transpose()) ) );
                 
                 ptoc(className()+"::DerivativeAssembler");
             }
             
-            return std::any_cast<SparseBinaryMatrix_T &>( this->GetCache(tag) );
+            return std::any_cast<SparseBinaryMatrix_T &>( this->GetPersistentCache(tag) );
             
         } // DerivativeAssembler
         
@@ -1366,7 +1368,7 @@ namespace Repulsor
                 obstacle = std::move(obstacle_);
             }
 
-            this->SetCache(tag, std::any( obstacle ) );
+            this->SetPersistentCache(tag, std::any( obstacle ) );
 
         }
         
@@ -1374,15 +1376,15 @@ namespace Repulsor
         {
             static std::string tag ("Obstacle");
 
-            if( !this->InCacheQ(tag) )
+            if( !this->InPersistentCacheQ(tag) )
             {
                 wprint( ClassName()+"::GetObstacle: Obstacle not initialized.");
                 
                 // We have to construct an empty SimplicialMesh because Obstacle_T is abstract.
-                this->SetCache(tag, std::any(std::make_shared<SimplicialMesh>()) );
+                this->SetPersistentCache(tag, std::any(std::make_shared<SimplicialMesh>()) );
             }
             
-            return *std::any_cast<std::shared_ptr<Obstacle_T>>( this->GetCache(tag) );
+            return *std::any_cast<std::shared_ptr<Obstacle_T>>( this->GetPersistentCache(tag) );
         }
         
         virtual const ClusterTree_T & GetObstacleClusterTree() const override
@@ -1394,11 +1396,11 @@ namespace Repulsor
         {
             static std::string tag ( "ObstacleBlockClusterTree" );
             
-            if( !this->InCacheQ( tag ) )
+            if( !this->InPersistentCacheQ( tag ) )
             {
                 ptic(className()+"::GetObstacleBlockClusterTree");
                 
-                this->SetCache( tag,
+                this->SetPersistentCache( tag,
                     std::make_any<ObstacleBlockClusterTree_T>(
                         GetClusterTree(), GetObstacleClusterTree(), block_cluster_tree_settings
                     )
@@ -1408,25 +1410,25 @@ namespace Repulsor
 
             }
             
-            return std::any_cast<ObstacleBlockClusterTree_T &>( this->GetCache(tag) );
+            return std::any_cast<ObstacleBlockClusterTree_T &>( this->GetPersistentCache(tag) );
         }
         
         virtual const ObstacleCollisionTree_T & GetObstacleCollisionTree() const override
         {
             static std::string tag ( "ObstacleCollisionTree" );
             
-            if( !this->InCacheQ(tag) )
+            if( !this->InPersistentCacheQ(tag) )
             {
                 ptic(className()+"::GetObstacleCollisionTree");
                 
-                this->SetCache( tag,
+                this->SetPersistentCache( tag,
                     std::make_any<ObstacleCollisionTree_T>( GetClusterTree(), GetObstacleClusterTree() )
                 );
 
                 ptoc(className()+"::GetObstacleCollisionTree");
             }
             
-            return std::any_cast<ObstacleCollisionTree_T &>( this->GetCache(tag) );
+            return std::any_cast<ObstacleCollisionTree_T &>( this->GetPersistentCache(tag) );
         }
 
         
