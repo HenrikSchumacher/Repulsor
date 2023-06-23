@@ -442,7 +442,6 @@ namespace Repulsor
                     Tiny::Vector<AMB_DIM,Real,Int> center;
                     
                     Tiny::Matrix<SIZE,   AMB_DIM,Real,Int> hull;
-                    
                     Tiny::Matrix<AMB_DIM,DOM_DIM,Real,Int> df;
                     Tiny::Matrix<DOM_DIM,AMB_DIM,Real,Int> dfdagger;
                     Tiny::Matrix<AMB_DIM,AMB_DIM,Real,Int> P;
@@ -452,9 +451,8 @@ namespace Repulsor
                     Tiny::Vector<SIZE,Int,Int> simplex;
                     Tiny::Vector<SIZE,Int,Int> s_simplex;   // Sorted simplex.
                     
-                    const Int simplex_count = simplices.Dimension(0);
-                    const Int i_begin = JobPointer<Int>(simplex_count, ThreadCount(), thread  );
-                    const Int i_end   = JobPointer<Int>(simplex_count, ThreadCount(), thread+1);
+                    const Int i_begin = JobPointer<Int>(SimplexCount(),ThreadCount(),thread  );
+                    const Int i_end   = JobPointer<Int>(SimplexCount(),ThreadCount(),thread+1);
         
                     Sorter<SIZE,Int> sort;
                     
@@ -464,7 +462,7 @@ namespace Repulsor
                         mut<Real> far    = P_far.data(i);
                         
                           simplex.Read( simplices.data(i) );
-                        s_simplex.Read( simplex.data() );
+                        s_simplex.Read( simplex.data()    );
                       
                         // sorting simplex so that we do not have to sort the sparse arrays to achieve CSR format later
                         sort( &s_simplex[0] );
@@ -474,7 +472,7 @@ namespace Repulsor
                             copy_buffer<AMB_DIM>( V_coords.data(simplex[l]), hull[l] );
                         }
 
-                        hull.Write( &near[1]              );
+                        hull.Write( &near[1] );
                         
                         
                         copy_buffer<AMB_DIM>(hull[0],center.data());
