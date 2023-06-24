@@ -91,7 +91,7 @@ StringJoin[
 Table[line[5,"simplex[",s[j],"] = sorted_simplex[",s[j],"] = simplices__[",s[n+1],"*i +",s[j],"]"],{j,0,n+1-1}],
 "                  
 	                // sorting simplex so that we do not have to sort the sparse arrays to achieve CSR format later
-	                std::sort( sorted_simplex, sorted_simplex + ",s[n+1]," );
+	                Sort( sorted_simplex, sorted_simplex + ",s[n+1]," );
 	
 					AvOp_outer[i+1] = (i+1) * ",s[n+1],";  
                       
@@ -194,7 +194,7 @@ StringJoin[
 Table[line[5,"simplex[",s[j],"] = sorted_simplex[",s[j],"] = simplices__[",s[n+1],"*i +",s[j],"]"],{j,0,n+1-1}],
 "                  
 	                // sorting simplex so that we do not have to sort the sparse arrays to achieve CSR format later
-	                std::sort( sorted_simplex, sorted_simplex + ",s[n+1]," );
+	                Sort( sorted_simplex, sorted_simplex + ",s[n+1]," );
 	
 					AvOp_outer[i+1] = (i+1) * ",s[n+1],";  
 	                      
@@ -318,7 +318,7 @@ StringJoin[
 Table[line[5,"simplex[",s[j],"] = sorted_simplex[",s[j],"] = simplices__[",s[n+1],"*i +",s[j],"]"],{j,0,n+1-1}],
 "                  
 	                // sorting simplex so that we do not have to sort the sparse arrays to achieve CSR format later
-	                std::sort( sorted_simplex, sorted_simplex + ",s[n+1]," );
+	                Sort( sorted_simplex, sorted_simplex + ",s[n+1]," );
 ","
 					AvOp_outer[i+1] = (i+1) * ",s[n+1],";                      
 ",

@@ -259,7 +259,7 @@ namespace Repulsor
                     const Int i_begin = JobPointer<Int>(simplex_count, ThreadCount(), thread  );
                     const Int i_end   = JobPointer<Int>(simplex_count, ThreadCount(), thread+1);
         
-                    Sorter<SIZE,Int> sort;
+                    SortNet<SIZE,Int> sort;
                     
                     for( Int i = i_begin; i < i_end; ++i )
                     {
@@ -454,7 +454,7 @@ namespace Repulsor
                     const Int i_begin = JobPointer<Int>(SimplexCount(),ThreadCount(),thread  );
                     const Int i_end   = JobPointer<Int>(SimplexCount(),ThreadCount(),thread+1);
         
-                    Sorter<SIZE,Int> sort;
+                    SortNet<SIZE,Int> sort;
                     
                     for( Int i = i_begin; i < i_end; ++i )
                     {

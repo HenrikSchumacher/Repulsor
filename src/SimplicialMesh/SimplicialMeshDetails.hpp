@@ -220,7 +220,7 @@ namespace Repulsor
 					simplex[0] = sorted_simplex[0] = simplices__[1*i +0];
                   
 	                // sorting simplex so that we do not have to sort the sparse arrays to achieve CSR format later
-	                std::sort( sorted_simplex, sorted_simplex + 1 );
+	                Sort( sorted_simplex, sorted_simplex + 1 );
 	
 					AvOp_outer[i+1] = (i+1) * 1;  
                       
@@ -480,7 +480,7 @@ namespace Repulsor
 					simplex[0] = sorted_simplex[0] = simplices__[1*i +0];
                   
 	                // sorting simplex so that we do not have to sort the sparse arrays to achieve CSR format later
-	                std::sort( sorted_simplex, sorted_simplex + 1 );
+	                Sort( sorted_simplex, sorted_simplex + 1 );
 	
 					AvOp_outer[i+1] = (i+1) * 1;  
                       
@@ -755,7 +755,7 @@ namespace Repulsor
 					simplex[0] = sorted_simplex[0] = simplices__[1*i +0];
                   
 	                // sorting simplex so that we do not have to sort the sparse arrays to achieve CSR format later
-	                std::sort( sorted_simplex, sorted_simplex + 1 );
+	                Sort( sorted_simplex, sorted_simplex + 1 );
 	
 					AvOp_outer[i+1] = (i+1) * 1;  
                       
@@ -1047,7 +1047,7 @@ namespace Repulsor
 					simplex[0] = sorted_simplex[0] = simplices__[1*i +0];
                   
 	                // sorting simplex so that we do not have to sort the sparse arrays to achieve CSR format later
-	                std::sort( sorted_simplex, sorted_simplex + 1 );
+	                Sort( sorted_simplex, sorted_simplex + 1 );
 	
 					AvOp_outer[i+1] = (i+1) * 1;  
                       
@@ -1365,7 +1365,7 @@ namespace Repulsor
 					simplex[1] = sorted_simplex[1] = simplices__[2*i +1];
                   
 	                // sorting simplex so that we do not have to sort the sparse arrays to achieve CSR format later
-	                std::sort( sorted_simplex, sorted_simplex + 2 );
+	                Sort( sorted_simplex, sorted_simplex + 2 );
 	
 					AvOp_outer[i+1] = (i+1) * 2;  
 	                      
@@ -1835,7 +1835,7 @@ namespace Repulsor
 					simplex[1] = sorted_simplex[1] = simplices__[2*i +1];
                   
 	                // sorting simplex so that we do not have to sort the sparse arrays to achieve CSR format later
-	                std::sort( sorted_simplex, sorted_simplex + 2 );
+	                Sort( sorted_simplex, sorted_simplex + 2 );
 	
 					AvOp_outer[i+1] = (i+1) * 2;  
 	                      
@@ -2411,7 +2411,7 @@ namespace Repulsor
 					simplex[1] = sorted_simplex[1] = simplices__[2*i +1];
                   
 	                // sorting simplex so that we do not have to sort the sparse arrays to achieve CSR format later
-	                std::sort( sorted_simplex, sorted_simplex + 2 );
+	                Sort( sorted_simplex, sorted_simplex + 2 );
 	
 					AvOp_outer[i+1] = (i+1) * 2;  
 	                      
@@ -3082,7 +3082,7 @@ namespace Repulsor
 					simplex[2] = sorted_simplex[2] = simplices__[3*i +2];
                   
 	                // sorting simplex so that we do not have to sort the sparse arrays to achieve CSR format later
-	                std::sort( sorted_simplex, sorted_simplex + 3 );
+	                Sort( sorted_simplex, sorted_simplex + 3 );
 
 					AvOp_outer[i+1] = (i+1) * 3;                      
 					AvOp_inner[3*i+0] = sorted_simplex[0];
@@ -3939,7 +3939,7 @@ namespace Repulsor
 					simplex[2] = sorted_simplex[2] = simplices__[3*i +2];
                   
 	                // sorting simplex so that we do not have to sort the sparse arrays to achieve CSR format later
-	                std::sort( sorted_simplex, sorted_simplex + 3 );
+	                Sort( sorted_simplex, sorted_simplex + 3 );
 
 					AvOp_outer[i+1] = (i+1) * 3;                      
 					AvOp_inner[3*i+0] = sorted_simplex[0];
