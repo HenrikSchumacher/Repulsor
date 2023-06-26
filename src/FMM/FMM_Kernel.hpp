@@ -4,7 +4,7 @@ namespace Repulsor
 {
     template<
         typename ClusterTree_T_,
-        bool is_symmetric_,
+        bool symmetricQ_,
         bool energy_flag_, bool diff_flag_, bool metric_flag_
     >
     class alignas( OBJECT_ALIGNMENT ) FMM_Kernel
@@ -23,7 +23,7 @@ namespace Repulsor
         using Values_T           = typename Configurator_T::Values_T;
         using ValueContainer_T   = typename Configurator_T::ValueContainer_T;
         
-        static constexpr bool is_symmetric = is_symmetric_;
+        static constexpr bool symmetricQ = symmetricQ_;
         static constexpr bool energy_flag  = energy_flag_;
         static constexpr bool diff_flag    = diff_flag_;
         static constexpr bool metric_flag  = metric_flag_;
@@ -37,7 +37,7 @@ namespace Repulsor
         static constexpr Real one  = static_cast<Real>(1);
         static constexpr Real two  = static_cast<Real>(2);
         
-        static constexpr Real symmetry_factor = one / (one + !static_cast<Real>(is_symmetric) );
+        static constexpr Real symmetry_factor = one / (one + !static_cast<Real>(symmetricQ) );
                                             
         
         const Int thread = 0;

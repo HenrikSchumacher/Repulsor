@@ -4,7 +4,7 @@
 
 namespace Repulsor
 {
-    template<typename Kernel_T, bool is_symmetric, bool leaves_are_singletons>
+    template<typename Kernel_T, bool symmetricQ, bool leaves_are_singletons>
     class ClusterTreePairTraversor
     {
     public:
@@ -35,11 +35,11 @@ namespace Repulsor
         ,   T_C_begin ( T_.ClusterBegin().data()         )
         ,   T_C_end   ( T_.ClusterEnd().data()           )
         {
-            if constexpr ( is_symmetric )
+            if constexpr ( symmetricQ )
             {
                 if( std::addressof(S_) != std::addressof(T_) )
                 {
-                    eprint(className()+": is_symmetric == true, bu S != T.");
+                    eprint(className()+": symmetricQ == true, bu S != T.");
                 }
             }
         } // Constructor
@@ -79,9 +79,9 @@ namespace Repulsor
             return thread_count;
         }
         
-        constexpr bool IsSymmetric() const
+        constexpr bool SymmetricQ() const
         {
-            return is_symmetric;
+            return symmetricQ;
         }
         
     public:

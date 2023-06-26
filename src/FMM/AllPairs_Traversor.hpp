@@ -23,7 +23,7 @@ namespace Repulsor
         using Values_T          = Tensor2<Real,LInt>;
         using ValueContainer_T  = std::unordered_map<std::string,Values_T>;
         
-        static constexpr bool is_symmetric = Kernel_T::is_symmetric;
+        static constexpr bool symmetricQ = Kernel_T::symmetricQ;
         
         AllPairs_Traversor() = default;
         
@@ -64,7 +64,7 @@ namespace Repulsor
             // TODO: Symmetrization
             JobPointers<Int> job_ptr;
             
-            if constexpr ( is_symmetric )
+            if constexpr ( symmetricQ )
             {
                 Tensor1<LInt, Int> costs (m+1);
                 costs[0] = 0;
@@ -101,7 +101,7 @@ namespace Repulsor
                     for( Int i = i_begin; i < i_end; ++i )
                     {
                         // These are the corresponding nonzero blocks in i-th row.
-                        const Int j_begin = COND( is_symmetric, i+1, 0 );
+                        const Int j_begin = COND( symmetricQ, i+1, 0 );
                         const Int j_end   = n;
                         
                         // Clear the local vector chunk of the kernel.

@@ -5,14 +5,14 @@ namespace Repulsor
     template<
         int S_DOM_DIM, int T_DOM_DIM,
         typename ClusterTree_T_,
-        bool is_symmetric_,
+        bool symmetricQ_,
         bool high_order_
     >
-    class PseudoLaplacian_Kernel_FF : public FMM_Kernel_FF<ClusterTree_T_,is_symmetric_,false,false,true>
+    class PseudoLaplacian_Kernel_FF : public FMM_Kernel_FF<ClusterTree_T_,symmetricQ_,false,false,true>
     {
     private:
         
-        using Base_T = FMM_Kernel_FF<ClusterTree_T_,is_symmetric_,false,false,true>;
+        using Base_T = FMM_Kernel_FF<ClusterTree_T_,symmetricQ_,false,false,true>;
         
     public:
         
@@ -43,7 +43,7 @@ namespace Repulsor
         using Base_T::zero;
         using Base_T::one;
         using Base_T::two;
-        using Base_T::is_symmetric;
+        using Base_T::symmetricQ;
         
     public:
         
@@ -149,7 +149,7 @@ namespace Repulsor
             + ToString(S_DOM_DIM) + ","
             + ToString(T_DOM_DIM) + ","
             + this->GetS().ClassName() + ","
-            + ToString(is_symmetric) + ","
+            + ToString(symmetricQ) + ","
             + ToString(high_order)
             + ">";
         }

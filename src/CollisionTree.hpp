@@ -7,8 +7,8 @@
 
 namespace Repulsor
 {
-    template<int AMB_DIM, typename Real_, typename Int_, typename SReal_, typename ExtReal_, bool is_symmetric>
-    class CollisionTree : public CollisionTreeBase<Real_,Int_,SReal_,ExtReal_,is_symmetric>
+    template<int AMB_DIM, typename Real_, typename Int_, typename SReal_, typename ExtReal_, bool symmetricQ>
+    class CollisionTree : public CollisionTreeBase<Real_,Int_,SReal_,ExtReal_,symmetricQ>
     {
         ASSERT_FLOAT(Real_   );
         ASSERT_INT  (Int_    );
@@ -17,7 +17,7 @@ namespace Repulsor
         
     private:
         
-        using Base_T = CollisionTreeBase<Real_,Int_,SReal_,ExtReal_,is_symmetric>;
+        using Base_T = CollisionTreeBase<Real_,Int_,SReal_,ExtReal_,symmetricQ>;
         
     public:
         
@@ -43,11 +43,11 @@ namespace Repulsor
         ,   thread_count( std::min(S_.ThreadCount(), T_.ThreadCount()) )
         {
             ptic(className()+"()");
-            if constexpr ( is_symmetric )
+            if constexpr ( symmetricQ )
             {
                 if( std::addressof(S_) != std::addressof(T_) )
                 {
-                    eprint(className()+": is_symmetric == true, bu S != T.");
+                    eprint(className()+": symmetricQ == true, bu S != T.");
                 }
             }
             ptoc(className()+"()");
@@ -107,13 +107,13 @@ namespace Repulsor
                 
                 if( S.SplitThreshold()==1 && T.SplitThreshold()==1 )
                 {
-                    ClusterTreePairTraversor<Kernel_T, is_symmetric, true > traversor (S, T, kernels);
+                    ClusterTreePairTraversor<Kernel_T, symmetricQ, true > traversor (S, T, kernels);
                     
                     traversor.Traverse();
                 }
                 else
                 {
-                    ClusterTreePairTraversor<Kernel_T, is_symmetric, false> traversor (S, T, kernels);
+                    ClusterTreePairTraversor<Kernel_T, symmetricQ, false> traversor (S, T, kernels);
                     
                     traversor.Traverse();
                 }
@@ -144,7 +144,7 @@ namespace Repulsor
                 P_collision_matrix = CollisionMatrix_T(
                     triples,
                     S.PrimitiveCount(), T.PrimitiveCount(),
-                    thread_count, false, is_symmetric
+                    thread_count, false, symmetricQ
                 );
                 
                 P_collision_matrix_initialized = true;
@@ -188,13 +188,13 @@ namespace Repulsor
             
             if( S.SplitThreshold()==1 && T.SplitThreshold()==1 )
             {
-                ClusterTreePairTraversor<Kernel_T, is_symmetric, true>  traversor (S, T, kernels);
+                ClusterTreePairTraversor<Kernel_T, symmetricQ, true>  traversor (S, T, kernels);
                 
                 traversor.Traverse();
             }
             else
             {
-                ClusterTreePairTraversor<Kernel_T, is_symmetric, false> traversor (S, T, kernels);
+                ClusterTreePairTraversor<Kernel_T, symmetricQ, false> traversor (S, T, kernels);
                 
                 traversor.Traverse();
             }
@@ -248,7 +248,7 @@ namespace Repulsor
         
         static std::string className()
         {
-            return  "CollisionTree<"+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+","+TypeName<ExtReal>+","+ToString(is_symmetric)+">";
+            return  "CollisionTree<"+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+","+TypeName<ExtReal>+","+ToString(symmetricQ)+">";
         }
 
     }; // class CollisionTree

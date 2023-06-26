@@ -158,7 +158,7 @@ namespace Repulsor
             T_P_proto->SetPointer(T_P_serialized,j);
         }
         
-        force_inline bool IsAdmissable()
+        force_inline bool AdmissableQ()
         {
             return G.MultipoleAcceptanceCriterion( *S_C_proto, *T_C_proto, far_theta2 );
         }
@@ -181,11 +181,11 @@ namespace Repulsor
         {
             const bool neighbor_found = A.FindNonzeroPosition(P_i,P_j).found;
 
-            const bool admissable = neighbor_found || G.MultipoleAcceptanceCriterion(
+            const bool admissableQ = neighbor_found || G.MultipoleAcceptanceCriterion(
                     *S_P_proto, *T_P_proto, near_theta2
             );
             
-            if( admissable )
+            if( admissableQ )
             {
                 near_idx.Push(P_i,P_j);
             }
@@ -210,11 +210,11 @@ namespace Repulsor
         {
             const bool neighbor_found = A.FindNonzeroPosition(P_i,P_j).found;
 
-            const bool admissable = neighbor_found || G.MultipoleAcceptanceCriterion(
+            const bool admissableQ = neighbor_found || G.MultipoleAcceptanceCriterion(
                 *S_P_proto, *T_P_proto, near_theta2
             );
             
-            if( admissable )
+            if( admissableQ )
             {
                 near_idx.Push(P_j,P_i);
             }

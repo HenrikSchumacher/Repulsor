@@ -27,9 +27,9 @@ public:
             const Int left_i = S_C_left[i];
             const Int left_j = T_C_left[j];
             
-            const bool admissable = (!( is_symmetric && (i == j) )) && K.IsAdmissable();
+            const bool admissableQ = (!( symmetricQ && (i == j) )) && K.AdmissableQ();
             
-            if( !admissable )
+            if( !admissableQ )
             {
                 // Warning: This assumes that either both children are defined or empty.
                 if( left_i >= null || left_j >= null )
@@ -42,7 +42,7 @@ public:
                     
                     if( score_i == score_j && score_i > zero )
                     {
-                        if constexpr ( is_symmetric )
+                        if constexpr ( symmetricQ )
                         {
                             if( i == j )
                             {
@@ -136,7 +136,7 @@ public:
                     
                     // We have to go through all the primitive pairs to classify them.
                     
-                    if constexpr ( is_symmetric )
+                    if constexpr ( symmetricQ )
                     {
                         if( i == j )
                         {
@@ -216,7 +216,7 @@ public:
                             }
                         }
                     }
-                    else // !is_symmetric
+                    else // !symmetricQ
                     {
                         if constexpr ( leaves_are_singletons )
                         {
@@ -247,9 +247,9 @@ public:
                     }
                 }
             }
-            else // admissable
+            else // admissableQ
             {
-                if constexpr ( is_symmetric )
+                if constexpr ( symmetricQ )
                 {                    
                     if( i <= j )
                     {

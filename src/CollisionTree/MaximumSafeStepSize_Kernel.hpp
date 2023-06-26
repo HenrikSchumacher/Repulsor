@@ -153,7 +153,7 @@ namespace Repulsor
             P_j = j;
         }
         
-        force_inline bool IsAdmissable()
+        force_inline bool AdmissableQ()
         {
             SReal a = static_cast<SReal>(0);
             SReal b = static_cast<SReal>(1);

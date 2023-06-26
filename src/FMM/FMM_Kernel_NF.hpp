@@ -5,14 +5,14 @@ namespace Repulsor
     template<
         int S_DOM_DIM_, int T_DOM_DIM_,
         typename ClusterTree_T_,
-        bool is_symmetric_,
+        bool symmetricQ_,
         bool energy_flag_, bool diff_flag_, bool metric_flag_
     >
-    class FMM_Kernel_NF : public FMM_Kernel<ClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,metric_flag_>
+    class FMM_Kernel_NF : public FMM_Kernel<ClusterTree_T_,symmetricQ_,energy_flag_,diff_flag_,metric_flag_>
     {
     private:
         
-        using Base_T = FMM_Kernel<ClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,metric_flag_>;
+        using Base_T = FMM_Kernel<ClusterTree_T_,symmetricQ_,energy_flag_,diff_flag_,metric_flag_>;
         
     public:
         
@@ -31,7 +31,7 @@ namespace Repulsor
         using Base_T::AMB_DIM;
         using Base_T::PROJ_DIM;
         using Base_T::symmetry_factor;
-        using Base_T::is_symmetric;
+        using Base_T::symmetricQ;
         using Base_T::energy_flag;
         using Base_T::diff_flag;
         using Base_T::metric_flag;

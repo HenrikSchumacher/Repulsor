@@ -7,7 +7,7 @@ namespace Repulsor
     template<
         int S_DOM_DIM_, int T_DOM_DIM_,
         typename ClusterTree_T_,
-        bool is_symmetric_,
+        bool symmetricQ_,
         bool energy_flag, bool diff_flag, bool metric_flag
     >
     class TP_AllPairs_Traversor
@@ -32,7 +32,7 @@ namespace Repulsor
         static constexpr Int  AMB_DIM      = ClusterTree_T::AMB_DIM;
         static constexpr Int  S_DOM_DIM    = S_DOM_DIM_;
         static constexpr Int  T_DOM_DIM    = T_DOM_DIM_;
-        static constexpr bool is_symmetric = is_symmetric_;
+        static constexpr bool symmetricQ = symmetricQ_;
         
         using TangentVector_T   = Tensor2<ExtReal,Int>;
         using CotangentVector_T = Tensor2<ExtReal,Int>;
@@ -147,7 +147,7 @@ namespace Repulsor
             {
                 S.CleanseDerivativeBuffers();
                 
-                if( !is_symmetric )
+                if( !symmetricQ )
                 {
                     T.CleanseDerivativeBuffers();
                 }
@@ -160,7 +160,7 @@ namespace Repulsor
                 S.NF_Accumulator()
                 = Accumulator_T( thread_count, S.PrimitiveCount(), NF_blk_size, 0 );
 
-                if constexpr ( !is_symmetric )
+                if constexpr ( !symmetricQ )
                 {
                     T.NF_Accumulator()
                     = Accumulator_T( thread_count, T.GetT().PrimitiveCount(), NF_blk_size, 0 );
@@ -208,7 +208,7 @@ namespace Repulsor
 
             const Int thread_count = std::min( S.ThreadCount(), T.ThreadCount() );
             S.NF_Accumulator() = Accumulator_T( thread_count, 1, 1, 0 );
-            if constexpr ( !is_symmetric )
+            if constexpr ( !symmetricQ )
             {
                 T.NF_Accumulator() = Accumulator_T( thread_count, 1, 1, 0 );
             }
@@ -231,7 +231,7 @@ namespace Repulsor
             using Kernel_T = TP_Kernel_NF<
                 S_DOM_DIM, T_DOM_DIM,
                 ClusterTree_T, T1, T2,
-                is_symmetric,
+                symmetricQ,
                 energy_flag, diff_flag, metric_flag
             >;
 
@@ -243,7 +243,7 @@ namespace Repulsor
 
             if constexpr ( metric_flag )
             {
-                if constexpr ( is_symmetric )
+                if constexpr ( symmetricQ )
                 {
                     // TODO: Need dense matrix here.
 //                    SparseKernelMatrixCSR<Kernel_Block_Mul_T> matrix ( bct.Near() );
@@ -302,7 +302,7 @@ namespace Repulsor
 //                rhs_count
 //            );
             
-            if constexpr ( is_symmetric )
+            if constexpr ( symmetricQ )
             {
                 DiagonalKernelMatrix<Kernel_Diag_MulAdd_T> diag (
                     S.PrimitiveCount(),

@@ -23,7 +23,7 @@ namespace Repulsor
         using Values_T          = Tensor2<Real,LInt>;
         using ValueContainer_T  = std::unordered_map<std::string,Values_T>;
         
-        static constexpr bool is_symmetric = Kernel_T::is_symmetric;
+        static constexpr bool symmetricQ = Kernel_T::symmetricQ;
         
         FMM_Traversor() = delete;
         
@@ -59,13 +59,13 @@ namespace Repulsor
             }
 
             const auto & job_ptr = COND(
-                is_symmetric,
+                symmetricQ,
                 pattern.UpperTriangularJobPtr(),
                 pattern.JobPtr()
             );
 
             // Make sure that pattern.Diag() is created before the parallel region.
-            if constexpr ( is_symmetric )
+            if constexpr ( symmetricQ )
             {
                 (void)pattern.Diag();
             }
@@ -87,7 +87,7 @@ namespace Repulsor
 
                     Real local_sum (0);
                     
-                    ptr<LInt> diag = COND(is_symmetric, pattern.Diag().data(), nullptr);
+                    ptr<LInt> diag = COND(symmetricQ, pattern.Diag().data(), nullptr);
                     ptr<LInt> rp   = pattern.Outer().data();
                     ptr<Int>  ci   = pattern.Inner().data();
                     
@@ -100,7 +100,7 @@ namespace Repulsor
                     for( Int i = i_begin; i < i_end; ++i )
                     {
                         // These are the corresponding nonzero blocks in i-th row.
-                        const LInt k_begin = COND( is_symmetric, diag[i], rp[i] );
+                        const LInt k_begin = COND( symmetricQ, diag[i], rp[i] );
                         const LInt k_end   = rp[i+1];
                         
                         if( k_end > k_begin )

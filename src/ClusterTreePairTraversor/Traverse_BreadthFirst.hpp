@@ -24,9 +24,9 @@ public:
             K.LoadClusterS(i);
             K.LoadClusterT(j);
             
-            const bool admissable = (!( is_symmetric && (i == j) )) && K.IsAdmissable();
+            const bool admissableQ = (!( symmetricQ && (i == j) )) && K.AdmissableQ();
 
-            if( !admissable )
+            if( !admissableQ )
             {
                 const Int left_i = S_C_left[i];
                 const Int left_j = T_C_left[j];
@@ -44,7 +44,7 @@ public:
                     {
                         // tie breaker: split both clusters
 
-                        if constexpr ( is_symmetric )
+                        if constexpr ( symmetricQ )
                         {
                             if( i == j )
                             {
@@ -123,7 +123,7 @@ public:
                     
                     // We have to go through all the primitive pairs to classify them.
                     
-                    if constexpr ( is_symmetric )
+                    if constexpr ( symmetricQ )
                     {
                         if( i == j )
                         {
@@ -205,7 +205,7 @@ public:
                             }
                         }
                     }
-                    else // !is_symmetric
+                    else // !symmetricQ
                     {
                         if constexpr ( leaves_are_singletons )
                         {
@@ -236,9 +236,9 @@ public:
                     }
                 }
             }
-            else // admissable
+            else // admissableQ
             {
-                if constexpr ( is_symmetric )
+                if constexpr ( symmetricQ )
                 {
                     if( i <= j )
                     {

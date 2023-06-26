@@ -26,16 +26,18 @@
 #include "../Tensors/Sparse.hpp"
 
 
+
 //#include "../Tensors/ConjugateGradient.hpp"
 //#include "../Tensors/GMRES.hpp"
 //#include "../Tensors/Sparse.hpp"
 
+using namespace Repulsor;
+using namespace Tensors;
+using namespace Tools;
+
+
 int main(int argc, const char * argv[])
 {
-    using namespace Repulsor;
-    using namespace Tensors;
-    using namespace Tools;
-    
     const char * homedir = getenv("HOME");
 
     if( homedir == nullptr)
@@ -291,9 +293,9 @@ int main(int argc, const char * argv[])
         A.ThreadCount(), static_cast<INT>(4)
     );
     
-    S.SN_SymbolicFactorization();
+    S.SymbolicFactorization();
     
-    S.SN_NumericFactorization( A.Values().data(), Scalar::Zero<REAL> );
+    S.NumericFactorization( A.Values().data(), Scalar::Zero<REAL> );
     
 //    print( S.GetPermutation().GetPermutation().ToString() );
 

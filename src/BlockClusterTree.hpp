@@ -7,8 +7,8 @@ namespace Repulsor
 {
     
     
-    template<int AMB_DIM_, typename Real_, typename Int_, typename SReal_, typename ExtReal_, bool is_symmetric_>
-    class BlockClusterTree : public BlockClusterTreeBase<Real_,Int_,SReal_,ExtReal_,is_symmetric_>
+    template<int AMB_DIM_, typename Real_, typename Int_, typename SReal_, typename ExtReal_, bool symmetricQ_>
+    class BlockClusterTree : public BlockClusterTreeBase<Real_,Int_,SReal_,ExtReal_,symmetricQ_>
     {
     public:
         
@@ -19,13 +19,13 @@ namespace Repulsor
         using ExtReal = ExtReal_;
         using Int     = Int_;
         
-        using BlockClusterTreeBase_T = BlockClusterTreeBase<Real,Int,SReal,ExtReal,is_symmetric_>;
+        using BlockClusterTreeBase_T = BlockClusterTreeBase<Real,Int,SReal,ExtReal,symmetricQ_>;
         
         using LInt    = typename BlockClusterTreeBase_T::LInt;
         
 
         static constexpr Int  AMB_DIM      = AMB_DIM_;
-        static constexpr bool is_symmetric = is_symmetric_;
+        static constexpr bool symmetricQ = symmetricQ_;
         
         using Setting_T = typename BlockClusterTreeBase_T::Setting_T;
 
@@ -65,15 +65,15 @@ namespace Repulsor
         ,   near_theta2( pow(settings_.near_field_separation_parameter,2) )
         ,    far_theta2( pow(settings_. far_field_separation_parameter,2) )
         ,   thread_count( std::min(S_.ThreadCount(), T_.ThreadCount()) )
-//        ,   is_symmetric( std::addressof(S_) == std::addressof(T_) )
+//        ,   symmetricQ( std::addressof(S_) == std::addressof(T_) )
         {
             ptic(className());
             
-            if constexpr ( is_symmetric )
+            if constexpr ( symmetricQ )
             {
                 if( std::addressof(S_) != std::addressof(T_) )
                 {
-                    eprint(className()+": is_symmetric == true, bu S != T.");
+                    eprint(className()+": symmetricQ == true, bu S != T.");
                 }
             }
 
@@ -104,7 +104,7 @@ namespace Repulsor
         const SReal  far_theta2 = static_cast<SReal>(0.25);
         
         const Int thread_count = static_cast<Int>(1);
-//        const bool is_symmetric;
+//        const bool symmetricQ;
         
         mutable bool blocks_initialized = false;
         
@@ -210,7 +210,7 @@ namespace Repulsor
 
             << "\n---- bool data ----" << "\n"
 
-            << " IsSymmetric()               = " <<  is_symmetric << "\n"
+            << " SymmetricQ()               = " <<  symmetricQ << "\n"
 
             << "\n==== "+className()+" Stats ====\n" << std::endl;
 
@@ -247,13 +247,13 @@ namespace Repulsor
             ptic(className()+"::ComputeBlocks: traversal");
             if( (S.SplitThreshold()==1) && (T.SplitThreshold()==1) )
             {
-                ClusterTreePairTraversor<BlockSplitter_T,is_symmetric,true> traversor ( S, T, kernels );
+                ClusterTreePairTraversor<BlockSplitter_T,symmetricQ,true> traversor ( S, T, kernels );
 
                 traversor.Traverse();
             }
             else
             {
-                ClusterTreePairTraversor<BlockSplitter_T,is_symmetric,false> traversor ( S, T, kernels );
+                ClusterTreePairTraversor<BlockSplitter_T,symmetricQ,false> traversor ( S, T, kernels );
 
                 traversor.Traverse();
             }
@@ -312,10 +312,10 @@ namespace Repulsor
             ptic(className()+"  Primitive intersection data");
             
 //            inter = Inter_T( inter_idx, inter_jdx, S.PrimitiveCount(), T.PrimitiveCount(),
-//                thread_count, false, is_symmetric );
+//                thread_count, false, symmetricQ );
             
             inter = Inter_Pattern_T( inter_idx, S.PrimitiveCount(), T.PrimitiveCount(),
-                thread_count, false, is_symmetric );
+                thread_count, false, symmetricQ );
 
             pdump(inter.Stats());
 
@@ -325,7 +325,7 @@ namespace Repulsor
             ptic(className()+"  Very near field interaction data");
 
             verynear = VeryNear_Pattern_T( verynear_idx, S.PrimitiveCount(), T.PrimitiveCount(),
-                thread_count, false, is_symmetric );
+                thread_count, false, symmetricQ );
             
             pdump(verynear.Stats());
 
@@ -335,7 +335,7 @@ namespace Repulsor
             ptic(className()+"  Near field interaction data");
 
             near = Near_Pattern_T( near_idx, S.PrimitiveCount(), T.PrimitiveCount(),
-                thread_count, false, is_symmetric );
+                thread_count, false, symmetricQ );
 
             pdump(near.Stats());
 
@@ -345,7 +345,7 @@ namespace Repulsor
             ptic(className()+"  Far field interaction data");
 
             far = Far_Pattern_T( far_idx, S.ClusterCount(), T.ClusterCount(),
-                    thread_count, false, is_symmetric );
+                    thread_count, false, symmetricQ );
 
             pdump(far.Stats());
 
@@ -360,7 +360,7 @@ namespace Repulsor
         
         static std::string className()
         {
-            return  "BlockClusterTree<"+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+","+TypeName<ExtReal>+","+ToString(is_symmetric)+">";
+            return  "BlockClusterTree<"+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+","+TypeName<ExtReal>+","+ToString(symmetricQ)+">";
         }
       
     public:

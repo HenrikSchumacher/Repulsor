@@ -31,7 +31,7 @@ namespace Repulsor
 
         virtual Int ThreadCount() const = 0;
         
-        virtual bool IsSymmetric() const = 0;
+        virtual bool SymmetricQ() const = 0;
 
         virtual const CollisionMatrix_T & ClusterCollisionMatrix() const = 0;
         

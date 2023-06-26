@@ -1,13 +1,13 @@
 #pragma once
 
-#define BASE FMM_Kernel_FF<ClusterTree_T_,is_symmetric_,energy_flag_,diff_flag_,metric_flag_>
+#define BASE FMM_Kernel_FF<ClusterTree_T_,symmetricQ_,energy_flag_,diff_flag_,metric_flag_>
 
 namespace Repulsor
 {
     template<
         typename ClusterTree_T_,
         typename T1, typename T2,
-        bool is_symmetric_,
+        bool symmetricQ_,
         bool energy_flag_, bool diff_flag_, bool metric_flag_
     >
     class TP_Kernel_FF : public BASE
@@ -45,7 +45,7 @@ namespace Repulsor
         using Base_T::zero;
         using Base_T::one;
         using Base_T::two;
-        using Base_T::is_symmetric;
+        using Base_T::symmetricQ;
         using Base_T::energy_flag;
         using Base_T::diff_flag;
         using Base_T::metric_flag;

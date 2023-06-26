@@ -163,7 +163,7 @@ namespace Repulsor
             P_j = j;
         }
         
-        force_inline bool IsAdmissable()
+        force_inline bool AdmissableQ()
         {
             Compute_AABB_CollisionTimeInterval<ClusterTree_T::AMB_DIM, SReal, Int> (
                 S_C_ser.data(C_i), S_C_up_ser.data(C_i),

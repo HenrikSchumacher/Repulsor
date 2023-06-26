@@ -3,7 +3,7 @@
 namespace Repulsor
 {
     
-    template<typename Real_, typename Int_, typename SReal_, typename ExtReal_, bool is_symmetric>
+    template<typename Real_, typename Int_, typename SReal_, typename ExtReal_, bool symmetricQ>
     class BlockClusterTreeBase
     {
         ASSERT_FLOAT(Real_   );
@@ -42,9 +42,9 @@ namespace Repulsor
         
         virtual Real NearFieldSeparationParameter() const = 0;
         
-        static constexpr bool IsSymmetric()
+        static constexpr bool SymmetricQ()
         {
-            return is_symmetric;
+            return symmetricQ;
         }
         
         virtual LInt PrimitiveIntersectionCount() const = 0;
@@ -75,7 +75,7 @@ namespace Repulsor
         
         virtual std::string ClassName() const
         {
-            return  std::string("BlockClusterTreeBase<")+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+","+TypeName<ExtReal>+","+ToString(is_symmetric)+">";
+            return  std::string("BlockClusterTreeBase<")+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+","+TypeName<ExtReal>+","+ToString(symmetricQ)+">";
         }
         
     }; // class BlockClusterTreeBase

@@ -34,7 +34,7 @@ namespace Repulsor
         static constexpr Int  AMB_DIM      = ClusterTree_T::AMB_DIM;
         static constexpr Int  S_DOM_DIM    = S_DOM_DIM_;
         static constexpr Int  T_DOM_DIM    = T_DOM_DIM_;
-        static constexpr bool is_symmetric = BlockClusterTree_T::IsSymmetric();
+        static constexpr bool symmetricQ = BlockClusterTree_T::SymmetricQ();
         
         using TangentVector_T   = Tensor2<ExtReal,Int>;
         using CotangentVector_T = Tensor2<ExtReal,Int>;
@@ -128,7 +128,7 @@ namespace Repulsor
             bct.GetS().FF_Accumulator()
             = Accumulator_T( thread_count, bct.GetS().ClusterCount(),   FF_blk_size, 0 );
 
-            if constexpr ( !is_symmetric )
+            if constexpr ( !symmetricQ )
             {
                 bct.GetT().VF_Accumulator()
                 = Accumulator_T( thread_count, bct.GetT().PrimitiveCount(), VF_blk_size, 0 );
@@ -158,7 +158,7 @@ namespace Repulsor
             bct.GetS().NF_Accumulator() = Accumulator_T( thread_count, 1, 1, 0 );
             bct.GetS().FF_Accumulator() = Accumulator_T( thread_count, 1, 1, 0 );
 
-            if constexpr ( !is_symmetric )
+            if constexpr ( !symmetricQ )
             {
                 bct.GetT().VF_Accumulator() = Accumulator_T( thread_count, 1, 1, 0 );
                 bct.GetT().NF_Accumulator() = Accumulator_T( thread_count, 1, 1, 0 );
@@ -181,7 +181,7 @@ namespace Repulsor
             
             using Kernel_T = PseudoLaplacian_Kernel_VF<
                 S_DOM_DIM, T_DOM_DIM,
-                ClusterTree_T, BlockClusterTree_T::is_symmetric,
+                ClusterTree_T, BlockClusterTree_T::symmetricQ,
                 high_order
             >;
             
@@ -191,7 +191,7 @@ namespace Repulsor
             
             (void)traversor.Compute();
 
-            if constexpr ( is_symmetric )
+            if constexpr ( symmetricQ )
             {
                 Sparse::KernelMatrixCSR<Kernel_Block_Mul_T> matrix ( bct.VeryNear() );
                 
@@ -212,7 +212,7 @@ namespace Repulsor
 
             using Kernel_T = PseudoLaplacian_Kernel_NF<
                 S_DOM_DIM, T_DOM_DIM,
-                ClusterTree_T, BlockClusterTree_T::is_symmetric,
+                ClusterTree_T, BlockClusterTree_T::symmetricQ,
                 high_order
             >;
 
@@ -222,7 +222,7 @@ namespace Repulsor
 
             (void)traversor.Compute();
 
-            if constexpr ( is_symmetric )
+            if constexpr ( symmetricQ )
             {
                 Sparse::KernelMatrixCSR<Kernel_Block_Mul_T> matrix ( bct.Near() );
                 
@@ -243,7 +243,7 @@ namespace Repulsor
             
             using Kernel_T = PseudoLaplacian_Kernel_FF<
                 S_DOM_DIM, T_DOM_DIM,
-                ClusterTree_T, BlockClusterTree_T::is_symmetric,
+                ClusterTree_T, BlockClusterTree_T::symmetricQ,
                 high_order
             >;
             
@@ -253,7 +253,7 @@ namespace Repulsor
             
             (void)traversor.Compute();
             
-            if constexpr ( is_symmetric )
+            if constexpr ( symmetricQ )
             {
                 Sparse::KernelMatrixCSR<Kernel_Block_Mul_T> matrix ( bct.Far() );
                 
@@ -323,7 +323,7 @@ namespace Repulsor
                 rhs_count
             );
             
-            if constexpr ( is_symmetric )
+            if constexpr ( symmetricQ )
             {
                 DiagonalKernelMatrix<Kernel_Diag_MulAdd_T> diag (
                     bct.Near().RowCount(),
@@ -350,7 +350,7 @@ namespace Repulsor
                 rhs_count
             );
             
-            if constexpr ( is_symmetric )
+            if constexpr ( symmetricQ )
             {
                 DiagonalKernelMatrix<Kernel_Diag_MulAdd_T> diag (
                     bct.VeryNear().RowCount(),
@@ -377,7 +377,7 @@ namespace Repulsor
                 rhs_count
            );
             
-            if constexpr ( is_symmetric )
+            if constexpr ( symmetricQ )
             {
                 DiagonalKernelMatrix<Kernel_Diag_MulAdd_T> diag (
                     bct.Far().RowCount(),

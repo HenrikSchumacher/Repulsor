@@ -2,7 +2,7 @@
 
 namespace Repulsor
 {
-    template<typename Real_, typename Int_, typename SReal_, typename ExtReal_, bool is_symmetric>
+    template<typename Real_, typename Int_, typename SReal_, typename ExtReal_, bool symmetricQetric>
     class CollisionTreeBase
     {
         ASSERT_FLOAT(Real_   );
@@ -40,9 +40,9 @@ namespace Repulsor
 
         virtual Int ThreadCount() const = 0;
         
-        static constexpr bool IsSymmetric()
+        static constexpr bool SymmetricQ()
         {
-            return is_symmetric;
+            return symmetricQetric;
         }
 
         virtual const CollisionMatrix_T & PrimitiveCollisionMatrix() const = 0;

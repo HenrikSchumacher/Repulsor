@@ -31,13 +31,13 @@ public:
                 {
 //                    logprint("not max_level");
                     // If not at lowest level, then we have to check for admissability.
-                    const bool admissable = this->gjk.MultipoleAcceptanceCriterion(
+                    const bool admissableQ = this->gjk.MultipoleAcceptanceCriterion(
                         S_Tree.SimplexPrototype(),
                         T_Tree.SimplexPrototype(),
                         this->theta2
                     );
                     
-                    if( admissable )
+                    if( admissableQ )
                     {
 //                        logprint("admissable");
                         // We compute energy, go to parent, and prepare the next child of the parent.

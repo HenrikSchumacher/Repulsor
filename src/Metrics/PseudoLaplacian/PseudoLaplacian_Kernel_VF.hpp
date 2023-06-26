@@ -1,7 +1,7 @@
 #pragma once
 
 #define BASE  FMM_Kernel_VF<                                                \
-        S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,is_symmetric_,                 \
+        S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,symmetricQ_,                   \
         false,false,true                                                    \
     >
 
@@ -10,7 +10,7 @@ namespace Repulsor
     template<
         int S_DOM_DIM_, int T_DOM_DIM_,
         typename ClusterTree_T_,
-        bool is_symmetric_,
+        bool symmetricQ_,
         bool high_order_
     >
     class PseudoLaplacian_Kernel_VF : public BASE
@@ -57,7 +57,7 @@ namespace Repulsor
         using Base_T::zero;
         using Base_T::one;
         using Base_T::two;
-        using Base_T::is_symmetric;
+        using Base_T::symmetricQ;
         
     public:
         
@@ -203,7 +203,7 @@ namespace Repulsor
             + ToString(S_DOM_DIM) + ","
             + ToString(T_DOM_DIM) + ","
             + this->GetS().ClassName() + ","
-            + ToString(is_symmetric) + ","
+            + ToString(symmetricQ) + ","
             + ToString(high_order)
             + ">";
         }
