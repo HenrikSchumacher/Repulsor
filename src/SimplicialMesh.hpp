@@ -16,6 +16,16 @@ namespace Repulsor
     template<int DOM_DIM, int AMB_DIM, typename Real_, typename Int_, typename SReal_, typename ExtReal_>
     class SimplicialMesh : public SimplicialMeshBase<Real_,Int_,SReal_,ExtReal_>
     {
+        
+        static_assert(DOM_DIM >= 1       , "Domain dimension must be positive.");
+        static_assert(AMB_DIM >= DOM_DIM , "Ambient dimension must at least as high as the domain dimension.");
+        
+        
+        ASSERT_FLOAT(Real_);
+        ASSERT_INT(Int_);
+        ASSERT_FLOAT(SReal_);
+        ASSERT_FLOAT(ExtReal_);
+        
     private:
         
         using Base_T = SimplicialMeshBase<Real_,Int_,SReal_,ExtReal_>;
