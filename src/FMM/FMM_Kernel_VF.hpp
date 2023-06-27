@@ -25,9 +25,8 @@ namespace Repulsor
         using LInt               = typename Base_T::LInt;
         
         using Configurator_T     = typename Base_T::Configurator_T;
-        using Values_T           = typename Base_T::Values_T;
         using ValueContainer_T   = typename Base_T::ValueContainer_T;
-        
+        using Values_T           = typename ValueContainer_T::Values_T;
         
         
         using Base_T::AMB_DIM;
@@ -158,7 +157,7 @@ namespace Repulsor
                                   std::min(S_Tree_T::MaxLevel(),S_Tree_T::MaxLevel())
                               )                                                                )
         {
-            debug_print(std::string( "Initializing "+ClassName()+" from Configurator_T on thread " + ToString(thread)) );
+            debug_print(std::string( "Initializing " + this->ClassName() + " from Configurator_T on thread " + ToString(thread)) );
             
             if( GetS().PrimitiveSerialized().Dimension(1) != S_Tree.SimplexPrototype().Size() )
             {
@@ -305,22 +304,22 @@ namespace Repulsor
         
         Values_T & OffDiag()
         {
-            return this->metric_values["VF"];
+            return this->metric_values.VF;
         }
         
         const Values_T & OffDiag() const
         {
-            return this->metric_values["VF"];
+            return this->metric_values.VF;
         }
         
         Values_T & Diag()
         {
-            return this->metric_values["VF_diag"];
+            return this->metric_values.VF_diag;
         }
         
         const Values_T & Diag() const
         {
-            return this->metric_values["VF_diag"];
+            return this->metric_values.VF_diag;
         }
         
 //        void CreateLogFile() const
@@ -377,10 +376,11 @@ namespace Repulsor
         
         std::string ClassName() const
         {
-            return "FMM_Kernel_VF<"
+            return std::string("FMM_Kernel_VF<")
             + ToString(S_DOM_DIM) + ","
             + ToString(T_DOM_DIM) + ","
-            + GetS().ClassName() + ","
+//            + GetS().ClassName() + ","
+            + "...,"
             + ToString(energy_flag) + ","
             + ToString(diff_flag) + ","
             + ToString(metric_flag) + ","

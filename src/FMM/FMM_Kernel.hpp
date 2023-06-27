@@ -17,11 +17,11 @@ namespace Repulsor
         using SReal              = typename ClusterTree_T::SReal;
         using ExtReal            = typename ClusterTree_T::ExtReal;
         using Int                = typename ClusterTree_T::Int;
-        using LInt               = Size_T;
+        using LInt               = typename ClusterTree_T::LInt;
 
         using Configurator_T     = FMM_Configurator<ClusterTree_T>;
-        using Values_T           = typename Configurator_T::Values_T;
         using ValueContainer_T   = typename Configurator_T::ValueContainer_T;
+        using Values_T           = typename ValueContainer_T::Values_T;
         
         static constexpr bool symmetricQ = symmetricQ_;
         static constexpr bool energy_flag  = energy_flag_;
@@ -95,7 +95,7 @@ namespace Repulsor
         ,   metric_values ( conf.MetricValues()  )   // In configure mode, kernels needs
         {
             Init();
-            debug_print(std::string( "Initializing "+ClassName()+" from Configurator_T on thread " + ToString(thread)) );
+            debug_print(std::string( "Initializing " + this-> ClassName() + " from Configurator_T on thread " + ToString(thread)) );
         }
         
         FMM_Kernel( const FMM_Kernel & other, const Int thread_ )
@@ -105,13 +105,18 @@ namespace Repulsor
         ,   metric_values ( other.metric_values  )
         {
             Init();
-            debug_print(std::string( "Initializing "+ClassName()+" from "+ClassName()+" on thread " + ToString(thread)) );
+            debug_print(std::string( "Initializing " + this->ClassName() + " from "+ClassName()+" on thread " + ToString(thread)) );
         }
         
         
         Int Thread() const
         {
             return thread;
+        }
+        
+        std::string ThreadString() const
+        {
+            return "(" + ToString(thread) +")";
         }
         
         ~FMM_Kernel() = default;
@@ -144,7 +149,8 @@ namespace Repulsor
         
         std::string ClassName() const
         {
-            return "FMM_Kernel<"+S.ClassName()+">";
+//            return "FMM_Kernel<"+S.ClassName()+">";
+            return "FMM_Kernel<...>";
         }
 
     };

@@ -2,32 +2,30 @@
 
 namespace Repulsor
 {
-    template<typename Real, typename Int, typename SReal, typename ExtReal>
-    class EnergyBase
+    template<typename MeshBase_T> class EnergyBase {};
+
+    template< typename Real, typename Int, typename LInt, typename SReal, typename ExtReal >
+    class EnergyBase<SimplicialMeshBase<Real,Int,LInt,SReal,ExtReal>>
     {
-        ASSERT_FLOAT( Real    );
-        ASSERT_FLOAT( SReal   );
-        ASSERT_FLOAT( ExtReal );
-        ASSERT_INT  ( Int     );
         
     public:
         
         
-        using MeshBase_T         = SimplicialMeshBase<Real,Int,SReal,ExtReal>;
-        using BlockClusterTree_T = typename MeshBase_T::BlockClusterTree_T;
-        using LInt               = Size_T;
-        using TangentVector_T    = typename MeshBase_T::TangentVector_T;
-        using CotangentVector_T  = typename MeshBase_T::CotangentVector_T;
+        using MeshBase_T             = SimplicialMeshBase<Real,Int,LInt,SReal,ExtReal>;
+        using BlockClusterTreeBase_T = typename MeshBase_T::BlockClusterTreeBase_T;
+        using TangentVector_T        = typename MeshBase_T::TangentVector_T;
+        using CotangentVector_T      = typename MeshBase_T::CotangentVector_T;
+        using ValueContainer_T       = MetricValueContainer<Real,LInt>;
         
-        using Values_T           = Tensor2<Real,LInt>;
-        using ValueContainer_T   = std::unordered_map<std::string,Values_T>;
-        
-        EnergyBase() = default;
+        EnergyBase()
+        {}
 
         virtual ~EnergyBase() = default;
         
     protected:
 
+        // We need some dummy values so that kernels won't complain, in particular when run in parallel.
+        mutable ValueContainer_T metric_values;
         
     public:
         
@@ -97,7 +95,7 @@ namespace Repulsor
 
         static std::string className()
         {
-            return std::string("EnergyBase<")+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+","+TypeName<ExtReal>+">";
+            return std::string("EnergyBase<")+TypeName<Real>+","+TypeName<Int>+","+TypeName<LInt>+","+TypeName<SReal>+","+TypeName<ExtReal>+">";
         }
         
         virtual std::string ClassName() const

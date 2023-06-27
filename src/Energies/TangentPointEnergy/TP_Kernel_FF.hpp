@@ -19,8 +19,6 @@ namespace Repulsor
     public:
         
         using ClusterTree_T      = ClusterTree_T_;
-        using Values_T           = typename Base_T::Values_T;
-        using ValueContainer_T   = typename Base_T::ValueContainer_T;
         
         using Real               = typename Base_T::Real;
         using SReal              = typename Base_T::SReal;
@@ -29,6 +27,8 @@ namespace Repulsor
         using LInt               = typename Base_T::LInt;
         
         using Configurator_T     = typename Base_T::Configurator_T;
+        using ValueContainer_T   = typename Base_T::ValueContainer_T;
+        using Values_T           = typename ValueContainer_T::Values_T;
         
         using Base_T::AMB_DIM;
         using Base_T::PROJ_DIM;
@@ -359,14 +359,15 @@ namespace Repulsor
         
         std::string ClassName() const
         {
-            return "TP_Kernel_FF<"
-            + this->S.ClassName() + ","
+            return std::string("TP_Kernel_FF<")
+//            + this->S.ClassName() + ","
+            + "...,"
             + TypeName<T1> + ","
             + TypeName<T2> + ","
             + ToString(energy_flag) + ","
             + ToString(diff_flag) + ","
             + ToString(metric_flag) + ","
-            ">";
+            ">" + this->ThreadString();
         }
     };
 

@@ -5,17 +5,12 @@ namespace Repulsor
     template<
         int MIN_DOM_DIM_, int MAX_DOM_DIM_,
         int MIN_AMB_DIM_, int MAX_AMB_DIM_,
-        typename Real_, typename Int_, typename SReal_, typename ExtReal_
+        typename Real, typename Int, typename LInt, typename SReal, typename ExtReal
     >
-    class CONCAT(CLASS,_Factory)< SimplicialMeshBase<Real_,Int_,SReal_,ExtReal_>, MIN_DOM_DIM_, MAX_DOM_DIM_, MIN_AMB_DIM_, MAX_AMB_DIM_ >
+    class CONCAT(CLASS,_Factory)<BESH, MIN_DOM_DIM_, MAX_DOM_DIM_, MIN_AMB_DIM_, MAX_AMB_DIM_ >
     {
     public:
-        
-        using Real    = Real_;
-        using Int     = Int_;
-        using SReal   = SReal_;
-        using ExtReal = ExtReal_;
-        
+
         static constexpr Int MIN_AMB_DIM = std::max( Int(1), Int(MIN_AMB_DIM_) );
         static constexpr Int MAX_AMB_DIM = std::max( Int(1), Int(MAX_AMB_DIM_) );
         
@@ -92,14 +87,18 @@ namespace Repulsor
             if( (1 < s) && (s < 2) )
             {
                 return std::unique_ptr<ROOT>(
-                    new CLASS<DOM_DIM,AMB_DIM,Real,Int,SReal,ExtReal,true>( s )
-                );
+                    new CLASS<
+                        SimplicialMesh<DOM_DIM,AMB_DIM,Real,Int,LInt,SReal,ExtReal>,
+                        true
+                    >( s ) );
             }
             else if( (0 < s) && (s < 1) )
             {
                 return std::unique_ptr<ROOT>(
-                    new CLASS<DOM_DIM,AMB_DIM,Real,Int,SReal,ExtReal,false>( s )
-                );
+                    new CLASS<
+                        SimplicialMesh<DOM_DIM,AMB_DIM,Real,Int,LInt,SReal,ExtReal>,
+                        false
+                    >( s ) );
             }
             else
             {
@@ -126,6 +125,7 @@ namespace Repulsor
             + ToString(MAX_AMB_DIM)+ ","
             + TypeName<Real>       + ","
             + TypeName<Int>        + ","
+            + TypeName<LInt>       + ","
             + TypeName<SReal>      + ","
             + TypeName<ExtReal>    + ","
             + ">";

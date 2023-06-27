@@ -4,14 +4,21 @@
 
 #define CLASS PseudoLaplacian
 
-#define BASE MetricDimRestricted<DOM_DIM,AMB_DIM,Real,Int,SReal,ExtReal, high_order ? OperatorType::HighOrder : OperatorType::LowOrder>
+#define BASE  MetricDimRestricted<                                          \
+        SimplicialMesh<DOM_DIM,AMB_DIM,Real,Int,LInt,SReal,ExtReal>,        \
+        high_order ? OperatorType::HighOrder : OperatorType::LowOrder       \
+    >
 
-#define ROOT  MetricBase<Real,Int,SReal,ExtReal>
+#define MESH  SimplicialMesh<DOM_DIM,AMB_DIM,Real,Int,LInt,SReal,ExtReal>
+#define BESH  SimplicialMeshBase<Real,Int,LInt,SReal,ExtReal>
+#define ROOT  MetricBase<SimplicialMeshBase<Real,Int,LInt,SReal,ExtReal>>
 
 namespace Repulsor
 {
-    template<int DOM_DIM, int AMB_DIM, typename Real, typename Int, typename SReal, typename ExtReal, bool high_order>
-    class CLASS : public BASE
+    template<typename Mesh_T, bool high_order> class CLASS {};
+    
+    template<int DOM_DIM, int AMB_DIM,  typename Real, typename Int, typename LInt, typename SReal, typename ExtReal, bool high_order>
+    class CLASS<MESH,high_order> : public BASE
     {
     private:
         
@@ -22,10 +29,10 @@ namespace Repulsor
         using Mesh_T                  = typename Base_T::Mesh_T;
         using BlockClusterTree_T      = typename Mesh_T::BlockClusterTree_T;
         
-        using Values_T                = typename Base_T::Values_T;
-        using ValueContainer_T        = typename Base_T::ValueContainer_T;
         using TangentVector_T         = typename Base_T::TangentVector_T;
         using CotangentVector_T       = typename Base_T::CotangentVector_T;
+        using ValueContainer_T        = typename Base_T::ValueContainer_T;
+        using Values_T                = typename ValueContainer_T::Values_T;
         
         using Base_T::MetricValues;
         
@@ -70,7 +77,7 @@ namespace Repulsor
         
         std::string className() const
         {
-            return TO_STD_STRING(CLASS)+"<"+ToString(DOM_DIM)+","+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+","+TypeName<ExtReal>+">("+ToString(s)+")";
+            return TO_STD_STRING(CLASS)+"<"+ToString(DOM_DIM)+","+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<LInt>+","+TypeName<SReal>+","+TypeName<ExtReal>+">("+ToString(s)+")";
         }
         
         virtual std::string ClassName() const override
@@ -84,10 +91,8 @@ namespace Repulsor
 
 #include "PseudoLaplacian/PseudoLaplacian_Factory.hpp"
 
+#undef BESH
+#undef MESH
 #undef ROOT
 #undef BASE
 #undef CLASS
-
-
-
-

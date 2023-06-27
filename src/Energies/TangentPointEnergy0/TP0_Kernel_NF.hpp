@@ -30,10 +30,9 @@ namespace Repulsor
         using LInt               = typename Base_T::LInt;
         
         using Configurator_T     = typename Base_T::Configurator_T;
-        using Values_T           = typename Base_T::Values_T;
         using ValueContainer_T   = typename Base_T::ValueContainer_T;
+        using Values_T           = typename ValueContainer_T::Values_T;
 
-        
         using Base_T::AMB_DIM;
         using Base_T::PROJ_DIM;
         using Base_T::S_DOM_DIM;

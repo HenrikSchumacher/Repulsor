@@ -1,20 +1,15 @@
 namespace Repulsor
 {
-    template < class T, int ...N> class CONCAT(CLASS,_Factory) {};
+    template < class Mesh_T, int ...N> class CONCAT(CLASS,_Factory) {};
     
     template<
+        typename Real, typename Int, typename LInt, typename SReal, typename ExtReal,
         int MIN_DOM_DIM_, int MAX_DOM_DIM_,
-        int MIN_AMB_DIM_, int MAX_AMB_DIM_,
-        typename Real_, typename Int_, typename SReal_, typename ExtReal_
+        int MIN_AMB_DIM_, int MAX_AMB_DIM_
     >
-    class CONCAT(CLASS,_Factory)< SimplicialMeshBase<Real_,Int_,SReal_,ExtReal_>, MIN_DOM_DIM_, MAX_DOM_DIM_, MIN_AMB_DIM_, MAX_AMB_DIM_ >
+    class CONCAT(CLASS,_Factory)<BESH, MIN_DOM_DIM_, MAX_DOM_DIM_, MIN_AMB_DIM_, MAX_AMB_DIM_>
     {
     public:
-        
-        using Real    = Real_;
-        using Int     = Int_;
-        using SReal   = SReal_;
-        using ExtReal = ExtReal_;
         
         static constexpr Int MIN_AMB_DIM = std::max( Int(1), Int(MIN_AMB_DIM_) );
         static constexpr Int MAX_AMB_DIM = std::max( Int(1), Int(MAX_AMB_DIM_) );
@@ -73,9 +68,7 @@ namespace Repulsor
         {
             if( dom_dim == DOM_DIM )
             {
-                return std::unique_ptr<BASE>(
-                    new CLASS<DOM_DIM,AMB_DIM,Real,Int,SReal,ExtReal>( q, p )
-                );
+                return std::unique_ptr<BASE>( new CLASS<MESH>( q, p ) );
             }
             else if constexpr ( DOM_DIM > MIN_DOM_DIM )
             {
@@ -106,6 +99,7 @@ namespace Repulsor
             + ToString(MAX_AMB_DIM)+ ","
             + TypeName<Real>       + ","
             + TypeName<Int>        + ","
+            + TypeName<LInt>       + ","
             + TypeName<SReal>      + ","
             + TypeName<ExtReal>    + ","
             + ">";

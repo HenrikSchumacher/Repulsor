@@ -23,7 +23,6 @@ namespace Repulsor
         using ExtReal            = typename ClusterTree_T::ExtReal;
         
         using Configurator_T     = FMM_Configurator<ClusterTree_T>;
-        using Values_T           = typename Configurator_T::Values_T;
         using ValueContainer_T   = typename Configurator_T::ValueContainer_T;
         using LInt               = typename Configurator_T::LInt;
         
@@ -296,7 +295,7 @@ namespace Repulsor
 //            SparseKernelMatrixCSR<Kernel_Block_Mul_T> matrix ( bct.Near() );
 //
 //            matrix.Dot(
-//                metric_values["NF"].data(),
+//                metric_values.NF.data(),
 //                one,  T.PrimitiveInputBuffer().data(),
 //                zero, S.PrimitiveOutputBuffer().data(),
 //                rhs_count
@@ -310,7 +309,7 @@ namespace Repulsor
                 );
 
                 diag.Dot(
-                    metric_values["NF_diag"].data(),
+                    metric_values.NF_diag.data(),
                     one, T.PrimitiveInputBuffer().data(),
                     one, S.PrimitiveOutputBuffer().data(),
                     rhs_count

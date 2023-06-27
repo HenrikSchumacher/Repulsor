@@ -2,23 +2,23 @@
 
 namespace Repulsor
 {
-    template<int DOM_DIM, int AMB_DIM, typename Real, typename Int, typename SReal, typename ExtReal>
-    class EnergyDimRestricted : public EnergyBase<Real,Int,SReal,ExtReal>
+    template<typename Mesh_T> class EnergyDimRestricted {};
+
+    template<int DOM_DIM, int AMB_DIM, typename Real, typename Int, typename LInt, typename SReal, typename ExtReal >
+    class EnergyDimRestricted<SimplicialMesh<DOM_DIM,AMB_DIM,Real,Int,LInt,SReal,ExtReal>>
+        : public EnergyBase<SimplicialMeshBase<Real,Int,LInt,SReal,ExtReal>>
     {
-    private:
-        
-        using Base_T = EnergyBase<Real,Int,SReal,ExtReal>;
-        
     public:
         
-        using MeshBase_T        = typename Base_T::MeshBase_T;
+        using Mesh_T     = SimplicialMesh<DOM_DIM,AMB_DIM,Real,Int,LInt,SReal,ExtReal>;
+        using MeshBase_T = typename Mesh_T::Base_T;
+        
+        using Base_T     = EnergyBase<MeshBase_T>;
+        using Root_T     = EnergyBase<MeshBase_T>;
 
-        using Values_T          = typename Base_T::Values_T;
         using ValueContainer_T  = typename Base_T::ValueContainer_T;
         using TangentVector_T   = typename Base_T::TangentVector_T;
         using CotangentVector_T = typename Base_T::CotangentVector_T;
-        
-        using Mesh_T            = SimplicialMesh<DOM_DIM,AMB_DIM,Real,Int,SReal,ExtReal>;
         
         EnergyDimRestricted() = default;
 
@@ -66,7 +66,7 @@ namespace Repulsor
         
         static std::string className()
         {
-            return "EnergyDimRestricted<"+ToString(DOM_DIM)+","+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+","+TypeName<ExtReal>+">";
+            return "EnergyDimRestricted<"+ToString(DOM_DIM)+","+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<LInt>+","+TypeName<SReal>+","+TypeName<ExtReal>+">";
         }
         
         virtual std::string ClassName() const override

@@ -2,6 +2,23 @@
 
 namespace Repulsor
 {
+    template<typename Real_, typename LInt_>
+    struct MetricValueContainer
+    {
+        using Real = Real_;
+        using LInt = LInt_;
+        
+        using Values_T = typename Tensors::Tensor2<Real,LInt>;
+        
+        Values_T FF;
+        Values_T NF;
+        Values_T VF;
+        
+        Values_T FF_diag;
+        Values_T NF_diag;
+        Values_T VF_diag;
+    };
+    
     template<typename ClusterTree_T_>
     class alignas( OBJECT_ALIGNMENT ) FMM_Configurator
     {
@@ -13,11 +30,11 @@ namespace Repulsor
         using SReal              = typename ClusterTree_T::SReal;
         using ExtReal            = typename ClusterTree_T::ExtReal;
         using Int                = typename ClusterTree_T::Int;
-        using LInt               = Size_T;
+        using LInt               = typename ClusterTree_T::LInt;
         
-        using Values_T           = Tensor2<Real,LInt>;
-        using ValueContainer_T   = std::unordered_map<std::string,Values_T>;
-
+        
+        using ValueContainer_T   = MetricValueContainer<Real,LInt>;
+        
         
     public:
 

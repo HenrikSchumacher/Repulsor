@@ -2,25 +2,18 @@
 
 namespace Repulsor
 {
-    template<typename Real, typename Int, typename SReal, typename ExtReal>
-    class MetricBase
+    template<typename Mesh_T> class MetricBase {};
+    
+    template< typename Real, typename Int, typename LInt, typename SReal, typename ExtReal >
+    class MetricBase<SimplicialMeshBase<Real,Int,LInt,SReal,ExtReal>>
     {
-        ASSERT_FLOAT(Real   );
-        ASSERT_INT  (Int    );
-        ASSERT_FLOAT(SReal  );
-        ASSERT_FLOAT(ExtReal);
-        
     public:
         
-        using MeshBase_T         = SimplicialMeshBase<Real,Int,SReal,ExtReal>;
-        
-        using TangentVector_T    = typename MeshBase_T::TangentVector_T;
-        using CotangentVector_T  = typename MeshBase_T::CotangentVector_T;
-        
-        using BlockClusterTree_T = typename MeshBase_T::BlockClusterTree_T;
-        
-        using Values_T           = Tensor2<Real,size_t>;
-        using ValueContainer_T   = std::unordered_map<std::string,Values_T>;
+        using MeshBase_T             = SimplicialMeshBase<Real,Int,LInt,SReal,ExtReal>;
+        using BlockClusterTreeBase_T = typename MeshBase_T::BlockClusterTreeBase_T;
+        using TangentVector_T        = typename MeshBase_T::TangentVector_T;
+        using CotangentVector_T      = typename MeshBase_T::CotangentVector_T;
+        using ValueContainer_T       = MetricValueContainer<Real,LInt>;
         
         MetricBase() = default;
 
@@ -62,7 +55,7 @@ namespace Repulsor
 
         static std::string className()
         {
-            return std::string("MetricBase<")+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+","+TypeName<ExtReal>+">";
+            return std::string("MetricBase<")+TypeName<Real>+","+TypeName<Int>+","+TypeName<LInt>+","+TypeName<SReal>+","+TypeName<ExtReal>+">";
         }
         
         virtual std::string ClassName() const

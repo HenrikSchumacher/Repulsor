@@ -115,10 +115,9 @@ public:
     }
 
 
-    void PrintReport( Int thread, float time ) const
+    void PrintReport( float time ) const
     {
-        logprint("Thread "+ToString(thread)+": "
-            + "\n\t kernel:        \t" + this->ClassName()
+        logprint( this->ClassName() + ": "
             + "\n\t time elapsed:  \t" + ToString(time)
             + "\n\t evaluations:   \t" + ToString(this->evaluations)
             + "\n\t deepest level: \t" + ToString(this->max_level_reached)
@@ -127,6 +126,7 @@ public:
         
         if( this->max_level_reached >= this->max_refinement )
         {
-            wprint(this->ClassName()+" on thread "+ToString(thread)+" reached the maximal allowed refinement level "+ToString(this->max_refinement)+".");
+            wprint(this->ClassName() + " reached the maximal allowed refinement level "+ToString(this->max_refinement)+".");
         }
+        
     }

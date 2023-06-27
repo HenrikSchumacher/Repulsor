@@ -31,8 +31,8 @@ namespace Repulsor
         using LInt               = typename Base_T::LInt;
         
         using Configurator_T     = typename Base_T::Configurator_T;
-        using Values_T           = typename Base_T::Values_T;
         using ValueContainer_T   = typename Base_T::ValueContainer_T;
+        using Values_T           = typename ValueContainer_T::Values_T;
         
         using Base_T::AMB_DIM;
         using Base_T::PROJ_DIM;
@@ -415,16 +415,17 @@ namespace Repulsor
         
         std::string ClassName() const
         {
-            return "TP_Kernel_VF<"
+            return std::string("TP_Kernel_VF<")
             + ToString(S_DOM_DIM) + ","
             + ToString(T_DOM_DIM) + ","
-            + this->S.ClassName() + ","
+//            + this->S.ClassName() + ","
+            + "...,"
             + TypeName<T1> + ","
             + TypeName<T2> + ","
             + ToString(energy_flag) + ","
             + ToString(diff_flag) + ","
             + ToString(metric_flag) +
-            ">";
+            ">" + this->ThreadString();
         }
         
     }; // class TP_Kernel_VF

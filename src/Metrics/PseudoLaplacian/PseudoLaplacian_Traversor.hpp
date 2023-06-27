@@ -26,8 +26,8 @@ namespace Repulsor
         using ExtReal            = typename ClusterTree_T::ExtReal;
         
         using Configurator_T     = FMM_Configurator<ClusterTree_T>;
-        using Values_T           = typename Configurator_T::Values_T;
         using ValueContainer_T   = typename Configurator_T::ValueContainer_T;
+        using Values_T           = typename ValueContainer_T::Values_T;
         
         using Accumulator_T      = typename ClusterTree_T::Accumulator_T;
         
@@ -317,7 +317,7 @@ namespace Repulsor
             Sparse::KernelMatrixCSR<Kernel_Block_Mul_T> matrix ( bct.Near() );
         
             matrix.Dot(
-                metric_values["NF"].data(),
+                metric_values.NF.data(),
                 one,  bct.GetT().PrimitiveInputBuffer().data(),
                 zero, bct.GetS().PrimitiveOutputBuffer().data(),
                 rhs_count
@@ -331,7 +331,7 @@ namespace Repulsor
                 );
 
                 diag.Dot(
-                    metric_values["NF_diag"].data(),
+                    metric_values.NF_diag.data(),
                     one, bct.GetT().PrimitiveInputBuffer().data(),
                     one, bct.GetS().PrimitiveOutputBuffer().data(),
                     rhs_count
@@ -344,7 +344,7 @@ namespace Repulsor
             Sparse::KernelMatrixCSR<Kernel_Block_MulAdd_T> matrix ( bct.VeryNear() );
             
             matrix.Dot(
-                metric_values["VF"].data(),
+                metric_values.VF.data(),
                 one, bct.GetT().PrimitiveInputBuffer().data(),
                 one, bct.GetS().PrimitiveOutputBuffer().data(),
                 rhs_count
@@ -358,7 +358,7 @@ namespace Repulsor
                 );
 
                 diag.Dot(
-                    metric_values["VF_diag"].data(),
+                    metric_values.VF_diag.data(),
                     one, bct.GetT().PrimitiveInputBuffer().data(),
                     one, bct.GetS().PrimitiveOutputBuffer().data(),
                     rhs_count
@@ -371,7 +371,7 @@ namespace Repulsor
             Sparse::KernelMatrixCSR<Kernel_Block_Mul_T> matrix ( bct.Far() );
             
             matrix.Dot(
-                metric_values["FF"].data(),
+                metric_values.FF.data(),
                 one,  bct.GetT().ClusterInputBuffer().data(),
                 zero, bct.GetS().ClusterOutputBuffer().data(),
                 rhs_count
@@ -385,7 +385,7 @@ namespace Repulsor
                 );
                 
                 diag.Dot(
-                    metric_values["FF_diag"].data(),
+                    metric_values.FF_diag.data(),
                     one, bct.GetT().ClusterInputBuffer().data(),
                     one, bct.GetS().ClusterOutputBuffer().data(),
                     rhs_count

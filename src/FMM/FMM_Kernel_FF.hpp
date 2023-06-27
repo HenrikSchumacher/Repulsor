@@ -24,8 +24,8 @@ namespace Repulsor
         using LInt               = typename Base_T::LInt;
         
         using Configurator_T     = typename Base_T::Configurator_T;
-        using Values_T           = typename Base_T::Values_T;
         using ValueContainer_T   = typename Base_T::ValueContainer_T;
+        using Values_T           = typename ValueContainer_T::Values_T;
         
         using Base_T::AMB_DIM;
         using Base_T::PROJ_DIM;
@@ -95,7 +95,7 @@ namespace Repulsor
         ,   T_D_data    ( GetT().ThreadClusterDFarFieldData().data(thread) )
         ,   T_diag      ( GetT().FF_Accumulator().data(            thread) )
         {
-            debug_print(std::string( "Initializing "+ClassName()+" from Configurator_T on thread " + ToString(thread)) );
+            debug_print(std::string( "Initializing " + this->ClassName()+" from Configurator_T on thread " + ToString(thread)) );
             
             if( GetS().ClusterFarFieldData().Dimension(1) != S_DATA_DIM )
             {
@@ -221,22 +221,22 @@ namespace Repulsor
 
         Values_T & OffDiag()
         {
-            return this->metric_values["FF"];
+            return this->metric_values.FF;
         }
         
         const Values_T & OffDiag() const
         {
-            return this->metric_values["FF"];
+            return this->metric_values.FF;
         }
         
         Values_T & Diag()
         {
-            return this->metric_values["FF_diag"];
+            return this->metric_values.FF_diag;
         }
         
         const Values_T & Diag() const
         {
-            return this->metric_values["FF_diag"];
+            return this->metric_values.FF_diag;
         }
 
         void Reduce( const FMM_Kernel_FF & ker )
@@ -244,8 +244,9 @@ namespace Repulsor
         
         std::string ClassName() const
         {
-            return "FMM_Kernel_FF<"
-            + GetS().ClassName() + ","
+            return std::string("FMM_Kernel_FF<")
+//            + GetS().ClassName() + ","
+            + "...,"
             + ToString(energy_flag) + ","
             + ToString(diff_flag) + ","
             + ToString(metric_flag) +

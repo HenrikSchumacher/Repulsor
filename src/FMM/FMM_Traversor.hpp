@@ -72,18 +72,11 @@ namespace Repulsor
 
             kernel.Allocate( pattern.NonzeroCount() );
             
-            //DEBUGGING
+            // DEBUG THIS!
             Real global_sum = ParallelDoReduce(
                 [=,&job_ptr]( const Int thread )
                 {
-                    // Initialize local kernel and feed it all the information that is going to be constant along its life time.
-                    
-//                    logprint( ToString(thread) + " -> kernel.Thread() = " + ToString(kernel.Thread()) );
-                    
-                    
                     Kernel_T ker ( kernel, thread );
-                    
-//                    logprint( ToString(thread) + " -> ker.Thread() = " + ToString(ker.Thread()) );
 
                     Real local_sum (0);
                     
@@ -97,6 +90,7 @@ namespace Repulsor
                     
                     const Time start_time = Clock::now();
                     
+//                    print("Loop on " + ToString(thread) + " begins");
                     for( Int i = i_begin; i < i_end; ++i )
                     {
                         // These are the corresponding nonzero blocks in i-th row.
@@ -140,13 +134,13 @@ namespace Repulsor
                             ker.WriteS(i);
                         }
                         
-                        // Incoporate the local vector chunk into the i-th chunk of the output.
+                        // Incorporate the local vector chunk into the i-th chunk of the output.
                         
                     }
                     
                     const Time stop_time = Clock::now();
                     
-                    ker.PrintReport( thread, Tools::Duration(start_time,stop_time) );
+                    ker.PrintReport( Tools::Duration(start_time,stop_time) );
                     
                     return local_sum; 
                 },
@@ -154,7 +148,7 @@ namespace Repulsor
                 Scalar::Zero<Real>,
                 job_ptr.ThreadCount()
             );
-
+            
             ptoc(ClassName()+"::Compute");
 
             return global_sum;

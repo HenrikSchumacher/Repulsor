@@ -3,24 +3,27 @@
 #include "../Energies/TangentPointEnergy/TP_Traversor.hpp"
 
 #define CLASS TangentPointMetric
-#define BASE  MetricDimRestricted<DOM_DIM,AMB_DIM,Real,Int,SReal,ExtReal,OperatorType::MixedOrder>
-#define ROOT  MetricBase<Real,Int,SReal,ExtReal>
+#define BASE  MetricDimRestricted<SimplicialMesh<DOM_DIM,AMB_DIM,Real,Int,LInt,SReal,ExtReal>,OperatorType::MixedOrder>
+#define MESH  SimplicialMesh<DOM_DIM,AMB_DIM,Real,Int,LInt,SReal,ExtReal>
+#define BESH  SimplicialMeshBase<Real,Int,LInt,SReal,ExtReal>
+#define ROOT  MetricBase<SimplicialMeshBase<Real,Int,LInt,SReal,ExtReal>>
 
 namespace Repulsor
 {
-    template<int DOM_DIM, int AMB_DIM, typename Real, typename Int, typename SReal, typename ExtReal>
-    class CLASS : public BASE
+    template<typename Mesh_T> class CLASS {};
+    
+    template<int DOM_DIM, int AMB_DIM, typename Real, typename Int, typename LInt, typename SReal, typename ExtReal>
+    class CLASS<MESH> : public BASE
     {
     public:
         
         using Mesh_T                  = typename BASE::Mesh_T;
         using BlockClusterTree_T      = typename Mesh_T::BlockClusterTree_T;
         
-        using Values_T                = typename BASE::Values_T;
         using ValueContainer_T        = typename BASE::ValueContainer_T;
         using TangentVector_T         = typename BASE::TangentVector_T;
         using CotangentVector_T       = typename BASE::CotangentVector_T;
-        
+        using Values_T                = typename ValueContainer_T::Values_T;
         using BASE::MetricValues;
         
         CLASS( const Real q_, const Real p_ )
@@ -66,7 +69,7 @@ namespace Repulsor
         
         std::string className() const
         {
-            return TO_STD_STRING(CLASS)+"<"+ToString(DOM_DIM)+","+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+","+TypeName<ExtReal>+">("+ToString(q)+","+ToString(p)+")";
+            return TO_STD_STRING(CLASS)+"<"+ToString(DOM_DIM)+","+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<LInt>+","+TypeName<SReal>+","+TypeName<ExtReal>+">("+ToString(q)+","+ToString(p)+")";
         }
         
         virtual std::string ClassName() const override
@@ -80,9 +83,8 @@ namespace Repulsor
 
 #include "../Energies/TangentPointEnergy/TP_Factory.hpp"
 
+#undef BESH
+#undef MESH
 #undef ROOT
 #undef BASE
 #undef CLASS
-
-
-

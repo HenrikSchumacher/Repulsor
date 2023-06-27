@@ -2,28 +2,25 @@
 
 namespace Repulsor
 {
-    template<
-        int DOM_DIM, int AMB_DIM,
-        typename Real, typename Int, typename SReal, typename ExtReal,
-        OperatorType op_type
-    >
-    class MetricDimRestricted : public MetricBase<Real,Int,SReal,ExtReal>
-    {
-    private:
-     
-        using Base_T = MetricBase<Real,Int,SReal,ExtReal>;
         
+    template<typename Mesh_T, OperatorType op_type> class MetricDimRestricted {};
+
+    template<int DOM_DIM, int AMB_DIM, typename Real, typename Int, typename LInt, typename SReal, typename ExtReal, OperatorType op_type>
+    class MetricDimRestricted<SimplicialMesh<DOM_DIM,AMB_DIM,Real,Int,LInt,SReal,ExtReal>, op_type>
+        : public MetricBase<SimplicialMeshBase<Real,Int,LInt,SReal,ExtReal>>
+    {
     public:
         
-        using MeshBase_T         = typename Base_T::MeshBase_T;
+        using Mesh_T     = SimplicialMesh<DOM_DIM,AMB_DIM,Real,Int,LInt,SReal,ExtReal>;
+        using MeshBase_T = typename Mesh_T::Base_T;
+        
+        using Base_T     = MetricBase<MeshBase_T>;
+        using Root_T     = MetricBase<MeshBase_T>;
+    
 
         using TangentVector_T    = typename Base_T::TangentVector_T;
         using CotangentVector_T  = typename Base_T::CotangentVector_T;
-        
-        using Values_T           = typename Base_T::Values_T;
         using ValueContainer_T   = typename Base_T::ValueContainer_T;
-        
-        using Mesh_T             = SimplicialMesh<DOM_DIM,AMB_DIM,Real,Int,SReal,ExtReal>;
         
         MetricDimRestricted() = default;
 
@@ -149,7 +146,7 @@ namespace Repulsor
         
         static std::string className()
         {
-            return "MetricDimRestricted<"+ToString(DOM_DIM)+","+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+","+TypeName<ExtReal>+">";
+            return "MetricDimRestricted<"+ToString(DOM_DIM)+","+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<LInt>+","+TypeName<SReal>+","+TypeName<ExtReal>+">";
         }
         
         virtual std::string ClassName() const override
