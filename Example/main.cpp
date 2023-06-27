@@ -3,23 +3,17 @@
 #include <sys/types.h>
 #include <pwd.h>
 
-// We have to toggle which domain dimensions and ambient dimensions shall be supported by runtime polymorphism before we load Repulsor.hpp
-// You can activate everything you want, but compile times might increase substatially.
-#define INT     int32_t
-#define LINT    std::size_t
-//#define INT     int64_t
-#define EXTINT  int64_t
-#define REAL    double
-#define SREAL   float
-#define EXTREAL double
+
 
 //#define REMESHER_VERBATIM
 
 #define TOOLS_ENABLE_PROFILER // enable profiler
 
-//#include <Accelerate/Accelerate.h>
-#include <cblas.h>
-#include <lapacke.h>
+#define LAPACK_DISABLE_NAN_CHECK
+#define ACCELERATE_NEW_LAPACK
+#include <Accelerate/Accelerate.h>
+//#include <cblas.h>
+//#include <lapacke.h>
 
 #include "../Repulsor.hpp"
 #include "../Tensors/MyBLAS.hpp"
@@ -36,8 +30,26 @@ using namespace Tensors;
 using namespace Tools;
 
 
+// We have to toggle which domain dimensions and ambient dimensions shall be supported by runtime polymorphism before we load Repulsor.hpp
+// You can activate everything you want, but compile times might increase substatially.
+using Int     = Int64;
+using LInt    = Int64;
+using ExtInt  = Int64;
+
+using Real    = Real64;
+using SReal   = Real64;
+using ExtReal = Real64;
+
+
 int main(int argc, const char * argv[])
 {
+    print("");
+    print("###############################################################");
+    print("###       Test program for Repulsor::SimplicialMesh        ####");
+    print("###############################################################");
+    print("");
+    
+    
     const char * homedir = getenv("HOME");
 
     if( homedir == nullptr)
@@ -49,8 +61,8 @@ int main(int argc, const char * argv[])
     Profiler::Clear( path );
 
     
-    int thread_count = 8;
-//    int thread_count = 1;    
+//    int thread_count = 8;
+    int thread_count = 1;
     
 #include "Meshes.hpp"
     
@@ -65,14 +77,15 @@ int main(int argc, const char * argv[])
     // SReal   = ("short real") floating point type for storage of clustering information
     // ExtReal = ("external real") floating point type that is used by the outer world, e.g. for submitting the mesh's vertex coordinates and vectors to multiply against the metric.
     
-
-    using Mesh_T   = SimplicialMeshBase<REAL,INT,SREAL,EXTREAL>;
-    using Energy_T = EnergyBase<REAL,INT,SREAL,EXTREAL>;
-    using Metric_T = MetricBase<REAL,INT,SREAL,EXTREAL>;
-
+    using Mesh_T         = SimplicialMeshBase<Real,Int,LInt,SReal,ExtReal>;
+    using Mesh_Factory_T = SimplicialMesh_Factory<Mesh_T,2,2,3,3>;
+    
+    using Energy_T       = EnergyBase<Mesh_T>;
+    using Metric_T       = MetricBase<Mesh_T>;
+    
     // Create a factory that can make instances of SimplicialMesh with domain dimension in the range 2,...,2 and ambient dimension in the range 3,...,3.
     // (The main purpose of this factory is to tell the compiler which template instantiations of SimplicialMesh it shall generate. Note that with obstacles one might want to use meshes of various dimensions. So this factory basically about saving compile time.)
-    SimplicialMesh_Factory<Mesh_T,2,2,3,3> mesh_factory;
+    Mesh_Factory_T mesh_factory;
 
 
     // This factory allows run-time polymorphism. But know that all specializations of SimplicialMesh in theses ranges have to be compiled! That may lead to horrific compile times, thus the ability to restrict the ranges in the factory.
@@ -113,8 +126,8 @@ int main(int argc, const char * argv[])
 
     print("");
 
-    const REAL q = 6;
-    const REAL p = 12;
+    const Real q = 6;
+    const Real p = 12;
 
     // Again some factories.
     TangentPointEnergy_Factory<Mesh_T,2,2,3,3> TPE_factory;
@@ -129,7 +142,7 @@ int main(int argc, const char * argv[])
     const auto & tpm = *tpm_ptr;
 
     double en;
-    // Mesh_T::CotangentVector_T is Tensor2<REAL,INT> in this case. It is a simple container class for heap-allocated matrices.
+    // Mesh_T::CotangentVector_T is Tensor2<Real,Int> in this case. It is a simple container class for heap-allocated matrices.
     Mesh_T::CotangentVector_T diff;
 
     tic("tpe.Energy(M)");
@@ -157,19 +170,19 @@ int main(int argc, const char * argv[])
     dump(en);
     print("");
 
-    // Mesh_T::TangentVector_T and Mesh_T::CotangentVector_T are both Tensor2<REAL,INT> in this example.
+    // Mesh_T::TangentVector_T and Mesh_T::CotangentVector_T are both Tensor2<Real,Int> in this example.
     Mesh_T::TangentVector_T   X ( M.VertexCount(), M.AmbDim() );
     Mesh_T::CotangentVector_T Y ( M.VertexCount(), M.AmbDim() );
 
     // Load some random data into U.
     X.Random();
 
-    const REAL alpha = 1.0;
-    const REAL beta  = 0.0;
+    const Real alpha = 1.0;
+    const Real beta  = 0.0;
     //Performs generalized matrix-matrix product Y = alpha * A * X + beta * Y, where A is the tangent-point metric.
 
     tic("tpm.MetricValues(M)");
-    tpm.MetricValues(M);         // Not necessary. Will automatically called by al routines that require it.
+    tpm.MetricValues(M);         // Not necessary. Will automatically called by all routines that require it.
     toc("tpm.MetricValues(M)");
 
     tic("tpm.MultiplyMetric");
@@ -203,7 +216,7 @@ int main(int argc, const char * argv[])
     print("");
 
     tic("Create obstacle trees");
-    M.GetObstacleBlockClusterTree();    // Not necessary. Will automatically called by al routines that require it.
+    M.GetObstacleBlockClusterTree();    // Not necessary. Will automatically called by all routines that require it.
     toc("Create obstacle trees");
     print("");
 
@@ -235,7 +248,7 @@ int main(int argc, const char * argv[])
     TangentPointMetric0_Factory<Mesh_T,2,2,3,3> TPM0_factory;
     PseudoLaplacian_Factory    <Mesh_T,2,2,3,3> Prec_factory;
 
-    const REAL s = (p - 2)/q;
+    const Real s = (p - 2)/q;
 
     dump(s);
     dump(2-s);
@@ -288,19 +301,21 @@ int main(int argc, const char * argv[])
     
 //    print( perm.ToString() );
     
-    Sparse::CholeskyDecomposition<REAL, INT, LINT> S (
+    Sparse::CholeskyDecomposition<Real,Int,LInt> S (
         A.Outer().data(), A.Inner().data(), perm.data(), A.RowCount(),
-        A.ThreadCount(), static_cast<INT>(4)
+        A.ThreadCount(), static_cast<Int>(4)
     );
     
     S.SymbolicFactorization();
     
-    S.NumericFactorization( A.Values().data(), Scalar::Zero<REAL> );
+    S.NumericFactorization( A.Values().data(), Scalar::Zero<Real> );
+    
+    
     
 //    print( S.GetPermutation().GetPermutation().ToString() );
 
-    Tensor1<REAL,INT> b ( M.VertexCount(), 1 );
-    Tensor1<REAL,INT> x ( M.VertexCount(), 0 );
+    Tensor1<Real,Int> b ( M.VertexCount(), 1 );
+    Tensor1<Real,Int> x ( M.VertexCount(), 0 );
     
     S.Solve( b.data(), x.data() );
     
@@ -309,9 +324,9 @@ int main(int argc, const char * argv[])
     print("");
     print("Testing remesher.");
 
-    std::unique_ptr<Mesh_T::Remesher_T> R = M_ptr->CreateRemesher();
+    std::unique_ptr<Mesh_T::RemesherBase_T> R = M_ptr->CreateRemesher();
 
-    std::vector<INT> edges {1,2,3};
+    std::vector<Int> edges {1,2,3};
 
     R->CollapseEdges( edges );
 

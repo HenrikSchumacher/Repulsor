@@ -1,13 +1,13 @@
 // Some hard-coded example featuring two meshed sphere is close vicinity to to each other.
-constexpr INT dom_dim      = 2;
-constexpr INT amb_dim      = 3;
-constexpr INT vertex_count           = 162;
-constexpr INT simplex_count          = 320;
+constexpr Int dom_dim      = 2;
+constexpr Int amb_dim      = 3;
+constexpr Int vertex_count           = 162;
+constexpr Int simplex_count          = 320;
 
-constexpr INT obstacle_vertex_count  = 162;
-constexpr INT obstacle_simplex_count = 320;
+constexpr Int obstacle_vertex_count  = 162;
+constexpr Int obstacle_simplex_count = 320;
 
-EXTREAL vertex_coordinates [vertex_count][amb_dim] = {
+ExtReal vertex_coordinates [vertex_count][amb_dim] = {
     {-0.0000000000000000, 0.0000000000000000, 0.0039062500000000},
     {0.0000000000000000, 0.0000000000000000, 2.0039062500000000},
     {-0.8944271909999160, 0.0000000000000000, 0.5566926545000421},
@@ -172,7 +172,7 @@ EXTREAL vertex_coordinates [vertex_count][amb_dim] = {
     {-0.1476132178595674, 0.9510037209628170, 1.2755719648556310}
 };
 
-EXTINT simplices [simplex_count][dom_dim+1] = {
+ExtInt simplices [simplex_count][dom_dim+1] = {
     {  5,  68,  69}, { 27, 146,  68}, { 30,  69, 146}, {146,  69,  68}, {  3,  58,  59},
     { 26, 141,  58}, { 27,  59, 141}, {141,  59,  58}, {  4,  64,  63}, { 30, 143,  64},
     { 26,  63, 143}, {143,  63,  64}, { 26, 143, 141}, { 30, 146, 143}, { 27, 141, 146},
@@ -238,7 +238,7 @@ EXTINT simplices [simplex_count][dom_dim+1] = {
     {41, 91, 160}, {160, 91, 90}, {7, 81, 80}, {39, 159, 81}, {38, 80, 159},
     {159, 80, 81}, {38, 159, 160}, {39, 161, 159}, {41, 160, 161}, {161, 160, 159}};
 
-EXTREAL obstacle_vertex_coordinates [obstacle_vertex_count][3] = {
+ExtReal obstacle_vertex_coordinates [obstacle_vertex_count][3] = {
     {-0.0000000000000000, 0.0000000000000000, -2.0039062500000000},
     {0.0000000000000000, 0.0000000000000000, -0.0039062500000000},
     {-0.8944271909999160, 0.0000000000000000, -1.4511198454999580},
@@ -403,7 +403,7 @@ EXTREAL obstacle_vertex_coordinates [obstacle_vertex_count][3] = {
     {-0.1476132178595674, 0.9510037209628170, -0.7322405351443689}
 };
 
-EXTINT obstacle_simplices [obstacle_simplex_count][dom_dim+1] = {
+ExtInt obstacle_simplices [obstacle_simplex_count][dom_dim+1] = {
     {  5,  68,  69}, { 27, 146,  68}, { 30,  69, 146}, {146,  69,  68}, {  3,  58,  59},
     { 26, 141,  58}, { 27,  59, 141}, {141,  59,  58}, {  4,  64,  63}, { 30, 143,  64},
     { 26,  63, 143}, {143,  63,  64}, { 26, 143, 141}, { 30, 146, 143}, { 27, 141, 146},

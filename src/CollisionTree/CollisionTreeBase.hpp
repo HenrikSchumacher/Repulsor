@@ -2,11 +2,12 @@
 
 namespace Repulsor
 {
-    template<typename Real_, typename Int_, typename SReal_, typename ExtReal_, bool symmetricQetric>
+    template<typename Real_, typename Int_, typename LInt_, typename SReal_, typename ExtReal_, bool symmetricQetric>
     class CollisionTreeBase
     {
         ASSERT_FLOAT(Real_   );
         ASSERT_INT  (Int_    );
+        ASSERT_INT  (LInt_   );
         ASSERT_FLOAT(SReal_  );
         ASSERT_FLOAT(ExtReal_);
         
@@ -14,12 +15,12 @@ namespace Repulsor
         
         using Real              = Real_;
         using Int               = Int_;
+        using LInt              = LInt_;
         using SReal             = SReal_;
         using ExtReal           = ExtReal_;
         
-        using ClusterTreeBase_T = ClusterTreeBase<Real,Int,SReal,ExtReal>;
+        using ClusterTreeBase_T = ClusterTreeBase<Real,Int,LInt,SReal,ExtReal>;
         
-        using LInt              = typename ClusterTreeBase_T::LInt;
         using CollisionMatrix_T = Sparse::MatrixCSR<SReal,Int,LInt>;
         
         
@@ -58,7 +59,7 @@ namespace Repulsor
         
         virtual std::string ClassName() const
         {
-            return  std::string("CollisionTreeBase<")+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+","+TypeName<ExtReal>+">";
+            return  std::string("CollisionTreeBase<")+TypeName<Real>+","+TypeName<Int>+","+TypeName<LInt>+","+TypeName<SReal>+","+TypeName<ExtReal>+">";
         }
 
     }; // class CollisionTreeBase

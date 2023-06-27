@@ -2,11 +2,12 @@
 
 namespace Repulsor
 {
-    template<typename Real_, typename Int_, typename SReal_, typename ExtReal_>
+    template<typename Real_, typename Int_, typename LInt_, typename SReal_, typename ExtReal_>
     class ClusterTreeBase : public CachedObject
     {
         ASSERT_FLOAT(Real_   );
         ASSERT_INT  (Int_    );
+        ASSERT_INT  (LInt_   );
         ASSERT_FLOAT(SReal_  );
         ASSERT_FLOAT(ExtReal_);
  
@@ -17,8 +18,8 @@ namespace Repulsor
         using Int                   = Int_;
         using SReal                 = SReal_;
         using ExtReal               = ExtReal_;
+        using LInt                  = LInt_;
         
-        using LInt                  = Size_T;
         using SparseMatrix_T        = Sparse::MatrixCSR      <Real,Int,LInt>;
         using SparseBinaryMatrix_T  = Sparse::BinaryMatrixCSR<     Int,LInt>;
         
@@ -782,7 +783,7 @@ namespace Repulsor
     private:
         std::string className() const
         {
-            return std::string("ClusterTreeBase<")+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+","+TypeName<ExtReal>+">";
+            return std::string("ClusterTreeBase<")+TypeName<Real>+","+TypeName<Int>+","+TypeName<LInt>+","+TypeName<SReal>+","+TypeName<ExtReal>+">";
         }
         
     public:

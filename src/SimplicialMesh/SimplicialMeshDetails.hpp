@@ -4,17 +4,16 @@
 
 namespace Repulsor
 {
-	template<int DOM_DIM, int AMB_DIM, typename Real, typename Int>
+	template<int DOM_DIM, int AMB_DIM, typename Real, typename Int, typename LInt>
     struct SimplicialMeshDetails
     {
 	public:
 
-		using LInt           = Size_T;
 		using SparseMatrix_T = Sparse::MatrixCSR<Real,Int,LInt>;
 
 		std::string ClassName() const
         {
-            return std::string("SimplicialMeshDetails<")+ToString(DOM_DIM)+","+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+">";
+            return std::string("SimplicialMeshDetails<")+ToString(DOM_DIM)+","+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<LInt>+">";
         }
 
 		
@@ -84,17 +83,16 @@ namespace Repulsor
         ptoc(ClassName()+"::DFarToHulls");
     }
 
-	}; // SimplicialMeshDetails<DOM_DIM,AMB,Real,Int>
+	}; // SimplicialMeshDetails<DOM_DIM,AMB,Real,Int,LInt>
 
 //----------------------------------------------------------------------------------------------
 
     
-    template<typename Real, typename Int>
-    struct SimplicialMeshDetails<0,1,Real,Int>
+    template<typename Real, typename Int, typename LInt>
+    struct SimplicialMeshDetails<0,1,Real,Int,LInt>
     {
 	public:
 
-		using LInt           = Size_T;
 		using SparseMatrix_T = Sparse::MatrixCSR<Real,Int,LInt>;
 
 	private:
@@ -345,12 +343,11 @@ namespace Repulsor
 
 //----------------------------------------------------------------------------------------------
 
-    template<typename Real, typename Int>
-    struct SimplicialMeshDetails<0,2,Real,Int>
+    template<typename Real, typename Int, typename LInt>
+    struct SimplicialMeshDetails<0,2,Real,Int,LInt>
     {
 	public:
 
-		using LInt           = Size_T;
 		using SparseMatrix_T = Sparse::MatrixCSR<Real,Int,LInt>;
 
 	private:
@@ -615,12 +612,11 @@ namespace Repulsor
 
 //----------------------------------------------------------------------------------------------
 
-    template<typename Real, typename Int>
-    struct SimplicialMeshDetails<0,3,Real,Int>
+    template<typename Real, typename Int, typename LInt>
+    struct SimplicialMeshDetails<0,3,Real,Int,LInt>
     {
 	public:
 
-		using LInt           = Size_T;
 		using SparseMatrix_T = Sparse::MatrixCSR<Real,Int,LInt>;
 
 	private:
@@ -901,12 +897,11 @@ namespace Repulsor
 
 //----------------------------------------------------------------------------------------------
 
-    template<typename Real, typename Int>
-    struct SimplicialMeshDetails<0,4,Real,Int>
+    template<typename Real, typename Int, typename LInt>
+    struct SimplicialMeshDetails<0,4,Real,Int,LInt>
     {
 	public:
 
-		using LInt           = Size_T;
 		using SparseMatrix_T = Sparse::MatrixCSR<Real,Int,LInt>;
 
 	private:
@@ -1205,12 +1200,11 @@ namespace Repulsor
 
 //----------------------------------------------------------------------------------------------
 
-    template<typename Real, typename Int>
-    struct SimplicialMeshDetails<1,2,Real,Int>
+    template<typename Real, typename Int, typename LInt>
+    struct SimplicialMeshDetails<1,2,Real,Int,LInt>
     {
 	public:
 
-		using LInt           = Size_T;
 		using SparseMatrix_T = Sparse::MatrixCSR<Real,Int,LInt>;
 
 	private:
@@ -1667,12 +1661,11 @@ namespace Repulsor
 
 //----------------------------------------------------------------------------------------------
 
-    template<typename Real, typename Int>
-    struct SimplicialMeshDetails<1,3,Real,Int>
+    template<typename Real, typename Int, typename LInt>
+    struct SimplicialMeshDetails<1,3,Real,Int,LInt>
     {
 	public:
 
-		using LInt           = Size_T;
 		using SparseMatrix_T = Sparse::MatrixCSR<Real,Int,LInt>;
 
 	private:
@@ -2234,12 +2227,11 @@ namespace Repulsor
 
 //----------------------------------------------------------------------------------------------
 
-    template<typename Real, typename Int>
-    struct SimplicialMeshDetails<1,4,Real,Int>
+    template<typename Real, typename Int, typename LInt>
+    struct SimplicialMeshDetails<1,4,Real,Int,LInt>
     {
 	public:
 
-		using LInt           = Size_T;
 		using SparseMatrix_T = Sparse::MatrixCSR<Real,Int,LInt>;
 
 	private:
@@ -2896,12 +2888,11 @@ namespace Repulsor
 
 //----------------------------------------------------------------------------------------------
 
-    template<typename Real, typename Int>
-    struct SimplicialMeshDetails<2,3,Real,Int>
+    template<typename Real, typename Int, typename LInt>
+    struct SimplicialMeshDetails<2,3,Real,Int,LInt>
     {
 	public:
 
-		using LInt           = Size_T;
 		using SparseMatrix_T = Sparse::MatrixCSR<Real,Int,LInt>;
 
 	private:
@@ -3741,12 +3732,11 @@ namespace Repulsor
 
 //----------------------------------------------------------------------------------------------
 
-    template<typename Real, typename Int>
-    struct SimplicialMeshDetails<2,4,Real,Int>
+    template<typename Real, typename Int, typename LInt>
+    struct SimplicialMeshDetails<2,4,Real,Int,LInt>
     {
 	public:
 
-		using LInt           = Size_T;
 		using SparseMatrix_T = Sparse::MatrixCSR<Real,Int,LInt>;
 
 	private:

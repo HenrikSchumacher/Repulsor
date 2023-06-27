@@ -129,7 +129,7 @@ namespace Repulsor
             ParallelDo_Dynamic(
                 [this]( const Int thread, const Int k )
                 {
-                    debug_print(className()+"::Traverse_Parallel: Requesting kernel "+ kernels[thread].ClassName() + " on thread " + ToString(thread) + " for task " + ToString(k) + "." );
+                    debug_print(className()+"::Traverse_Parallel: Requesting kernel on thread " + ToString(thread) + " for task " + ToString(k) + "." );
                     
                     Traverse_DepthFirst( thread, i_queue[k], j_queue[k] );
                 },

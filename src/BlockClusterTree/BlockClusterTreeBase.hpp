@@ -3,11 +3,12 @@
 namespace Repulsor
 {
     
-    template<typename Real_, typename Int_, typename SReal_, typename ExtReal_, bool symmetricQ>
+    template<typename Real_, typename Int_, typename LInt_, typename SReal_, typename ExtReal_, bool symmetricQ>
     class BlockClusterTreeBase
     {
         ASSERT_FLOAT(Real_   );
         ASSERT_INT  (Int_    );
+        ASSERT_INT  (LInt_   );
         ASSERT_FLOAT(SReal_  );
         ASSERT_FLOAT(ExtReal_);
         
@@ -16,8 +17,7 @@ namespace Repulsor
         using Int     = Int_;
         using SReal   = SReal_;
         using ExtReal = ExtReal_;
-        
-        using LInt    = Size_T;
+        using LInt    = LInt_;
         
         using Setting_T          = BlockClusterTreeSettings;
 
@@ -26,7 +26,7 @@ namespace Repulsor
         using Near_Pattern_T     = Sparse::BinaryMatrixCSR<Int,LInt>;
         using Far_Pattern_T      = Sparse::BinaryMatrixCSR<Int,LInt>;
         
-        using ClusterTreeBase_T  = ClusterTreeBase<Real,Int,SReal,ExtReal>;
+        using ClusterTreeBase_T  = ClusterTreeBase<Real,Int,LInt,SReal,ExtReal>;
 
     protected:
 
@@ -75,7 +75,7 @@ namespace Repulsor
         
         virtual std::string ClassName() const
         {
-            return  std::string("BlockClusterTreeBase<")+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+","+TypeName<ExtReal>+","+ToString(symmetricQ)+">";
+            return  std::string("BlockClusterTreeBase<")+TypeName<Real>+","+TypeName<Int>+","+TypeName<LInt>+","+TypeName<SReal>+","+TypeName<ExtReal>+","+ToString(symmetricQ)+">";
         }
         
     }; // class BlockClusterTreeBase

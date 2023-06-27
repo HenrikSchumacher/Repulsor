@@ -1,9 +1,7 @@
 #pragma once
 
-
 namespace Repulsor
 {
-    
     
     // Some generic template for all the factories to come.
     template < class T, int ...N> class SimplicialMesh_Factory {};
@@ -11,15 +9,16 @@ namespace Repulsor
     template<
         int MinDomDim_, int MaxDomDim_,
         int MinAmbDim_, int MaxAmbDim_,
-        typename Real_, typename Int_, typename SReal_, typename ExtReal_
+        typename Real_, typename Int_, typename LInt_, typename SReal_, typename ExtReal_
     >
-    class SimplicialMesh_Factory< SimplicialMeshBase<Real_,Int_,SReal_,ExtReal_>, MinDomDim_, MaxDomDim_, MinAmbDim_, MaxAmbDim_ >
+    class SimplicialMesh_Factory< SimplicialMeshBase<Real_,Int_,LInt_,SReal_,ExtReal_>, MinDomDim_, MaxDomDim_, MinAmbDim_, MaxAmbDim_ >
     {
         static_assert( MinDomDim_ <= MaxDomDim_, "MinDomDim_ <= MaxDomDim_ required." );
         static_assert( MinAmbDim_ <= MaxAmbDim_, "MinAmbDim_ <= MaxAmbDim_ required." );
         
         ASSERT_FLOAT(Real_);
         ASSERT_INT(Int_);
+        ASSERT_INT(LInt_);
         ASSERT_FLOAT(SReal_);
         ASSERT_FLOAT(ExtReal_);
         
@@ -27,10 +26,11 @@ namespace Repulsor
         
         using Real    = Real_;
         using Int     = Int_;
+        using LInt    = LInt_;
         using SReal   = SReal_;
         using ExtReal = ExtReal_;
         
-        using Base_T  = SimplicialMeshBase<Real,Int,SReal,ExtReal>;
+        using MeshBase_T  = SimplicialMeshBase<Real,Int,LInt,SReal,ExtReal>;
         
         static constexpr Int MinAmbDim = std::max( Int(1), Int(MinAmbDim_) );
         static constexpr Int MaxAmbDim = std::max( Int(1), Int(MaxAmbDim_) );
@@ -43,7 +43,7 @@ namespace Repulsor
         ~SimplicialMesh_Factory() = default;
 
         template<typename ExtInt>
-        std::unique_ptr<Base_T> Make(
+        std::unique_ptr<MeshBase_T> Make(
             const ExtReal * const vertex_coords, // vertex coordinates; size = vertex_count_ x amb_dim
             const Int             vertex_count,
             const Int             amb_dim,
@@ -84,7 +84,7 @@ namespace Repulsor
     private:
         
         template<Int AmbDim, typename ExtInt>
-        std::unique_ptr<Base_T> make_1(
+        std::unique_ptr<MeshBase_T> make_1(
             const ExtReal * const v,
             const Int             v_cnt,
             const Int             amb_dim,
@@ -116,7 +116,7 @@ namespace Repulsor
         }
         
         template<Int DomDim, Int AmbDim, typename ExtInt>
-        std::unique_ptr<Base_T> make_2(
+        std::unique_ptr<MeshBase_T> make_2(
             const ExtReal * const v,
             const Int             v_cnt,
             const Int             amb_dim,
@@ -130,8 +130,8 @@ namespace Repulsor
         {
             if( dom_dim == DomDim )
             {
-                return std::unique_ptr<Base_T>(
-                    new SimplicialMesh<DomDim,AmbDim,Real,Int,SReal,ExtReal>(
+                return std::unique_ptr<MeshBase_T>(
+                    new SimplicialMesh<DomDim,AmbDim,Real,Int,LInt,SReal,ExtReal>(
                         v, v_cnt, v_transp, s, s_cnt, s_transp, thread_count
                     )
                 );
@@ -149,17 +149,16 @@ namespace Repulsor
             }
         }
             
-        std::unique_ptr<Base_T> Error( const Int dom_dim, const Int amb_dim )
+        std::unique_ptr<MeshBase_T> Error( const Int dom_dim, const Int amb_dim )
         {
             eprint(ClassName()+" cannot create SimplicialMesh with domain dimension "+ToString(dom_dim)+" and  ambient dimension "+ToString(amb_dim)+".");
             
-            return std::unique_ptr<Base_T>( nullptr );
+            return std::unique_ptr<MeshBase_T>( nullptr );
         }
         
     public:
         
-        template<typename Real, typename Int, typename SReal, typename ExtReal>
-        std::unique_ptr<Base_T> Make_FromFile( const std::string & file_name, const Int thread_count )
+        std::unique_ptr<MeshBase_T> Make_FromFile( const std::string & file_name, const Int thread_count )
         {
             ptic(ClassName()+"Make_FromFile");
             
@@ -221,7 +220,7 @@ namespace Repulsor
             }
             
             
-            std::unique_ptr<Base_T> M = Make(
+            std::unique_ptr<MeshBase_T> M = Make(
                 V, vertex_count,  amb_dim,      false,
                 S, simplex_count, simplex_size, false,
                 thread_count

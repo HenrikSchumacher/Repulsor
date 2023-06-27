@@ -13,30 +13,28 @@ namespace Repulsor
     template<int DOM_DIM, int AMB_DIM, typename Real_, typename Int_>
     class SimplicialRemesher;
     
-    template<int DOM_DIM, int AMB_DIM, typename Real_, typename Int_, typename SReal_, typename ExtReal_>
-    class SimplicialMesh : public SimplicialMeshBase<Real_,Int_,SReal_,ExtReal_>
-    {
-        
+    template<int DOM_DIM, int AMB_DIM, typename Real_, typename Int_, typename LInt_, typename SReal_, typename ExtReal_>
+    class SimplicialMesh : public SimplicialMeshBase<Real_,Int_,LInt_,SReal_,ExtReal_>
+    {   
         static_assert(DOM_DIM >= 1       , "Domain dimension must be positive.");
         static_assert(AMB_DIM >= DOM_DIM , "Ambient dimension must at least as high as the domain dimension.");
         
         
         ASSERT_FLOAT(Real_);
         ASSERT_INT(Int_);
+        ASSERT_INT(LInt_);
         ASSERT_FLOAT(SReal_);
         ASSERT_FLOAT(ExtReal_);
         
-    private:
-        
-        using Base_T = SimplicialMeshBase<Real_,Int_,SReal_,ExtReal_>;
-        
     public:
+        
+        using Base_T = SimplicialMeshBase<Real_,Int_,LInt_,SReal_,ExtReal_>;
         
         using Real    = Real_;
         using Int     = Int_;
         using SReal   = SReal_;
         using ExtReal = ExtReal_;
-        using LInt    = typename Base_T::LInt;
+        using LInt    = LInt_;
         
         using TangentVector_T      = typename Base_T::TangentVector_T;
         using CotangentVector_T    = typename Base_T::CotangentVector_T;
@@ -49,18 +47,18 @@ namespace Repulsor
         using BoundingVolume_T = AABB<AMB_DIM,GJK_Real,Int,SReal>;
         
         
-        using ClusterTree_T           = ClusterTree<AMB_DIM,Real,Int,SReal,ExtReal>;
-        using BlockClusterTree_T      = BlockClusterTree<AMB_DIM,Real,Int,SReal,ExtReal,true>;
+        using ClusterTree_T           = ClusterTree      <AMB_DIM,Real,Int,LInt,SReal,ExtReal>;
+        using BlockClusterTree_T      = BlockClusterTree <AMB_DIM,Real,Int,LInt,SReal,ExtReal,true>;
         using ObstacleBlockClusterTree_T
-                                      = BlockClusterTree<AMB_DIM,Real,Int,SReal,ExtReal,false>;
-        using CollisionTree_T         = CollisionTree<AMB_DIM,Real,Int,SReal,ExtReal,true>;
-        using ObstacleCollisionTree_T = CollisionTree<AMB_DIM,Real,Int,SReal,ExtReal,false>;
+                                      = BlockClusterTree <AMB_DIM,Real,Int,LInt,SReal,ExtReal,false>;
+        using CollisionTree_T         = CollisionTree    <AMB_DIM,Real,Int,LInt,SReal,ExtReal,true>;
+        using ObstacleCollisionTree_T = CollisionTree    <AMB_DIM,Real,Int,LInt,SReal,ExtReal,false>;
 
-        using Remesher_T         = SimplicialRemesher<DOM_DIM,AMB_DIM,Real,Int>;
+        using Remesher_T              = SimplicialRemesher<DOM_DIM,AMB_DIM,Real,Int>;
         
-        using RemesherBase_T     = typename Base_T::Remesher_T;
+        using RemesherBase_T          = typename Base_T::RemesherBase_T;
         
-        using Obstacle_T         = Base_T;
+        using Obstacle_T              = Base_T;
         
         static constexpr Int  FAR_DIM = 1 + AMB_DIM + (AMB_DIM * (AMB_DIM + 1)) / 2;
         static constexpr Int NEAR_DIM = 1 + (DOM_DIM+1) * AMB_DIM + (AMB_DIM * (AMB_DIM + 1)) / 2;
@@ -213,7 +211,7 @@ namespace Repulsor
         mutable Tensor1<Int,Int> simplex_row_pointers;
         mutable Tensor1<Int,Int> simplex_column_indices;
         
-        SimplicialMeshDetails<DOM_DIM,AMB_DIM,Real_,Int_> details;
+        SimplicialMeshDetails<DOM_DIM,AMB_DIM,Real,Int,LInt> details;
 
         
     protected:
@@ -797,7 +795,7 @@ namespace Repulsor
                     
                     queue_1.resize(0);
                     
-                    debug_print("queue = "+ToString(queue));
+                    debug_print("queue_0 = "+ToString(queue_0));
                     
                     perm_1.Read( perm_0.data() );
                     
@@ -1016,6 +1014,8 @@ namespace Repulsor
             ComputeNearFarData( P_near, P_far );
             
             GetClusterTree().SemiStaticUpdate( P_near, P_far );
+            
+//            dump(GetCollisionTree().PrimitiveCollisionMatrix().NonzeroCount());
             
             ptoc(className()+"::SemiStaticUpdate");
         }
@@ -1533,7 +1533,7 @@ namespace Repulsor
   
         static std::string className()
         {
-            return "SimplicialMesh<"+ToString(DOM_DIM)+","+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+","+TypeName<ExtReal>+">";
+            return "SimplicialMesh<"+ToString(DOM_DIM)+","+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<LInt>+","+TypeName<SReal>+","+TypeName<ExtReal>+","+TypeName<LInt>+">";
         }
     };
 } // namespace Repulsor

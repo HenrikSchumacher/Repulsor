@@ -7,17 +7,18 @@
 
 namespace Repulsor
 {
-    template<int AMB_DIM, typename Real_, typename Int_, typename SReal_, typename ExtReal_, bool symmetricQ>
-    class CollisionTree : public CollisionTreeBase<Real_,Int_,SReal_,ExtReal_,symmetricQ>
+    template<int AMB_DIM, typename Real_, typename Int_, typename LInt_, typename SReal_, typename ExtReal_, bool symmetricQ>
+    class CollisionTree : public CollisionTreeBase<Real_,Int_,LInt_,SReal_,ExtReal_,symmetricQ>
     {
         ASSERT_FLOAT(Real_   );
         ASSERT_INT  (Int_    );
+        ASSERT_INT  (LInt_   );
         ASSERT_FLOAT(SReal_  );
         ASSERT_FLOAT(ExtReal_);
         
     private:
         
-        using Base_T = CollisionTreeBase<Real_,Int_,SReal_,ExtReal_,symmetricQ>;
+        using Base_T = CollisionTreeBase<Real_,Int_,LInt_,SReal_,ExtReal_,symmetricQ>;
         
     public:
         
@@ -25,8 +26,9 @@ namespace Repulsor
         using Int               = Int_;
         using SReal             = SReal_;
         using ExtReal           = ExtReal_;
+        using LInt              = LInt_;
         
-        using ClusterTree_T     = ClusterTree<AMB_DIM,Real,Int,SReal,ExtReal>;
+        using ClusterTree_T     = ClusterTree<AMB_DIM,Real,Int,LInt,SReal,ExtReal>;
         using CollisionMatrix_T = typename Base_T::CollisionMatrix_T;
         
         using Primitive_T       = typename ClusterTree_T::Primitive_T;
@@ -248,7 +250,7 @@ namespace Repulsor
         
         static std::string className()
         {
-            return  "CollisionTree<"+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+","+TypeName<ExtReal>+","+ToString(symmetricQ)+">";
+            return  "CollisionTree<"+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<LInt>+","+TypeName<SReal>+","+TypeName<ExtReal>+","+ToString(symmetricQ)+">";
         }
 
     }; // class CollisionTree

@@ -256,7 +256,7 @@ namespace Repulsor
       
         std::string className() const
         {
-            return "BlockSplit_Kernel<"+this->tree_string+">";
+            return std::string("BlockSplit_Kernel<")+this->tree_string+">";
         }
         
     }; // class BlockSplit_Kernel

@@ -9,8 +9,8 @@
 
 namespace Repulsor
 {
-    template<int AMB_DIM_, typename Real_, typename Int_, typename SReal_, typename ExtReal_>
-    class ClusterTree : public ClusterTreeBase<Real_,Int_,SReal_,ExtReal_>
+    template<int AMB_DIM_, typename Real_, typename Int_, typename LInt_, typename SReal_, typename ExtReal_>
+    class ClusterTree : public ClusterTreeBase<Real_,Int_,LInt_,SReal_,ExtReal_>
     {
     public:
         
@@ -18,10 +18,10 @@ namespace Repulsor
         using Int     = Int_;
         using SReal   = SReal_;
         using ExtReal = ExtReal_;
+        using LInt    = LInt_;
         
-        using Base_T               = ClusterTreeBase<Real,Int,SReal,ExtReal>;
+        using Base_T               = ClusterTreeBase<Real,Int,LInt,SReal,ExtReal>;
         
-        using LInt                 = typename Base_T::LInt;
         using SparseMatrix_T       = typename Base_T::SparseMatrix_T;
         using SparseBinaryMatrix_T = typename Base_T::SparseBinaryMatrix_T;
         
@@ -1237,7 +1237,6 @@ namespace Repulsor
                     );
                 }
             }
-            
             ptoc(className()+"::CollectNearFieldDerivatives");
             
         } // CollectNearFieldDerivatives
@@ -1335,7 +1334,7 @@ namespace Repulsor
         
         static std::string className()
         {
-            return  "ClusterTree<"+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+","+TypeName<ExtReal>+">";
+            return  "ClusterTree<"+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<LInt>+","+TypeName<SReal>+","+TypeName<ExtReal>+">";
         }
 
     }; // class ClusterTree

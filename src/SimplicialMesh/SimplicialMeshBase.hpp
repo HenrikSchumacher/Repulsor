@@ -5,12 +5,13 @@ namespace Repulsor
     template<typename Real_, typename Int_>
     class SimplicialRemesherBase;
     
-    template<typename Real_, typename Int_, typename SReal_, typename ExtReal_>
+    template<typename Real_, typename Int_, typename LInt_, typename SReal_, typename ExtReal_>
     class SimplicialMeshBase : public CachedObject
     {
         
         ASSERT_FLOAT(Real_);
         ASSERT_INT(Int_);
+        ASSERT_INT(LInt_);
         ASSERT_FLOAT(SReal_);
         ASSERT_FLOAT(ExtReal_);
         
@@ -20,20 +21,19 @@ namespace Repulsor
         using Int     = Int_;
         using SReal   = SReal_;
         using ExtReal = ExtReal_;
+        using LInt    = LInt_;
+        using SparseMatrix_T                 = Sparse::MatrixCSR      <Real,Int,LInt>;
+        using SparseBinaryMatrix_T           = Sparse::BinaryMatrixCSR<     Int,LInt>;
         
-        using LInt                       = Size_T;
-        using SparseMatrix_T             = Sparse::MatrixCSR      <Real,Int,LInt>;
-        using SparseBinaryMatrix_T       = Sparse::BinaryMatrixCSR<     Int,LInt>;
+        using ClusterTreeBase_T              =        ClusterTreeBase<Real,Int,LInt,SReal,ExtReal>;
+        using BlockClusterTreeBase_T         =   BlockClusterTreeBase<Real,Int,LInt,SReal,ExtReal,true>;
+        using CollisionTreeBase_T            =      CollisionTreeBase<Real,Int,LInt,SReal,ExtReal,true>;
+        using ObstacleBlockClusterTreeBase_T =   BlockClusterTreeBase<Real,Int,LInt,SReal,ExtReal,false>;
+        using ObstacleCollisionTreeBase_T    =      CollisionTreeBase<Real,Int,LInt,SReal,ExtReal,false>;
+        using RemesherBase_T                 = SimplicialRemesherBase<Real,Int>;
         
-        using ClusterTree_T              =        ClusterTreeBase<Real,Int,SReal,ExtReal>;
-        using BlockClusterTree_T         =   BlockClusterTreeBase<Real,Int,SReal,ExtReal,true>;
-        using CollisionTree_T            =      CollisionTreeBase<Real,Int,SReal,ExtReal,true>;
-        using ObstacleBlockClusterTree_T =   BlockClusterTreeBase<Real,Int,SReal,ExtReal,false>;
-        using ObstacleCollisionTree_T    =      CollisionTreeBase<Real,Int,SReal,ExtReal,false>;
-        using Remesher_T                 = SimplicialRemesherBase<Real,Int>;
-        
-        using TangentVector_T            = Tensor2<ExtReal,Int>;
-        using CotangentVector_T          = Tensor2<ExtReal,Int>;
+        using TangentVector_T                = Tensor2<ExtReal,Int>;
+        using CotangentVector_T              = Tensor2<ExtReal,Int>;
         
         SimplicialMeshBase() = default;
 
@@ -80,11 +80,11 @@ namespace Repulsor
         
         virtual void SemiStaticUpdate( ptr<ExtReal> V_coords_, const bool transp_ = false ) const = 0;
         
-        virtual const ClusterTree_T & GetClusterTree() const = 0;
+        virtual const ClusterTreeBase_T & GetClusterTree() const = 0;
         
-        virtual const BlockClusterTree_T & GetBlockClusterTree() const = 0;
+        virtual const BlockClusterTreeBase_T & GetBlockClusterTree() const = 0;
         
-        virtual const CollisionTree_T & GetCollisionTree() const = 0;
+        virtual const CollisionTreeBase_T & GetCollisionTree() const = 0;
                 
         virtual const SparseBinaryMatrix_T & DerivativeAssembler() const = 0;
         
@@ -138,11 +138,11 @@ namespace Repulsor
         
 //        virtual bool  ObstacleInitialized() const = 0;
         
-        virtual const ClusterTree_T & GetObstacleClusterTree() const = 0;
+        virtual const ClusterTreeBase_T & GetObstacleClusterTree() const = 0;
         
-        virtual const ObstacleBlockClusterTree_T & GetObstacleBlockClusterTree() const = 0;
+        virtual const ObstacleBlockClusterTreeBase_T & GetObstacleBlockClusterTree() const = 0;
         
-        virtual const ObstacleCollisionTree_T & GetObstacleCollisionTree() const = 0;
+        virtual const ObstacleCollisionTreeBase_T & GetObstacleCollisionTree() const = 0;
     
             
 //##############################################################################################
@@ -159,7 +159,7 @@ namespace Repulsor
         
     public:
         
-        virtual std::unique_ptr<Remesher_T> CreateRemesher() = 0;
+        virtual std::unique_ptr<RemesherBase_T> CreateRemesher() = 0;
         
 //##############################################################################################
 //      Standard interface
@@ -169,7 +169,7 @@ namespace Repulsor
         
         virtual std::string ClassName() const
         {
-            return std::string("SimplicialMeshBase<")+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+","+TypeName<ExtReal>+">";
+            return std::string("SimplicialMeshBase<")+TypeName<Real>+","+TypeName<Int>+","+TypeName<LInt>+","+TypeName<SReal>+","+TypeName<ExtReal>+">";
         }
         
     }; // class SimplicialMeshBase

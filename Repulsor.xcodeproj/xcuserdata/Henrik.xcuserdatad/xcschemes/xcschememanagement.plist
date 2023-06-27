@@ -9,10 +9,10 @@
 			<key>orderHint</key>
 			<integer>0</integer>
 		</dict>
-		<key>Example_OpenMP.xcscheme_^#shared#^_</key>
+		<key>Example2.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>2</integer>
+			<integer>1</integer>
 		</dict>
 		<key>Example_Remesher.xcscheme_^#shared#^_</key>
 		<dict>
@@ -28,6 +28,11 @@
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
 		<key>AF3DADB428ECF0470089476A</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>AF789CF52A4AC95800546B46</key>
 		<dict>
 			<key>primary</key>
 			<true/>

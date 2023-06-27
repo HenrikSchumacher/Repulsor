@@ -23,7 +23,8 @@ namespace Repulsor
             const ClusterTree_T & S_,
             const ClusterTree_T & T_
         )
-        :   tree_string( S_.ClassName() )
+//        :   tree_string( S_.ClassName() )
+        :   tree_string( "..." )
         {}
         
         ClusterTreePairTraversor_Kernel(

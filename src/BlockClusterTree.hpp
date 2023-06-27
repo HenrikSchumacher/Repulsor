@@ -7,21 +7,18 @@ namespace Repulsor
 {
     
     
-    template<int AMB_DIM_, typename Real_, typename Int_, typename SReal_, typename ExtReal_, bool symmetricQ_>
-    class BlockClusterTree : public BlockClusterTreeBase<Real_,Int_,SReal_,ExtReal_,symmetricQ_>
+    template<int AMB_DIM_, typename Real_, typename Int_, typename LInt_, typename SReal_, typename ExtReal_, bool symmetricQ_>
+    class BlockClusterTree : public BlockClusterTreeBase<Real_,Int_,LInt_,SReal_,ExtReal_,symmetricQ_>
     {
     public:
-        
-        
         
         using Real    = Real_;
         using SReal   = SReal_;
         using ExtReal = ExtReal_;
         using Int     = Int_;
+        using LInt    = LInt_;
         
-        using BlockClusterTreeBase_T = BlockClusterTreeBase<Real,Int,SReal,ExtReal,symmetricQ_>;
-        
-        using LInt    = typename BlockClusterTreeBase_T::LInt;
+        using BlockClusterTreeBase_T = BlockClusterTreeBase<Real,Int,LInt,SReal,ExtReal,symmetricQ_>;
         
 
         static constexpr Int  AMB_DIM      = AMB_DIM_;
@@ -34,7 +31,7 @@ namespace Repulsor
         using Near_Pattern_T      = typename BlockClusterTreeBase_T::Near_Pattern_T;
         using Far_Pattern_T       = typename BlockClusterTreeBase_T::Far_Pattern_T;
         
-        using ClusterTree_T     = ClusterTree<AMB_DIM,Real,Int,SReal,ExtReal>;
+        using ClusterTree_T     = ClusterTree<AMB_DIM,Real,Int,LInt,SReal,ExtReal>;
         using BlockSplitter_T   = BlockSplit_Kernel<ClusterTree_T>;
         
         using Primitive_T       = typename ClusterTree_T::Primitive_T;
@@ -360,7 +357,7 @@ namespace Repulsor
         
         static std::string className()
         {
-            return  "BlockClusterTree<"+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+","+TypeName<ExtReal>+","+ToString(symmetricQ)+">";
+            return  "BlockClusterTree<"+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<LInt>+","+TypeName<SReal>+","+TypeName<ExtReal>+","+ToString(symmetricQ)+">";
         }
       
     public:

@@ -8,8 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		AF3DADB828ECF0470089476A /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AF3DADB728ECF0470089476A /* main.cpp */; };
+		AF789CF92A4AC95800546B46 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AF789CF82A4AC95800546B46 /* main.cpp */; };
+		AF789CFD2A4AC9F300546B46 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AF83C2E8293B426000A23318 /* Accelerate.framework */; };
 		AF83C2EA293B426400A23318 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AF83C2E8293B426000A23318 /* Accelerate.framework */; };
-		AFB9A50E2A0D1726008E5520 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AFB9A50D2A0D1726008E5520 /* main.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -22,7 +23,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
-		AFB9A5092A0D1726008E5520 /* CopyFiles */ = {
+		AF789CF42A4AC95800546B46 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = /usr/share/man/man1/;
@@ -40,14 +41,13 @@
 		AF3DADB028ECEFFC0089476A /* src */ = {isa = PBXFileReference; lastKnownFileType = folder; path = src; sourceTree = "<group>"; };
 		AF3DADB528ECF0470089476A /* Example */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Example; sourceTree = BUILT_PRODUCTS_DIR; };
 		AF3DADB728ECF0470089476A /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		AF789CF62A4AC95800546B46 /* Example2 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Example2; sourceTree = BUILT_PRODUCTS_DIR; };
+		AF789CF82A4AC95800546B46 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		AF83C2E8293B426000A23318 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 		AF88400F28ECEEBA0040A2FC /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		AF88401028ECEEBA0040A2FC /* Repulsor.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Repulsor.hpp; sourceTree = "<group>"; };
 		AF98B21F28EF0DDC00413977 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		AFA60FCE2906739700CF0C41 /* Meshes.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Meshes.hpp; sourceTree = "<group>"; };
-		AFB9A50B2A0D1726008E5520 /* Example_OpenMP */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Example_OpenMP; sourceTree = BUILT_PRODUCTS_DIR; };
-		AFB9A50D2A0D1726008E5520 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		AFB9A5122A0D175E008E5520 /* Meshes.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Meshes.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,10 +59,11 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		AFB9A5082A0D1726008E5520 /* Frameworks */ = {
+		AF789CF32A4AC95800546B46 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AF789CFD2A4AC9F300546B46 /* Accelerate.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -97,7 +98,7 @@
 				AF88401028ECEEBA0040A2FC /* Repulsor.hpp */,
 				AF98B21F28EF0DDC00413977 /* README.md */,
 				AF3DADB628ECF0470089476A /* Example */,
-				AFB9A50C2A0D1726008E5520 /* Example_OpenMP */,
+				AF789CF72A4AC95800546B46 /* Example2 */,
 				AF47B00428ECEE8800A5FCEA /* Products */,
 				AF83C2E7293B426000A23318 /* Frameworks */,
 			);
@@ -107,9 +108,17 @@
 			isa = PBXGroup;
 			children = (
 				AF3DADB528ECF0470089476A /* Example */,
-				AFB9A50B2A0D1726008E5520 /* Example_OpenMP */,
+				AF789CF62A4AC95800546B46 /* Example2 */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		AF789CF72A4AC95800546B46 /* Example2 */ = {
+			isa = PBXGroup;
+			children = (
+				AF789CF82A4AC95800546B46 /* main.cpp */,
+			);
+			path = Example2;
 			sourceTree = "<group>";
 		};
 		AF83C2E7293B426000A23318 /* Frameworks */ = {
@@ -118,15 +127,6 @@
 				AF83C2E8293B426000A23318 /* Accelerate.framework */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		AFB9A50C2A0D1726008E5520 /* Example_OpenMP */ = {
-			isa = PBXGroup;
-			children = (
-				AFB9A5122A0D175E008E5520 /* Meshes.hpp */,
-				AFB9A50D2A0D1726008E5520 /* main.cpp */,
-			);
-			path = Example_OpenMP;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -149,21 +149,21 @@
 			productReference = AF3DADB528ECF0470089476A /* Example */;
 			productType = "com.apple.product-type.tool";
 		};
-		AFB9A50A2A0D1726008E5520 /* Example_OpenMP */ = {
+		AF789CF52A4AC95800546B46 /* Example2 */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = AFB9A5112A0D1726008E5520 /* Build configuration list for PBXNativeTarget "Example_OpenMP" */;
+			buildConfigurationList = AF789CFA2A4AC95800546B46 /* Build configuration list for PBXNativeTarget "Example2" */;
 			buildPhases = (
-				AFB9A5072A0D1726008E5520 /* Sources */,
-				AFB9A5082A0D1726008E5520 /* Frameworks */,
-				AFB9A5092A0D1726008E5520 /* CopyFiles */,
+				AF789CF22A4AC95800546B46 /* Sources */,
+				AF789CF32A4AC95800546B46 /* Frameworks */,
+				AF789CF42A4AC95800546B46 /* CopyFiles */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = Example_OpenMP;
-			productName = Example_NoOpenMP;
-			productReference = AFB9A50B2A0D1726008E5520 /* Example_OpenMP */;
+			name = Example2;
+			productName = Example2;
+			productReference = AF789CF62A4AC95800546B46 /* Example2 */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -178,8 +178,8 @@
 					AF3DADB428ECF0470089476A = {
 						CreatedOnToolsVersion = 14.0.1;
 					};
-					AFB9A50A2A0D1726008E5520 = {
-						CreatedOnToolsVersion = 14.3;
+					AF789CF52A4AC95800546B46 = {
+						CreatedOnToolsVersion = 14.3.1;
 					};
 				};
 			};
@@ -197,7 +197,7 @@
 			projectRoot = "";
 			targets = (
 				AF3DADB428ECF0470089476A /* Example */,
-				AFB9A50A2A0D1726008E5520 /* Example_OpenMP */,
+				AF789CF52A4AC95800546B46 /* Example2 */,
 			);
 		};
 /* End PBXProject section */
@@ -211,11 +211,11 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		AFB9A5072A0D1726008E5520 /* Sources */ = {
+		AF789CF22A4AC95800546B46 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AFB9A50E2A0D1726008E5520 /* main.cpp in Sources */,
+				AF789CF92A4AC95800546B46 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -297,7 +297,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = /opt/homebrew/opt/libomp/include;
+				HEADER_SEARCH_PATHS = "";
 				LIBRARY_SEARCH_PATHS = (
 					/opt/homebrew/opt/libomp/lib,
 					/opt/homebrew/Cellar/openblas/0.3.23/lib,
@@ -311,22 +311,19 @@
 					"-flto",
 					"-ffast-math",
 					"-fno-math-errno",
+					"-pthread",
 				);
 				OTHER_LDFLAGS = (
 					"-ldl",
 					"-lm",
-					"-lopenblas",
+					"-pthread",
 				);
 				SDKROOT = macosx;
 				SYSTEM_HEADER_SEARCH_PATHS = (
-					/opt/homebrew/opt/libomp/include,
 					/usr/include,
 					/opt/homebrew/include,
-					/opt/homebrew/Cellar/openblas/0.3.23/include,
-					/opt/homebrew/opt/libomp/include,
 				);
 				USER_HEADER_SEARCH_PATHS = (
-					/opt/homebrew/opt/libomp/include,
 					/opt/homebrew/include,
 					/usr/include,
 				);
@@ -380,7 +377,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = /opt/homebrew/opt/libomp/include;
+				HEADER_SEARCH_PATHS = "";
 				LIBRARY_SEARCH_PATHS = (
 					/opt/homebrew/opt/libomp/lib,
 					/opt/homebrew/Cellar/openblas/0.3.23/lib,
@@ -394,74 +391,48 @@
 					"-flto",
 					"-ffast-math",
 					"-fno-math-errno",
+					"-pthread",
 				);
 				OTHER_LDFLAGS = (
 					"-ldl",
 					"-lm",
-					"-lopenblas",
+					"-pthread",
 				);
 				SDKROOT = macosx;
 				SYSTEM_HEADER_SEARCH_PATHS = (
-					/opt/homebrew/opt/libomp/include,
 					/usr/include,
 					/opt/homebrew/include,
-					/opt/homebrew/Cellar/openblas/0.3.23/include,
-					/opt/homebrew/opt/libomp/include,
 				);
 				USER_HEADER_SEARCH_PATHS = (
-					/opt/homebrew/opt/libomp/include,
 					/opt/homebrew/include,
 					/usr/include,
 				);
 			};
 			name = Release;
 		};
-		AFB9A50F2A0D1726008E5520 /* Debug */ = {
+		AF789CFB2A4AC95800546B46 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = Y6DQ749ZRT;
 				ENABLE_HARDENED_RUNTIME = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
-				OTHER_CFLAGS = "";
-				OTHER_CPLUSPLUSFLAGS = (
-					"$(OTHER_CFLAGS)",
-					"-flto",
-					"-ffast-math",
-					"-fno-math-errno",
-					"-Xpreprocessor",
-					"-fopenmp",
-				);
-				OTHER_LDFLAGS = (
-					"-ldl",
-					"-lm",
-					"-lomp",
-				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
 		};
-		AFB9A5102A0D1726008E5520 /* Release */ = {
+		AF789CFC2A4AC95800546B46 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_STYLE = Automatic;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = Y6DQ749ZRT;
 				ENABLE_HARDENED_RUNTIME = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
-				OTHER_CFLAGS = "";
-				OTHER_CPLUSPLUSFLAGS = (
-					"$(OTHER_CFLAGS)",
-					"-flto",
-					"-ffast-math",
-					"-fno-math-errno",
-					"-Xpreprocessor",
-					"-fopenmp",
-				);
-				OTHER_LDFLAGS = (
-					"-ldl",
-					"-lm",
-					"-lomp",
-				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -487,11 +458,11 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		AFB9A5112A0D1726008E5520 /* Build configuration list for PBXNativeTarget "Example_OpenMP" */ = {
+		AF789CFA2A4AC95800546B46 /* Build configuration list for PBXNativeTarget "Example2" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				AFB9A50F2A0D1726008E5520 /* Debug */,
-				AFB9A5102A0D1726008E5520 /* Release */,
+				AF789CFB2A4AC95800546B46 /* Debug */,
+				AF789CFC2A4AC95800546B46 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
