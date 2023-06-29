@@ -808,34 +808,35 @@ namespace Repulsor
         {
             ptic(ClassName()+"::Pre");
 
+            std::string tag = ClassName();
             SparseMatrix_T * pre;
             
             switch( op_type )
             {
                 case OperatorType::FractionalOnly:
                 {
-                    ptic(ClassName()+" pre->Dot (lo)");
+                    tag += " pre->Dot (lo)";
                     pre  = &lo_pre ;
                     this->RequireBuffers( nrhs );
                     break;
                 }
                 case OperatorType::HighOrder:
                 {
-                    ptic(ClassName()+" pre->Dot (hi)");
+                    tag += " pre->Dot (hi)";
                     pre  = &hi_pre ;
                     this->RequireBuffers( AmbDim() * nrhs ); // Beware: The derivative operator increases the number of columns!
                     break;
                 }
                 case OperatorType::LowOrder:
                 {
-                    ptic(ClassName()+" pre->Dot (lo)");
+                    tag += " pre->Dot (lo)";
                     pre  = &lo_pre ;
                     this->RequireBuffers( nrhs );
                     break;
                 }
                 case OperatorType::MixedOrder:
                 {
-                    ptic(ClassName()+" pre->Dot (mi)");
+                    tag += " pre->Dot (mi)";
                     pre  = &mi_pre ;
                     this->RequireBuffers( (AmbDim()+1) * nrhs ); // Beware: The mixed preprocessor operator increases the number of columns!
                     break;
@@ -847,6 +848,8 @@ namespace Repulsor
                     return;
                 }
             }
+            
+            ptic(tag);
 
             // Caution: Some magic is going on here high order term...
             // Apply diff/averaging operate, reorder and multiply by weights.
@@ -873,7 +876,7 @@ namespace Repulsor
                 }
                 default:
                 {
-                    pre->template Dot<0>(
+                    pre->template Dot<VarSize>(
                         Scalar::One <Real>, input,
                         Scalar::Zero<Real>, P_in.data(),
                         nrhs
@@ -881,42 +884,15 @@ namespace Repulsor
                     break;
                 }
             }
-            
-            switch( op_type )
-            {
-                case OperatorType::FractionalOnly:
-                {
-                    ptoc(ClassName()+" pre->Dot (lo)");
-                    break;
-                }
-                case OperatorType::HighOrder:
-                {
-                    ptoc(ClassName()+" pre->Dot (hi)");
-                    break;
-                }
-                case OperatorType::LowOrder:
-                {
-                    ptoc(ClassName()+" pre->Dot (lo)");
-                    break;
-                }
-                case OperatorType::MixedOrder:
-                {
-                    ptoc(ClassName()+" pre->Dot (mi)");
-                    break;
-                }
-                default:
-                {
-                    eprint("Unknown kernel. Doing no.");
-                    ptoc(ClassName()+"::Pre");
-                    return;
-                }
-            }
-            
+
+            ptoc(tag);
             
             // Accumulate into leaf clusters.
             PrimitivesToClusters(false);
             
             this->PercolateUp();
+            
+            
 
             ptoc(ClassName()+"::Pre");
         }; // Pre
@@ -928,29 +904,35 @@ namespace Repulsor
 
             SparseMatrix_T * post;
             
+            this->PercolateDown();
+              
+            ClustersToPrimitives( true );
+            
+            std::string tag = ClassName();
+            
             switch( op_type )
             {
                 case OperatorType::FractionalOnly:
                 {
-                    ptic(ClassName()+" post->Dot (lo)");
+                    tag += " post->Dot (lo)";
                     post  = &lo_post;
                     break;
                 }
                 case OperatorType::HighOrder:
                 {
-                    ptic(ClassName()+" post->Dot (hi)");
+                    tag += " post->Dot (hi)";
                     post  = &hi_post;
                     break;
                 }
                 case OperatorType::LowOrder:
                 {
-                    ptic(ClassName()+" post->Dot (lo)");
+                    tag += " post->Dot (lo)";
                     post  = &lo_post;
                     break;
                 }
                 case OperatorType::MixedOrder:
                 {
-                    ptic(ClassName()+" post->Dot (mi)");
+                    tag += " post->Dot (mi)";
                     post  = &mi_post;
                     break;
                 }
@@ -961,11 +943,9 @@ namespace Repulsor
                     return;
                 }
             }
-          
-            this->PercolateDown();
+                         
+            ptic(tag);
             
-            ClustersToPrimitives( true );
-                            
             // Multiply by weights, restore external ordering, and apply transpose of diff/averaging operator.
             
             const Int nrhs = ( PrimitiveCount() * buffer_dim ) / post->ColCount();
@@ -992,7 +972,7 @@ namespace Repulsor
                 }
                 default:
                 {
-                    post->template Dot<0>(
+                    post->template Dot<VarSize>(
                         alpha, P_out.data(),
                         beta,  output,
                         nrhs
@@ -1000,36 +980,7 @@ namespace Repulsor
                 }
             }
             
-            
-            switch( op_type )
-            {
-                case OperatorType::FractionalOnly:
-                {
-                    ptoc(ClassName()+" post->Dot (lo)");
-                    break;
-                }
-                case OperatorType::HighOrder:
-                {
-                    ptoc(ClassName()+" post->Dot (hi)");
-                    break;
-                }
-                case OperatorType::LowOrder:
-                {
-                    ptoc(ClassName()+" post->Dot (lo)");
-                    break;
-                }
-                case OperatorType::MixedOrder:
-                {
-                    ptoc(ClassName()+" post->Dot (mi)");
-                    break;
-                }
-                default:
-                {
-                    eprint("Unknown kernel. Doing no.");
-                    ptoc(ClassName()+"::Post");
-                    return;
-                }
-            }
+            ptoc(tag);
                 
             ptoc(ClassName()+"::Post");
         }; // Post
