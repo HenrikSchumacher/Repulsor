@@ -715,7 +715,7 @@ namespace Repulsor
             this->RequireBuffers( static_cast<Int>(1) );
             
             // Compute dual volume vectors.
-            fill_buffer( &P_in[0], PrimitiveCount(), static_cast<Real>(1) );
+            fill_buffer( &P_in[0], static_cast<Real>(1), PrimitiveCount() );
 
             Tensor1<ExtReal,Int> dual_volumes ( lo_post.RowCount() );
         

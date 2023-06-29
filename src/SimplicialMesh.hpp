@@ -630,7 +630,7 @@ namespace Repulsor
                         df.Transpose( dftransp );
 
                         // g = df^T * df.
-                        Dot<0>( dftransp, df, g_inv );
+                        Dot<Overwrite>( dftransp, df, g_inv );
                         
                         g.Read( g_inv.data() );
                         
@@ -664,7 +664,7 @@ namespace Repulsor
                         }
                         
                         combine_buffers<
-                            SIZE * SIZE, Scalar::Flag::Generic, Scalar::Flag::Plus
+                            Scalar::Flag::Generic, Scalar::Flag::Plus, SIZE * SIZE
                         >(
                             a,                 mass.data(),
                             Scalar::One<Real>, val.data()

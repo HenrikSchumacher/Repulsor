@@ -856,7 +856,7 @@ namespace Repulsor
                 case 1:
                 {
                     pre->template Dot<1>(
-                        Scalar::One<Real>,  input,
+                        Scalar::One <Real>, input,
                         Scalar::Zero<Real>, P_in.data(),
                         1
                     );
@@ -865,7 +865,7 @@ namespace Repulsor
                 case AMB_DIM:
                 {
                     pre->template Dot<AMB_DIM>(
-                        Scalar::One<Real>,  input,
+                        Scalar::One <Real>, input,
                         Scalar::Zero<Real>, P_in.data(),
                         AMB_DIM
                     );
@@ -874,7 +874,7 @@ namespace Repulsor
                 default:
                 {
                     pre->template Dot<0>(
-                        Scalar::One<Real>,  input,
+                        Scalar::One <Real>, input,
                         Scalar::Zero<Real>, P_in.data(),
                         nrhs
                     );

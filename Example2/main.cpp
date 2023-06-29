@@ -7,7 +7,7 @@
 // You can activate everything you want, but compile times might increase substatially.
 
 //#define NDEBUG
-//#define TOOLS_DEBUG
+#define TOOLS_DEBUG
 
 #define TOOLS_ENABLE_PROFILER // enable profiler
 
