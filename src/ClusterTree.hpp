@@ -733,6 +733,15 @@ namespace Repulsor
                     );
                     break;
                 }
+                case FAR_DIM:
+                {
+                    C_to_P.template Dot<FAR_DIM>(
+                        Scalar::One<Real>,         C_out.data(),
+                        static_cast<Real>(add_to), P_out.data(),
+                        FAR_DIM
+                    );
+                    break;
+                }
                 default:
                 {
                     P_to_C.template Dot<0>(
@@ -786,6 +795,15 @@ namespace Repulsor
                         Scalar::One<Real>,         C_out.data(),
                         static_cast<Real>(add_to), P_out.data(),
                         (AMB_DIM + 1) * AMB_DIM
+                    );
+                    break;
+                }
+                case FAR_DIM:
+                {
+                    C_to_P.template Dot<FAR_DIM>(
+                        Scalar::One<Real>,         C_out.data(),
+                        static_cast<Real>(add_to), P_out.data(),
+                        FAR_DIM
                     );
                     break;
                 }
