@@ -78,6 +78,10 @@ namespace Repulsor
                 
                 return traversor.Compute();
             }
+            else
+            {
+                return Scalar::Zero<ExtReal>;
+            }
         }
         
     public:

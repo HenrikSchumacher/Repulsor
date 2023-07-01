@@ -78,8 +78,6 @@ namespace Repulsor
         using Base_T::y;
         using Base_T::Q;
         
-        using Base_T::lin_k;
-        
         const Real s;
         const Real s_exp;
         

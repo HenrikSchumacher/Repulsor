@@ -2,7 +2,7 @@ protected:
 
     using PercolationRoots_T = std::vector<Int>;
 
-    const PercolationRoots_T & ParallelPercolationRoots() const
+    const PercolationRoots_T & restrict ParallelPercolationRoots() const
     {
         static std::string tag ( "ParallelPercolationRoots" );
         
@@ -61,7 +61,7 @@ public:
     {
         ptic(ClassName()+"::PercolateUp_Parallel");
         
-        const PercolationRoots_T & parallel_perc_roots = ParallelPercolationRoots();
+        const PercolationRoots_T & restrict parallel_perc_roots = ParallelPercolationRoots();
         
         // TODO: Add thread balancing.
         ParallelDo(
@@ -82,7 +82,7 @@ public:
     {
         ptic(ClassName()+"::PercolateDown_Parallel");
         
-        const PercolationRoots_T & parallel_perc_roots = ParallelPercolationRoots();
+        const PercolationRoots_T & restrict parallel_perc_roots = ParallelPercolationRoots();
         
         PercolateDown_DFS( null, static_cast<Int>(settings.parallel_perc_depth) );
         

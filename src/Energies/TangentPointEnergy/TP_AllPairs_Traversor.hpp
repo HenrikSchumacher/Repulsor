@@ -82,9 +82,9 @@ namespace Repulsor
         TP_AllPairs_Traversor() = delete;
         
         TP_AllPairs_Traversor(
-              const ClusterTree_T & S_,
-              const ClusterTree_T & T_,
-              ValueContainer_T & metric_values_,
+              const ClusterTree_T & restrict S_,
+              const ClusterTree_T & restrict T_,
+              ValueContainer_T & restrict metric_values_,
               const Real q_,
               const Real p_
         )
@@ -107,12 +107,12 @@ namespace Repulsor
 
     protected:
 
-        const ClusterTree_T & S;
-        const ClusterTree_T & T;
+        const ClusterTree_T & restrict S;
+        const ClusterTree_T & restrict T;
         
         Configurator_T conf;
         
-        ValueContainer_T & metric_values;
+        ValueContainer_T & restrict metric_values;
         
         const Real q;
         const Real p;
@@ -170,26 +170,52 @@ namespace Repulsor
             {
                 DummyAllocators();
             }
-            if( q_half_is_int )
+            
+            if( q_half_real >= one )
             {
-                if( p_half_is_int )
+                if( q_half_is_int )
                 {
-                    NF_Compute<Int,Int>( q_half_int, p_half_int );
+                    if( p_half_is_int )
+                    {
+                        NF_Compute<Int,Int,2>( q_half_int, p_half_int );
+                    }
+                    else
+                    {
+                        NF_Compute<Int,Real,2>( q_half_int, p_half_real );
+                    }
                 }
                 else
                 {
-                    NF_Compute<Int,Real>( q_half_int, p_half_real );
+                    if( p_half_is_int)
+                    {
+                        NF_Compute<Real,Int,2>( q_half_real, p_half_int );
+                    }
+                    else
+                    {
+                        NF_Compute<Real,Real,2>( q_half_real, p_half_real );
+                    }
+                }
+            }
+            else if( q_half_real == zero )
+            {
+                if( p_half_is_int )
+                {
+                    NF_Compute<Int,Int,0>( q_half_real, p_half_real );
+                }
+                else
+                {
+                    NF_Compute<Int,Real,0>( q_half_real, p_half_real );
                 }
             }
             else
             {
-                if( p_half_is_int)
+                if( q_half_real < zero )
                 {
-                    NF_Compute<Real,Int>( q_half_real, p_half_int );
+                    eprint("Tangent-point kernels not well-defined for q < 0.");
                 }
                 else
                 {
-                    NF_Compute<Real,Real>( q_half_real, p_half_real );
+                    eprint("Tangent-point kernels not implement for 0 < q < 2.");
                 }
             }
 

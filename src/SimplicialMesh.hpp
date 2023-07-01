@@ -9,7 +9,7 @@ namespace Repulsor
     
     template<int DOM_DIM, int AMB_DIM, typename Real_, typename Int_>
     class SimplicialRemesher;
-    
+
     template<int DOM_DIM, int AMB_DIM, typename Real_, typename Int_, typename LInt_, typename SReal_, typename ExtReal_>
     class SimplicialMesh : public SimplicialMeshBase<Real_,Int_,LInt_,SReal_,ExtReal_>
     {   
@@ -67,11 +67,11 @@ namespace Repulsor
         SimplicialMesh() = default;
 
         SimplicialMesh(
-            const Tensor2<Real,Int> & V_coords_,
+            const Tensor2<Real,Int> & restrict V_coords_,
             // vertex coordinates; assumed to be of size vertex_count_ x AMB_DIM
-            const Tensor2<Int, Int> & simplices_,
+            const Tensor2<Int, Int> & restrict simplices_,
             // simplices; assumed to be of size simplex_count_ x (DOM_DIM+1)
-            const Tensor1<Real,Int> & V_charges_,
+            const Tensor1<Real,Int> & restrict V_charges_,
             // vertex charges; assumed to be of size DOM_DIM+1
             const Size_T thread_count_ = 1
         )
@@ -228,6 +228,7 @@ namespace Repulsor
         
         SimplicialMeshDetails<DOM_DIM,AMB_DIM,Real,Int,LInt> details;
 
+#include "SimplicialMesh/PrimitiveDataKernel.hpp"
 #include "SimplicialMesh/ComputeNearFarDataOps.hpp"
 #include "SimplicialMesh/ComputeNearFarData.hpp"
 #include "SimplicialMesh/H1Metric.hpp"
@@ -360,7 +361,7 @@ namespace Repulsor
             Tensor2<SReal,Int> P_velocities_serialized ( SimplexCount(), P_moving.VelocitySize(), 0 );
             mut<SReal> P_v_ser = P_velocities_serialized.data();
             
-            const Tensor1<Int,Int> & P_ordering = GetClusterTree().PrimitiveOrdering();
+            const Tensor1<Int,Int> & restrict P_ordering = GetClusterTree().PrimitiveOrdering();
 
             JobPointers<Int> job_ptr ( SimplexCount(), GetClusterTree().ThreadCount() );
             

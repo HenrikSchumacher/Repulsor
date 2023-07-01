@@ -1,8 +1,8 @@
 protected:
     
     void ComputeNearFarData(
-        Tensor2<Real,Int> & P_near,
-        Tensor2<Real,Int> & P_far
+        Tensor2<Real,Int> & restrict P_near,
+        Tensor2<Real,Int> & restrict P_far
     ) const
     {
         ptic(ClassName()+"::ComputeNearFarData");

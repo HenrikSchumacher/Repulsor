@@ -21,8 +21,6 @@
 #include "../Tensors/MyBLAS.hpp"
 #include "../Tensors/Sparse.hpp"
 
-#include "../Repulsor.hpp"
-
 
 using namespace Repulsor;
 using namespace Tensors;
@@ -58,7 +56,7 @@ int main(int argc, const char * argv[])
     using Energy_T = EnergyBase<Mesh_T>;
     using Metric_T = MetricBase<Mesh_T>;
 
-    const Int thread_count = 8;
+    const Int thread_count = 1;
     const Real q = 6;
     const Real p = 12;
     
@@ -93,11 +91,11 @@ int main(int argc, const char * argv[])
     M.adaptivity_settings.theta                                    = 10.0;
 
     tic("GetClusterTree");
-    M.GetClusterTree();           // Not necessary. Will automatically called by al routines that require it.
+    M.GetClusterTree();           // Not necessary. Will automatically called by all routines that require it.
     toc("GetClusterTree");
 
     tic("GetBlockClusterTree");
-    M.GetBlockClusterTree();      // Not necessary. Will automatically called by al routines that require it.
+    M.GetBlockClusterTree();      // Not necessary. Will automatically called by all routines that require it.
     toc("GetBlockClusterTree");
 //
     

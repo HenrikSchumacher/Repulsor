@@ -48,30 +48,30 @@ int main(int argc, const char * argv[])
     using MeshBase_T  = SimplicialMeshBase<Real,Int,LInt,SReal,ExtReal>;
 
     const Int thread_count = 1;
-    
+
     SimplicialMesh_Factory<MeshBase_T,0,0,3,3> mesh_factory;
-    
+
     tic("Initializing mesh");
-    
+
     std::unique_ptr<MeshBase_T> M_ptr = mesh_factory.Make_FromFile( path + name, thread_count );
-    
+
     Tensor1<Real,Int> vertex_charges ( M_ptr->VertexCount(), 1. );
-    
+
     Mesh_T M (
         M_ptr->VertexCoordinates().data(), M_ptr->VertexCount(),  false,
         M_ptr->Simplices().data(),         M_ptr->SimplexCount(), false,
         vertex_charges.data(),
         M_ptr->ThreadCount()
     );
-    
+
     M_ptr = nullptr;
-    
+
     dump(M.ThreadCount());
 
     toc("Initializing mesh");
-    
+
     print("");
-    
+
     // Some quite decent settings for 2-dimensional surfaces.
     M.cluster_tree_settings.split_threshold                        =  2;
     M.cluster_tree_settings.thread_count                           =  0; // take as many threads as there are used by SimplicialMesh M
@@ -87,11 +87,11 @@ int main(int argc, const char * argv[])
     toc("GetBlockClusterTree");
 
     const Real alpha = 1;
-    
+
 //    CoulombEnergy<Mesh_T> E( alpha );
-    
+
     TangentPointEnergy<Mesh_T> E( 0, alpha );
-    
+
     ExtReal en;
     // Mesh_T::CotangentVector_T is Tensor2<REAL,INT> in this case. It is a simple container class for heap-allocated matrices.
     Mesh_T::CotangentVector_T diff;
@@ -106,6 +106,5 @@ int main(int argc, const char * argv[])
     diff = E.Differential(M);
     toc("tpe.Differential(M)");
     
-
     return 0;
 }

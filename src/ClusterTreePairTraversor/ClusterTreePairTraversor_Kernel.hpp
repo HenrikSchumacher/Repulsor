@@ -20,15 +20,15 @@ namespace Repulsor
         ClusterTreePairTraversor_Kernel() = default;
         
         ClusterTreePairTraversor_Kernel(
-            const ClusterTree_T & S_,
-            const ClusterTree_T & T_
+            const ClusterTree_T & restrict S_,
+            const ClusterTree_T & restrict T_
         )
 //        :   tree_string( S_.ClassName() )
         :   tree_string( "..." )
         {}
         
         ClusterTreePairTraversor_Kernel(
-            const ClusterTreePairTraversor_Kernel & other
+            const ClusterTreePairTraversor_Kernel & restrict other
         )
         :   tree_string ( other.tree_string                )
         {}

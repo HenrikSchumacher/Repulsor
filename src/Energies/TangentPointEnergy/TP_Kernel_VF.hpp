@@ -109,8 +109,6 @@ namespace Repulsor
         using Base_T::y_buffer;
         using Base_T::Q;
         
-        using Base_T::lin_k;
-        
         using Base_T::S_Tree;
         using Base_T::T_Tree;
         
@@ -172,7 +170,7 @@ namespace Repulsor
             {
                 for( Int j = 0; j < AMB_DIM; ++j )
                 {
-                    const Int k = lin_k[i][j];
+                    const Int k = lin_k<AMB_DIM>(i,j);
                     Pv[i] += P[k] * v[j];
                     Qv[i] += Q[k] * v[j];
                     if( j >= i )

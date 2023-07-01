@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		AF3DADB828ECF0470089476A /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AF3DADB728ECF0470089476A /* main.cpp */; };
+		AF68F6DE2A4FE96E00009C92 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AF68F6DD2A4FE96E00009C92 /* main.cpp */; };
+		AF68F6E22A4FE97D00009C92 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AF83C2E8293B426000A23318 /* Accelerate.framework */; };
 		AF789CF92A4AC95800546B46 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AF789CF82A4AC95800546B46 /* main.cpp */; };
 		AF789CFD2A4AC9F300546B46 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AF83C2E8293B426000A23318 /* Accelerate.framework */; };
 		AF83C2EA293B426400A23318 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AF83C2E8293B426000A23318 /* Accelerate.framework */; };
@@ -15,6 +17,15 @@
 
 /* Begin PBXCopyFilesBuildPhase section */
 		AF3DADB328ECF0470089476A /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		AF68F6D92A4FE96E00009C92 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = /usr/share/man/man1/;
@@ -41,6 +52,9 @@
 		AF3DADB028ECEFFC0089476A /* src */ = {isa = PBXFileReference; lastKnownFileType = folder; path = src; sourceTree = "<group>"; };
 		AF3DADB528ECF0470089476A /* Example */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Example; sourceTree = BUILT_PRODUCTS_DIR; };
 		AF3DADB728ECF0470089476A /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		AF68F6DB2A4FE96E00009C92 /* CoulombPotential */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = CoulombPotential; sourceTree = BUILT_PRODUCTS_DIR; };
+		AF68F6DD2A4FE96E00009C92 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		AF68F6E32A4FEBB200009C92 /* Sphere_Points.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Sphere_Points.txt; sourceTree = "<group>"; };
 		AF789CF62A4AC95800546B46 /* Example2 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Example2; sourceTree = BUILT_PRODUCTS_DIR; };
 		AF789CF82A4AC95800546B46 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		AF83C2E8293B426000A23318 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
@@ -56,6 +70,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				AF83C2EA293B426400A23318 /* Accelerate.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AF68F6D82A4FE96E00009C92 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AF68F6E22A4FE97D00009C92 /* Accelerate.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -99,6 +121,7 @@
 				AF98B21F28EF0DDC00413977 /* README.md */,
 				AF3DADB628ECF0470089476A /* Example */,
 				AF789CF72A4AC95800546B46 /* Example2 */,
+				AF68F6DC2A4FE96E00009C92 /* CoulombPotential */,
 				AF47B00428ECEE8800A5FCEA /* Products */,
 				AF83C2E7293B426000A23318 /* Frameworks */,
 			);
@@ -109,8 +132,18 @@
 			children = (
 				AF3DADB528ECF0470089476A /* Example */,
 				AF789CF62A4AC95800546B46 /* Example2 */,
+				AF68F6DB2A4FE96E00009C92 /* CoulombPotential */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		AF68F6DC2A4FE96E00009C92 /* CoulombPotential */ = {
+			isa = PBXGroup;
+			children = (
+				AF68F6DD2A4FE96E00009C92 /* main.cpp */,
+				AF68F6E32A4FEBB200009C92 /* Sphere_Points.txt */,
+			);
+			path = CoulombPotential;
 			sourceTree = "<group>";
 		};
 		AF789CF72A4AC95800546B46 /* Example2 */ = {
@@ -149,6 +182,23 @@
 			productReference = AF3DADB528ECF0470089476A /* Example */;
 			productType = "com.apple.product-type.tool";
 		};
+		AF68F6DA2A4FE96E00009C92 /* CoulombPotential */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AF68F6E12A4FE96E00009C92 /* Build configuration list for PBXNativeTarget "CoulombPotential" */;
+			buildPhases = (
+				AF68F6D72A4FE96E00009C92 /* Sources */,
+				AF68F6D82A4FE96E00009C92 /* Frameworks */,
+				AF68F6D92A4FE96E00009C92 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CoulombPotential;
+			productName = CoulombPotential;
+			productReference = AF68F6DB2A4FE96E00009C92 /* CoulombPotential */;
+			productType = "com.apple.product-type.tool";
+		};
 		AF789CF52A4AC95800546B46 /* Example2 */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = AF789CFA2A4AC95800546B46 /* Build configuration list for PBXNativeTarget "Example2" */;
@@ -178,6 +228,9 @@
 					AF3DADB428ECF0470089476A = {
 						CreatedOnToolsVersion = 14.0.1;
 					};
+					AF68F6DA2A4FE96E00009C92 = {
+						CreatedOnToolsVersion = 14.3.1;
+					};
 					AF789CF52A4AC95800546B46 = {
 						CreatedOnToolsVersion = 14.3.1;
 					};
@@ -198,6 +251,7 @@
 			targets = (
 				AF3DADB428ECF0470089476A /* Example */,
 				AF789CF52A4AC95800546B46 /* Example2 */,
+				AF68F6DA2A4FE96E00009C92 /* CoulombPotential */,
 			);
 		};
 /* End PBXProject section */
@@ -208,6 +262,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				AF3DADB828ECF0470089476A /* main.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AF68F6D72A4FE96E00009C92 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AF68F6DE2A4FE96E00009C92 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -410,6 +472,33 @@
 			};
 			name = Release;
 		};
+		AF68F6DF2A4FE96E00009C92 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = Y6DQ749ZRT;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				MACOSX_DEPLOYMENT_TARGET = 13.3;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		AF68F6E02A4FE96E00009C92 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = Y6DQ749ZRT;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				MACOSX_DEPLOYMENT_TARGET = 13.3;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		AF789CFB2A4AC95800546B46 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -454,6 +543,15 @@
 			buildConfigurations = (
 				AF47B00828ECEE8800A5FCEA /* Debug */,
 				AF47B00928ECEE8800A5FCEA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AF68F6E12A4FE96E00009C92 /* Build configuration list for PBXNativeTarget "CoulombPotential" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AF68F6DF2A4FE96E00009C92 /* Debug */,
+				AF68F6E02A4FE96E00009C92 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

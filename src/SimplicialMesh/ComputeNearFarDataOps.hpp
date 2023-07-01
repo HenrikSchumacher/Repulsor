@@ -1,12 +1,12 @@
 protected:
     
     void ComputeNearFarDataOps(
-        Tensor2<Real,Int> & P_coords,
-        Tensor3<Real,Int> & P_hull_coords,
-        Tensor2<Real,Int> & P_near,
-        Tensor2<Real,Int> & P_far,
-        SparseMatrix_T    & DiffOp,
-        SparseMatrix_T    & AvOp
+        Tensor2<Real,Int> & restrict P_coords,
+        Tensor3<Real,Int> & restrict P_hull_coords,
+        Tensor2<Real,Int> & restrict P_near,
+        Tensor2<Real,Int> & restrict P_far,
+        SparseMatrix_T    & restrict DiffOp,
+        SparseMatrix_T    & restrict AvOp
     ) const
     {
         ptic(ClassName()+"::ComputeNearFarDataOps");

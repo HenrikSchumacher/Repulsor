@@ -23,10 +23,10 @@ namespace Repulsor
         
     public:
         
-        virtual ValueContainer_T & MetricValues( const MeshBase_T & M ) const = 0;
+        virtual ValueContainer_T & MetricValues( const MeshBase_T & restrict M ) const = 0;
 
         virtual void MultiplyMetric(
-            const MeshBase_T & M,
+            const MeshBase_T & restrict M,
             const ExtReal alpha, ptr<ExtReal> X,
             const ExtReal beta,  mut<ExtReal> Y,
             const Int  rhs_count,
@@ -37,11 +37,11 @@ namespace Repulsor
         
         // Return the differential of the energy; use caching.
         void MultiplyMetric(
-            const MeshBase_T & M,
+            const MeshBase_T & restrict M,
             const ExtReal alpha,
-            const TangentVector_T & X,
+            const TangentVector_T & restrict X,
             const ExtReal beta,
-                  CotangentVector_T & Y,
+                  CotangentVector_T & restrict Y,
             const bool VF_flag = true,
             const bool NF_flag = true,
             const bool FF_flag = true

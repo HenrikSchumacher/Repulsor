@@ -125,15 +125,15 @@ namespace Repulsor
         
         // To allow polymorphism, we require the user to create instances of the desired types for the primitives and the bounding volumes, so that we can Clone() them.
         ClusterTree(
-              const Primitive_T        &  P_proto_,
-              const Tensor2<SReal,Int> &  P_serialized_,
-              const BoundingVolume_T   &  C_proto_,
-              const Tensor1<Int ,Int>  &  P_ordering_,
-              const Tensor2<Real,Int>  &  P_near_, // data used actual interaction computation; assumed to be of size PrimitiveCount() x NearDim(). For a triangle mesh in 3D, we want to feed each triangles i), area ii) barycenter and iii) normal as a 1 + 3 + 3 = 7 vector
-              const Tensor2<Real,Int>  &  P_far_, // data used actual interaction computation; assumed to be of size PrimitiveCount() x FarDim(). For a triangle mesh in 3D, we want to feed each triangles i), area ii) barycenter and iii) orthoprojector onto normal space as a 1 + 3 + 6 = 10 vector
-              const SparseMatrix_T & DiffOp,
-              const SparseMatrix_T & AvOp,
-              const ClusterTreeSettings & settings_ = ClusterTreeSettings()
+              const Primitive_T        & restrict P_proto_,
+              const Tensor2<SReal,Int> & restrict P_serialized_,
+              const BoundingVolume_T   & restrict C_proto_,
+              const Tensor1<Int ,Int>  & restrict P_ordering_,
+              const Tensor2<Real,Int>  & restrict P_near_, // data used actual interaction computation; assumed to be of size PrimitiveCount() x NearDim(). For a triangle mesh in 3D, we want to feed each triangles i), area ii) barycenter and iii) normal as a 1 + 3 + 3 = 7 vector
+              const Tensor2<Real,Int>  & restrict P_far_, // data used actual interaction computation; assumed to be of size PrimitiveCount() x FarDim(). For a triangle mesh in 3D, we want to feed each triangles i), area ii) barycenter and iii) orthoprojector onto normal space as a 1 + 3 + 6 = 10 vector
+              const SparseMatrix_T & restrict DiffOp,
+              const SparseMatrix_T & restrict AvOp,
+              const ClusterTreeSettings & restrict settings_ = ClusterTreeSettings()
               )
         :   Base_T( settings_ )
         ,   P_proto      ( ThreadCount() )
@@ -434,8 +434,8 @@ namespace Repulsor
 
         
         void ComputePrePost(
-            const SparseMatrix_T & DiffOp,
-            const SparseMatrix_T & AvOp
+            const SparseMatrix_T & restrict DiffOp,
+            const SparseMatrix_T & restrict AvOp
         )
         {
             if( !this->pre_post_initialized )
@@ -991,7 +991,10 @@ namespace Repulsor
         // All data related to clustering or multipole acceptance criteria remain are unchanged, as well
         // as the preprocessor and postprocessor matrices (that are needed for matrix-vector multiplies of the BCT.)
         
-        void SemiStaticUpdate( const Tensor2<Real,Int> & P_near_, const Tensor2<Real,Int> & P_far_ ) const override
+        void SemiStaticUpdate(
+            const Tensor2<Real,Int> & restrict  P_near_,
+            const Tensor2<Real,Int> & restrict  P_far_
+        ) const override
         {
             if( P_near_.Dimension(0) != PrimitiveCount() )
             {
@@ -1035,8 +1038,8 @@ namespace Repulsor
         } // SemiStaticUpdate
         
         void TakeUpdateVectors(
-            MovingPrimitive_T & P_moving_,
-            Tensor2<SReal,Int> & P_velocities_serialized_,
+            MovingPrimitive_T  & restrict P_moving_,
+            Tensor2<SReal,Int> & restrict P_velocities_serialized_,
             const SReal max_time
         ) const
         {
@@ -1089,8 +1092,8 @@ namespace Repulsor
                     const Int i_begin = JobPointer<Int>(LeafClusterCount(), ThreadCount(), thread     );
                     const Int i_end   = JobPointer<Int>(LeafClusterCount(), ThreadCount(), thread + 1 );
                     
-                         Primitive_T & P_   = *P_proto[thread];
-                    BoundingVolume_T & C_bv = *C_proto[thread];
+                         Primitive_T & restrict P_   = *P_proto[thread];
+                    BoundingVolume_T & restrict C_bv = *C_proto[thread];
                                        
                     for( Int i = i_begin; i < i_end; ++i )
                     {
@@ -1113,7 +1116,7 @@ namespace Repulsor
 
                 Tensor1<bool,Int> visited( ClusterCount(), false );
 
-                BoundingVolume_T & C_bv = *C_proto[0];
+                BoundingVolume_T & restrict C_bv = *C_proto[0];
 
                 while( (0 <= stack_ptr) && (stack_ptr < 126) )
                 {

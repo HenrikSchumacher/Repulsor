@@ -25,8 +25,8 @@ namespace Repulsor
         ~Collision_Kernel() = default;
         
         Collision_Kernel(
-            const ClusterTree_T & S,
-            const ClusterTree_T & T,
+            const ClusterTree_T & restrict S,
+            const ClusterTree_T & restrict T,
             const SReal t_init_,
             const SReal TOL
         )
@@ -46,7 +46,7 @@ namespace Repulsor
         {}
         
 
-        Collision_Kernel( const Collision_Kernel & other )
+        Collision_Kernel( const Collision_Kernel & restrict other )
         :   Base_T( other )
         ,   S_C_ser     ( other.S_C_ser     )
         ,   S_C_up_ser  ( other.S_C_up_ser  )
@@ -63,7 +63,7 @@ namespace Repulsor
         ,   triples     ( other.triples     )
         {}
         
-        friend void swap(Collision_Kernel &A, Collision_Kernel &B)
+        friend void swap(Collision_Kernel & restrict A, Collision_Kernel & restrict B)
         {
             // see https://stackoverflow.com/questions/5695548/public-friend-swap-member-function for details
             using std::swap;
@@ -111,17 +111,17 @@ namespace Repulsor
         
     protected:
         
-        const Tensor2<SReal,Int> & S_C_ser;
-        const Tensor2<SReal,Int> & S_C_up_ser;
-        const Tensor2<SReal,Int> & T_C_ser;
-        const Tensor2<SReal,Int> & T_C_up_ser;
+        const Tensor2<SReal,Int> & restrict S_C_ser;
+        const Tensor2<SReal,Int> & restrict S_C_up_ser;
+        const Tensor2<SReal,Int> & restrict T_C_ser;
+        const Tensor2<SReal,Int> & restrict T_C_up_ser;
 
-        const Tensor2<SReal,Int> & S_P_ser;
-        const Tensor2<SReal,Int> & S_P_v_ser;
-        const Tensor2<SReal,Int> & T_P_ser;
-        const Tensor2<SReal,Int> & T_P_v_ser;
+        const Tensor2<SReal,Int> & restrict S_P_ser;
+        const Tensor2<SReal,Int> & restrict S_P_v_ser;
+        const Tensor2<SReal,Int> & restrict T_P_ser;
+        const Tensor2<SReal,Int> & restrict T_P_v_ser;
         
-        const typename ClusterTree_T::SparseBinaryMatrix_T & A;
+        const typename ClusterTree_T::SparseBinaryMatrix_T & restrict A;
         
         CollisionFinder<ClusterTree_T::AMB_DIM,Real,Int,SReal> C;
         

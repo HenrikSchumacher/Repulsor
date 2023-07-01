@@ -100,8 +100,6 @@ namespace Repulsor
         using Base_T::y_buffer;
         using Base_T::Q;
         
-        using Base_T::lin_k;
-        
         using Base_T::S_Tree;
         using Base_T::T_Tree;
         

@@ -131,7 +131,7 @@ protected:
         const Int L = C_left [C];
         const Int R = C_right[C];
         
-        if( ( L >= null ) && ( R >= null ) )
+        if( (L >= null) && (R >= null) )
         {
             mut<Real> c = C_out.data();
             

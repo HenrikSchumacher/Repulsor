@@ -26,7 +26,7 @@ namespace Repulsor
 
         virtual ~MetricDimRestricted() override = default;
         
-        ValueContainer_T & MetricValues( const MeshBase_T & M ) const override
+        ValueContainer_T & MetricValues( const MeshBase_T & restrict M ) const override
         {
             std::string tag ( ClassName()+"::MetricValues" );
 
@@ -36,14 +36,14 @@ namespace Repulsor
                 M.SetCache( tag, compute_metric(M) );
             }
             
-            ValueContainer_T & result = std::any_cast<ValueContainer_T &>( M.GetCache(tag) );
+            ValueContainer_T & restrict result = std::any_cast<ValueContainer_T &>( M.GetCache(tag) );
             
             ptoc(tag);
             
             return result;
         }
         
-        ValueContainer_T & MetricValues( const Mesh_T & M ) const
+        ValueContainer_T & MetricValues( const Mesh_T & restrict M ) const
         {
             std::string tag ( ClassName()+"::MetricValues" );
 
@@ -53,7 +53,7 @@ namespace Repulsor
                 M.SetCache( tag, compute_metric(M) );
             }
             
-            ValueContainer_T & result = std::any_cast<ValueContainer_T &>( M.GetCache(tag) );
+            ValueContainer_T & restrict result = std::any_cast<ValueContainer_T &>( M.GetCache(tag) );
             
             ptoc(tag);
             
@@ -63,10 +63,10 @@ namespace Repulsor
     
     protected:
         
-        ValueContainer_T compute_metric( const MeshBase_T & M ) const
+        ValueContainer_T compute_metric( const MeshBase_T & restrict M ) const
         {
             // Do a down cast and delegate implementation further to descendant class.
-            const Mesh_T * Q = dynamic_cast<const Mesh_T *>(&M);
+            const Mesh_T * restrict Q = dynamic_cast<const Mesh_T *>(&M);
                         
             if( Q != nullptr )
             {
@@ -82,13 +82,13 @@ namespace Repulsor
         
         
         // Actual implementation to be specified by descendants.
-        virtual ValueContainer_T compute_metric( const Mesh_T & M ) const = 0;
+        virtual ValueContainer_T compute_metric( const Mesh_T & restrict M ) const = 0;
         
         
     public:
         
         void MultiplyMetric(
-            const MeshBase_T & M,
+            const MeshBase_T & restrict M,
             const ExtReal alpha, ptr<ExtReal> X,
             const ExtReal beta,  mut<ExtReal> Y,
             const Int  rhs_count,
@@ -121,8 +121,8 @@ namespace Repulsor
         ) const
         {
             ptic(ClassName()+"::MultiplyMetric");
-            auto & S = M.GetBlockClusterTree().GetS();
-            auto & T = M.GetBlockClusterTree().GetT();
+            auto & restrict S = M.GetBlockClusterTree().GetS();
+            auto & restrict T = M.GetBlockClusterTree().GetT();
 
             T.Pre( X, rhs_count, op_type );
             
@@ -138,7 +138,7 @@ namespace Repulsor
         
         // Actual implementation to be specified by descendants.
         virtual void multiply_metric(
-            const Mesh_T & M,
+            const Mesh_T & restrict M,
             const bool VF_flag, const bool NF_flag, const bool FF_flag
         ) const = 0;
 

@@ -16,7 +16,7 @@ public:
         
         Forest_T(
             TopTreeRows_T && top_tree_rows_,
-            const Tensor1<Int,Int> & C_next,
+            const Tensor1<Int,Int> & restrict C_next,
             const Int thread_count_
         ) noexcept
         :   top_tree_rows ( std::move(top_tree_rows_) )
@@ -236,7 +236,7 @@ protected:
             ptic(ClassName()+"::PercolateDown_Parallel<0> ("+ToString(buffer_dim)+")");
         }
         
-        const Forest_T & forest = Forest();
+        const Forest_T & restrict forest = Forest();
         
         logprint("Breadth-first scan to for the top levels of the tree.");
         for( Int level = 0; level < forest.TopLevels(); ++level )
@@ -367,7 +367,7 @@ protected:
             ptic(ClassName()+"::PercolateUp_Parallel<0> ("+ToString(buffer_dim)+")");
         }
         
-        const Forest_T & forest = Forest();
+        const Forest_T & restrict forest = Forest();
         
         logprint("Parallel reverse depth-first scan to for subtrees.");
         ParallelDo(

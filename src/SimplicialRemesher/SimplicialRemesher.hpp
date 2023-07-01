@@ -65,10 +65,6 @@ namespace Repulsor
         
         static constexpr Int V_max_simplex_valence = (DOM_DIM == 1) ? 2 : (DOM_DIM == 2) ? 9 : 100;
         
-        Int tri_i [S_edge_count]     = {};
-        Int tri_j [S_edge_count]     = {};
-        Int lin_k [AMB_DIM][AMB_DIM] = {};
-        
         Tensor2<Real,Int> V_coords; // vertex coordinates
         Tensor2<Real,Int> V_data;   // extra data per vertex which we will be transformed
         Tensor1<Int, Int> V_lookup;
@@ -109,10 +105,7 @@ namespace Repulsor
         
     public:
         
-        SimplicialRemesher()
-        {
-            Init();
-        }
+        SimplicialRemesher() = default;
         
 //        explicit SimplicialRemesher( const Mesh_T & M )
 //        {
@@ -136,8 +129,6 @@ namespace Repulsor
             const Int thread_count_ = 1
         )
         {
-            Init();
-            
             Real * null = nullptr;
             
             this->LoadMesh(
@@ -156,8 +147,6 @@ namespace Repulsor
             const Int thread_count_ = 1
         )
         {
-            Init();
-            
             this->LoadMesh(
                 V_coords_ ,  vertex_count_,
                 simplices_,  simplex_count_,
@@ -167,39 +156,6 @@ namespace Repulsor
         }
         
         virtual ~SimplicialRemesher() = default;
-        
-        void Init()
-        {
-            Int k = 0;
-            
-            for( Int i = 0; i < DOM_DIM+1; ++i )
-            {
-                for( Int j = i+1; j < DOM_DIM+1; ++j )
-                {
-                    tri_i[k] = i;
-                    tri_j[k] = j;
-                    lin_k[i][j] = lin_k[j][i] = k;
-                    ++k;
-                }
-            }
-        }
-        
-        void CheckInit() const
-        {
-            print(className()+"::CheckInit");
-            for( Int i = 0; i < AMB_DIM; ++i )
-            {
-                for( Int j = i+1; j < AMB_DIM; ++j )
-                {
-                    print("{ "+ToString(i)+"," +ToString(j)+" } -> " + ToString(lin_k[i][j]) );
-                }
-            }
-
-            for( Int k = 0; k < S_vertex_count; ++k )
-            {
-                print( ToString(k) +" -> { "+ToString(tri_i[k])+"," +ToString(tri_j[k])+" }");
-            }
-        }
         
         
         virtual Int VertexCount() const override

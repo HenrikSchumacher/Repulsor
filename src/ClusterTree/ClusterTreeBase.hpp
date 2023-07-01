@@ -764,7 +764,9 @@ namespace Repulsor
 //##################################################################################################
 
         virtual void SemiStaticUpdate(
-            const Tensor2<Real,Int> & P_near_, const Tensor2<Real,Int> & P_far_ ) const = 0;
+            const Tensor2<Real,Int> & restrict P_near_,
+            const Tensor2<Real,Int> & restrict P_far_
+        ) const = 0;
         
         virtual void SemiStaticUpdate( ptr<Real> P_near_, ptr<Real> P_far_ ) const = 0;
         

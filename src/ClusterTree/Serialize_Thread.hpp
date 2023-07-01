@@ -41,7 +41,7 @@ private:
         
         logprint("Parallel depth-first scans for each subtree.");
         
-        std::vector<Cluster_T *> & tree_row = tree_rows_ptr[top_level_count];
+        std::vector<Cluster_T *> & restrict tree_row = tree_rows_ptr[top_level_count];
         
         ParallelDo_Dynamic(
             [=,&tree_row]( const Int thread, const Int i )

@@ -83,9 +83,9 @@ namespace Repulsor
         TP_AllPairsBlocked_Traversor() = delete;
         
         TP_AllPairsBlocked_Traversor(
-            const ClusterTree_T & S_,
-            const ClusterTree_T & T_,
-            ValueContainer_T & metric_values_,
+            const ClusterTree_T & restrict S_,
+            const ClusterTree_T & restrict T_,
+            ValueContainer_T & restrict  metric_values_,
             const Real q_,
             const Real p_
         )
@@ -108,12 +108,12 @@ namespace Repulsor
         
     protected:
         
-        const ClusterTree_T & S;
-        const ClusterTree_T & T;
+        const ClusterTree_T & restrict S;
+        const ClusterTree_T & restrict T;
         
         Configurator_T conf;
         
-        ValueContainer_T & metric_values;
+        ValueContainer_T & restrict metric_values;
         
         const Real q;
         const Real p;

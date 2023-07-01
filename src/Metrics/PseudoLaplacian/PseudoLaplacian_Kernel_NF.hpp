@@ -102,8 +102,6 @@ namespace Repulsor
         using Base_T::y;
         using Base_T::Q;
         
-        using Base_T::lin_k;
-        
         using Base_T::S_scale;
         using Base_T::T_scale;
         

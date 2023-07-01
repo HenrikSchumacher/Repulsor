@@ -4,6 +4,11 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
+		<key>CoulombPotential.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>2</integer>
+		</dict>
 		<key>Example.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
@@ -28,6 +33,11 @@
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
 		<key>AF3DADB428ECF0470089476A</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>AF68F6DA2A4FE96E00009C92</key>
 		<dict>
 			<key>primary</key>
 			<true/>
