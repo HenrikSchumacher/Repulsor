@@ -84,7 +84,7 @@ protected:
             
             if constexpr ( leaves_are_singletons )
             {
-                copy_buffer<FAR_DIM>( P_far.data(C_begin[C]), C_far.data(C) );
+                copy_buffer<FAR_DIM,Sequential>( P_far.data(C_begin[C]), C_far.data(C) );
             }
             else
             {
@@ -93,9 +93,21 @@ protected:
                 const Int begin = C_begin[C];
                 const Int end   = C_end  [C];
                 
-                zerofy_buffer( C_C, FAR_DIM );
+                {
+                    const Int i = begin;
+                    ptr<Real> P = P_far.data(i);
+                    
+                    const Real a = P[0];
+                    
+                    C_C[0] = a;
+                    
+                    for( Int j = 1; j < FAR_DIM; ++j )
+                    {
+                        C_C[j] = a * P[j];
+                    }
+                }
                 
-                for( Int i = begin; i < end; ++i )
+                for( Int i = begin+1; i < end; ++i )
                 {
                     ptr<Real> P = P_far.data(i);
                     
