@@ -158,7 +158,7 @@ namespace Repulsor
         
         std::string ClassName() const
         {
-            return "FMM_Traversor<"+kernel.ClassName()+TypeName<LInt>+">";
+            return "FMM_Traversor<"+kernel.ClassName() + ","+TypeName<LInt>+">";
         }
         
     }; // class FMM_Traversor
