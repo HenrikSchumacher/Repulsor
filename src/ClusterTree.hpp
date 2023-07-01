@@ -445,7 +445,7 @@ namespace Repulsor
                 
                 const Int primitive_count = PrimitiveCount();
                 
-                ptic("hi_pre");
+//                ptic("hi_pre");
                 
                 hi_pre = SparseMatrix_T(
                     DiffOp.RowCount(),
@@ -486,14 +486,14 @@ namespace Repulsor
                         ThreadCount()
                     );
                 }
-                ptoc("hi_pre");
+//                ptoc("hi_pre");
                 
-                ptic("hi_post");
+//                ptic("hi_post");
                 pdump(hi_pre.Stats());
                 hi_post = hi_pre.Transpose();
-                ptoc("hi_post");
+//                ptoc("hi_post");
                 
-                ptic("lo_pre");
+//                ptic("lo_pre");
                 
                 lo_pre = SparseMatrix_T(
                     AvOp.RowCount(),
@@ -533,12 +533,12 @@ namespace Repulsor
                         ThreadCount()
                     );
                 }
-                ptoc("lo_pre");
+//                ptoc("lo_pre");
                 
-                ptic("lo_post");
+//                ptic("lo_post");
                 pdump(lo_pre.Stats());
                 lo_post = lo_pre.Transpose();
-                ptoc("lo_post");
+//                ptoc("lo_post");
                 
                 this->pre_post_initialized = true;
                 
@@ -551,11 +551,13 @@ namespace Repulsor
         {
             if( !this->mi_pre_post_initialized )
             {
-                ptic(className()+"::RequireMixedPrePost");
+                std::string tag = className()+"::RequireMixedPrePost";
+                
+                ptic(tag);
                 
                 const Int primitive_count = PrimitiveCount();
                 
-                ptic("mi_pre");
+//                ptic(tag + ": mi_pre");
                 
                 mi_pre = SparseMatrix_T(
                     lo_pre.RowCount()     + hi_pre.RowCount(),
@@ -566,7 +568,11 @@ namespace Repulsor
                 
                 {
                     // We assume that each row has the same number of nonzeros.
-                    assert( lo_pre.Outer(1) - lo_pre.Outer(0) == hi_pre.Outer(1) - hi_pre.Outer(0) );
+                    debug_assert(
+                        lo_pre.Outer(1) - lo_pre.Outer(0) == hi_pre.Outer(1) - hi_pre.Outer(0),
+                        ""
+                    );
+                    
                     const Int row_size = static_cast<Int>( lo_pre.Outer(1) - lo_pre.Outer(0) );
                     
     //                ptr<LInt> lo_outer  = lo_pre.Outer().data();
@@ -616,13 +622,11 @@ namespace Repulsor
                         ThreadCount()
                     );
                 }
-                ptoc("mi_pre");
-
+//                ptoc(tag + ": mi_pre");
+                
                 pdump(mi_pre.Stats());
                 
-                ptic("mi_post");
-
-//                mi_post = mi_pre.Transpose();
+//                ptic(tag + ": mi_post");
                 
                 mi_post = SparseMatrix_T(
                     lo_post.RowCount(),
@@ -679,13 +683,13 @@ namespace Repulsor
                     );
                 }
                 
-                ptoc("mi_post");
-                
+//                ptoc(tag + ": mi_post");
+
                 pdump(mi_post.Stats());
                 
                 this->mi_pre_post_initialized = true;
                 
-                ptoc(className()+"::RequireMixedPrePost");
+                ptoc(tag);
             }
         }
         
