@@ -8,6 +8,7 @@
 //#define REMESHER_VERBATIM
 
 #define TOOLS_ENABLE_PROFILER // enable profiler
+#define TOOLS_DEBUG 
 
 #define LAPACK_DISABLE_NAN_CHECK
 #define ACCELERATE_NEW_LAPACK
@@ -294,6 +295,9 @@ int main(int argc, const char * argv[])
     dump(Y.MaxNorm());
     
     
+    print("");
+    print("");
+    
     // A = M.StiffnessMatrix() + M.MassMatrix()
     auto A = M.H1Metric(1,1);
     
@@ -305,32 +309,31 @@ int main(int argc, const char * argv[])
         A.Outer().data(), A.Inner().data(), perm.data(), A.RowCount(),
         A.ThreadCount(), static_cast<Int>(4)
     );
-    
+
     S.SymbolicFactorization();
-    
+
     S.NumericFactorization( A.Values().data(), Scalar::Zero<Real> );
     
-    
-    
+
 //    print( S.GetPermutation().GetPermutation().ToString() );
 
     Tensor1<Real,Int> b ( M.VertexCount(), 1 );
     Tensor1<Real,Int> x ( M.VertexCount(), 0 );
-    
+
     S.Solve( b.data(), x.data() );
     
-//    print( x.ToString() );
     
-    print("");
-    print("Testing remesher.");
-
-    std::unique_ptr<Mesh_T::RemesherBase_T> R = M_ptr->CreateRemesher();
-
-    std::vector<Int> edges {1,2,3};
-
-    R->CollapseEdges( edges );
-
-    R->SplitEdges( edges );
+    
+//    print("");
+//    print("Testing remesher.");
+//
+//    std::unique_ptr<Mesh_T::RemesherBase_T> R = M_ptr->CreateRemesher();
+//
+//    std::vector<Int> edges {1,2,3};
+//
+//    R->CollapseEdges( edges );
+//
+//    R->SplitEdges( edges );
 
 //    R->UnifyEdgeLengths(<#const Real collapse_threshold#>, <#const Real split_threshold#>);
     
