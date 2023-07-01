@@ -61,6 +61,10 @@ namespace Repulsor
         
         virtual const Tensor2<Int,Int> & Simplices() const = 0;
 
+        virtual const Tensor1<Real,Int> & VertexCharges() const = 0;
+        
+        virtual const Tensor1<Real,Int> & SimplexCharges() const = 0;
+        
         virtual Int FarDim() const = 0;
         
         virtual Int NearDim() const = 0;
