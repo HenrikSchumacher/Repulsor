@@ -77,9 +77,6 @@ namespace Repulsor
         mut<Real> T_D_data = nullptr;
         mut<Real> T_diag   = nullptr;
         
-        using Base_T::tri_i;
-        using Base_T::tri_j;
-        using Base_T::lin_k;
         using Base_T::thread;
         
     public:

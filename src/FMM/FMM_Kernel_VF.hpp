@@ -99,12 +99,7 @@ namespace Repulsor
 #else
         mutable Real const * restrict y_buffer  = nullptr;
 #endif
-        
-        using Base_T::tri_i;
-        using Base_T::tri_j;
-        using Base_T::lin_k;
         using Base_T::thread;
-
         
         mutable S_Tree_T S_Tree;
         mutable T_Tree_T T_Tree;

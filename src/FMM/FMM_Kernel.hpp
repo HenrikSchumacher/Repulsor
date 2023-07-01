@@ -39,50 +39,7 @@ namespace Repulsor
         
         static constexpr Real symmetry_factor = one / (one + !static_cast<Real>(symmetricQ) );
                                             
-        
         const Int thread = 0;
-        
-        Int tri_i [PROJ_DIM] = {};
-        Int tri_j [PROJ_DIM] = {};
-        Int lin_k [AMB_DIM][AMB_DIM] = {};
-        
-        void Init()
-        {
-            Int k = 0;
-            
-            for( Int i = 0; i < AMB_DIM; ++i )
-            {
-                lin_k[i][i] = k;
-                tri_i[k]    = i;
-                tri_j[k]    = i;
-                ++k;
-                for( Int j = i+1; j < AMB_DIM; ++j )
-                {
-                    tri_i[k]    = i;
-                    tri_j[k]    = j;
-                    lin_k[i][j] = lin_k[j][i] = k;
-                    ++k;
-                }
-            }
-        }
-        
-        void CheckInit()
-        {
-            print(ClassName()+"::CheckInit");
-            for( Int i = 0; i < AMB_DIM; ++i )
-            {
-                for( Int j = 0; j < AMB_DIM; ++j )
-                {
-                    print("{ "+ToString(i)+"," +ToString(j)+" } -> " + ToString(lin_k[i][j]) );
-                }
-            }
-
-            for( Int k = 0; k < PROJ_DIM; ++k )
-            {
-                print( ToString(k) +" -> { "+ToString(tri_i[k])+"," +ToString(tri_j[k])+" }");
-            }
-        }
-        
         
     public:
 
@@ -94,7 +51,6 @@ namespace Repulsor
         ,   T             ( conf.GetT()          )
         ,   metric_values ( conf.MetricValues()  )   // In configure mode, kernels needs
         {
-            Init();
             debug_print(std::string( "Initializing " + this-> ClassName() + " from Configurator_T on thread " + ToString(thread)) );
         }
         
@@ -104,7 +60,6 @@ namespace Repulsor
         ,   T             ( other.T              )
         ,   metric_values ( other.metric_values  )
         {
-            Init();
             debug_print(std::string( "Initializing " + this->ClassName() + " from "+ClassName()+" on thread " + ToString(thread)) );
         }
         
