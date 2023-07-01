@@ -69,13 +69,17 @@ namespace Repulsor
             {
 //                M.GetS().CleanseDerivativeBuffers();
 
-                differential(M);
+                const ExtReal en = differential(M);
+                
+                if( !M.InCacheQ(ClassName()+"::Value"))
+                {
+                    M.SetCache( ClassName()+"::Value", en );
+                }
                 
                 CotangentVector_T diff ( M.VertexCount(), M.AmbDim() );
 
                 M.Assemble_ClusterTree_Derivatives( diff.data(), ExtReal(1), false );
                 
-                // TODO: Find out whether this incurs a copy operation.
                 M.SetCache( ClassName()+"::Differential", std::move(diff) );
             }
             
@@ -86,10 +90,24 @@ namespace Repulsor
             );
         }
         
+        // Return the differential of the energy to a pointer; don't use any caching.
+        ExtReal Differential( MeshBase_T & M, mut<ExtReal> diff ) const
+        {
+            ptic(ClassName()+"::Differential (pointer)");
+            
+            const ExtReal en = differential(M);
+            
+            M.Assemble_ClusterTree_Derivatives( diff, ExtReal(1), false );
+            
+            ptoc(ClassName()+"::Differential (pointer)");
+            
+            return en;
+        }
+        
     protected:
         
         // Actual implementation to be specified by descendants.
-        virtual void differential( const MeshBase_T & M ) const = 0;
+        virtual ExtReal differential( const MeshBase_T & M ) const = 0;
 
     public:
 

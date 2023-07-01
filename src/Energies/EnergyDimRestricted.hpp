@@ -24,6 +24,9 @@ namespace Repulsor
 
         virtual ~EnergyDimRestricted() override = default;
         
+        using Base_T::Value;
+        using Base_T::Differential;
+        
         // Do a down cast and delegate implementation further to descendant class.
         ExtReal value( const MeshBase_T & M ) const override
         {
@@ -45,22 +48,26 @@ namespace Repulsor
 
         
         // Do a down cast and delegate implementation further to descendant class.
-        void differential( const MeshBase_T & M ) const override
+        ExtReal differential( const MeshBase_T & M ) const override
         {
             const Mesh_T * Q = dynamic_cast<const Mesh_T *>(&M);
-                        
+                    
             if( Q != nullptr )
             {
-                differential(*Q);
+                ExtReal en = differential(*Q);
+                
+                return en;
+                
             }
             else
             {
                 eprint(ClassName()+"::differential: Input could not be downcast to compatible type. Doing nothing.");
+                return 0;
             }
         }
         
         // Actual implementation to be specified by descendants.
-        virtual void differential( const Mesh_T & M ) const = 0;
+        virtual ExtReal differential( const Mesh_T & M ) const = 0;
 
     public:
         

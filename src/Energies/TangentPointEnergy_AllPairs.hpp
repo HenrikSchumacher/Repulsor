@@ -31,6 +31,8 @@ namespace Repulsor
         using TangentVector_T        = typename Base_T::TangentVector_T;
         using CotangentVector_T      = typename Base_T::CotangentVector_T;
         
+        using Base_T::Value;
+        using Base_T::Differential;
         
         CLASS( const Real q_, const Real p_ )
         :   Base_T ()
@@ -55,12 +57,12 @@ namespace Repulsor
             return traversor.Compute();
         }
         
-        virtual void differential( const Mesh_T & M ) const override
+        virtual ExtReal differential( const Mesh_T & M ) const override
         {
-            TP_AllPairs_Traversor<DOM_DIM,DOM_DIM,ClusterTree_T,true,false,true,false>
+            TP_AllPairs_Traversor<DOM_DIM,DOM_DIM,ClusterTree_T,true,true,true,false>
                 traversor( M.GetClusterTree(), M.GetClusterTree(), this->metric_values, q, p );
             
-            (void)traversor.Compute();
+            return traversor.Compute();
         }
         
     public:

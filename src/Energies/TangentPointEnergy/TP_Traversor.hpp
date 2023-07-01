@@ -87,10 +87,10 @@ namespace Repulsor
         TP_Traversor() = delete;
         
         TP_Traversor(
-              const BlockClusterTree_T & bct_,
-              ValueContainer_T & metric_values_,
-              const Real q_,
-              const Real p_
+            const BlockClusterTree_T & bct_,
+            ValueContainer_T & metric_values_,
+            const Real q_,
+            const Real p_
         )
         :   bct           ( bct_          )
         ,   conf          ( bct.GetS(), bct.GetT(), metric_values_ )
@@ -121,8 +121,8 @@ namespace Repulsor
         const Real q_half_real;
         const Real p_half_real;
         
-        const Int q_half_int;
-        const Int p_half_int;
+        const Int  q_half_int;
+        const Int  p_half_int;
         
         const bool q_half_is_int;
         const bool p_half_is_int;
@@ -180,34 +180,64 @@ namespace Repulsor
             {
                 DummyAllocators();
             }
-            if( q_half_is_int )
+            
+            if( q_half_real >= one )
             {
-                if( p_half_is_int )
+                if( q_half_is_int )
                 {
-                    VF_Compute<Int,Int>( q_half_int, p_half_int );
-                    NF_Compute<Int,Int>( q_half_int, p_half_int );
-                    FF_Compute<Int,Int>( q_half_int, p_half_int );
+                    if( p_half_is_int )
+                    {
+                        VF_Compute<Int,Int,2>( q_half_int, p_half_int );
+                        NF_Compute<Int,Int,2>( q_half_int, p_half_int );
+                        FF_Compute<Int,Int,2>( q_half_int, p_half_int );
+                    }
+                    else
+                    {
+                        VF_Compute<Int,Real,2>( q_half_int, p_half_real );
+                        NF_Compute<Int,Real,2>( q_half_int, p_half_real );
+                        FF_Compute<Int,Real,2>( q_half_int, p_half_real );
+                    }
                 }
                 else
                 {
-                    VF_Compute<Int,Real>( q_half_int, p_half_real );
-                    NF_Compute<Int,Real>( q_half_int, p_half_real );
-                    FF_Compute<Int,Real>( q_half_int, p_half_real );
+                    if( p_half_is_int)
+                    {
+                        VF_Compute<Real,Int,2>( q_half_real, p_half_int );
+                        NF_Compute<Real,Int,2>( q_half_real, p_half_int );
+                        FF_Compute<Real,Int,2>( q_half_real, p_half_int );
+                    }
+                    else
+                    {
+                        VF_Compute<Real,Real,2>( q_half_real, p_half_real );
+                        NF_Compute<Real,Real,2>( q_half_real, p_half_real );
+                        FF_Compute<Real,Real,2>( q_half_real, p_half_real );
+                    }
+                }
+            }
+            else if( q_half_real == zero )
+            {
+                if( p_half_is_int )
+                {
+                    VF_Compute<Int,Int,0>( q_half_int, p_half_int );
+                    NF_Compute<Int,Int,0>( q_half_int, p_half_int );
+                    FF_Compute<Int,Int,0>( q_half_int, p_half_int );
+                }
+                else
+                {
+                    VF_Compute<Int,Real,0>( q_half_int, p_half_real );
+                    NF_Compute<Int,Real,0>( q_half_int, p_half_real );
+                    FF_Compute<Int,Real,0>( q_half_int, p_half_real );
                 }
             }
             else
             {
-                if( p_half_is_int)
+                if( q_half_real < zero )
                 {
-                    VF_Compute<Real,Int>( q_half_real, p_half_int );
-                    NF_Compute<Real,Int>( q_half_real, p_half_int );
-                    FF_Compute<Real,Int>( q_half_real, p_half_int );
+                    eprint("Tangent-point kernels not well-defined for q < 0.");
                 }
                 else
                 {
-                    VF_Compute<Real,Real>( q_half_real, p_half_real );
-                    NF_Compute<Real,Real>( q_half_real, p_half_real );
-                    FF_Compute<Real,Real>( q_half_real, p_half_real );
+                    eprint("Tangent-point kernels not implement for 0 < q < 2.");
                 }
             }
 
@@ -246,14 +276,19 @@ namespace Repulsor
     
     protected:
         
-        template< typename T1, typename T2 >
-        void VF_Compute( const T1 q_half_, const T1 p_half_ )
+        template< typename T1, typename T2, int q_flag >
+        void VF_Compute( const T1 q_half_, const T2 p_half_ )
         {
+            if constexpr ( S_DOM_DIM == 0 && T_DOM_DIM == 0 )
+            {
+                return;
+            }
+            
             ptic(ClassName()+"::VF_Compute");
             
             using Kernel_T = TP_Kernel_VF<
                 S_DOM_DIM, T_DOM_DIM,
-                ClusterTree_T, T1, T2, BlockClusterTree_T::symmetricQ,
+                ClusterTree_T, T1, T2, q_flag, BlockClusterTree_T::symmetricQ,
                 energy_flag, diff_flag, metric_flag
             >;
 
@@ -280,14 +315,14 @@ namespace Repulsor
         }
             
         
-        template< typename T1, typename T2 >
-        void NF_Compute( const T1 q_half_, const T1 p_half_ )
+        template< typename T1, typename T2, int q_flag >
+        void NF_Compute( const T1 q_half_, const T2 p_half_ )
         {
             ptic(ClassName()+"::NF_Compute");
 
             using Kernel_T = TP_Kernel_NF<
                 S_DOM_DIM, T_DOM_DIM,
-                ClusterTree_T, T1, T2,
+                ClusterTree_T, T1, T2, q_flag,
                 BlockClusterTree_T::SymmetricQ(),
                 energy_flag, diff_flag, metric_flag
             >;
@@ -315,13 +350,13 @@ namespace Repulsor
         }
         
             
-        template< typename T1, typename T2 >
-        void FF_Compute( const T1 q_half_, const T1 p_half_ )
+        template< typename T1, typename T2, int q_flag >
+        void FF_Compute( const T1 q_half_, const T2 p_half_ )
         {
             ptic(ClassName()+"::FF_Compute");
             
             using Kernel_T = TP_Kernel_FF<
-                ClusterTree_T, T1, T2,
+                ClusterTree_T, T1, T2, q_flag,
                 BlockClusterTree_T::SymmetricQ(),
                 energy_flag, diff_flag, metric_flag
             >;
@@ -426,6 +461,11 @@ namespace Repulsor
         
         void VF_MultiplyMetric( const Int rhs_count ) const
         {
+            if constexpr ( S_DOM_DIM == 0 && T_DOM_DIM == 0 )
+            {
+                return;
+            }
+            
             Sparse::KernelMatrixCSR<Kernel_Block_MulAdd_T> matrix ( bct.VeryNear() );
             
             matrix.Dot(

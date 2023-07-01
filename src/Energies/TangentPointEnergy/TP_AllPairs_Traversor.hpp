@@ -222,24 +222,24 @@ namespace Repulsor
     
     protected:
         
-        template< typename T1, typename T2 >
+        template< typename T1, typename T2, int q_flag>
         void NF_Compute( const T1 q_half_, const T1 p_half_ )
         {
             ptic(ClassName()+"::NF_Compute");
 
             using Kernel_T = TP_Kernel_NF<
                 S_DOM_DIM, T_DOM_DIM,
-                ClusterTree_T, T1, T2,
+                ClusterTree_T, T1, T2, q_flag,
                 symmetricQ,
                 energy_flag, diff_flag, metric_flag
             >;
-
+            
             Kernel_T ker ( conf, 0, q_half_, p_half_ );
 
             AllPairs_Traversor traversor ( S.PrimitiveCount(), T.PrimitiveCount(), ker );
-
+            
             en += traversor.Compute();
-
+            
             if constexpr ( metric_flag )
             {
                 if constexpr ( symmetricQ )

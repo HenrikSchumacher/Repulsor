@@ -10,7 +10,7 @@ namespace Repulsor
     template<
         int S_DOM_DIM_, int T_DOM_DIM_,
         typename ClusterTree_T_,
-        typename T1, typename T2,
+        typename T1, typename T2, int q_flag,
         bool symmetricQ_,
         bool energy_flag_, bool diff_flag_, bool metric_flag_
     >
@@ -162,18 +162,41 @@ namespace Repulsor
                 rCosPsi_2 += v[i] * Qv[i];
             }
 
-            // |P*(y-x)|^{q-2}
-            const Real rCosPhi_q_minus_2 = Power<Real,T1>( std::abs(rCosPhi_2), q_half_minus_1);
-            // |Q*(y-x)|^{q-2}
-            const Real rCosPsi_q_minus_2 = Power<Real,T1>( std::abs(rCosPsi_2), q_half_minus_1);
             // r^{-p-2}
             const Real r_minus_p_minus_2 = Power<Real,T2>( r2, minus_p_half_minus_1 );
             // |y-x|^-p
             const Real r_minus_p = r_minus_p_minus_2 * r2;
-            // |P*(y-x)|^q
-            const Real rCosPhi_q = rCosPhi_q_minus_2 * rCosPhi_2;
-            // |Q*(y-x)|^q
-            const Real rCosPsi_q = rCosPsi_q_minus_2 * rCosPsi_2;
+            
+            Real rCosPhi_q_minus_2;
+            Real rCosPsi_q_minus_2;
+            Real rCosPhi_q;
+            Real rCosPsi_q;
+            
+            if constexpr ( q_flag >= 2 )
+            {
+                // |P*(y-x)|^{q-2}
+                rCosPhi_q_minus_2 = Power<Real,T1>( std::abs(rCosPhi_2), q_half_minus_1 );
+                
+                // |Q*(y-x)|^{q-2}
+                rCosPsi_q_minus_2 = Power<Real,T1>( std::abs(rCosPsi_2), q_half_minus_1 );
+                
+                // |P*(y-x)|^q
+                rCosPhi_q = rCosPhi_q_minus_2 * rCosPhi_2;
+                // |Q*(y-x)|^q
+                rCosPsi_q = rCosPsi_q_minus_2 * rCosPsi_2;
+            }
+            else
+            {
+                // Does not make any sense.
+                rCosPhi_q_minus_2 = one;
+                // Does not make any sense.
+                rCosPsi_q_minus_2 = one;
+                
+                // |P*(y-x)|^q
+                rCosPhi_q = Power<Real,T1>( std::abs(rCosPhi_2), q_half );
+                // |Q*(y-x)|^q
+                rCosPsi_q = Power<Real,T1>( std::abs(rCosPsi_2), q_half );
+            }
             
             const Real Num = ( rCosPhi_q + rCosPsi_q );
 
@@ -183,11 +206,11 @@ namespace Repulsor
             if constexpr ( diff_flag || metric_flag )
             {
                 // factor = q / |y-x|^p
-                const Real factor = q * r_minus_p;
+                const Real factor = COND( q_flag == 0, zero, q * r_minus_p );
                 // K_xy = q * |P*(y-x)|^(q-2) / |y-x|^p
-                const Real K_xy = factor * rCosPhi_q_minus_2;
+                const Real K_xy   = COND( q_flag == 0, zero, factor * rCosPhi_q_minus_2 );
                 // K_yx = q * |Q*(y-x)|^(q-2) / |y-x|^p
-                const Real K_yx = factor * rCosPsi_q_minus_2;
+                const Real K_yx   = COND( q_flag == 0, zero, factor * rCosPsi_q_minus_2 );
                 // H    = p * ( |P*(y-x)|^q + |Q*(y-x)|^q) / |y-x|^(p+2)
                 const Real H = p * r_minus_p_minus_2 * Num;
                 
@@ -198,18 +221,18 @@ namespace Repulsor
                     
                     for( Int i = 0; i < AMB_DIM; ++i )
                     {
-                        dEdv[i] = K_xy * Pv[i] + K_yx * Qv[i] - H * v[i];
+                        dEdv[i] = COND( q_flag == 0, zero, K_xy * Pv[i] + K_yx * Qv[i]) - H * v[i];
                         dEdvx += dEdv[i] * x[i];
                         dEdvy += dEdv[i] * y[i];
                         
                         for( Int ii = 0; ii < S_DOM_DIM+1; ++ii )
                         {
-                            DX[1+AMB_DIM*ii+i] -=    S_scale *  b * dEdv[i];
+                            DX[1+AMB_DIM*ii+i] -= S_scale *  b * dEdv[i];
                         }
                         
                         for( Int ii = 0; ii < T_DOM_DIM+1; ++ii )
                         {
-                            DY[1+AMB_DIM*ii+i] +=    T_scale *  a * dEdv[i];
+                            DY[1+AMB_DIM*ii+i] += T_scale *  a * dEdv[i];
                         }
                     }
                     
