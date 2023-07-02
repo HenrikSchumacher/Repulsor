@@ -630,10 +630,24 @@ namespace Repulsor
             GetClusterTree().CollectDerivatives();
             
             
-            details.DNearToHulls( V_coords, simplices, GetClusterTree().PrimitiveDNearFieldData(), buffer, false );
-            
-            details.DFarToHulls ( V_coords, simplices, GetClusterTree().PrimitiveDFarFieldData(), buffer, true );
+//            details.template DNearToHulls<Overwrite>(
+//                V_coords, simplices, GetClusterTree().PrimitiveDNearFieldData(), V_charges, buffer
+//            );
+//
+//            details.template DFarToHulls<AddTo>(
+//                V_coords, simplices, GetClusterTree().PrimitiveDFarFieldData(), V_charges, buffer
+//            );
 
+            // TODO: A single templated function
+            details.DNearFarToHulls(
+                V_coords,
+                simplices,
+                GetClusterTree().PrimitiveDNearFieldData(),
+                GetClusterTree().PrimitiveDFarFieldData(),
+                V_charges,
+                buffer
+            );
+            
             DerivativeAssembler().template Dot<AMB_DIM>(
                 static_cast<Real>(weight),   buffer.data(),
                 static_cast<ExtReal>(addTo), output,

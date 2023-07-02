@@ -7,19 +7,20 @@ DNearToHulls[n_,m_]:=Module[{name},
 name="DNearToHulls";
 StringJoin[
 "
+	template<AddTo_T addtoQ> 
 	void ",name,"( 
-		const Tensor2<Real,Int> & V_coords, 
-		const Tensor2<Int ,Int> & simplices, 
-		const Tensor2<Real,Int> & P_D_near, 
+		const Tensor2<Real,Int> & restrict V_coords, 
+		const Tensor2<Int ,Int> & restrict simplices, 
+		const Tensor2<Real,Int> & restrict P_D_near, 
+		const Tensor1<Real,Int> & restrict V_charges,
         // cppcheck-suppress [constParameter]
-		      Tensor3<Real,Int> & buffer, 
-		bool addTo 
+		      Tensor3<Real,Int> & restrict buffer
 	) const
     {
         ptic(ClassName()+\"::",name,"\");
         eprint(ClassName()+\"::",name," not implemented. Returning 0.\");
 		
-		if(!addTo)
+		if constexpr ( addtoQ != AddTo )
 		{
 			buffer.Fill(static_cast<Real>(0));
 		}
@@ -50,7 +51,7 @@ vol=1;
 
 dXX=Table[Indexed[PDdata,i],{i,1,datadim}];
 vcpdata=Join[{vol},vol Flatten[PP],vol Flatten[Table[pr[[i,j]],{i,1,m},{j,i,m}]]];
-A=dXX . D[vcpdata,{Flatten[PP],1}];
+A= "charge" (dXX . D[vcpdata,{Flatten[PP],1}]);
 
 code0=Part[Experimental`OptimizeExpression[A,"OptimizationLevel"->2,
 "OptimizationSymbol"->$
@@ -79,13 +80,14 @@ codestringAddTo=StringCases[StringReplace[GenerateCode[CBlock[code1],Indent->5],
 
 
 StringJoin["
+	template<AddTo_T addtoQ> 
 	void ",name,"( 
-		const Tensor2<Real,Int> & V_coords, 
-		const Tensor2<Int ,Int> & simplices, 
-		const Tensor2<Real,Int> & P_D_near, 
+		const Tensor2<Real,Int> & restrict V_coords, 
+		const Tensor2<Int ,Int> & restrict simplices, 
+		const Tensor2<Real,Int> & restrict P_D_near,
+		const Tensor1<Real,Int> & restrict V_charges,
         // cppcheck-suppress [constParameter]
-		      Tensor3<Real,Int> & buffer, 
-		bool addTo 
+		      Tensor3<Real,Int> & restrict buffer
 	) const
     {
         ptic(ClassName()+\"::"<>name<>"\");
@@ -100,11 +102,18 @@ StringJoin["
 		ptr<Real> P_D_near__  = P_D_near.data();
 		mut<Real> buffer__    = buffer.data();
         
-        if( addTo )
+        if constexpr ( addtoQ == AddTo )
 		{
 			ParallelDo(
 				[=]( const Int i )
 				{
+					Real charge = 0;
+					for( Int k = 0; k < SIZE; ++k )
+					{
+						charge += V_charges[simplices(i,k)];
+					}
+					charge *= nth;
+
 "<>codestringAddTo<>"
 				},
 				simplices.Dimension(0),
@@ -116,6 +125,13 @@ StringJoin["
 			ParallelDo(
 				[=]( const Int i )
 				{
+					Real charge = 0;
+					for( Int k = 0; k < SIZE; ++k )
+					{
+						charge += V_charges[simplices(i,k)];
+					}
+					charge *= nth;
+
 "<>codestringAssign<>"
 				},
 				simplices.Dimension(0),
@@ -153,7 +169,7 @@ vol=Sqrt[# . #]&[\[Tau]];
 
 dXX=Table[Indexed[PDdata,i],{i,1,datadim}];
 vcpdata=Join[{vol},vol Flatten[PP],vol Flatten[Table[pr[[i,j]],{i,1,m},{j,i,m}]]];
-A=dXX . D[vcpdata,{Flatten[PP],1}];
+A= "charge" (dXX . D[vcpdata,{Flatten[PP],1}]);
 
 code0=Part[Experimental`OptimizeExpression[A,"OptimizationLevel"->2,
 "OptimizationSymbol"->$
@@ -182,13 +198,14 @@ codestringAddTo=StringCases[StringReplace[GenerateCode[CBlock[code1],Indent->5],
 
 
 StringJoin["
+	template<AddTo_T addtoQ> 
 	void ",name,"( 
-		const Tensor2<Real,Int> & V_coords, 
-		const Tensor2<Int ,Int> & simplices, 
-		const Tensor2<Real,Int> & P_D_near, 
+		const Tensor2<Real,Int> & restrict V_coords, 
+		const Tensor2<Int ,Int> & restrict simplices, 
+		const Tensor2<Real,Int> & restrict P_D_near, 
+		const Tensor1<Real,Int> & restrict V_charges,
         // cppcheck-suppress [constParameter]
-		      Tensor3<Real,Int> & buffer, 
-		bool addTo 
+		      Tensor3<Real,Int> & restrict buffer
 	) const
     {
         ptic(ClassName()+\"::"<>name<>"\");
@@ -203,11 +220,18 @@ StringJoin["
 		ptr<Real> P_D_near__  = P_D_near.data();
 		mut<Real> buffer__    = buffer.data();
         
-        if( addTo )
+        if constexpr ( addtoQ == AddTo )
 		{
 			ParallelDo(
 				[=]( const Int i )
 				{
+					Real charge = 0;
+					for( Int k = 0; k < SIZE; ++k )
+					{
+						charge += V_charges[simplices(i,k)];
+					}
+					charge *= nth;
+
 "<>codestringAddTo<>"
 				},
 				simplices.Dimension(0),
@@ -219,6 +243,13 @@ StringJoin["
 			ParallelDo(
 				[=]( const Int i )
 				{
+					Real charge = 0;
+					for( Int k = 0; k < SIZE; ++k )
+					{
+						charge += V_charges[simplices(i,k)];
+					}
+					charge *= nth;
+
 "<>codestringAssign<>"
 				},
 				simplices.Dimension(0),
@@ -251,7 +282,7 @@ If[m==3,
 (
 	\[Nu]=Cross[PP[[2]]-PP[[1]],PP[[3]]-PP[[1]]];
 	pr=KroneckerProduct[\[Nu],\[Nu]]/Dot[\[Nu] . \[Nu]];
-	vol=1/2Sqrt[ # . #]&[\[Nu]];
+	vol=1/2 Sqrt[ # . #]&[\[Nu]];
 
 	dXX=Table[Indexed[PDdata,i],{i,1,datadim}];
 	vcpdata=Join[{vol},vol Flatten[PP],vol Flatten[Table[pr[[i,j]],{i,1,m},{j,i,m}]]];
@@ -260,7 +291,7 @@ If[m==3,
 (
 	df=Transpose[Table[PP[[j+1]]-PP[[1]],{j,1,n}]];
 	g=df\[Transpose] . df;
-	vol=Sqrt[Det[g]]/n!;
+	vol= "charge" Sqrt[Det[g]]/n!;
 	pr=Flatten[Table[(df . Inverse[g] . Transpose[df])[[i,j]],{i,1,m},{j,i,m}]];
 
 	dXX=Table[Indexed[PDdata,i],{i,1,datadim}];
@@ -268,7 +299,7 @@ If[m==3,
 )
 ];
 
-A=dXX . D[vcpdata,{Flatten[PP],1}];
+A= "charge" (dXX . D[vcpdata,{Flatten[PP],1}]);
 
 code0=Part[
 Experimental`OptimizeExpression[A,
@@ -299,13 +330,14 @@ code1[[-1]]=Flatten@MapIndexed[CAddTo["buffer__["<>HullSize<>"*i+"<>s[m (#2[[1]]
 codestringAddTo=StringCases[StringReplace[GenerateCode[CBlock[code1],Indent->5],"Sqrt("->"std::sqrt("],Longest["{\n"~~x___~~"\n}"]:>x][[1]];
 
 StringJoin["
+	template<AddTo_T addtoQ> 
     void ",name,"( 
-		const Tensor2<Real,Int> & V_coords, 
-		const Tensor2<Int ,Int> & simplices, 
-		const Tensor2<Real,Int> & P_D_near, 
+		const Tensor2<Real,Int> & restrict V_coords, 
+		const Tensor2<Int ,Int> & restrict simplices, 
+		const Tensor2<Real,Int> & restrict P_D_near, 
+		const Tensor1<Real,Int> & restrict V_charges,
         // cppcheck-suppress [constParameter]
-		      Tensor3<Real,Int> & buffer, 
-		bool addTo 
+		      Tensor3<Real,Int> & restrict buffer
 	) const
     {
         ptic(ClassName()+\"::"<>name<>"\");
@@ -320,11 +352,18 @@ StringJoin["
 		ptr<Real> P_D_near__  = P_D_near.data();
         mut<Real> buffer__    = buffer.data();
 
-		if( addTo )
+		if constexpr ( addtoQ == AddTo )
 		{
 			ParallelDo(
 				[=]( const Int i )
 				{
+					Real charge = 0;
+					for( Int k = 0; k < SIZE; ++k )
+					{
+						charge += V_charges[simplices(i,k)];
+					}
+					charge *= nth;
+
 "<>codestringAddTo<>"
 				},
 				simplices.Dimension(0),
@@ -336,6 +375,13 @@ StringJoin["
 			ParallelDo(
 				[=]( const Int i )
 				{
+					Real charge = 0;
+					for( Int k = 0; k < SIZE; ++k )
+					{
+						charge += V_charges[simplices(i,k)];
+					}
+					charge *= nth;
+
 "<>codestringAssign<>"
 				},
 				simplices.Dimension(0),
