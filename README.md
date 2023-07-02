@@ -2,7 +2,11 @@
 
 # Installation
 
-After cloning make sure to run the following to connect all submodules to their repos.
+Either clone with
+
+    git clone --recurse-submodules
+
+or clone as usual and then run the following to connect all submodules to their repos.
 
     git submodule update --init --recursive
     
