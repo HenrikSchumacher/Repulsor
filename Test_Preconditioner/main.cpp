@@ -143,26 +143,12 @@ int main(int argc, const char * argv[])
         tpm.MultiplyMetric( M, Scalar::One<Real>, X, Scalar::Zero<Real>, Y, NRHS );
     };
 
-    auto H1_metric = M.H1Metric(1,1);
-    
-    Permutation<Int> perm (
-        M.NestedDissectionOrdering().data(), M.VertexCount(), Inverse::False, thread_count
-    );
-    
-    Sparse::CholeskyDecomposition<Real,Int,LInt> S (
-        H1_metric.Outer().data(), H1_metric.Inner().data(), std::move(perm)
-    );
-
-    S.SymbolicFactorization();
-
-    S.NumericFactorization( H1_metric.Values().data(), Scalar::Zero<Real> );
-    
     // The operator for the preconditioner.
     auto P = [&]( ptr<Real> X, mut<Real> Y )
     {
-        S.Solve<Parallel>( X, Y, NRHS );
+        M.H1Solve( X, Y, NRHS );
         pseudo_lap.MultiplyMetric( M, Scalar::One<Real>, Y, Scalar::Zero<Real>, Z, NRHS );
-        S.Solve<Parallel>( Z, Y, NRHS );
+        M.H1Solve( Z, Y, NRHS );
     };
 
     print("");
@@ -187,7 +173,7 @@ int main(int argc, const char * argv[])
     
     print("");
     
-    const Int max_iter = 30;
+    const Int max_iter = 100;
     
     ConjugateGradient<NRHS,Real,Int> CG ( M.VertexCount(), max_iter, thread_count );
     
@@ -201,11 +187,6 @@ int main(int argc, const char * argv[])
     dump(CG.RelativeResiduals());
     
     print("");
-    
-    A(X,Y);    
-    Y_buffer -= B_buffer;
-    
-    dump( Y_buffer.MaxNorm() / B_buffer.MaxNorm() );
     
     return 0;
 }

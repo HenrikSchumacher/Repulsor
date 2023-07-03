@@ -1,6 +1,11 @@
 protected:
     
-    virtual SparseMatrix_T H1Metric( const Real c_1, const Real c_0 ) const override
+    using Solver_T = Sparse::CholeskyDecomposition<Real,Int,LInt>;
+
+    mutable Real H1_c_0 = 1;
+    mutable Real H1_c_1 = 1;
+
+    SparseMatrix_T Create_H1Metric( const Real c_1, const Real c_0 ) const
     {
         Tensor2<Int, Int> ilist ( SimplexCount(), SIZE * SIZE );
         Tensor2<Int, Int> jlist ( SimplexCount(), SIZE * SIZE );
@@ -130,6 +135,58 @@ protected:
     }
     
 public:
+
+    std::shared_ptr<Solver_T> H1Solver() const
+    {
+        std::string tag ("H1Solver");
+        if( !this->InCacheQ(tag))
+        {
+            ptic(ClassName()+"::"+tag);
+            
+            auto & A = H1Metric();
+            
+            Permutation<Int> perm (
+                NestedDissectionOrdering().data(), VertexCount(), Inverse::False, ThreadCount()
+            );
+            
+            std::shared_ptr<Solver_T> S = std::make_shared<Solver_T>(
+                A.Outer().data(), A.Inner().data(), std::move( perm )
+            );
+            
+            S->NumericFactorization( A.Values().data(), Scalar::Zero<Real> );
+            
+            this->SetCache( tag, std::any( std::move( S ) ) );
+            
+            ptoc(ClassName()+"::"+tag);
+        }
+        
+        return std::any_cast<std::shared_ptr<Solver_T>>( this->GetCache(tag) );
+    }
+
+    virtual void H1Solve( ptr<ExtReal> X, mut<ExtReal> Y, const Int nrhs ) const override
+    {
+        H1Solver()->template Solve<Parallel>( X, Y, nrhs );
+    }
+
+
+
+    virtual SparseMatrix_T & H1Metric() const override
+    {
+        std::string tag ("H1Metric");
+        if( !this->InCacheQ(tag))
+        {
+            ptic(ClassName()+"::"+tag);
+            
+            this->SetCache( tag,
+               std::any( std::move( Create_H1Metric(H1_c_1,H1_c_0) ) )
+            );
+            
+            ptoc(ClassName()+"::"+tag);
+        }
+        
+        return std::any_cast<SparseMatrix_T &>( this->GetCache(tag) );
+    }
+
     
     virtual const SparseMatrix_T & StiffnessMatrix() const override
     {
@@ -139,7 +196,7 @@ public:
             ptic(ClassName()+"::"+tag);
             
             this->SetCache( tag,
-               std::any(std::move(H1Metric(1,0)))
+               std::any(std::move(Create_H1Metric(1,0)))
             );
             
             ptoc(ClassName()+"::"+tag);
@@ -147,6 +204,7 @@ public:
         
         return std::any_cast<SparseMatrix_T &>( this->GetCache(tag) );
     }
+
     
     virtual const SparseMatrix_T & MassMatrix() const override
     {
@@ -156,7 +214,7 @@ public:
             ptic(ClassName()+"::"+tag);
             
             this->SetCache( tag,
-                std::any(std::move(H1Metric(0,1)))
+                std::any(std::move(Create_H1Metric(0,1)))
             );
             
             ptoc(ClassName()+"::"+tag);
