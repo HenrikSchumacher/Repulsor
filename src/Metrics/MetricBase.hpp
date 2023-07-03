@@ -35,7 +35,6 @@ namespace Repulsor
             const bool FF_flag = true
         ) const = 0;
         
-        // Return the differential of the energy; use caching.
         void MultiplyMetric(
             const MeshBase_T & restrict M,
             const ExtReal alpha,
@@ -49,7 +48,22 @@ namespace Repulsor
         {
             this->MultiplyMetric( M, alpha, X.data(), beta, Y.data(), X.Dimension(1), VF_flag, NF_flag, FF_flag );
         }
-
+        
+//        virtual void MultiplyPreconditioner(
+//            const MeshBase_T & restrict M,
+//            const ExtReal alpha, ptr<ExtReal> X,
+//            const ExtReal beta,  mut<ExtReal> Y,
+//            const Int  rhs_count
+//        ) const = 0;
+//
+//        virtual void SolveMetric(
+//            const MeshBase_T & restrict M,
+//            const ExtReal alpha, ptr<ExtReal> X,
+//            const ExtReal beta,  mut<ExtReal> Y,
+//            const Int  rhs_count,
+//            const Int  max_iter,
+//            const Real tolerance
+//        ) const = 0;
         
     public:
 
