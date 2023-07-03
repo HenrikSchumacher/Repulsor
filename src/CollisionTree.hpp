@@ -93,7 +93,6 @@ namespace Repulsor
                 ptic(ClassName()+"PrimitiveCollisionMatrix");
                 
                 using Kernel_T = Collision_Kernel<ClusterTree_T>;
-                using LInt     = typename Kernel_T::LInt;
                 
                 ptic(ClassName()+"::PrimitiveCollisionMatrix: Prepare kernels");
                 std::vector<Kernel_T> kernels;

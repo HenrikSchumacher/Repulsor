@@ -50,7 +50,7 @@ namespace Repulsor
 
         static constexpr Int   null      = static_cast<Int>(0);
         static constexpr Int   max_depth = 128;
-        static constexpr SReal zero      = static_cast<SReal>(0);
+        static constexpr SReal zero      = Scalar::Zero<SReal>;
     
         std::vector<Kernel_T> & restrict kernels;
         

@@ -53,7 +53,7 @@ protected:
     {
         for( Int k = 0; k < AMB_DIM; ++k )
         {
-            V_coords(w,k) = static_cast<Real>(0.5) * ( V_coords(v_0,k) + V_coords(v_1,k) );
+            V_coords(w,k) = Scalar::Half<Real> * ( V_coords(v_0,k) + V_coords(v_1,k) );
         }
         
         if( with_data )
@@ -62,7 +62,7 @@ protected:
             
             for( Int k = 0; k < data_dim; ++k )
             {
-                V_data(w,k) = static_cast<Real>(0.5) * ( V_data(v_0,k) + V_data(v_1,k) );
+                V_data(w,k) = Scalar::Half<Real> * ( V_data(v_0,k) + V_data(v_1,k) );
             }
         }
     }

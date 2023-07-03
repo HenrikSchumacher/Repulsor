@@ -129,7 +129,7 @@ int main(int argc, const char * argv[])
     mut<Real> B  = B_buffer.data();
     mut<Real> X  = X_buffer.data();
     mut<Real> Y  = Y_buffer.data();
-    mut<Real> Z  = Z_buffer.data();
+//    mut<Real> Z  = Z_buffer.data();
     
     tic("tpe.Differential(M)");
     tpe.Differential(M, B );
@@ -140,6 +140,8 @@ int main(int argc, const char * argv[])
     // The operator for the metric.
     auto A = [&]( ptr<Real> X, mut<Real> Y )
     {
+        
+        //Y = alpha * A * X + beta * Y
         tpm.MultiplyMetric( M, Scalar::One<Real>, X, Scalar::Zero<Real>, Y, NRHS );
     };
 
@@ -147,8 +149,8 @@ int main(int argc, const char * argv[])
     auto P = [&]( ptr<Real> X, mut<Real> Y )
     {
         M.H1Solve( X, Y, NRHS );
-        pseudo_lap.MultiplyMetric( M, Scalar::One<Real>, Y, Scalar::Zero<Real>, Z, NRHS );
-        M.H1Solve( Z, Y, NRHS );
+        pseudo_lap.MultiplyMetric( M, Scalar::One<Real>, Y, Scalar::Zero<Real>, Y, NRHS );
+        M.H1Solve( Y, Y, NRHS );
     };
 
     print("");

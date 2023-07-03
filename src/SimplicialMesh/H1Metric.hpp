@@ -99,9 +99,7 @@ protected:
                         }
                     }
                     
-                    combine_buffers<
-                        Scalar::Flag::Generic, Scalar::Flag::Plus, Op::Id, Op::Id, SIZE * SIZE
-                    >(
+                    combine_buffers<Scalar::Flag::Generic,Scalar::Flag::Plus,Op::Id,Op::Id,SIZE*SIZE>(
                         a,                 mass.data(),
                         Scalar::One<Real>, val.data()
                     );
@@ -136,7 +134,7 @@ protected:
     
 public:
 
-    std::shared_ptr<Solver_T> H1Solver() const
+    virtual std::shared_ptr<Solver_T> H1Solver() const override
     {
         std::string tag ("H1Solver");
         if( !this->InCacheQ(tag))

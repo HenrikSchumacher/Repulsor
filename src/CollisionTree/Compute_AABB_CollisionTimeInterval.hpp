@@ -16,8 +16,8 @@ namespace Repulsor
         //     Q(t) = (1-t) * q_0 + t * q_1
         // intersect.
         
-        static constexpr SReal zero = static_cast<SReal>(0);
-        static constexpr SReal one  = static_cast<SReal>(1);
+        static constexpr SReal zero = Scalar::Zero<SReal>;
+        static constexpr SReal one  = Scalar::One<SReal>;
         
         SReal t_0 = zero;
         SReal t_1 = one;

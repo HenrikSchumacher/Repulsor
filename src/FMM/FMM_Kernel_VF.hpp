@@ -56,10 +56,10 @@ namespace Repulsor
         
         Real * restrict const metric_data = nullptr;
         
-        mutable Real sum = static_cast<Real>(0);
+        mutable Real sum = Scalar::Zero<Real>;
         
-        mutable Real a   = static_cast<Real>(0);
-        mutable Real b   = static_cast<Real>(0);
+        mutable Real a   = Scalar::Zero<Real>;
+        mutable Real b   = Scalar::Zero<Real>;
         
         mutable Real x [AMB_DIM] = {};
 #ifdef NearField_S_Copy
@@ -118,7 +118,7 @@ namespace Repulsor
         mutable Int bottom_count = 0;
         mutable Int inadmissable_count = 0;
         mutable Int primitive_count = 0;
-        mutable Real total_sum = static_cast<Real>(0);
+        mutable Real total_sum = Scalar::Zero<Real>;
         
         mutable Size_T evaluations = 0;
         

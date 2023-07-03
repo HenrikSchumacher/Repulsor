@@ -18,11 +18,11 @@ namespace Repulsor
         
         static constexpr Level_T MaxLevel()
         {
-            return std::floor(
+            return static_cast<Level_T>( std::floor(
                 std::log( static_cast<double>(std::numeric_limits<Column_T>::max())))
                 /
                 std::log(static_cast<double>(ChildCount())
-            );
+            ) );
         }
         
         void ToChild( const Child_T k )

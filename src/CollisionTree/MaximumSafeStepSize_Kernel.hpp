@@ -61,23 +61,23 @@ namespace Repulsor
         ,   t_max       ( other.t_max       )
         {}
         
-        friend void swap(MaximumSafeStepSize_Kernel &A, MaximumSafeStepSize_Kernel &B)
+        friend void swap(MaximumSafeStepSize_Kernel & X, MaximumSafeStepSize_Kernel & Y )
         {
             // see https://stackoverflow.com/questions/5695548/public-friend-swap-member-function for details
             using std::swap;
 
-            swap( A.S_C_ser,        B.S_C_ser       );
-            swap( A.S_C_up_ser,     B.S_C_up_ser    );
-            swap( A.T_C_ser,        B.T_C_ser       );
-            swap( A.T_C_up_ser,     B.T_C_up_ser    );
-            swap( A.S_P_ser,        B.S_P_ser       );
-            swap( A.S_P_v_ser,      B.S_P_v_ser     );
-            swap( A.T_P_ser,        B.T_P_ser       );
-            swap( A.T_P_v_ser,      B.T_P_v_ser     );
-            swap( A.A,              B.A             );
-            swap( A.C,              B.C             );
-            swap( A.t_init,         B.t_init        );
-            swap( A.t_max,          B.t_max         );
+            swap( X.S_C_ser,        Y.S_C_ser       );
+            swap( X.S_C_up_ser,     Y.S_C_up_ser    );
+            swap( X.T_C_ser,        Y.T_C_ser       );
+            swap( X.T_C_up_ser,     Y.T_C_up_ser    );
+            swap( X.S_P_ser,        Y.S_P_ser       );
+            swap( X.S_P_v_ser,      Y.S_P_v_ser     );
+            swap( X.T_P_ser,        Y.T_P_ser       );
+            swap( X.T_P_v_ser,      Y.T_P_v_ser     );
+            swap( X.A,              Y.A             );
+            swap( X.C,              Y.C             );
+            swap( X.t_init,         Y.t_init        );
+            swap( X.t_max,          Y.t_max         );
         }
 
         // Copy assignment
@@ -155,8 +155,8 @@ namespace Repulsor
         
         force_inline bool AdmissableQ()
         {
-            SReal a = static_cast<SReal>(0);
-            SReal b = static_cast<SReal>(1);
+            SReal a = Scalar::Zero<SReal>;
+            SReal b = Scalar::One<SReal>;
             
             Compute_AABB_CollisionTimeInterval<ClusterTree_T::AMB_DIM, SReal, Int> (
                 S_C_ser.data(C_i), S_C_up_ser.data(C_i),

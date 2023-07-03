@@ -2,7 +2,7 @@ public:
 
     force_inline Real Compute( const LInt k_global )
     {
-        Real sum = static_cast<Real>(0);
+        Real sum = Scalar::Zero<Real>;
         
         bool from_above = true;
         bool shall_continue = true;

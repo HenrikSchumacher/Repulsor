@@ -1,7 +1,6 @@
 #pragma once
 
 #include "SimplicialMesh/SimplicialMeshBase.hpp"
-#include "../Tensors/Sparse.hpp"
 
 namespace Repulsor
 {
@@ -342,7 +341,7 @@ namespace Repulsor
 
             if( vecs == nullptr )
             {
-                V_updates.Fill(static_cast<Real>(0));
+                V_updates.Fill(Scalar::Zero<Real>);
             }
             else
             {
@@ -433,7 +432,7 @@ namespace Repulsor
                 if( (V_coords.Dimension(0) > 0) && (simplices.Dimension(0) > 0) )
                 {
                     ptic("Allocations");
-                    auto P_coords      = Tensor2<Real,Int> ( SimplexCount(), AMB_DIM, static_cast<Real>(0) );
+                    auto P_coords      = Tensor2<Real,Int> ( SimplexCount(), AMB_DIM, Scalar::Zero<Real> );
                     auto P_hull_coords = Tensor3<Real,Int> ( SimplexCount(), SIZE, AMB_DIM );
                     auto P_near        = Tensor2<Real,Int> ( SimplexCount(), NEAR_DIM );
                     auto P_far         = Tensor2<Real,Int> ( SimplexCount(), FAR_DIM );
@@ -626,7 +625,7 @@ namespace Repulsor
         {
             ptic(className()+"::Assemble_ClusterTree_Derivatives");
             
-            Tensor3<Real,Int> buffer ( SimplexCount(), SIZE, AMB_DIM, static_cast<Real>(0) );
+            Tensor3<Real,Int> buffer ( SimplexCount(), SIZE, AMB_DIM, Scalar::Zero<Real> );
             
             GetClusterTree().CollectDerivatives();
             

@@ -33,9 +33,9 @@ namespace Repulsor
         
     protected:
         
-        static constexpr Real zero = static_cast<Real>(0);
-        static constexpr Real one  = static_cast<Real>(1);
-        static constexpr Real two  = static_cast<Real>(2);
+        static constexpr Real zero = Scalar::Zero<Real>;
+        static constexpr Real one  = Scalar::One<Real>;
+        static constexpr Real two  = Scalar::Two<Real>;
         
         static constexpr Real symmetry_factor = one / (one + !static_cast<Real>(symmetricQ) );
                                             

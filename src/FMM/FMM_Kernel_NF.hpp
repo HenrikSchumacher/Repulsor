@@ -50,10 +50,10 @@ namespace Repulsor
         
         mut<Real> metric_data = nullptr;
         
-        mutable Real sum = static_cast<Real>(0);
+        mutable Real sum = Scalar::Zero<Real>;
         
-        mutable Real a   = static_cast<Real>(0);
-        mutable Real b   = static_cast<Real>(0);
+        mutable Real a   = Scalar::Zero<Real>;
+        mutable Real b   = Scalar::Zero<Real>;
         
         mutable Real x [AMB_DIM] = {};
 #ifdef NearField_S_Copy
@@ -82,8 +82,8 @@ namespace Repulsor
         
         using Base_T::thread;
     
-        static const constexpr Real S_scale = static_cast<Real>(1)/static_cast<Real>(S_DOM_DIM+1);
-        static const constexpr Real T_scale = static_cast<Real>(1)/static_cast<Real>(T_DOM_DIM+1);
+        static const constexpr Real S_scale = Scalar::Inv<Real>(S_DOM_DIM+1);
+        static const constexpr Real T_scale = Scalar::Inv<Real>(T_DOM_DIM+1);
         
     public:
         

@@ -88,8 +88,8 @@ namespace Repulsor
         ,   p             ( p_            )
         ,   q_half_real   ( q / two       )
         ,   p_half_real   ( p / two       )
-        ,   q_half_int    ( q_half_real   )
-        ,   p_half_int    ( p_half_real   )
+        ,   q_half_int    ( static_cast<Int>(q_half_real)                )
+        ,   p_half_int    ( static_cast<Int>(p_half_real)                )
         ,   q_half_is_int ( q_half_real == static_cast<Real>(q_half_int) )
         ,   p_half_is_int ( p_half_real == static_cast<Real>(p_half_int) )
         {}

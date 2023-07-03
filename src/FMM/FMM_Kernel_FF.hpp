@@ -45,10 +45,10 @@ namespace Repulsor
         
         mut<Real> metric_data = nullptr;
         
-        mutable Real sum = static_cast<Real>(0);
+        mutable Real sum = Scalar::Zero<Real>;
         
-        mutable Real a   = static_cast<Real>(0);
-        mutable Real b   = static_cast<Real>(0);
+        mutable Real a   = Scalar::Zero<Real>;
+        mutable Real b   = Scalar::Zero<Real>;
         
 #ifdef FarField_S_Copy
         mutable Real x [AMB_DIM] = {};

@@ -20,11 +20,11 @@ namespace Repulsor
         
         static constexpr Level_T MaxLevel()
         {
-            return std::floor(
+            return static_cast<Level_T>( std::floor(
                 std::log( static_cast<double>(std::numeric_limits<Column_T>::max())))
                 /
                 std::log(static_cast<double>(ChildCount())
-            );
+            ) );
         }
         
     public:
@@ -38,8 +38,8 @@ namespace Repulsor
             column = ChildCount() * column + k;
             ++level;
             
-            scale  *= static_cast<SReal>(0.5);
-            weight *= static_cast<SReal>(0.25);
+            scale  *= Scalar::Half<SReal>;
+            weight *= Scalar::Quarter<SReal>;
             
             if( (0<=k) && (k<=2) )
             {
@@ -86,8 +86,8 @@ namespace Repulsor
                 child_id = column % ChildCount();
                 --level;
                 
-                scale  *= static_cast<SReal>(2);
-                weight *= static_cast<SReal>(4);
+                scale  *= Scalar::Two<SReal>;
+                weight *= Scalar::Four<SReal>;
                 
                 if( (0<=k) && (k<=2) )
                 {

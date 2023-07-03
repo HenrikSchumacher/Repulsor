@@ -131,7 +131,7 @@ namespace Repulsor
         mutable Tensor2<SReal,Int> C_serialized;
         mutable Tensor2<SReal,Int> C_updated_serialized;
         
-        mutable SReal update_time = static_cast<SReal>(0);
+        mutable SReal update_time = Scalar::Zero<SReal>;
         
         // Some temproray shared data that is required for the parallel construction and serialization of the tree.
         
@@ -715,14 +715,14 @@ namespace Repulsor
             this->RequireBuffers( static_cast<Int>(1) );
             
             // Compute dual volume vectors.
-            fill_buffer( &P_in[0], static_cast<Real>(1), PrimitiveCount() );
+            fill_buffer( &P_in[0], Scalar::One<Real>, PrimitiveCount() );
 
             Tensor1<ExtReal,Int> dual_volumes ( lo_post.RowCount() );
         
             lo_post.template Dot<1>(
-                static_cast<Real>(1),    P_in.data(),
-                static_cast<ExtReal>(0), dual_volumes.data(),
-                static_cast<Int>(1)
+                Scalar::One<Real>,     P_in.data(),
+                Scalar::Zero<ExtReal>, dual_volumes.data(),
+                Scalar::One<Int>
             );
         
             //Collect the energies into P_out.
@@ -740,9 +740,9 @@ namespace Repulsor
             
             // Distribute the energy densities to energies per vertex. (Note that lo_post also multiplies by the primitives' volumes!)
             lo_post.template Dot<1>(
-                static_cast<Real>(1),        P_out.data(),
+                Scalar::One<Real>,           P_out.data(),
                 static_cast<ExtReal>(addTo), output,
-                static_cast<Int>(1)
+                Scalar::One<Int>
             );
 
             // Finally, we divide by the dual volumes to obtain the vertex densities.

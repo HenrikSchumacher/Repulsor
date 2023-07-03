@@ -67,27 +67,27 @@ namespace Repulsor
         ,   intersection_theta2 ( other.near_theta2             )
         {}
         
-        friend void swap(BlockSplit_Kernel &A, BlockSplit_Kernel &B)
+        friend void swap(BlockSplit_Kernel &X, BlockSplit_Kernel &Y )
         {
             // see https://stackoverflow.com/questions/5695548/public-friend-swap-member-function for details
             using std::swap;
 
-            swap( A.tree_string,            B.tree_string           );
-            swap( A.inter_idx,              B.inter_idx             );
-            swap( A.verynear_idx,           B.verynear_idx          );
-            swap( A.near_idx,               B.near_idx              );
-            swap( A.far_idx,                B.far_idx               );
-            swap( A.S_C_proto,              B.S_C_proto             );
-            swap( A.T_C_proto,              B.T_C_proto             );
-            swap( A.T_P_proto,              B.T_P_proto             );
-            swap( A.S_C_serialized,         B.S_C_serialized        );
-            swap( A.T_C_serialized,         B.T_C_serialized        );
-            swap( A.S_P_serialized,         B.S_P_serialized        );
-            swap( A.T_P_serialized,         B.T_P_serialized        );
-            swap( A.A,                      B.A                     );
-            swap( A.far_theta2,             B.far_theta2            );
-            swap( A.near_theta2,            B.near_theta2           );
-            swap( A.intersection_theta2,    B.intersection_theta2   );
+            swap( X.tree_string,            Y.tree_string           );
+            swap( X.inter_idx,              Y.inter_idx             );
+            swap( X.verynear_idx,           Y.verynear_idx          );
+            swap( X.near_idx,               Y.near_idx              );
+            swap( X.far_idx,                Y.far_idx               );
+            swap( X.S_C_proto,              Y.S_C_proto             );
+            swap( X.T_C_proto,              Y.T_C_proto             );
+            swap( X.T_P_proto,              Y.T_P_proto             );
+            swap( X.S_C_serialized,         Y.S_C_serialized        );
+            swap( X.T_C_serialized,         Y.T_C_serialized        );
+            swap( X.S_P_serialized,         Y.S_P_serialized        );
+            swap( X.T_P_serialized,         Y.T_P_serialized        );
+            swap( X.A,                      Y.A                     );
+            swap( X.far_theta2,             Y.far_theta2            );
+            swap( X.near_theta2,            Y.near_theta2           );
+            swap( X.intersection_theta2,    Y.intersection_theta2   );
         }
 
         // Copy assignment

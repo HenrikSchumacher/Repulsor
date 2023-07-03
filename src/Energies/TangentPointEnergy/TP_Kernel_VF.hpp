@@ -175,7 +175,7 @@ namespace Repulsor
                     Qv[i] += Q[k] * v[j];
                     if( j >= i )
                     {
-                        V[k] = ( static_cast<Real>(1) + static_cast<Real>(i!=j) )*v[i]*v[j];
+                        V[k] = ( Scalar::One<Real> + static_cast<Real>(i!=j) ) * v[i] * v[j];
                     }
                 }
                 rCosPhi_2 += v[i] * Pv[i];

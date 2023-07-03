@@ -9,11 +9,11 @@ public:
  
 protected:
 
-    static constexpr SReal zero = static_cast<SReal>(0);
-    static constexpr SReal one  = static_cast<SReal>(1);
-    static constexpr SReal half = static_cast<SReal>(0.5);
-    static constexpr SReal two  = static_cast<SReal>(2);
-    static constexpr SReal nth  = one / static_cast<SReal>(DOM_DIM+1);
+    static constexpr SReal zero = Scalar::Zero<SReal>;
+    static constexpr SReal one  = Scalar::One<SReal>;
+    static constexpr SReal half = Scalar::Half<SReal>;
+    static constexpr SReal two  = Scalar::Two<SReal>;
+    static constexpr SReal nth  = Scalar::Inv<SReal>(DOM_DIM+1);
 
     SReal root_serialized    [SIZE] = {};
     SReal simplex_serialized [SIZE] = {};
@@ -178,8 +178,8 @@ public:
             level  = 0;
             column = 0;
             
-            scale  = static_cast<SReal>(1);
-            weight = static_cast<SReal>(1);
+            scale  = Scalar::One<SReal>;
+            weight = Scalar::One<SReal>;
 
             P.SetPointer(&root_serialized[0]);
 
@@ -189,7 +189,7 @@ public:
 
             for( Int i = 0; i < DOM_DIM+1; ++i )
             {
-                center[i] = static_cast<SReal>(1)/static_cast<SReal>(DOM_DIM+1);
+                center[i] = Scalar::Inv<SReal>(DOM_DIM+1);
             
                 for( Int j = 0; j < DOM_DIM+1; ++j )
                 {

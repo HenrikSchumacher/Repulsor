@@ -132,6 +132,8 @@ namespace Repulsor
         
         virtual void H1Solve( ptr<ExtReal> X, mut<ExtReal> Y, const Int nrhs ) const = 0;
         
+        virtual std::shared_ptr<Sparse::CholeskyDecomposition<Real,Int,LInt>> H1Solver() const = 0;
+        
 //#######################################################################################
 //      Obstacle
 //#######################################################################################

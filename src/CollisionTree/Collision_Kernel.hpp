@@ -63,24 +63,24 @@ namespace Repulsor
         ,   triples     ( other.triples     )
         {}
         
-        friend void swap(Collision_Kernel & restrict A, Collision_Kernel & restrict B)
+        friend void swap(Collision_Kernel & restrict X, Collision_Kernel & restrict Y)
         {
             // see https://stackoverflow.com/questions/5695548/public-friend-swap-member-function for details
             using std::swap;
 
-            swap( A.S_C_ser,        B.S_C_ser       );
-            swap( A.S_C_up_ser,     B.S_C_up_ser    );
-            swap( A.T_C_ser,        B.T_C_ser       );
-            swap( A.T_C_up_ser,     B.T_C_up_ser    );
-            swap( A.S_P_ser,        B.S_P_ser       );
-            swap( A.S_P_v_ser,      B.S_P_v_ser     );
-            swap( A.T_P_ser,        B.T_P_ser       );
-            swap( A.T_P_v_ser,      B.T_P_v_ser     );
-            swap( A.A,              B.A             );
-            swap( A.C,              B.C             );
-            swap( A.t_init,         B.t_init        );
-            swap( A.t_max,          B.t_max         );
-            swap( A.triples,        B.triples       );
+            swap( X.S_C_ser,        Y.S_C_ser       );
+            swap( X.S_C_up_ser,     Y.S_C_up_ser    );
+            swap( X.T_C_ser,        Y.T_C_ser       );
+            swap( X.T_C_up_ser,     Y.T_C_up_ser    );
+            swap( X.S_P_ser,        Y.S_P_ser       );
+            swap( X.S_P_v_ser,      Y.S_P_v_ser     );
+            swap( X.T_P_ser,        Y.T_P_ser       );
+            swap( X.T_P_v_ser,      Y.T_P_v_ser     );
+            swap( X.A,              Y.A             );
+            swap( X.C,              Y.C             );
+            swap( X.t_init,         Y.t_init        );
+            swap( X.t_max,          Y.t_max         );
+            swap( X.triples,        Y.triples       );
         }
 
         // Copy assignment
@@ -127,8 +127,8 @@ namespace Repulsor
         
         const SReal t_init;
         
-        SReal a = static_cast<SReal>(0);
-        SReal b = static_cast<SReal>(1);
+        SReal a = Scalar::Zero<SReal>;
+        SReal b = Scalar::One<SReal>;
         
         SReal t_max;
         
@@ -171,7 +171,7 @@ namespace Repulsor
                 a, b
             );
             
-            return a >= static_cast<SReal>(1);
+            return a >= Scalar::One<SReal>;
         }
         
         force_inline SReal ClusterScoreS()

@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef REPULSOR_HPP
 
     #define REPULSOR_HPP
@@ -8,6 +10,7 @@
     //#include "MyMath.hpp"
 
     #include "Tensors/Tensors.hpp"
+    #include "Tensors/Sparse.hpp"
     #include "GJK/GJK.hpp"
 
     namespace Repulsor {
@@ -49,9 +52,9 @@
 //#define FarField_T_Copy
 //    #include "src/Kernels/FarFieldKernelBase_FMM.hpp"
 //
-#include "src/FMM.hpp"
-#include "src/Energies.hpp"
-#include "src/Metrics.hpp"
-//    #include "src/Metrics.hpp"
+    #include "src/FMM.hpp"
+    #include "src/Energies.hpp"
+    #include "src/Metrics.hpp"
+    //    #include "src/Metrics.hpp"
 
 #endif
