@@ -3,8 +3,6 @@
 #include <sys/types.h>
 #include <pwd.h>
 
-
-
 //#define REMESHER_VERBATIM
 
 #define TOOLS_ENABLE_PROFILER // enable profiler
@@ -13,8 +11,10 @@
 #define LAPACK_DISABLE_NAN_CHECK
 #define ACCELERATE_NEW_LAPACK
 #include <Accelerate/Accelerate.h>
+
+//#define LAPACK_DISABLE_NAN_CHECK
 //#include <cblas.h>
-//#include <lapacke.h>
+//#include <lapack.h>
 
 #include "../Repulsor.hpp"
 #include "../Tensors/MyBLAS.hpp"
