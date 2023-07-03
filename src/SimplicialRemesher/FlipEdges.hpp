@@ -278,7 +278,7 @@ Int FlipEdge( const Edge_T e, const bool check_Delaunay = false )
         Real alpha = Angle(a,b);
         Real beta  = Angle(c,d);
         
-        do_flip = ( (alpha + beta) > static_cast<Real>(M_PI) );
+        do_flip = ( (alpha + beta) > Scalar::Pi<Real> );
     }
     else
     {
