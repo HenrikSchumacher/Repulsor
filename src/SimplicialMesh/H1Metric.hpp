@@ -150,7 +150,8 @@ public:
             );
             
             std::shared_ptr<Solver_T> S = std::make_shared<Solver_T>(
-                A.Outer().data(), A.Inner().data(), std::move( perm )
+                A.Outer().data(), A.Inner().data(), NestedDissectionOrdering().data(),
+                A.RowCount(), A.ThreadCount()
             );
             
             S->NumericFactorization( A.Values().data(), Scalar::Zero<Real> );

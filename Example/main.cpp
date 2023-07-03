@@ -7,6 +7,7 @@
 
 //#define REMESHER_VERBATIM
 
+#define NDEBUG
 #define TOOLS_ENABLE_PROFILER // enable profiler
 #define TOOLS_DEBUG 
 
@@ -14,7 +15,7 @@
 #define ACCELERATE_NEW_LAPACK
 #include <Accelerate/Accelerate.h>
 //#include <cblas.h>
-//#include <lapacke.h>
+//#include <lapack.h>
 
 #include "../Repulsor.hpp"
 #include "../Tensors/MyBLAS.hpp"
@@ -299,15 +300,14 @@ int main(int argc, const char * argv[])
     print("");
     
     // A = M.StiffnessMatrix() + M.MassMatrix()
-    auto A = M.H1Metric(1,1);
+    auto A = M.H1Metric();
     
     auto perm = M.NestedDissectionOrdering();
     
 //    print( perm.ToString() );
     
     Sparse::CholeskyDecomposition<Real,Int,LInt> S (
-        A.Outer().data(), A.Inner().data(), perm.data(), A.RowCount(),
-        A.ThreadCount(), static_cast<Int>(4)
+        A.Outer().data(), A.Inner().data(), perm.data(), A.RowCount(), A.ThreadCount()
     );
 
     S.SymbolicFactorization();

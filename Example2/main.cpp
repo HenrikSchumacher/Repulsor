@@ -15,7 +15,7 @@
 #define ACCELERATE_NEW_LAPACK
 #include <Accelerate/Accelerate.h>
 //#include <cblas.h>
-//#include <lapacke.h>
+//#include <lapack.h>
 
 #include "../Repulsor.hpp"
 #include "../Tensors/MyBLAS.hpp"
