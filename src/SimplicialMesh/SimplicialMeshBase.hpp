@@ -120,13 +120,17 @@ namespace Repulsor
         ) = 0;
         
         
-        virtual       SparseMatrix_T   H1Metric( const Real c_1, const Real c_0 ) const = 0;
+        virtual       SparseMatrix_T & H1Metric() const = 0;
+        
+//        virtual std::shared_ptr<Sparse::CholeskyDecomposition<Real,Int,LInt> H1Solver() const = 0;
         
         virtual const SparseMatrix_T & StiffnessMatrix() const = 0;
         
         virtual const SparseMatrix_T & MassMatrix() const = 0;
         
         virtual const Tensor1<Int,Int> & NestedDissectionOrdering() const = 0;
+        
+        virtual void H1Solve( ptr<ExtReal> X, mut<ExtReal> Y, const Int nrhs ) const = 0;
         
 //#######################################################################################
 //      Obstacle

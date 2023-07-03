@@ -1,6 +1,7 @@
 #pragma once
 
 #include "SimplicialMesh/SimplicialMeshBase.hpp"
+#include "../Tensors/Sparse.hpp"
 
 namespace Repulsor
 {
