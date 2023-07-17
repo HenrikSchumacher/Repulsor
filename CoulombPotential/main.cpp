@@ -7,10 +7,18 @@
 // You can activate everything you want, but compile times might increase substatially.
 
 //#define NDEBUG
-#define TOOLS_DEBUG
+//#define TOOLS_DEBUG
 
 #define TOOLS_ENABLE_PROFILER // enable profiler
 
+
+#define LAPACK_DISABLE_NAN_CHECK
+#define ACCELERATE_NEW_LAPACK
+#include <Accelerate/Accelerate.h>
+
+//#define LAPACK_DISABLE_NAN_CHECK
+//#include <cblas.h>
+//#include <lapack.h>
 
 #include "../Repulsor.hpp"
 
