@@ -8,15 +8,11 @@ namespace Repulsor
         
         ASSERT_REAL(Real_);
         ASSERT_INT(Int_);
-//        ASSERT_REAL(ExtReal_);
-//        ASSERT_INT(ExtInt_);
         
     public:
         
         using Real    = Real_;
         using Int     = Int_;
-//        using ExtReal = ExtReal_;
-//        using ExtInt  = ExtInt_;
         
         using Vertex_T   = Int;
         using Edge_T     = Int;
@@ -57,9 +53,9 @@ namespace Repulsor
         
         virtual const Tensor2<Int,Int> & Simplices() = 0;
         
-        virtual Int DomDim() = 0;
+        virtual Int DomDim() const = 0;
         
-        virtual Int AmbDim() = 0;
+        virtual Int AmbDim() const = 0;
         
         virtual Int SplitEdges( ptr<Edge_T> e_list, const Int n ) = 0;
         
