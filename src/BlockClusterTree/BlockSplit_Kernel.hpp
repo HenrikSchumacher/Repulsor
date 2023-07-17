@@ -191,11 +191,11 @@ namespace Repulsor
             }
             else
             {
-                const bool intersecting = (!G.SeparatedQ()) && G.IntersectingQ(
+                const bool intersectingQ = (!G.SeparatedQ()) && G.IntersectingQ(
                     *S_P_proto, *T_P_proto, intersection_theta2
                 );
                 
-                if( intersecting )
+                if( intersectingQ )
                 {
                     inter_idx.Push(P_i,P_j);
                 }
@@ -220,11 +220,11 @@ namespace Repulsor
             }
             else
             {
-                const bool intersecting = (!G.SeparatedQ()) && G.IntersectingQ(
+                const bool intersectingQ = (!G.SeparatedQ()) && G.IntersectingQ(
                     *S_P_proto, *T_P_proto//, intersection_theta2
                 );
                 
-                if( intersecting )
+                if( intersectingQ )
                 {
                     inter_idx.Push(P_j,P_i);
                 }
