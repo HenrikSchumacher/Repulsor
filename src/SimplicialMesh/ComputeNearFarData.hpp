@@ -10,7 +10,7 @@ protected:
         ParallelDo(
             [&]( const Int thread )
             {
-                PrimitiveDataKernel ker ( *this );
+                PrimitiveDataKernel_T ker ( V_coords, simplices, V_charges );
                 
                 const Int i_begin = JobPointer<Int>(SimplexCount(),ThreadCount(),thread  );
                 const Int i_end   = JobPointer<Int>(SimplexCount(),ThreadCount(),thread+1);
