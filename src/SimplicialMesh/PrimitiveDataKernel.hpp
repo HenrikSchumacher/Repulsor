@@ -1,15 +1,39 @@
-private:
+#pragma once
 
-    struct PrimitiveDataKernel
+namespace Repulsor
+{
+    
+    template<int DOM_DIM_, int AMB_DIM_, typename Real_, typename Int_>
+    class PrimitiveDataKernel
     {
-        using Mesh_T = SimplicialMesh<DOM_DIM,AMB_DIM,Real,Int,LInt,SReal,ExtReal>;
+    public:
         
-        const Mesh_T & M;
-        static constexpr Int PROJ_DIM  = (AMB_DIM*(AMB_DIM+1))/2;
+        using Real = Real_;
+        using Int  = Int_;
         
+        static constexpr Int DOM_DIM    = DOM_DIM_;
+        static constexpr Int AMB_DIM    = AMB_DIM_;
+        static constexpr Int SIZE       = DOM_DIM + 1;
+        static constexpr Int PROJ_DIM   = (AMB_DIM*(AMB_DIM+1))/2;
+        static constexpr Int  HULL_SIZE = AMB_DIM * SIZE;
+        static constexpr Real nth       = Scalar::Inv<Real>( SIZE );
+        
+        static constexpr Real StandardSimplexVolume()
+        {
+            return Scalar::Inv<Real>( Factorial(static_cast<Real>(DOM_DIM)) );
+        }
+        
+    private:
+        
+        
+        const Tensor2<Real,Int> & restrict V_coords;
+        const Tensor2<Int ,Int> & restrict simplices;
+        const Tensor1<Real,Int> & restrict V_charges;
         
         Tiny::Vector<SIZE,Int,Int>   simplex;
         Tiny::Vector<SIZE,Int,Int> s_simplex;
+        
+        SortNet<SIZE,Int> sort;
         
         Tiny::Vector<AMB_DIM,Real,Int> center;
         
@@ -18,24 +42,37 @@ private:
         Tiny::Matrix<DOM_DIM,AMB_DIM,Real,Int> dfdagger;
         Tiny::Matrix<AMB_DIM,AMB_DIM,Real,Int> P;
         
-//        Tiny::Matrix< FAR_DIM,AMB_DIM*SIZE,Real,Int> Dfar;
-//        Tiny::Matrix<NEAR_DIM,AMB_DIM*SIZE,Real,Int> Dnear;
-        
         Tiny::SelfAdjointMatrix<DOM_DIM,Real,Int> g_inv;
         
-        Tiny::Matrix<AMB_DIM,SIZE,Real,Int> D_f;
-
         Real a;
         Real charge;
         
-        SortNet<SIZE,Int> sort;
+    public:
         
-        PrimitiveDataKernel( const Mesh_T & M_ )
-        :   M ( M_ )
+//        PrimitiveDataKernel( const Mesh_T & M_ )
+//        :   M ( M_ )
+//        {
+//            if constexpr ( DOM_DIM == 0 )
+//            {
+//                P.SetZero();
+//                for( Int k = 0; k < AMB_DIM; ++k )
+//                {
+//                    P[k][k] = Scalar::One<Real>;
+//                }
+//            }
+//        }
+        
+        PrimitiveDataKernel(
+            const Tensor2<Real,Int> & restrict V_coords_,
+            const Tensor2<Int ,Int> & restrict simplices_,
+            const Tensor1<Real,Int> & restrict V_charges_
+        )
+        :   V_coords ( V_coords_  )
+        ,   simplices( simplices_ )
+        ,   V_charges( V_charges_ )
         {
             if constexpr ( DOM_DIM == 0 )
             {
-                D_f.SetZero();
                 P.SetZero();
                 for( Int k = 0; k < AMB_DIM; ++k )
                 {
@@ -48,30 +85,30 @@ private:
         
         void ReadPrimitive( const Int i )
         {
-              simplex.Read( M.simplices.data(i) );
+            simplex.Read( simplices.data(i) );
             s_simplex.Read( simplex.data()      );
-          
+            
             // sorting simplex so that we do not have to sort the sparse arrays to achieve CSR format later
             sort( &s_simplex[0] );
             
             for( Int l = 0; l < SIZE; ++l )
             {
-                copy_buffer<AMB_DIM>( M.V_coords.data(simplex[l]), hull[l] );
+                copy_buffer<AMB_DIM>( V_coords.data(simplex[l]), hull[l] );
             }
             
             copy_buffer<AMB_DIM>(hull[0],center.data());
             
-            charge = M.V_charges[simplex[0]];
+            charge = V_charges[simplex[0]];
             for( Int l = 1; l < SIZE; ++l )
             {
                 add_to_buffer<AMB_DIM>( hull[l], center.data() );
                 
-                charge += M.V_charges[simplex[l]];
+                charge += V_charges[simplex[l]];
             }
             center *= nth;
             charge *= nth;
             
-            a = charge * Mesh_T::StandardSimplexVolume();
+            a = charge * StandardSimplexVolume();
             
             if constexpr ( DOM_DIM > 0 )
             {
@@ -80,25 +117,25 @@ private:
                     for( Int k = 0; k < AMB_DIM; ++k )
                     {
                         df[k][l] =
-                        M.V_coords[s_simplex[l+1]][k]
+                        V_coords[s_simplex[l+1]][k]
                         -
-                        M.V_coords[s_simplex[0  ]][k];
+                        V_coords[s_simplex[0  ]][k];
                     }
                 }
                 
                 df.Transpose( dfdagger );
                 
-            // Compute inverse metric.
+                // Compute inverse metric.
                 
                 // g = df^T * df.
                 // At the moment dfdagger is just the transpose of df.
                 Tiny::gemm<Op::Id,Op::Id,DOM_DIM,DOM_DIM,AMB_DIM,
-                Scalar::Flag::Plus,Scalar::Flag::Zero
+                    Scalar::Flag::Plus,Scalar::Flag::Zero
                 >(
-                    Scalar::One<Real>,  dfdagger.data(), AMB_DIM,
-                                        df.data(),       DOM_DIM,
-                    Scalar::Zero<Real>, g_inv.data(),    DOM_DIM
-                );
+                  Scalar::One<Real>,  dfdagger.data(), AMB_DIM,
+                                      df.data(),       DOM_DIM,
+                  Scalar::Zero<Real>, g_inv.data(),    DOM_DIM
+                  );
                 
                 // Factorize g in place.
                 g_inv.Cholesky();
@@ -109,42 +146,26 @@ private:
                 }
                 
                 
-            // Compute pseudo-inverse of df
+                // Compute pseudo-inverse of df
                 
                 //  dfdagger = g^{-1} * df^T
                 g_inv.CholeskySolve( dfdagger );
-
                 
-            // Compute normal projektor.
+                
+                // Compute normal projektor.
                 
                 // P = id - df * dfdagger
                 Tiny::gemm<Op::Id,Op::Id,AMB_DIM,AMB_DIM,DOM_DIM,
                 Scalar::Flag::Minus,Scalar::Flag::Zero
                 >(
-                    -Scalar::One<Real>,  df.data(),       DOM_DIM,
-                                         dfdagger.data(), AMB_DIM,
-                     Scalar::Zero<Real>, P.data(),        AMB_DIM
-                );
+                  -Scalar::One<Real>,  df.data(),       DOM_DIM,
+                                       dfdagger.data(), AMB_DIM,
+                  Scalar::Zero<Real>,  P.data(),        AMB_DIM
+                  );
                 
                 for( Int k = 0; k < AMB_DIM; ++k )
                 {
                     P[k][k] += Scalar::One<Real>;
-                }
-                
-            // Compute derivative operator (AMB_DIM x SIZE matrix).
-                                
-                for( Int k = 0; k < AMB_DIM; ++k )
-                {
-                    D_f[k][0] = 0;
-                    
-                    if constexpr ( DOM_DIM > 0 )
-                    {
-                        for( Int l = 0; l < DOM_DIM; ++l )
-                        {
-                            D_f[k][0  ] -= dfdagger[l][k];
-                            D_f[k][l+1]  = dfdagger[l][k];
-                        }
-                    }
                 }
             }
         }
@@ -152,7 +173,7 @@ private:
         void WriteNear( mut<Real> near ) const
         {
             near[0] = a;
-
+            
             hull.Write( &near[1] );
             
             LOOP_UNROLL_FULL
@@ -165,7 +186,7 @@ private:
         void WriteFar( mut<Real> far ) const
         {
             far[0] = a;
-
+            
             center.Write( &far[1] );
             
             LOOP_UNROLL_FULL
@@ -174,4 +195,70 @@ private:
                 far[1 + AMB_DIM + k] = P[ tri_i<AMB_DIM>(k) ][ tri_j<AMB_DIM>(k) ];
             }
         }
-    };
+        
+        void WriteSortedSimplex( mut<Int> simplex_out ) const
+        {
+            s_simplex.Write(simplex_out);
+        }
+        
+        
+        
+        void WriteDiffOp( mut<Real> diff )
+        {
+            // Compute derivative operator (AMB_DIM x SIZE matrix).
+            
+            if constexpr ( DOM_DIM == 0 )
+            {
+                zerofy_buffer<DOM_DIM>(diff);
+            }
+            else
+            {
+                
+                Tiny::Matrix<AMB_DIM,SIZE,Real,Int> D_f;
+                
+                for( Int k = 0; k < AMB_DIM; ++k )
+                {
+                    D_f[k][0] = 0;
+                    
+                    for( Int l = 0; l < DOM_DIM; ++l )
+                    {
+                        D_f[k][0  ] -= dfdagger[l][k];
+                        D_f[k][l+1]  = dfdagger[l][k];
+                    }
+                }
+                
+                D_f.Write(diff);
+            }
+            
+        }
+        
+        
+        const Real Volume() const
+        {
+            return a;
+        }
+        
+        const Tiny::Matrix<SIZE,AMB_DIM,Real,Int> & Hull() const
+        {
+            return hull;
+        }
+        
+        const Tiny::Matrix<AMB_DIM,AMB_DIM,Real,Int> & NormalProjector() const
+        {
+            return P;
+        }
+        
+        const Tiny::Vector<AMB_DIM,Real,Int> & Center() const
+        {
+            return center;
+        }
+        
+        const Tiny::Vector<AMB_DIM,Int,Int> & Simplex() const
+        {
+            return simplex;
+        }
+        
+        
+    }; // class PrimitiveDataKernel
+    
+}
