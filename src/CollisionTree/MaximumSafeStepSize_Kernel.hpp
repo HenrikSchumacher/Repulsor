@@ -108,17 +108,17 @@ namespace Repulsor
         
     protected:
         
-        const Tensor2<SReal,Int> & restrict S_C_ser;
-        const Tensor2<SReal,Int> & restrict S_C_up_ser;
-        const Tensor2<SReal,Int> & restrict T_C_ser;
-        const Tensor2<SReal,Int> & restrict T_C_up_ser;
+        cref<Tensor2<SReal,Int>> S_C_ser;
+        cref<Tensor2<SReal,Int>> S_C_up_ser;
+        cref<Tensor2<SReal,Int>> T_C_ser;
+        cref<Tensor2<SReal,Int>> T_C_up_ser;
 
-        const Tensor2<SReal,Int> & restrict S_P_ser;
-        const Tensor2<SReal,Int> & restrict S_P_v_ser;
-        const Tensor2<SReal,Int> & restrict T_P_ser;
-        const Tensor2<SReal,Int> & restrict T_P_v_ser;
+        cref<Tensor2<SReal,Int>> S_P_ser;
+        cref<Tensor2<SReal,Int>> S_P_v_ser;
+        cref<Tensor2<SReal,Int>> T_P_ser;
+        cref<Tensor2<SReal,Int>> T_P_v_ser;
         
-        const typename ClusterTree_T::SparseBinaryMatrix_T & restrict A;
+        cref<typename ClusterTree_T::SparseBinaryMatrix_T> A;
         
         CollisionFinder<ClusterTree_T::AMB_DIM,Real,Int,SReal> C;
         
