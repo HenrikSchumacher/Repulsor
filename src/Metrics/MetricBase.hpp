@@ -26,9 +26,9 @@ namespace Repulsor
         virtual ValueContainer_T & MetricValues( const MeshBase_T & restrict M ) const = 0;
 
         virtual void MultiplyMetric(
-            const MeshBase_T & restrict M,
-            const ExtReal alpha, ptr<ExtReal> X,
-            const ExtReal beta,  mut<ExtReal> Y,
+            cref<MeshBase_T> M,
+            cref<ExtReal> alpha, cptr<ExtReal> X,
+            cref<ExtReal> beta,  mptr<ExtReal> Y,
             const Int  rhs_count,
             const bool VF_flag = true,
             const bool NF_flag = true,
@@ -36,11 +36,9 @@ namespace Repulsor
         ) const = 0;
         
         void MultiplyMetric(
-            const MeshBase_T & restrict M,
-            const ExtReal alpha,
-            const TangentVector_T & restrict X,
-            const ExtReal beta,
-                  CotangentVector_T & restrict Y,
+            cref<MeshBase_T> M,
+            cref<ExtReal> alpha,  cref<TangentVector_T>   X,
+            cref<ExtReal> beta,   mref<CotangentVector_T> Y,
             const bool VF_flag = true,
             const bool NF_flag = true,
             const bool FF_flag = true

@@ -124,8 +124,8 @@ namespace Repulsor
 
         template<typename Real_1, typename Int_1>
         SimplicialRemesher(
-            ptr<Real_1> V_coords_ ,  const Int vertex_count_,
-            ptr< Int_1> simplices_,   const Int simplex_count_,
+            cptr<Real_1> V_coords_ ,  const Int vertex_count_,
+            cptr< Int_1> simplices_,  const Int simplex_count_,
             const Int thread_count_ = 1
         )
         {
@@ -141,9 +141,9 @@ namespace Repulsor
         
         template<typename Real_1, typename Int_1, typename Real_2>
         SimplicialRemesher(
-            ptr<Real_1> V_coords_ ,  const Int vertex_count_,
-            ptr< Int_1> simplices_,  const Int simplex_count_,
-            ptr<Real_2> V_data_,     const Int V_data_dim_,
+            cptr<Real_1> V_coords_ ,  const Int vertex_count_,
+            cptr< Int_1> simplices_,  const Int simplex_count_,
+            cptr<Real_2> V_data_,     const Int V_data_dim_,
             const Int thread_count_ = 1
         )
         {
@@ -176,9 +176,9 @@ namespace Repulsor
     public:
         
         void LoadMesh(
-            ptr<Real> V_coords_ ,  const Int vertex_count_,
-            ptr<Int>  simplices_,  const Int simplex_count_,
-            ptr<Real> V_data_,     const Int V_data_dim_,
+            cptr<Real> V_coords_ ,  const Int vertex_count_,
+            cptr<Int>  simplices_,  const Int simplex_count_,
+            cptr<Real> V_data_,     const Int V_data_dim_,
             const Int thread_count_ = 1
         ) override
         {

@@ -88,9 +88,9 @@ namespace Repulsor
     public:
         
         void MultiplyMetric(
-            const MeshBase_T & restrict M,
-            const ExtReal alpha, ptr<ExtReal> X,
-            const ExtReal beta,  mut<ExtReal> Y,
+            cref<MeshBase_T> M,
+            cref<ExtReal> alpha, cptr<ExtReal> X,
+            cref<ExtReal> beta,  mptr<ExtReal> Y,
             const Int  rhs_count,
             const bool VF_flag = true,
             const bool NF_flag = true,
@@ -111,9 +111,9 @@ namespace Repulsor
         }
         
         void MultiplyMetric(
-            const Mesh_T & M,
-            const ExtReal alpha, ptr<ExtReal> X,
-            const ExtReal beta,  mut<ExtReal> Y,
+            cref<Mesh_T> M,
+            cref<ExtReal> alpha, cptr<ExtReal> X,
+            cref<ExtReal> beta,  mptr<ExtReal> Y,
             const Int  rhs_count,
             const bool VF_flag = true,
             const bool NF_flag = true,
@@ -138,7 +138,7 @@ namespace Repulsor
         
         // Actual implementation to be specified by descendants.
         virtual void multiply_metric(
-            const Mesh_T & restrict M,
+            cref<Mesh_T> M,
             const bool VF_flag, const bool NF_flag, const bool FF_flag
         ) const = 0;
 

@@ -38,8 +38,8 @@ private:
         
         {
             const Int last = PrimitiveCount();
-            ptr<Int> ord     = P_ordering.data();
-            mut<Int> inv_ord = P_inverse_ordering.data();
+            cptr<Int> ord     = P_ordering.data();
+            mptr<Int> inv_ord = P_inverse_ordering.data();
             
             for( Int i = 0; i < last; ++i )
             {

@@ -172,7 +172,7 @@ namespace Repulsor
             }
         }
         
-        void WriteNear( mut<Real> near ) const
+        void WriteNear( mptr<Real> near ) const
         {
             near[0] = a;
             
@@ -185,7 +185,7 @@ namespace Repulsor
             }
         }
         
-        void WriteFar( mut<Real> far ) const
+        void WriteFar( mptr<Real> far ) const
         {
             far[0] = a;
             
@@ -198,14 +198,14 @@ namespace Repulsor
             }
         }
         
-        void WriteSortedSimplex( mut<Int> simplex_out ) const
+        void WriteSortedSimplex( mptr<Int> simplex_out ) const
         {
             s_simplex.Write(simplex_out);
         }
         
         
         
-        void WriteDiffOp( mut<Real> diff )
+        void WriteDiffOp( mptr<Real> diff )
         {
             // Compute derivative operator (AMB_DIM x SIZE matrix).
             

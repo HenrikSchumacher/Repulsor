@@ -199,8 +199,8 @@ namespace Repulsor
             Tensor2<Int,Int>     simplices (simplex_count,simplex_size);
             
             
-            mut<ExtReal> V = coords.data();
-            mut<Int>     S = simplices.data();
+            mptr<ExtReal> V = coords.data();
+            mptr<Int>     S = simplices.data();
             
             
             for( Int i = 0; i < vertex_count; ++i )

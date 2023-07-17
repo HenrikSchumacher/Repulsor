@@ -82,7 +82,7 @@ namespace Repulsor
             return thread_count;
         }
         
-        virtual void SemiStaticUpdate( ptr<ExtReal> V_coords_, const bool transp_ = false ) const = 0;
+        virtual void SemiStaticUpdate( cptr<ExtReal> V_coords_, const bool transp_ = false ) const = 0;
         
         virtual const ClusterTreeBase_T & GetClusterTree() const = 0;
         
@@ -93,27 +93,27 @@ namespace Repulsor
         virtual const SparseBinaryMatrix_T & DerivativeAssembler() const = 0;
         
         virtual void Assemble_ClusterTree_Derivatives(
-            mut<ExtReal> output,
+            mptr<ExtReal> output,
             const ExtReal weight,
             bool addTo = false
         ) const = 0;
 
         virtual void Assemble_ClusterTree_SimplexEnergies(
-            mut<ExtReal> output,
+            mptr<ExtReal> output,
             const ExtReal weight,
             bool addTo = false
         ) const = 0;
         
         virtual void Assemble_ClusterTree_Density(
-            mut<ExtReal> output,
+            mptr<ExtReal> output,
             const ExtReal weight,
             bool addTo = false
         ) const = 0;
         
-        virtual void LoadUpdateVectors( ptr<ExtReal> vecs, const ExtReal max_time, const bool transp_ = false ) const = 0;
+        virtual void LoadUpdateVectors( cptr<ExtReal> vecs, const ExtReal max_time, const bool transp_ = false ) const = 0;
 
         virtual ExtReal MaximumSafeStepSize(
-            ptr<ExtReal> vecs,
+            cptr<ExtReal> vecs,
             const ExtReal max_time,
             const ExtReal TOL = scalar_cast<ExtReal>(0.0625),
             const bool transp_ = false
@@ -130,7 +130,7 @@ namespace Repulsor
         
         virtual const Tensor1<Int,Int> & NestedDissectionOrdering() const = 0;
         
-        virtual void H1Solve( ptr<ExtReal> X, mut<ExtReal> Y, const Int nrhs ) const = 0;
+        virtual void H1Solve( cptr<ExtReal> X, mptr<ExtReal> Y, const Int nrhs ) const = 0;
         
         virtual std::shared_ptr<Sparse::CholeskyDecomposition<Real,Int,LInt>> H1Solver() const = 0;
         

@@ -298,7 +298,7 @@ namespace Repulsor
             return V_coords.data();
         }
         
-        virtual void SemiStaticUpdate( ptr<ExtReal> V_coords_, const bool transp_ = false ) const override
+        virtual void SemiStaticUpdate( cptr<ExtReal> V_coords_, const bool transp_ = false ) const override
         {
             ptic(className()+"::SemiStaticUpdate");
             
@@ -329,7 +329,7 @@ namespace Repulsor
        
         
         virtual void LoadUpdateVectors(
-            ptr<ExtReal> vecs,
+            cptr<ExtReal> vecs,
             const ExtReal max_time,
             const bool transp_
         ) const override
@@ -360,7 +360,7 @@ namespace Repulsor
             MovingPrimitive_T P_moving;
             
             Tensor2<SReal,Int> P_velocities_serialized ( SimplexCount(), P_moving.VelocitySize(), 0 );
-            mut<SReal> P_v_ser = P_velocities_serialized.data();
+            mptr<SReal> P_v_ser = P_velocities_serialized.data();
             
             const Tensor1<Int,Int> & restrict P_ordering = GetClusterTree().PrimitiveOrdering();
 
@@ -393,7 +393,7 @@ namespace Repulsor
         }
         
         virtual ExtReal MaximumSafeStepSize(
-            ptr<ExtReal> vecs,
+            cptr<ExtReal> vecs,
             const ExtReal max_time,
             const ExtReal TOL = scalar_cast<ExtReal>(0.0625),
             const bool transp_ = false
@@ -622,7 +622,7 @@ namespace Repulsor
             
         } // DerivativeAssembler
         
-        void Assemble_ClusterTree_Derivatives( mut<ExtReal> output, const ExtReal weight, bool addTo = false ) const override
+        void Assemble_ClusterTree_Derivatives( mptr<ExtReal> output, const ExtReal weight, bool addTo = false ) const override
         {
             ptic(className()+"::Assemble_ClusterTree_Derivatives");
             
@@ -658,7 +658,7 @@ namespace Repulsor
             ptoc(className()+"::Assemble_ClusterTree_Derivatives");
         }
         
-        void Assemble_ClusterTree_Density( mut<ExtReal> output, const ExtReal weight, bool addTo = false ) const override
+        void Assemble_ClusterTree_Density( mptr<ExtReal> output, const ExtReal weight, bool addTo = false ) const override
         {
             ptic(className()+"::Assemble_ClusterTree_Density");
             
@@ -667,7 +667,7 @@ namespace Repulsor
             ptoc(className()+"::Assemble_ClusterTree_Density");
         }
         
-        void Assemble_ClusterTree_SimplexEnergies( mut<ExtReal> output, const ExtReal weight, bool addTo = false ) const override
+        void Assemble_ClusterTree_SimplexEnergies( mptr<ExtReal> output, const ExtReal weight, bool addTo = false ) const override
         {
             ptic(className()+"::Assemble_ClusterTree_SimplexEnergies");
             
@@ -786,8 +786,8 @@ namespace Repulsor
             const Int vertex_count = VertexCount();
             const Int simplex_count = SimplexCount();
             
-            ptr<Real> V = V_coords.data();
-            ptr<Int>  S = simplices.data();
+            cptr<Real> V = V_coords.data();
+            cptr<Int>  S = simplices.data();
             
             s << "domain_dimension" << "\t" << DOM_DIM << "\n";
             s << "ambient_dimension" << "\t" << AMB_DIM << "\n";

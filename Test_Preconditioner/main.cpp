@@ -126,9 +126,9 @@ int main(int argc, const char * argv[])
     Tensor2<Real,Int> Y_buffer  ( M.VertexCount(), NRHS );
     Tensor2<Real,Int> Z_buffer  ( M.VertexCount(), NRHS );
     
-    mut<Real> B  = B_buffer.data();
-    mut<Real> X  = X_buffer.data();
-    mut<Real> Y  = Y_buffer.data();
+    mptr<Real> B  = B_buffer.data();
+    mptr<Real> X  = X_buffer.data();
+    mptr<Real> Y  = Y_buffer.data();
 //    mut<Real> Z  = Z_buffer.data();
     
     tic("tpe.Differential(M)");
@@ -138,7 +138,7 @@ int main(int argc, const char * argv[])
     print("");
     
     // The operator for the metric.
-    auto A = [&]( ptr<Real> X, mut<Real> Y )
+    auto A = [&]( cptr<Real> X, mptr<Real> Y )
     {
         
         //Y = alpha * A * X + beta * Y
@@ -146,7 +146,7 @@ int main(int argc, const char * argv[])
     };
 
     // The operator for the preconditioner.
-    auto P = [&]( ptr<Real> X, mut<Real> Y )
+    auto P = [&]( cptr<Real> X, mptr<Real> Y )
     {
         M.H1Solve( X, Y, NRHS );
         pseudo_lap.MultiplyMetric( M, Scalar::One<Real>, Y, Scalar::Zero<Real>, Y, NRHS );

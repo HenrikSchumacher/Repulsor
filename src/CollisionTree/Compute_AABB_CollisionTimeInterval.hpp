@@ -2,8 +2,8 @@ namespace Repulsor
 {
     template <int AMB_DIM, typename SReal, typename Int>
     void Compute_AABB_CollisionTimeInterval(
-       ptr<SReal> p_0, ptr<SReal> p_1,
-       ptr<SReal> q_0, ptr<SReal> q_1,
+       cptr<SReal> p_0, cptr<SReal> p_1,
+       cptr<SReal> q_0, cptr<SReal> q_1,
        mref<SReal> t_first,    // returning per reference to avoid std::pair
        mref<SReal> t_last      // returning per reference to avoid std::pair
     )

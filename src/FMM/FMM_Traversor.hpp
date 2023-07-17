@@ -80,9 +80,9 @@ namespace Repulsor
 
                     Real local_sum (0);
                     
-                    ptr<LInt> diag = COND(symmetricQ, pattern.Diag().data(), nullptr);
-                    ptr<LInt> rp   = pattern.Outer().data();
-                    ptr<Int>  ci   = pattern.Inner().data();
+                    cptr<LInt> diag = COND(symmetricQ, pattern.Diag().data(), nullptr);
+                    cptr<LInt> rp   = pattern.Outer().data();
+                    cptr<Int>  ci   = pattern.Inner().data();
                     
                     // Kernel is supposed the following rows of pattern:
                     const Int i_begin = job_ptr[thread  ];

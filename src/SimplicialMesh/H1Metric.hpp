@@ -162,7 +162,7 @@ public:
         return std::any_cast<std::shared_ptr<Solver_T>>( this->GetCache(tag) );
     }
 
-    virtual void H1Solve( ptr<ExtReal> X, mut<ExtReal> Y, const Int nrhs ) const override
+    virtual void H1Solve( cptr<ExtReal> X, mptr<ExtReal> Y, const Int nrhs ) const override
     {
         H1Solver()->template Solve<Parallel>( X, Y, nrhs );
     }

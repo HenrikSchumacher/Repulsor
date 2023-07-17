@@ -63,11 +63,11 @@ namespace Repulsor
         {}
         
         TP0_Kernel_MultiplyMetric(
-            ptr<Real>      A_,
-            const Real_out alpha_,
-            ptr<Real_in>   X_,
-            const Real_out beta_,
-            mut<Real>      Y_,
+            cptr<Real>     A_,
+            cref<Real_out> alpha_,
+            cptr<Real_in>  X_,
+            cref<Real_out> beta_,
+                           mptr<Real>      Y_,
             const Int      rhs_count_
         )
         :   Base_T( A_, alpha_, X_, beta_, Y_, rhs_count_ )
@@ -88,11 +88,7 @@ namespace Repulsor
 
         force_inline void TransposeBlock( const LInt from, const LInt to ) const
         {
-            ptr<Real> a_from = &A[ BLOCK_NNZ * from];
-            mut<Real> a_to   = &A[ BLOCK_NNZ * to  ];
-            
-            a_to[0] = a_from[0];
-            a_to[1] = a_from[1];
+            copy_buffer<2>( &A[ BLOCK_NNZ * from], &A[ BLOCK_NNZ * to  ] );
         }
         
         
@@ -100,7 +96,7 @@ namespace Repulsor
         {
             ReadX( j_global );
             
-            ptr<Real> a = &A_const[BLOCK_NNZ * k_global];
+            cptr<Real> a = &A_const[BLOCK_NNZ * k_global];
             
 /*            The metric block looks like this for AMB_DIM == 3:
 //

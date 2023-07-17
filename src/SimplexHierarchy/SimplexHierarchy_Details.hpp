@@ -132,9 +132,9 @@ public:
             // root_serialized[0] is the squared radius!
             simplex_serialized[0] = scale * scale * root_serialized[0];
             
-            ptr<SReal> root    =    &root_serialized[1 + AMB_DIM];
-            mut<SReal> c       = &simplex_serialized[1          ];
-            mut<SReal> current = &simplex_serialized[1 + AMB_DIM];
+            cptr<SReal> root    =    &root_serialized[1 + AMB_DIM];
+            mptr<SReal> c       = &simplex_serialized[1          ];
+            mptr<SReal> current = &simplex_serialized[1 + AMB_DIM];
 
             for( Int k = 0; k < AMB_DIM; ++k )
             {

@@ -624,8 +624,8 @@ namespace Repulsor
             // Collect first entry of thread_C_D_far into C_out.
             for( Int thread = 0; thread < thread_count; ++thread )
             {
-                ptr<Real> from = thread_C_D_far.data(thread);
-                mut<Real> to   = C_out.data();
+                cptr<Real> from = thread_C_D_far.data(thread);
+                mptr<Real> to   = C_out.data();
                 
                 ParallelDo(
                     [=]( const Int i )
@@ -666,8 +666,8 @@ namespace Repulsor
             // Add first entries of thread_P_D_near into P_out.
             for( Int thread = 0; thread < thread_count; ++thread )
             {
-                ptr<Real> from = thread_P_D_near.data(thread);
-                mut<Real> to   = P_out.data();
+                cptr<Real> from = thread_P_D_near.data(thread);
+                mptr<Real> to   = P_out.data();
                 
                 ParallelDo(
                     [=]( const Int i )
@@ -683,7 +683,7 @@ namespace Repulsor
             
         } // CollectPrimitiveEnergies
         
-        void CollectPrimitiveEnergies( mut<ExtReal> output, const ExtReal weight, bool addTo = false ) const
+        void CollectPrimitiveEnergies( mptr<ExtReal> output, const ExtReal weight, bool addTo = false ) const
         {
             ptic(ClassName()+"::CollectPrimitiveEnergies");
             
@@ -707,7 +707,7 @@ namespace Repulsor
        
         } // CollectPrimitiveEnergies
             
-        void CollectDensity( mut<ExtReal> output, const ExtReal weight, bool addTo = false ) const
+        void CollectDensity( mptr<ExtReal> output, const ExtReal weight, bool addTo = false ) const
         {
             ptic(ClassName()+"::CollectDensity");
             
@@ -764,11 +764,11 @@ namespace Repulsor
 //##################################################################################################
 
         virtual void SemiStaticUpdate(
-            const Tensor2<Real,Int> & restrict P_near_,
-            const Tensor2<Real,Int> & restrict P_far_
+            cref<Tensor2<Real,Int>> P_near_,
+            cref<Tensor2<Real,Int>> P_far_
         ) const = 0;
         
-        virtual void SemiStaticUpdate( ptr<Real> P_near_, ptr<Real> P_far_ ) const = 0;
+        virtual void SemiStaticUpdate( cptr<Real> P_near_, cptr<Real> P_far_ ) const = 0;
         
 //################################################################################################
 //##        Moments

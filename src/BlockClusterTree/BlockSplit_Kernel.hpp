@@ -116,11 +116,11 @@ namespace Repulsor
         
         GJK_Algorithm<ClusterTree_T::AMB_DIM,GJK_Real,Int> G;
         
-        mut<SReal> S_C_serialized = nullptr;
-        mut<SReal> T_C_serialized = nullptr;
+        mptr<SReal> S_C_serialized = nullptr;
+        mptr<SReal> T_C_serialized = nullptr;
 
-        mut<SReal> S_P_serialized = nullptr;
-        mut<SReal> T_P_serialized = nullptr;
+        mptr<SReal> S_P_serialized = nullptr;
+        mptr<SReal> T_P_serialized = nullptr;
         
         const typename ClusterTree_T::SparseBinaryMatrix_T & restrict A;
         

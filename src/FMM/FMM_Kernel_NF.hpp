@@ -72,11 +72,11 @@ namespace Repulsor
         mutable Real DX [S_DATA_DIM] = {};
         mutable Real DY [T_DATA_DIM] = {};
         
-        ptr<Real> S_data    = nullptr;
+        cptr<Real> S_data    = nullptr;
         mptr<Real> S_D_data  = nullptr;
         mptr<Real> S_diag    = nullptr;
         
-        ptr<Real> T_data    = nullptr;
+        cptr<Real> T_data    = nullptr;
         mptr<Real> T_D_data  = nullptr;
         mptr<Real> T_diag    = nullptr;
         
@@ -159,7 +159,7 @@ namespace Repulsor
         
         force_inline void loadS( const Int i_global )
         {
-            ptr<Real> X = &S_data[S_DATA_DIM * i_global];
+            cptr<Real> X = &S_data[S_DATA_DIM * i_global];
             
             a = X[0];
             
@@ -186,7 +186,7 @@ namespace Repulsor
         
         force_inline void loadT( const Int j_global )
         {
-            ptr<Real> Y = &T_data[T_DATA_DIM * j_global];
+            cptr<Real> Y = &T_data[T_DATA_DIM * j_global];
             
             b = Y[0];
             

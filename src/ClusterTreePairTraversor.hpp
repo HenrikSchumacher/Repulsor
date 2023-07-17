@@ -62,15 +62,15 @@ namespace Repulsor
         std::deque<Int> j_queue;
         
         
-        ptr<Int> S_C_left;
-        ptr<Int> S_C_right;
-        ptr<Int> S_C_begin;
-        ptr<Int> S_C_end;
+        cptr<Int> S_C_left;
+        cptr<Int> S_C_right;
+        cptr<Int> S_C_begin;
+        cptr<Int> S_C_end;
         
-        ptr<Int> T_C_left;
-        ptr<Int> T_C_right;
-        ptr<Int> T_C_begin;
-        ptr<Int> T_C_end;
+        cptr<Int> T_C_left;
+        cptr<Int> T_C_right;
+        cptr<Int> T_C_begin;
+        cptr<Int> T_C_end;
         
     public:
         

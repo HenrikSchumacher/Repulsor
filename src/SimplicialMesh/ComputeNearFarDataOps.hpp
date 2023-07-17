@@ -1,12 +1,12 @@
 protected:
     
     void ComputeNearFarDataOps(
-        Tensor2<Real,Int> & restrict P_coords,
-        Tensor3<Real,Int> & restrict P_hull_coords,
-        Tensor2<Real,Int> & restrict P_near,
-        Tensor2<Real,Int> & restrict P_far,
-        SparseMatrix_T    & restrict DiffOp,
-        SparseMatrix_T    & restrict AvOp
+        mref<Tensor2<Real,Int>> P_coords,
+        mref<Tensor3<Real,Int>> P_hull_coords,
+        mref<Tensor2<Real,Int>> P_near,
+        mref<Tensor2<Real,Int>> P_far,
+        mref<SparseMatrix_T>    DiffOp,
+        mref<SparseMatrix_T> AvOp
     ) const
     {
         ptic(ClassName()+"::ComputeNearFarDataOps");
@@ -15,13 +15,13 @@ protected:
             [&,this]( const Int thread )
             {
                 
-                mut<LInt> Av_outer   = AvOp.Outer().data();
-                mut< Int> Av_inner   = AvOp.Inner().data();
-                mut<Real> Av_value   = AvOp.Values().data();
+                mptr<LInt> Av_outer   = AvOp.Outer().data();
+                mptr< Int> Av_inner   = AvOp.Inner().data();
+                mptr<Real> Av_value   = AvOp.Values().data();
     
-                mut<LInt> Diff_outer = DiffOp.Outer().data();
-                mut< Int> Diff_inner = DiffOp.Inner().data();
-                mut<Real> Diff_value = DiffOp.Values().data();
+                mptr<LInt> Diff_outer = DiffOp.Outer().data();
+                mptr< Int> Diff_inner = DiffOp.Inner().data();
+                mptr<Real> Diff_value = DiffOp.Values().data();
     
                 PrimitiveDataKernel_T ker ( V_coords, simplices, V_charges );
                 

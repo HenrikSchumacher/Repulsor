@@ -57,7 +57,7 @@ virtual Int DelaunayFlip( const Int max_iter = 128 ) override
     return total_flip_count;
 }
 
-virtual Int FlipEdges( ptr<Edge_T> e_list, const Int n, const bool check_Delaunay = false ) override
+virtual Int FlipEdges( cptr<Edge_T> e_list, const Int n, const bool check_Delaunay = false ) override
 {
     if constexpr ( DOM_DIM != 2 )
     {
@@ -88,7 +88,7 @@ virtual Int FlipEdges( ptr<Edge_T> e_list, const Int n, const bool check_Delauna
 }
 
 
-virtual Int FlipEdges( const std::vector<Int> & e_list, const bool check_Delaunay = false  ) override
+virtual Int FlipEdges( cref<std::vector<Int>> e_list, const bool check_Delaunay = false  ) override
 {
     return this->FlipEdges( e_list.data(), int_cast<Int>(e_list.size()), check_Delaunay );
 }

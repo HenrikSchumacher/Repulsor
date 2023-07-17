@@ -4,7 +4,7 @@
    
 public:
 
-    virtual Int CollapseEdges( ptr<Edge_T> e_list, const Int n ) override
+    virtual Int CollapseEdges( cptr<Edge_T> e_list, const Int n ) override
     {
         ptic(className()+"::CollapseEdges");
         
@@ -25,7 +25,7 @@ public:
     }
 
 
-    virtual Int CollapseEdges( const std::vector<Int> & e_list ) override
+    virtual Int CollapseEdges( cref<std::vector<Int>> e_list ) override
     {
         return this->CollapseEdges( e_list.data(), int_cast<Int>(e_list.size()) );
     }

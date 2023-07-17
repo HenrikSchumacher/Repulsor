@@ -133,7 +133,7 @@ protected:
         
         if( (L >= null) && (R >= null) )
         {
-            mut<Real> c = C_out.data();
+            mptr<Real> c = C_out.data();
             
             const Int C_offset = buffer_dim * C;
             const Int L_offset = buffer_dim * L;

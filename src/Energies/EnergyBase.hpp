@@ -37,7 +37,7 @@ namespace Repulsor
     public:
         
         // Return the value of the energy; use caching.
-        ExtReal Value( MeshBase_T & M ) const
+        ExtReal Value( mref<MeshBase_T> M ) const
         {
             ptic(ClassName()+"::Value");
             
@@ -56,12 +56,12 @@ namespace Repulsor
     protected:
         
         // Actual implementation to be specified by descendants.
-        virtual ExtReal value( const MeshBase_T & M ) const = 0;
+        virtual ExtReal value( cref<MeshBase_T> M ) const = 0;
         
     public:
 
         // Return the differential of the energy; use caching.
-        const CotangentVector_T & Differential( MeshBase_T & M ) const
+        cref<CotangentVector_T> Differential( mref<MeshBase_T> M ) const
         {
             ptic(ClassName()+"::Differential");
             
@@ -91,7 +91,7 @@ namespace Repulsor
         }
         
         // Return the differential of the energy to a pointer; don't use any caching.
-        ExtReal Differential( MeshBase_T & M, mut<ExtReal> diff ) const
+        ExtReal Differential( mref<MeshBase_T> M, mptr<ExtReal> diff ) const
         {
             ptic(ClassName()+"::Differential (pointer)");
             

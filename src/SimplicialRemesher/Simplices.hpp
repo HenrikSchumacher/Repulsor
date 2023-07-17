@@ -66,7 +66,7 @@ protected:
         const Simplex_T s,
         const Vertex_T v_0,
         const Vertex_T v_1,
-        mut<Vertex_T> vertex_list
+        mptr<Vertex_T> vertex_list
     )
     {
         // Fill v_list with the vertices in simplex s that oppose v_0 and v_1.

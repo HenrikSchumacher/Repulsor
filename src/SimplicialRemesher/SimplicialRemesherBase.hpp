@@ -31,9 +31,9 @@ namespace Repulsor
         virtual void Compress() = 0;
 
         virtual void LoadMesh(
-            ptr<Real> V_coords_ ,  const Int vertex_count_,
-            ptr<Int>  simplices_,  const Int simplex_count_,
-            ptr<Real> V_data_,     const Int V_data_dim_,
+            cptr<Real> V_coords_ ,  const Int vertex_count_,
+            cptr<Int>  simplices_,  const Int simplex_count_,
+            cptr<Real> V_data_,     const Int V_data_dim_,
             const Int thread_count_ = 1
         ) = 0;
         
@@ -57,19 +57,19 @@ namespace Repulsor
         
         virtual Int AmbDim() const = 0;
         
-        virtual Int SplitEdges( ptr<Edge_T> e_list, const Int n ) = 0;
+        virtual Int SplitEdges( cptr<Edge_T> e_list, const Int n ) = 0;
         
-        virtual Int SplitEdges( const std::vector<Int> & e_list ) = 0;
+        virtual Int SplitEdges( cref<std::vector<Int>> e_list ) = 0;
         
-        virtual Int CollapseEdges( ptr<Edge_T> e_list, const Int n ) = 0;
+        virtual Int CollapseEdges( cptr<Edge_T> e_list, const Int n ) = 0;
         
-        virtual Int CollapseEdges( const std::vector<Int> & e_list ) = 0;
+        virtual Int CollapseEdges( cref<std::vector<Int>> e_list ) = 0;
 
         
         
-        virtual Int FlipEdges( ptr<Edge_T> e_list, const Int n, const bool check_Delaunay = false ) = 0;
+        virtual Int FlipEdges( cptr<Edge_T> e_list, const Int n, const bool check_Delaunay = false ) = 0;
         
-        virtual Int FlipEdges( const std::vector<Int> & e_list, const bool check_Delaunay = false ) = 0;
+        virtual Int FlipEdges( cref<std::vector<Int>> e_list, const bool check_Delaunay = false ) = 0;
 
         virtual bool UnifyEdgeLengths(
             const Real collapse_threshold,

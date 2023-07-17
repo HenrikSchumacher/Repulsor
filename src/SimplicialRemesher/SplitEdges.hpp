@@ -4,7 +4,7 @@
 
 public:
 
-    virtual Int SplitEdges( ptr<Edge_T> e_list, const Int n ) override
+    virtual Int SplitEdges( cptr<Edge_T> e_list, const Int n ) override
     {
         ptic(className()+"::SplitEdges");
         
@@ -24,7 +24,7 @@ public:
         return split_counter;
     }
 
-virtual Int SplitEdges( const std::vector<Int> & e_list ) override
+virtual Int SplitEdges( cref<std::vector<Int>> e_list ) override
 {
     return this->SplitEdges( e_list.data(), int_cast<Int>(e_list.size()) );
 }

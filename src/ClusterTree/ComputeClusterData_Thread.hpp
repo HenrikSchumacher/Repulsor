@@ -59,9 +59,9 @@ protected:
         
         if( L >= 0 )
         {
-            mut<Real> C_C = C_far.data(C);
-            ptr<Real> C_L = C_far.data(L);
-            ptr<Real> C_R = C_far.data(R);
+            mptr<Real> C_C = C_far.data(C);
+            cptr<Real> C_L = C_far.data(L);
+            cptr<Real> C_R = C_far.data(R);
             
             Real L_weight = C_L[0];
             Real R_weight = C_R[0];
@@ -88,14 +88,14 @@ protected:
             }
             else
             {
-                mut<Real> C_C = C_far.data(C);
+                mptr<Real> C_C = C_far.data(C);
                 
                 const Int begin = C_begin[C];
                 const Int end   = C_end  [C];
                 
                 {
                     const Int i = begin;
-                    ptr<Real> P = P_far.data(i);
+                    cptr<Real> P = P_far.data(i);
                     
                     const Real a = P[0];
                     
@@ -109,7 +109,7 @@ protected:
                 
                 for( Int i = begin+1; i < end; ++i )
                 {
-                    ptr<Real> P = P_far.data(i);
+                    cptr<Real> P = P_far.data(i);
                     
                     const Real a = P[0];
                     
