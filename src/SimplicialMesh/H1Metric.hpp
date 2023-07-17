@@ -99,7 +99,7 @@ protected:
                         }
                     }
                     
-                    combine_buffers<Scalar::Flag::Generic,Scalar::Flag::Plus,Op::Id,Op::Id,SIZE*SIZE>(
+                    combine_buffers<Scalar::Flag::Generic,Scalar::Flag::Plus,SIZE*SIZE>(
                         a,                 mass.data(),
                         Scalar::One<Real>, val.data()
                     );
