@@ -1,6 +1,7 @@
 #pragma once
 
 #include "SimplicialMesh/SimplicialMeshBase.hpp"
+#include "SimplicialMesh/PrimitiveDataKernel.hpp"
 
 namespace Repulsor
 {
@@ -33,15 +34,16 @@ namespace Repulsor
         using ExtReal = ExtReal_;
         using LInt    = LInt_;
         
-        using TangentVector_T      = typename Base_T::TangentVector_T;
-        using CotangentVector_T    = typename Base_T::CotangentVector_T;
+        using TangentVector_T         = typename Base_T::TangentVector_T;
+        using CotangentVector_T       = typename Base_T::CotangentVector_T;
         
-        using SparseMatrix_T       = typename Base_T::SparseMatrix_T;
-        using SparseBinaryMatrix_T = typename Base_T::SparseBinaryMatrix_T;
+        using SparseMatrix_T          = typename Base_T::SparseMatrix_T;
+        using SparseBinaryMatrix_T    = typename Base_T::SparseBinaryMatrix_T;
         
-        using Primitive_T = Polytope<DOM_DIM+1,AMB_DIM,GJK_Real,Int,SReal,Real,Int>;
-        using MovingPrimitive_T = MovingPolytope<DOM_DIM+1,AMB_DIM,GJK_Real,Int,SReal,Real,Int>;
-        using BoundingVolume_T = AABB<AMB_DIM,GJK_Real,Int,SReal>;
+        using PrimitiveDataKernel_T   = PrimitiveDataKernel<DOM_DIM,AMB_DIM,Real,Int>;
+        using Primitive_T             = Polytope<DOM_DIM+1,AMB_DIM,GJK_Real,Int,SReal,Real,Int>;
+        using MovingPrimitive_T       = MovingPolytope<DOM_DIM+1,AMB_DIM,GJK_Real,Int,SReal,Real,Int>;
+        using BoundingVolume_T        = AABB<AMB_DIM,GJK_Real,Int,SReal>;
         
         
         using ClusterTree_T           = ClusterTree      <AMB_DIM,Real,Int,LInt,SReal,ExtReal>;
@@ -62,7 +64,7 @@ namespace Repulsor
         
         static constexpr Int  SIZE      = DOM_DIM + 1;
         static constexpr Int  HULL_SIZE = AMB_DIM * SIZE;
-        static constexpr Real nth       = Scalar::Inv<Real>( static_cast<Real>(SIZE));
+        static constexpr Real nth       = Scalar::Inv<Real>( SIZE );
         
         SimplicialMesh() = default;
 
@@ -83,7 +85,7 @@ namespace Repulsor
                   simplices_.Dimension(0),
                   false,
                   V_charges_.data(),
-                  static_cast<Int>(thread_count_)
+                  int_cast<Int>(thread_count_)
             )
         {
             ptic(className()+"()");
@@ -123,31 +125,31 @@ namespace Repulsor
         SimplicialMesh(
             const ExtReal_2 * vertex_coords_, // vertex coordinates; assumed to be of size vertex_count_ x AMB_DIM
             const Size_T vertex_count_,
-            const bool vertex_coords_transpose,
+            const bool vertex_coords_ColMajorQ,
             const ExtInt * simplices_, // simplices; assumed to be of size simplex_count_ x (DOM_DIM+1)
             const Size_T simplex_count_,
-            const bool simplices_transpose,
+            const bool simplices_ColMajorQ,
             const Size_T thread_count_ = 1
         )
-        :   Base_T    ( static_cast<Int>(thread_count_) )
+        :   Base_T    ( int_cast<Int>(thread_count_) )
         ,   V_coords  ( ToTensor2<Real,Int>(
                             vertex_coords_,
-                            static_cast<Int>(vertex_count_),
-                            static_cast<Int>(AMB_DIM),
-                            vertex_coords_transpose
+                            int_cast<Int>(vertex_count_),
+                            int_cast<Int>(AMB_DIM),
+                            vertex_coords_ColMajorQ
                         )
                       )
         ,   V_coords_frozen ( V_coords )
         ,   simplices ( ToTensor2<Int,Int>(
                             simplices_,
-                            static_cast<Int>(simplex_count_),
-                            static_cast<Int>(DOM_DIM+1),
-                            simplices_transpose
+                            int_cast<Int>(simplex_count_),
+                            int_cast<Int>(DOM_DIM+1),
+                            simplices_ColMajorQ
                         )
                       )
-        ,   V_charges ( vertex_count_, Scalar::One<Real> )
-        ,   P_charges ( simplex_count_, Scalar::One<Real> )
-        ,   details   ( static_cast<Int>(thread_count_) )
+        ,   V_charges ( int_cast<Int>(vertex_count_ ), Scalar::One<Real> )
+        ,   P_charges ( int_cast<Int>(simplex_count_), Scalar::One<Real> )
+        ,   details   ( int_cast<Int>(thread_count_ )                    )
         {
             ptic(className()+" (pointer)");
             ptoc(className()+" (pointer)");
@@ -158,32 +160,32 @@ namespace Repulsor
         SimplicialMesh(
             const ExtReal_2 * vertex_coords_, // vertex coordinates; assumed to be of size vertex_count_ x AMB_DIM
             const Size_T      vertex_count_,
-            const bool        vertex_coords_transpose,
+            const bool        vertex_coords_ColMajorQ,
             const ExtInt    * simplices_, // simplices; assumed to be of size simplex_count_ x (DOM_DIM+1)
             const Size_T      simplex_count_,
-            const bool        simplices_transpose,
+            const bool        simplices_ColMajorQ,
             const ExtReal_3 * vertex_charges_, // vertex charges; assumed to be of size vertex_count_
             const Size_T      thread_count_ = 1
         )
-        :   Base_T    ( static_cast<Int>(thread_count_) )
+        :   Base_T    ( int_cast<Int>(thread_count_) )
         ,   V_coords  ( ToTensor2<Real,Int>(
                             vertex_coords_,
-                            static_cast<Int>(vertex_count_),
-                            static_cast<Int>(AMB_DIM),
-                            vertex_coords_transpose
+                            int_cast<Int>(vertex_count_),
+                            int_cast<Int>(AMB_DIM),
+                            vertex_coords_ColMajorQ
                         )
                       )
         ,   V_coords_frozen ( V_coords )
         ,   simplices ( ToTensor2<Int,Int>(
                             simplices_,
-                            static_cast<Int>(simplex_count_),
-                            static_cast<Int>(DOM_DIM+1),
-                            simplices_transpose
+                            int_cast<Int>(simplex_count_),
+                            int_cast<Int>(DOM_DIM+1),
+                            simplices_ColMajorQ
                         )
                       )
-        ,   V_charges ( vertex_charges_, vertex_count_                     )
-        ,   P_charges (                  simplex_count_, Scalar::One<Real> )
-        ,   details   ( static_cast<Int>(thread_count_) )
+        ,   V_charges ( vertex_charges_, int_cast<Int>(vertex_count_ )                    )
+        ,   P_charges (                  int_cast<Int>(simplex_count_), Scalar::One<Real> )
+        ,   details   ( int_cast<Int>(thread_count_) )
         {
             ptic(className()+" (pointer,charges)");
             ptoc(className()+" (pointer,charges)");
@@ -228,7 +230,6 @@ namespace Repulsor
         
         SimplicialMeshDetails<DOM_DIM,AMB_DIM,Real,Int,LInt> details;
 
-#include "SimplicialMesh/PrimitiveDataKernel.hpp"
 #include "SimplicialMesh/ComputeNearFarDataOps.hpp"
 #include "SimplicialMesh/ComputeNearFarData.hpp"
 #include "SimplicialMesh/H1Metric.hpp"
