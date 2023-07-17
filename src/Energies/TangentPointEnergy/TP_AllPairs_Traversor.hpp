@@ -96,8 +96,8 @@ namespace Repulsor
         ,   p             ( p_            )
         ,   q_half_real   ( q / two       )
         ,   p_half_real   ( p / two       )
-        ,   q_half_int    ( q_half_real   )
-        ,   p_half_int    ( p_half_real   )
+        ,   q_half_int    ( static_cast<Int>(q_half_real) )
+        ,   p_half_int    ( static_cast<Int>(p_half_real) )
         ,   q_half_is_int ( q_half_real == static_cast<Real>(q_half_int) )
         ,   p_half_is_int ( p_half_real == static_cast<Real>(p_half_int) )
         {}
@@ -200,11 +200,11 @@ namespace Repulsor
             {
                 if( p_half_is_int )
                 {
-                    NF_Compute<Int,Int,0>( q_half_real, p_half_real );
+                    NF_Compute<Int,Int,0>( q_half_int, p_half_int );
                 }
                 else
                 {
-                    NF_Compute<Int,Real,0>( q_half_real, p_half_real );
+                    NF_Compute<Int,Real,0>( q_half_int, p_half_real );
                 }
             }
             else
@@ -249,7 +249,7 @@ namespace Repulsor
     protected:
         
         template< typename T1, typename T2, int q_flag>
-        void NF_Compute( const T1 q_half_, const T1 p_half_ )
+        void NF_Compute( const T1 q_half_, const T2 p_half_ )
         {
             ptic(ClassName()+"::NF_Compute");
 
