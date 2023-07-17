@@ -66,7 +66,7 @@ private:
         {
             for( Cluster_T * C : tree_rows_ptr[level] )
             {
-                if( C->left >= Int(0) )
+                if( C->left != nullptr )
                 {
                     Serialize_Cluster_Post( C );
                 }
