@@ -129,13 +129,14 @@ namespace Repulsor
                 
                 // g = df^T * df.
                 // At the moment dfdagger is just the transpose of df.
-                Tiny::gemm<Op::Id,Op::Id,DOM_DIM,DOM_DIM,AMB_DIM,
+                Tiny::gemm<
+                    Op::Id,Op::Id,DOM_DIM,DOM_DIM,AMB_DIM,
                     Scalar::Flag::Plus,Scalar::Flag::Zero
                 >(
-                  Scalar::One<Real>,  dfdagger.data(), AMB_DIM,
-                                      df.data(),       DOM_DIM,
-                  Scalar::Zero<Real>, g_inv.data(),    DOM_DIM
-                  );
+                    Scalar::One<Real>,  dfdagger.data(), AMB_DIM,
+                                        df.data(),       DOM_DIM,
+                    Scalar::Zero<Real>, g_inv.data(),    DOM_DIM
+                );
                 
                 // Factorize g in place.
                 g_inv.Cholesky();
@@ -155,13 +156,14 @@ namespace Repulsor
                 // Compute normal projektor.
                 
                 // P = id - df * dfdagger
-                Tiny::gemm<Op::Id,Op::Id,AMB_DIM,AMB_DIM,DOM_DIM,
-                Scalar::Flag::Minus,Scalar::Flag::Zero
+                Tiny::gemm<
+                    Op::Id,Op::Id,AMB_DIM,AMB_DIM,DOM_DIM,
+                    Scalar::Flag::Minus,Scalar::Flag::Zero
                 >(
-                  -Scalar::One<Real>,  df.data(),       DOM_DIM,
-                                       dfdagger.data(), AMB_DIM,
-                  Scalar::Zero<Real>,  P.data(),        AMB_DIM
-                  );
+                    -Scalar::One<Real>,  df.data(),       DOM_DIM,
+                                         dfdagger.data(), AMB_DIM,
+                    Scalar::Zero<Real>,  P.data(),        AMB_DIM
+                );
                 
                 for( Int k = 0; k < AMB_DIM; ++k )
                 {
