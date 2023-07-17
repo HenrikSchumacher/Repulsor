@@ -4,8 +4,8 @@ namespace Repulsor
     void Compute_AABB_CollisionTimeInterval(
        ptr<SReal> p_0, ptr<SReal> p_1,
        ptr<SReal> q_0, ptr<SReal> q_1,
-       SReal & restrict t_first,    // returning per reference to avoid std::pair
-       SReal & restrict t_last      // returning per reference to avoid std::pair
+       mref<SReal> t_first,    // returning per reference to avoid std::pair
+       mref<SReal> t_last      // returning per reference to avoid std::pair
     )
     {
         // Assuming p_0, p_1, q_0, q_1 are serizalizations in the format of some AABB<AMB_DIM,GJK_Real,Int,SReal>

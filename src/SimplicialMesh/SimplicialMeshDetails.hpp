@@ -18,18 +18,19 @@ namespace Repulsor
 
 		
 	void DNearFarToHulls( 
-		const Tensor2<Real,Int> & V_coords, 
-		const Tensor2<Int ,Int> & simplices, 
-		const Tensor2<Real,Int> & P_D_near, 
-		const Tensor2<Real,Int> & P_D_far, 
-		const Tensor1<Real,Int> & V_charges,
+		cref<Tensor2<Real,Int>> V_coords, 
+		cref<Tensor2<Int ,Int>> simplices, 
+		cref<Tensor2<Real,Int>> P_D_near, 
+		cref<Tensor2<Real,Int>> P_D_far, 
+		cref<Tensor1<Real,Int>> V_charges,
         // cppcheck-suppress [constParameter]
-		      Tensor3<Real,Int> & buffer
+		mref<Tensor3<Real,Int>> buffer
 	) const
     {
         ptic(ClassName()+"::DNearFarToHulls");
-
         eprint(ClassName()+"::DNearFarToHulls not implemented. Returning 0.");
+		
+		buffer.Fill(static_cast<Real>(0));
 
         ptoc(ClassName()+"::DNearFarToHulls");
     }
@@ -71,13 +72,13 @@ namespace Repulsor
         }
 		
 	void DNearFarToHulls( 
-		const Tensor2<Real,Int> & V_coords, 
-		const Tensor2<Int ,Int> & simplices, 
-		const Tensor2<Real,Int> & P_D_near,
-		const Tensor2<Real,Int> & P_D_far, 
-		const Tensor1<Real,Int> & V_charges,
+		cref<Tensor2<Real,Int>> V_coords, 
+		cref<Tensor2<Int ,Int>> simplices, 
+		cref<Tensor2<Real,Int>> P_D_near,
+		cref<Tensor2<Real,Int>> P_D_far, 
+		cref<Tensor1<Real,Int>> V_charges,
         // cppcheck-suppress [constParameter]
-		      Tensor3<Real,Int> & buffer
+		mref<Tensor3<Real,Int>> buffer
 	) const
     {
         ptic(ClassName()+"::DNearFarToHulls");
@@ -87,27 +88,21 @@ namespace Repulsor
             eprint("in DNearFarToHulls: P_D_near.Dimension(1) != 3. Aborting");
         }
 
-        if( P_D_far.Dimension(1) != 3 )
-        {
-            eprint("in DNearFarToHulls: P_D_far.Dimension(1) != 3. Aborting");
-        }
-
-		//ptr<Real> V_coords__  = V_coords.data();
-		ptr<Int>  simplices__ = simplices.data();
-		ptr<Real> P_D_near__  = P_D_near.data();
-		ptr<Real> P_D_far__   = P_D_far.data();
-		mut<Real> buffer__    = buffer.data();
-
+		//cptr<Real> V_coords__  = V_coords.data();
+		//cptr<Int>  simplices__ = simplices.data();
+		cptr<Real> P_D_near__    = P_D_near.data();
+		cptr<Real> P_D_far__     = P_D_far.data();
+		mptr<Real> buffer__      = buffer.data();
+        
 		ParallelDo(
 			[=]( const Int i )
 			{
 				Real charge = 0;
 				for( Int k = 0; k < SIZE; ++k )
 				{
-					charge += V_charges[simplices__[SIZE*i+k]];
+					charge += V_charges[simplices(i,k)];
 				}
 				charge *= nth;
-
 					buffer__[1*i+0] = charge*(P_D_far__[3*i+1] + P_D_near__[3*i+1]);
 			},
 			simplices.Dimension(0),
@@ -154,13 +149,13 @@ namespace Repulsor
         }
 		
 	void DNearFarToHulls( 
-		const Tensor2<Real,Int> & V_coords, 
-		const Tensor2<Int ,Int> & simplices, 
-		const Tensor2<Real,Int> & P_D_near,
-		const Tensor2<Real,Int> & P_D_far, 
-		const Tensor1<Real,Int> & V_charges,
+		cref<Tensor2<Real,Int>> V_coords, 
+		cref<Tensor2<Int ,Int>> simplices, 
+		cref<Tensor2<Real,Int>> P_D_near,
+		cref<Tensor2<Real,Int>> P_D_far, 
+		cref<Tensor1<Real,Int>> V_charges,
         // cppcheck-suppress [constParameter]
-		      Tensor3<Real,Int> & buffer
+		mref<Tensor3<Real,Int>> buffer
 	) const
     {
         ptic(ClassName()+"::DNearFarToHulls");
@@ -170,27 +165,21 @@ namespace Repulsor
             eprint("in DNearFarToHulls: P_D_near.Dimension(1) != 6. Aborting");
         }
 
-        if( P_D_far.Dimension(1) != 6 )
-        {
-            eprint("in DNearFarToHulls: P_D_far.Dimension(1) != 6. Aborting");
-        }
-
-		//ptr<Real> V_coords__  = V_coords.data();
-		ptr<Int>  simplices__ = simplices.data();
-		ptr<Real> P_D_near__  = P_D_near.data();
-		ptr<Real> P_D_far__   = P_D_far.data();
-		mut<Real> buffer__    = buffer.data();
-
+		//cptr<Real> V_coords__  = V_coords.data();
+		//cptr<Int>  simplices__ = simplices.data();
+		cptr<Real> P_D_near__    = P_D_near.data();
+		cptr<Real> P_D_far__     = P_D_far.data();
+		mptr<Real> buffer__      = buffer.data();
+        
 		ParallelDo(
 			[=]( const Int i )
 			{
 				Real charge = 0;
 				for( Int k = 0; k < SIZE; ++k )
 				{
-					charge += V_charges[simplices__[SIZE*i+k]];
+					charge += V_charges[simplices(i,k)];
 				}
 				charge *= nth;
-
 					buffer__[2*i+0] = charge*(P_D_far__[6*i+1] + P_D_near__[6*i+1]);
 					buffer__[2*i+1] = charge*(P_D_far__[6*i+2] + P_D_near__[6*i+2]);
 			},
@@ -238,13 +227,13 @@ namespace Repulsor
         }
 		
 	void DNearFarToHulls( 
-		const Tensor2<Real,Int> & V_coords, 
-		const Tensor2<Int ,Int> & simplices, 
-		const Tensor2<Real,Int> & P_D_near,
-		const Tensor2<Real,Int> & P_D_far, 
-		const Tensor1<Real,Int> & V_charges,
+		cref<Tensor2<Real,Int>> V_coords, 
+		cref<Tensor2<Int ,Int>> simplices, 
+		cref<Tensor2<Real,Int>> P_D_near,
+		cref<Tensor2<Real,Int>> P_D_far, 
+		cref<Tensor1<Real,Int>> V_charges,
         // cppcheck-suppress [constParameter]
-		      Tensor3<Real,Int> & buffer
+		mref<Tensor3<Real,Int>> buffer
 	) const
     {
         ptic(ClassName()+"::DNearFarToHulls");
@@ -254,27 +243,21 @@ namespace Repulsor
             eprint("in DNearFarToHulls: P_D_near.Dimension(1) != 10. Aborting");
         }
 
-        if( P_D_far.Dimension(1) != 10 )
-        {
-            eprint("in DNearFarToHulls: P_D_far.Dimension(1) != 10. Aborting");
-        }
-
-		//ptr<Real> V_coords__  = V_coords.data();
-		ptr<Int>  simplices__ = simplices.data();
-		ptr<Real> P_D_near__  = P_D_near.data();
-		ptr<Real> P_D_far__   = P_D_far.data();
-		mut<Real> buffer__    = buffer.data();
-
+		//cptr<Real> V_coords__  = V_coords.data();
+		//cptr<Int>  simplices__ = simplices.data();
+		cptr<Real> P_D_near__    = P_D_near.data();
+		cptr<Real> P_D_far__     = P_D_far.data();
+		mptr<Real> buffer__      = buffer.data();
+        
 		ParallelDo(
 			[=]( const Int i )
 			{
 				Real charge = 0;
 				for( Int k = 0; k < SIZE; ++k )
 				{
-					charge += V_charges[simplices__[SIZE*i+k]];
+					charge += V_charges[simplices(i,k)];
 				}
 				charge *= nth;
-
 					buffer__[3*i+0] = charge*(P_D_far__[10*i+1] + P_D_near__[10*i+1]);
 					buffer__[3*i+1] = charge*(P_D_far__[10*i+2] + P_D_near__[10*i+2]);
 					buffer__[3*i+2] = charge*(P_D_far__[10*i+3] + P_D_near__[10*i+3]);
@@ -323,13 +306,13 @@ namespace Repulsor
         }
 		
 	void DNearFarToHulls( 
-		const Tensor2<Real,Int> & V_coords, 
-		const Tensor2<Int ,Int> & simplices, 
-		const Tensor2<Real,Int> & P_D_near,
-		const Tensor2<Real,Int> & P_D_far, 
-		const Tensor1<Real,Int> & V_charges,
+		cref<Tensor2<Real,Int>> V_coords, 
+		cref<Tensor2<Int ,Int>> simplices, 
+		cref<Tensor2<Real,Int>> P_D_near,
+		cref<Tensor2<Real,Int>> P_D_far, 
+		cref<Tensor1<Real,Int>> V_charges,
         // cppcheck-suppress [constParameter]
-		      Tensor3<Real,Int> & buffer
+		mref<Tensor3<Real,Int>> buffer
 	) const
     {
         ptic(ClassName()+"::DNearFarToHulls");
@@ -339,27 +322,21 @@ namespace Repulsor
             eprint("in DNearFarToHulls: P_D_near.Dimension(1) != 15. Aborting");
         }
 
-        if( P_D_far.Dimension(1) != 15 )
-        {
-            eprint("in DNearFarToHulls: P_D_far.Dimension(1) != 15. Aborting");
-        }
-
-		//ptr<Real> V_coords__  = V_coords.data();
-		ptr<Int>  simplices__ = simplices.data();
-		ptr<Real> P_D_near__  = P_D_near.data();
-		ptr<Real> P_D_far__   = P_D_far.data();
-		mut<Real> buffer__    = buffer.data();
-
+		//cptr<Real> V_coords__  = V_coords.data();
+		//cptr<Int>  simplices__ = simplices.data();
+		cptr<Real> P_D_near__    = P_D_near.data();
+		cptr<Real> P_D_far__     = P_D_far.data();
+		mptr<Real> buffer__      = buffer.data();
+        
 		ParallelDo(
 			[=]( const Int i )
 			{
 				Real charge = 0;
 				for( Int k = 0; k < SIZE; ++k )
 				{
-					charge += V_charges[simplices__[SIZE*i+k]];
+					charge += V_charges[simplices(i,k)];
 				}
 				charge *= nth;
-
 					buffer__[4*i+0] = charge*(P_D_far__[15*i+1] + P_D_near__[15*i+1]);
 					buffer__[4*i+1] = charge*(P_D_far__[15*i+2] + P_D_near__[15*i+2]);
 					buffer__[4*i+2] = charge*(P_D_far__[15*i+3] + P_D_near__[15*i+3]);
@@ -409,13 +386,13 @@ namespace Repulsor
         }
 		
 	void DNearFarToHulls( 
-		const Tensor2<Real,Int> & V_coords, 
-		const Tensor2<Int ,Int> & simplices, 
-		const Tensor2<Real,Int> & P_D_near, 
-		const Tensor2<Real,Int> & P_D_far, 
-		const Tensor1<Real,Int> & V_charges,
+		cref<Tensor2<Real,Int>> V_coords, 
+		cref<Tensor2<Int ,Int>> simplices, 
+		cref<Tensor2<Real,Int>> P_D_near, 
+		cref<Tensor2<Real,Int>> P_D_far, 
+		cref<Tensor1<Real,Int>> V_charges,
         // cppcheck-suppress [constParameter]
-		      Tensor3<Real,Int> & buffer
+		mref<Tensor3<Real,Int>> buffer
 	) const
     {
         ptic(ClassName()+"::DNearFarToHulls");
@@ -425,28 +402,21 @@ namespace Repulsor
             eprint("in DNearFarToHulls: P_D_near.Dimension(1) != 8. Aborting");
         }
 
-        if( P_D_far.Dimension(1) != 6 )
-        {
-            eprint("in DNearFarToHulls: P_D_far.Dimension(1) != 6. Aborting");
-        }
-
-		ptr<Real> V_coords__  = V_coords.data();
-		ptr<Int>  simplices__ = simplices.data();
-		ptr<Real> P_D_near__  = P_D_near.data();
-		ptr<Real> P_D_far__   = P_D_far.data();
-		mut<Real> buffer__    = buffer.data();
+		cptr<Real> V_coords__  = V_coords.data();
+		cptr<Int>  simplices__ = simplices.data();
+		cptr<Real> P_D_near__  = P_D_near.data();
+		cptr<Real> P_D_far__   = P_D_far.data();
+		mptr<Real> buffer__    = buffer.data();
         
-
 		ParallelDo(
 			[=]( const Int i )
 			{
 				Real charge = 0;
 				for( Int k = 0; k < SIZE; ++k )
 				{
-					charge += V_charges[simplices__[SIZE*i+k]];
+					charge += V_charges[simplices(i,k)];
 				}
 				charge *= nth;
-
 					const Real s0 = V_coords__[2*simplices__[2*i+0]+0];
 					const Real s1 = -s0;
 					const Real s2 = V_coords__[2*simplices__[2*i+1]+0];
@@ -585,13 +555,13 @@ namespace Repulsor
         }
 		
 	void DNearFarToHulls( 
-		const Tensor2<Real,Int> & V_coords, 
-		const Tensor2<Int ,Int> & simplices, 
-		const Tensor2<Real,Int> & P_D_near, 
-		const Tensor2<Real,Int> & P_D_far, 
-		const Tensor1<Real,Int> & V_charges,
+		cref<Tensor2<Real,Int>> V_coords, 
+		cref<Tensor2<Int ,Int>> simplices, 
+		cref<Tensor2<Real,Int>> P_D_near, 
+		cref<Tensor2<Real,Int>> P_D_far, 
+		cref<Tensor1<Real,Int>> V_charges,
         // cppcheck-suppress [constParameter]
-		      Tensor3<Real,Int> & buffer
+		mref<Tensor3<Real,Int>> buffer
 	) const
     {
         ptic(ClassName()+"::DNearFarToHulls");
@@ -601,28 +571,21 @@ namespace Repulsor
             eprint("in DNearFarToHulls: P_D_near.Dimension(1) != 13. Aborting");
         }
 
-        if( P_D_far.Dimension(1) != 10 )
-        {
-            eprint("in DNearFarToHulls: P_D_far.Dimension(1) != 10. Aborting");
-        }
-
-		ptr<Real> V_coords__  = V_coords.data();
-		ptr<Int>  simplices__ = simplices.data();
-		ptr<Real> P_D_near__  = P_D_near.data();
-		ptr<Real> P_D_far__   = P_D_far.data();
-		mut<Real> buffer__    = buffer.data();
+		cptr<Real> V_coords__  = V_coords.data();
+		cptr<Int>  simplices__ = simplices.data();
+		cptr<Real> P_D_near__  = P_D_near.data();
+		cptr<Real> P_D_far__   = P_D_far.data();
+		mptr<Real> buffer__    = buffer.data();
         
-
 		ParallelDo(
 			[=]( const Int i )
 			{
 				Real charge = 0;
 				for( Int k = 0; k < SIZE; ++k )
 				{
-					charge += V_charges[simplices__[SIZE*i+k]];
+					charge += V_charges[simplices(i,k)];
 				}
 				charge *= nth;
-
 					const Real s0 = V_coords__[3*simplices__[2*i+0]+0];
 					const Real s1 = -s0;
 					const Real s2 = V_coords__[3*simplices__[2*i+1]+0];
@@ -835,13 +798,13 @@ namespace Repulsor
         }
 		
 	void DNearFarToHulls( 
-		const Tensor2<Real,Int> & V_coords, 
-		const Tensor2<Int ,Int> & simplices, 
-		const Tensor2<Real,Int> & P_D_near, 
-		const Tensor2<Real,Int> & P_D_far, 
-		const Tensor1<Real,Int> & V_charges,
+		cref<Tensor2<Real,Int>> V_coords, 
+		cref<Tensor2<Int ,Int>> simplices, 
+		cref<Tensor2<Real,Int>> P_D_near, 
+		cref<Tensor2<Real,Int>> P_D_far, 
+		cref<Tensor1<Real,Int>> V_charges,
         // cppcheck-suppress [constParameter]
-		      Tensor3<Real,Int> & buffer
+		mref<Tensor3<Real,Int>> buffer
 	) const
     {
         ptic(ClassName()+"::DNearFarToHulls");
@@ -851,28 +814,21 @@ namespace Repulsor
             eprint("in DNearFarToHulls: P_D_near.Dimension(1) != 19. Aborting");
         }
 
-        if( P_D_far.Dimension(1) != 15 )
-        {
-            eprint("in DNearFarToHulls: P_D_far.Dimension(1) != 15. Aborting");
-        }
-
-		ptr<Real> V_coords__  = V_coords.data();
-		ptr<Int>  simplices__ = simplices.data();
-		ptr<Real> P_D_near__  = P_D_near.data();
-		ptr<Real> P_D_far__   = P_D_far.data();
-		mut<Real> buffer__    = buffer.data();
+		cptr<Real> V_coords__  = V_coords.data();
+		cptr<Int>  simplices__ = simplices.data();
+		cptr<Real> P_D_near__  = P_D_near.data();
+		cptr<Real> P_D_far__   = P_D_far.data();
+		mptr<Real> buffer__    = buffer.data();
         
-
 		ParallelDo(
 			[=]( const Int i )
 			{
 				Real charge = 0;
 				for( Int k = 0; k < SIZE; ++k )
 				{
-					charge += V_charges[simplices__[SIZE*i+k]];
+					charge += V_charges[simplices(i,k)];
 				}
 				charge *= nth;
-
 					const Real s0 = V_coords__[4*simplices__[2*i+0]+0];
 					const Real s1 = -s0;
 					const Real s2 = V_coords__[4*simplices__[2*i+1]+0];
@@ -1181,13 +1137,13 @@ namespace Repulsor
         }
 		
     void DNearFarToHulls( 
-		const Tensor2<Real,Int> & V_coords, 
-		const Tensor2<Int ,Int> & simplices, 
-		const Tensor2<Real,Int> & P_D_near, 
-		const Tensor2<Real,Int> & P_D_far, 
-		const Tensor1<Real,Int> & V_charges,
+		cref<Tensor2<Real,Int>> V_coords, 
+		cref<Tensor2<Int ,Int>> simplices, 
+		cref<Tensor2<Real,Int>> P_D_near, 
+		cref<Tensor2<Real,Int>> P_D_far, 
+		cref<Tensor1<Real,Int>> V_charges,
         // cppcheck-suppress [constParameter]
-		      Tensor3<Real,Int> & buffer
+		mref<Tensor3<Real,Int>> buffer
 	) const
     {
         ptic(ClassName()+"::DNearFarToHulls");
@@ -1197,16 +1153,11 @@ namespace Repulsor
             eprint("in DNearFarToHulls: P_D_near.Dimension(1) != 16. Aborting");
         }
         
-        if( P_D_far.Dimension(1) != 10 )
-        {
-            eprint("in DNearFarToHulls: P_D_far.Dimension(1) != 10. Aborting");
-        }
-
-		ptr<Real> V_coords__  = V_coords.data();
-        ptr<Int>  simplices__ = simplices.data();
-		ptr<Real> P_D_near__  = P_D_near.data();
-		ptr<Real> P_D_far__   = P_D_far.data();
-        mut<Real> buffer__    = buffer.data();
+		cptr<Real> V_coords__  = V_coords.data();
+        cptr<Int>  simplices__ = simplices.data();
+		cptr<Real> P_D_near__  = P_D_near.data();
+		cptr<Real> P_D_far__   = P_D_far.data();
+        mptr<Real> buffer__    = buffer.data();
 
 		ParallelDo(
 			[=]( const Int i )
@@ -1214,7 +1165,7 @@ namespace Repulsor
 				Real charge = 0;
 				for( Int k = 0; k < SIZE; ++k )
 				{
-					charge += V_charges[simplices__[SIZE*i+k]];
+					charge += V_charges[simplices(i,k)];
 				}
 				charge *= nth;
 
@@ -1539,13 +1490,13 @@ namespace Repulsor
         }
 		
     void DNearFarToHulls( 
-		const Tensor2<Real,Int> & V_coords, 
-		const Tensor2<Int ,Int> & simplices, 
-		const Tensor2<Real,Int> & P_D_near, 
-		const Tensor2<Real,Int> & P_D_far, 
-		const Tensor1<Real,Int> & V_charges,
+		cref<Tensor2<Real,Int>> V_coords, 
+		cref<Tensor2<Int ,Int>> simplices, 
+		cref<Tensor2<Real,Int>> P_D_near, 
+		cref<Tensor2<Real,Int>> P_D_far, 
+		cref<Tensor1<Real,Int>> V_charges,
         // cppcheck-suppress [constParameter]
-		      Tensor3<Real,Int> & buffer
+		mref<Tensor3<Real,Int>> buffer
 	) const
     {
         ptic(ClassName()+"::DNearFarToHulls");
@@ -1555,16 +1506,11 @@ namespace Repulsor
             eprint("in DNearFarToHulls: P_D_near.Dimension(1) != 23. Aborting");
         }
         
-        if( P_D_far.Dimension(1) != 15 )
-        {
-            eprint("in DNearFarToHulls: P_D_far.Dimension(1) != 15. Aborting");
-        }
-
-		ptr<Real> V_coords__  = V_coords.data();
-        ptr<Int>  simplices__ = simplices.data();
-		ptr<Real> P_D_near__  = P_D_near.data();
-		ptr<Real> P_D_far__   = P_D_far.data();
-        mut<Real> buffer__    = buffer.data();
+		cptr<Real> V_coords__  = V_coords.data();
+        cptr<Int>  simplices__ = simplices.data();
+		cptr<Real> P_D_near__  = P_D_near.data();
+		cptr<Real> P_D_far__   = P_D_far.data();
+        mptr<Real> buffer__    = buffer.data();
 
 		ParallelDo(
 			[=]( const Int i )
@@ -1572,7 +1518,7 @@ namespace Repulsor
 				Real charge = 0;
 				for( Int k = 0; k < SIZE; ++k )
 				{
-					charge += V_charges[simplices__[SIZE*i+k]];
+					charge += V_charges[simplices(i,k)];
 				}
 				charge *= nth;
 
@@ -1831,7 +1777,7 @@ namespace Repulsor
 					const Real s252 = s234 + s237 + s248 + s249 + s250 + s251;
 					const Real s253 = s188*s252;
 					const Real s254 = s238 + s239 + s240 + s241 + s247 + s253;
-					const Real s255 = (s151*s254)/2.;
+					const Real s255 = (charge*s151*s254)/2.;
 					const Real s256 = s199*s210*s218;
 					const Real s257 = s188*s218*s223;
 					const Real s258 = s256 + s257;
@@ -1841,34 +1787,34 @@ namespace Repulsor
 					const Real s262 = s260 + s261;
 					const Real s263 = s188*s262;
 					const Real s264 = s259 + s263;
-					const Real s265 = (s152*s186*s264)/4.;
+					const Real s265 = (charge*s152*s186*s264)/4.;
 					const Real s266 = s255 + s265;
 					const Real s267 = s201*s246;
 					const Real s268 = s191*s252;
 					const Real s269 = s267 + s268;
-					const Real s270 = (s151*s269)/2.;
+					const Real s270 = (charge*s151*s269)/2.;
 					const Real s271 = s201*s258;
 					const Real s272 = s191*s262;
 					const Real s273 = s271 + s272;
-					const Real s274 = (s152*s186*s273)/4.;
+					const Real s274 = (charge*s152*s186*s273)/4.;
 					const Real s275 = s270 + s274;
 					const Real s276 = s203*s246;
 					const Real s277 = s194*s252;
 					const Real s278 = s276 + s277;
-					const Real s279 = (s151*s278)/2.;
+					const Real s279 = (charge*s151*s278)/2.;
 					const Real s280 = s203*s258;
 					const Real s281 = s194*s262;
 					const Real s282 = s280 + s281;
-					const Real s283 = (s152*s186*s282)/4.;
+					const Real s283 = (charge*s152*s186*s282)/4.;
 					const Real s284 = s279 + s283;
 					const Real s285 = s205*s246;
 					const Real s286 = s197*s252;
 					const Real s287 = s285 + s286;
-					const Real s288 = (s151*s287)/2.;
+					const Real s288 = (charge*s151*s287)/2.;
 					const Real s289 = s205*s258;
 					const Real s290 = s197*s262;
 					const Real s291 = s289 + s290;
-					const Real s292 = (s152*s186*s291)/4.;
+					const Real s292 = (charge*s152*s186*s291)/4.;
 					const Real s293 = s288 + s292;
 					const Real s294 = -(s201*s210*s225*s233);
 					const Real s295 = -(s191*s223*s225*s233);
@@ -1883,7 +1829,7 @@ namespace Repulsor
 					const Real s304 = s300 + s301 + s302 + s303;
 					const Real s305 = s191*s304;
 					const Real s306 = s299 + s305;
-					const Real s307 = (s151*s306)/2.;
+					const Real s307 = (charge*s151*s306)/2.;
 					const Real s308 = s201*s210*s218;
 					const Real s309 = s191*s218*s223;
 					const Real s310 = s308 + s309;
@@ -1893,25 +1839,25 @@ namespace Repulsor
 					const Real s314 = s312 + s313;
 					const Real s315 = s191*s314;
 					const Real s316 = s311 + s315;
-					const Real s317 = (s152*s186*s316)/4.;
+					const Real s317 = (charge*s152*s186*s316)/4.;
 					const Real s318 = s307 + s317;
 					const Real s319 = s203*s298;
 					const Real s320 = s194*s304;
 					const Real s321 = s319 + s320;
-					const Real s322 = (s151*s321)/2.;
+					const Real s322 = (charge*s151*s321)/2.;
 					const Real s323 = s203*s310;
 					const Real s324 = s194*s314;
 					const Real s325 = s323 + s324;
-					const Real s326 = (s152*s186*s325)/4.;
+					const Real s326 = (charge*s152*s186*s325)/4.;
 					const Real s327 = s322 + s326;
 					const Real s328 = s205*s298;
 					const Real s329 = s197*s304;
 					const Real s330 = s328 + s329;
-					const Real s331 = (s151*s330)/2.;
+					const Real s331 = (charge*s151*s330)/2.;
 					const Real s332 = s205*s310;
 					const Real s333 = s197*s314;
 					const Real s334 = s332 + s333;
-					const Real s335 = (s152*s186*s334)/4.;
+					const Real s335 = (charge*s152*s186*s334)/4.;
 					const Real s336 = s331 + s335;
 					const Real s337 = -(s203*s210*s225*s233);
 					const Real s338 = -(s194*s223*s225*s233);
@@ -1926,7 +1872,7 @@ namespace Repulsor
 					const Real s347 = s343 + s344 + s345 + s346;
 					const Real s348 = s194*s347;
 					const Real s349 = s342 + s348;
-					const Real s350 = (s151*s349)/2.;
+					const Real s350 = (charge*s151*s349)/2.;
 					const Real s351 = s203*s210*s218;
 					const Real s352 = s194*s218*s223;
 					const Real s353 = s351 + s352;
@@ -1936,16 +1882,16 @@ namespace Repulsor
 					const Real s357 = s355 + s356;
 					const Real s358 = s194*s357;
 					const Real s359 = s354 + s358;
-					const Real s360 = (s152*s186*s359)/4.;
+					const Real s360 = (charge*s152*s186*s359)/4.;
 					const Real s361 = s350 + s360;
 					const Real s362 = s205*s341;
 					const Real s363 = s197*s347;
 					const Real s364 = s362 + s363;
-					const Real s365 = (s151*s364)/2.;
+					const Real s365 = (charge*s151*s364)/2.;
 					const Real s366 = s205*s353;
 					const Real s367 = s197*s357;
 					const Real s368 = s366 + s367;
-					const Real s369 = (s152*s186*s368)/4.;
+					const Real s369 = (charge*s152*s186*s368)/4.;
 					const Real s370 = s365 + s369;
 					const Real s371 = -(s205*s210*s225*s233);
 					const Real s372 = -(s197*s223*s225*s233);
@@ -1960,7 +1906,7 @@ namespace Repulsor
 					const Real s381 = s377 + s378 + s379 + s380;
 					const Real s382 = s197*s381;
 					const Real s383 = s376 + s382;
-					const Real s384 = (s151*s383)/2.;
+					const Real s384 = (charge*s151*s383)/2.;
 					const Real s385 = s205*s210*s218;
 					const Real s386 = s197*s218*s223;
 					const Real s387 = s385 + s386;
@@ -1970,7 +1916,7 @@ namespace Repulsor
 					const Real s391 = s389 + s390;
 					const Real s392 = s197*s391;
 					const Real s393 = s388 + s392;
-					const Real s394 = (s152*s186*s393)/4.;
+					const Real s394 = (charge*s152*s186*s393)/4.;
 					const Real s395 = s384 + s394;
 					const Real s396 = P_D_far__[15*i+0];
 					const Real s397 = P_D_near__[23*i+0];
@@ -2027,9 +1973,9 @@ namespace Repulsor
 					const Real s448 = s11 + s16 + s6;
 					const Real s449 = P_D_far__[15*i+2];
 					const Real s450 = s0 + s12 + s8;
-					const Real s451 = s151/6.;
+					const Real s451 = (charge*s151)/6.;
 					const Real s452 = P_D_near__[23*i+2];
-					const Real s453 = s151/2.;
+					const Real s453 = (charge*s151)/2.;
 					const Real s454 = P_D_far__[15*i+5];
 					const Real s455 = -2*s201*s210;
 					const Real s456 = 2*s8;
@@ -2053,32 +1999,32 @@ namespace Repulsor
 					const Real s474 = s297 + s471 + s472 + s473;
 					const Real s475 = s188*s474;
 					const Real s476 = s470 + s475;
-					const Real s477 = (s151*s476)/2.;
-					const Real s478 = (s152*s264*s431)/4.;
+					const Real s477 = (charge*s151*s476)/2.;
+					const Real s478 = (charge*s152*s264*s431)/4.;
 					const Real s479 = s477 + s478;
 					const Real s480 = P_D_far__[15*i+6];
 					const Real s481 = P_D_near__[23*i+14];
 					const Real s482 = s201*s469;
 					const Real s483 = s191*s474;
 					const Real s484 = s238 + s239 + s240 + s241 + s482 + s483;
-					const Real s485 = (s151*s484)/2.;
-					const Real s486 = (s152*s273*s431)/4.;
+					const Real s485 = (charge*s151*s484)/2.;
+					const Real s486 = (charge*s152*s273*s431)/4.;
 					const Real s487 = s485 + s486;
 					const Real s488 = P_D_far__[15*i+7];
 					const Real s489 = P_D_near__[23*i+15];
 					const Real s490 = s203*s469;
 					const Real s491 = s194*s474;
 					const Real s492 = s490 + s491;
-					const Real s493 = (s151*s492)/2.;
-					const Real s494 = (s152*s282*s431)/4.;
+					const Real s493 = (charge*s151*s492)/2.;
+					const Real s494 = (charge*s152*s282*s431)/4.;
 					const Real s495 = s493 + s494;
 					const Real s496 = P_D_far__[15*i+8];
 					const Real s497 = P_D_near__[23*i+16];
 					const Real s498 = s205*s469;
 					const Real s499 = s197*s474;
 					const Real s500 = s498 + s499;
-					const Real s501 = (s151*s500)/2.;
-					const Real s502 = (s152*s291*s431)/4.;
+					const Real s501 = (charge*s151*s500)/2.;
+					const Real s502 = (charge*s152*s291*s431)/4.;
 					const Real s503 = s501 + s502;
 					const Real s504 = P_D_far__[15*i+9];
 					const Real s505 = -2*s191*s201*s218;
@@ -2098,24 +2044,24 @@ namespace Repulsor
 					const Real s519 = s237 + s251 + s505 + s516 + s517 + s518;
 					const Real s520 = s191*s519;
 					const Real s521 = s507 + s508 + s509 + s510 + s515 + s520;
-					const Real s522 = (s151*s521)/2.;
-					const Real s523 = (s152*s316*s431)/4.;
+					const Real s522 = (charge*s151*s521)/2.;
+					const Real s523 = (charge*s152*s316*s431)/4.;
 					const Real s524 = s522 + s523;
 					const Real s525 = P_D_far__[15*i+10];
 					const Real s526 = P_D_near__[23*i+18];
 					const Real s527 = s203*s514;
 					const Real s528 = s194*s519;
 					const Real s529 = s527 + s528;
-					const Real s530 = (s151*s529)/2.;
-					const Real s531 = (s152*s325*s431)/4.;
+					const Real s530 = (charge*s151*s529)/2.;
+					const Real s531 = (charge*s152*s325*s431)/4.;
 					const Real s532 = s530 + s531;
 					const Real s533 = P_D_far__[15*i+11];
 					const Real s534 = P_D_near__[23*i+19];
 					const Real s535 = s205*s514;
 					const Real s536 = s197*s519;
 					const Real s537 = s535 + s536;
-					const Real s538 = (s151*s537)/2.;
-					const Real s539 = (s152*s334*s431)/4.;
+					const Real s538 = (charge*s151*s537)/2.;
+					const Real s539 = (charge*s152*s334*s431)/4.;
 					const Real s540 = s538 + s539;
 					const Real s541 = P_D_far__[15*i+12];
 					const Real s542 = P_D_near__[23*i+20];
@@ -2132,16 +2078,16 @@ namespace Repulsor
 					const Real s553 = s549 + s550 + s551 + s552;
 					const Real s554 = s194*s553;
 					const Real s555 = s548 + s554;
-					const Real s556 = (s151*s555)/2.;
-					const Real s557 = (s152*s359*s431)/4.;
+					const Real s556 = (charge*s151*s555)/2.;
+					const Real s557 = (charge*s152*s359*s431)/4.;
 					const Real s558 = s556 + s557;
 					const Real s559 = P_D_far__[15*i+13];
 					const Real s560 = P_D_near__[23*i+21];
 					const Real s561 = s205*s547;
 					const Real s562 = s197*s553;
 					const Real s563 = s561 + s562;
-					const Real s564 = (s151*s563)/2.;
-					const Real s565 = (s152*s368*s431)/4.;
+					const Real s564 = (charge*s151*s563)/2.;
+					const Real s565 = (charge*s152*s368*s431)/4.;
 					const Real s566 = s564 + s565;
 					const Real s567 = P_D_far__[15*i+14];
 					const Real s568 = P_D_near__[23*i+22];
@@ -2158,8 +2104,8 @@ namespace Repulsor
 					const Real s579 = s575 + s576 + s577 + s578;
 					const Real s580 = s197*s579;
 					const Real s581 = s574 + s580;
-					const Real s582 = (s151*s581)/2.;
-					const Real s583 = (s152*s393*s431)/4.;
+					const Real s582 = (charge*s151*s581)/2.;
+					const Real s583 = (charge*s152*s393*s431)/4.;
 					const Real s584 = s582 + s583;
 					const Real s585 = 2*s10*s19;
 					const Real s586 = 2*s1*s10;
@@ -2216,26 +2162,26 @@ namespace Repulsor
 					const Real s637 = s340 + s634 + s635 + s636;
 					const Real s638 = s188*s637;
 					const Real s639 = s633 + s638;
-					const Real s640 = (s151*s639)/2.;
-					const Real s641 = (s152*s264*s618)/4.;
+					const Real s640 = (charge*s151*s639)/2.;
+					const Real s641 = (charge*s152*s264*s618)/4.;
 					const Real s642 = s640 + s641;
 					const Real s643 = s201*s632;
 					const Real s644 = s191*s637;
 					const Real s645 = s643 + s644;
-					const Real s646 = (s151*s645)/2.;
-					const Real s647 = (s152*s273*s618)/4.;
+					const Real s646 = (charge*s151*s645)/2.;
+					const Real s647 = (charge*s152*s273*s618)/4.;
 					const Real s648 = s646 + s647;
 					const Real s649 = s203*s632;
 					const Real s650 = s194*s637;
 					const Real s651 = s238 + s239 + s240 + s241 + s649 + s650;
-					const Real s652 = (s151*s651)/2.;
-					const Real s653 = (s152*s282*s618)/4.;
+					const Real s652 = (charge*s151*s651)/2.;
+					const Real s653 = (charge*s152*s282*s618)/4.;
 					const Real s654 = s652 + s653;
 					const Real s655 = s205*s632;
 					const Real s656 = s197*s637;
 					const Real s657 = s655 + s656;
-					const Real s658 = (s151*s657)/2.;
-					const Real s659 = (s152*s291*s618)/4.;
+					const Real s658 = (charge*s151*s657)/2.;
+					const Real s659 = (charge*s152*s291*s618)/4.;
 					const Real s660 = s658 + s659;
 					const Real s661 = -(s201*s210*s225*s626);
 					const Real s662 = -(s191*s223*s225*s626);
@@ -2248,20 +2194,20 @@ namespace Repulsor
 					const Real s669 = s546 + s666 + s667 + s668;
 					const Real s670 = s191*s669;
 					const Real s671 = s665 + s670;
-					const Real s672 = (s151*s671)/2.;
-					const Real s673 = (s152*s316*s618)/4.;
+					const Real s672 = (charge*s151*s671)/2.;
+					const Real s673 = (charge*s152*s316*s618)/4.;
 					const Real s674 = s672 + s673;
 					const Real s675 = s203*s664;
 					const Real s676 = s194*s669;
 					const Real s677 = s507 + s508 + s509 + s510 + s675 + s676;
-					const Real s678 = (s151*s677)/2.;
-					const Real s679 = (s152*s325*s618)/4.;
+					const Real s678 = (charge*s151*s677)/2.;
+					const Real s679 = (charge*s152*s325*s618)/4.;
 					const Real s680 = s678 + s679;
 					const Real s681 = s205*s664;
 					const Real s682 = s197*s669;
 					const Real s683 = s681 + s682;
-					const Real s684 = (s151*s683)/2.;
-					const Real s685 = (s152*s334*s618)/4.;
+					const Real s684 = (charge*s151*s683)/2.;
+					const Real s685 = (charge*s152*s334*s618)/4.;
 					const Real s686 = s684 + s685;
 					const Real s687 = -2*s194*s203*s218;
 					const Real s688 = -(s203*s210*s218);
@@ -2279,14 +2225,14 @@ namespace Repulsor
 					const Real s700 = s237 + s251 + s687 + s697 + s698 + s699;
 					const Real s701 = s194*s700;
 					const Real s702 = s688 + s689 + s690 + s691 + s696 + s701;
-					const Real s703 = (s151*s702)/2.;
-					const Real s704 = (s152*s359*s618)/4.;
+					const Real s703 = (charge*s151*s702)/2.;
+					const Real s704 = (charge*s152*s359*s618)/4.;
 					const Real s705 = s703 + s704;
 					const Real s706 = s205*s695;
 					const Real s707 = s197*s700;
 					const Real s708 = s706 + s707;
-					const Real s709 = (s151*s708)/2.;
-					const Real s710 = (s152*s368*s618)/4.;
+					const Real s709 = (charge*s151*s708)/2.;
+					const Real s710 = (charge*s152*s368*s618)/4.;
 					const Real s711 = s709 + s710;
 					const Real s712 = -(s205*s210*s225*s626);
 					const Real s713 = -(s197*s223*s225*s626);
@@ -2301,8 +2247,8 @@ namespace Repulsor
 					const Real s722 = s718 + s719 + s720 + s721;
 					const Real s723 = s197*s722;
 					const Real s724 = s717 + s723;
-					const Real s725 = (s151*s724)/2.;
-					const Real s726 = (s152*s393*s618)/4.;
+					const Real s725 = (charge*s151*s724)/2.;
+					const Real s726 = (charge*s152*s393*s618)/4.;
 					const Real s727 = s725 + s726;
 					const Real s728 = 2*s11*s19;
 					const Real s729 = 2*s1*s11;
@@ -2359,26 +2305,26 @@ namespace Repulsor
 					const Real s780 = s374 + s777 + s778 + s779;
 					const Real s781 = s188*s780;
 					const Real s782 = s776 + s781;
-					const Real s783 = (s151*s782)/2.;
-					const Real s784 = (s152*s264*s761)/4.;
+					const Real s783 = (charge*s151*s782)/2.;
+					const Real s784 = (charge*s152*s264*s761)/4.;
 					const Real s785 = s783 + s784;
 					const Real s786 = s201*s775;
 					const Real s787 = s191*s780;
 					const Real s788 = s786 + s787;
-					const Real s789 = (s151*s788)/2.;
-					const Real s790 = (s152*s273*s761)/4.;
+					const Real s789 = (charge*s151*s788)/2.;
+					const Real s790 = (charge*s152*s273*s761)/4.;
 					const Real s791 = s789 + s790;
 					const Real s792 = s203*s775;
 					const Real s793 = s194*s780;
 					const Real s794 = s792 + s793;
-					const Real s795 = (s151*s794)/2.;
-					const Real s796 = (s152*s282*s761)/4.;
+					const Real s795 = (charge*s151*s794)/2.;
+					const Real s796 = (charge*s152*s282*s761)/4.;
 					const Real s797 = s795 + s796;
 					const Real s798 = s205*s775;
 					const Real s799 = s197*s780;
 					const Real s800 = s238 + s239 + s240 + s241 + s798 + s799;
-					const Real s801 = (s151*s800)/2.;
-					const Real s802 = (s152*s291*s761)/4.;
+					const Real s801 = (charge*s151*s800)/2.;
+					const Real s802 = (charge*s152*s291*s761)/4.;
 					const Real s803 = s801 + s802;
 					const Real s804 = -(s201*s210*s225*s769);
 					const Real s805 = -(s191*s223*s225*s769);
@@ -2391,20 +2337,20 @@ namespace Repulsor
 					const Real s812 = s572 + s809 + s810 + s811;
 					const Real s813 = s191*s812;
 					const Real s814 = s808 + s813;
-					const Real s815 = (s151*s814)/2.;
-					const Real s816 = (s152*s316*s761)/4.;
+					const Real s815 = (charge*s151*s814)/2.;
+					const Real s816 = (charge*s152*s316*s761)/4.;
 					const Real s817 = s815 + s816;
 					const Real s818 = s203*s807;
 					const Real s819 = s194*s812;
 					const Real s820 = s818 + s819;
-					const Real s821 = (s151*s820)/2.;
-					const Real s822 = (s152*s325*s761)/4.;
+					const Real s821 = (charge*s151*s820)/2.;
+					const Real s822 = (charge*s152*s325*s761)/4.;
 					const Real s823 = s821 + s822;
 					const Real s824 = s205*s807;
 					const Real s825 = s197*s812;
 					const Real s826 = s507 + s508 + s509 + s510 + s824 + s825;
-					const Real s827 = (s151*s826)/2.;
-					const Real s828 = (s152*s334*s761)/4.;
+					const Real s827 = (charge*s151*s826)/2.;
+					const Real s828 = (charge*s152*s334*s761)/4.;
 					const Real s829 = s827 + s828;
 					const Real s830 = -(s203*s210*s225*s769);
 					const Real s831 = -(s194*s223*s225*s769);
@@ -2417,14 +2363,14 @@ namespace Repulsor
 					const Real s838 = s715 + s835 + s836 + s837;
 					const Real s839 = s194*s838;
 					const Real s840 = s834 + s839;
-					const Real s841 = (s151*s840)/2.;
-					const Real s842 = (s152*s359*s761)/4.;
+					const Real s841 = (charge*s151*s840)/2.;
+					const Real s842 = (charge*s152*s359*s761)/4.;
 					const Real s843 = s841 + s842;
 					const Real s844 = s205*s833;
 					const Real s845 = s197*s838;
 					const Real s846 = s688 + s689 + s690 + s691 + s844 + s845;
-					const Real s847 = (s151*s846)/2.;
-					const Real s848 = (s152*s368*s761)/4.;
+					const Real s847 = (charge*s151*s846)/2.;
+					const Real s848 = (charge*s152*s368*s761)/4.;
 					const Real s849 = s847 + s848;
 					const Real s850 = -2*s197*s205*s218;
 					const Real s851 = -(s205*s210*s218);
@@ -2442,8 +2388,8 @@ namespace Repulsor
 					const Real s863 = s237 + s251 + s850 + s860 + s861 + s862;
 					const Real s864 = s197*s863;
 					const Real s865 = s851 + s852 + s853 + s854 + s859 + s864;
-					const Real s866 = (s151*s865)/2.;
-					const Real s867 = (s152*s393*s761)/4.;
+					const Real s866 = (charge*s151*s865)/2.;
+					const Real s867 = (charge*s152*s393*s761)/4.;
 					const Real s868 = s866 + s867;
 					const Real s869 = 2*s18*s2;
 					const Real s870 = 2*s2*s21;
@@ -2492,26 +2438,26 @@ namespace Repulsor
 					const Real s913 = s909 + s910 + s911 + s912;
 					const Real s914 = s188*s913;
 					const Real s915 = s260 + s261 + s908 + s914;
-					const Real s916 = (s151*s915)/2.;
-					const Real s917 = (s152*s264*s899)/4.;
+					const Real s916 = (charge*s151*s915)/2.;
+					const Real s917 = (charge*s152*s264*s899)/4.;
 					const Real s918 = s916 + s917;
 					const Real s919 = s201*s907;
 					const Real s920 = s191*s913;
 					const Real s921 = s919 + s920;
-					const Real s922 = (s151*s921)/2.;
-					const Real s923 = (s152*s273*s899)/4.;
+					const Real s922 = (charge*s151*s921)/2.;
+					const Real s923 = (charge*s152*s273*s899)/4.;
 					const Real s924 = s922 + s923;
 					const Real s925 = s203*s907;
 					const Real s926 = s194*s913;
 					const Real s927 = s925 + s926;
-					const Real s928 = (s151*s927)/2.;
-					const Real s929 = (s152*s282*s899)/4.;
+					const Real s928 = (charge*s151*s927)/2.;
+					const Real s929 = (charge*s152*s282*s899)/4.;
 					const Real s930 = s928 + s929;
 					const Real s931 = s205*s907;
 					const Real s932 = s197*s913;
 					const Real s933 = s931 + s932;
-					const Real s934 = (s151*s933)/2.;
-					const Real s935 = (s152*s291*s899)/4.;
+					const Real s934 = (charge*s151*s933)/2.;
+					const Real s935 = (charge*s152*s291*s899)/4.;
 					const Real s936 = s934 + s935;
 					const Real s937 = -(s201*s210*s225*s902);
 					const Real s938 = -(s191*s223*s225*s902);
@@ -2525,20 +2471,20 @@ namespace Repulsor
 					const Real s946 = s943 + s944 + s945;
 					const Real s947 = s191*s946;
 					const Real s948 = s942 + s947;
-					const Real s949 = (s151*s948)/2.;
-					const Real s950 = (s152*s316*s899)/4.;
+					const Real s949 = (charge*s151*s948)/2.;
+					const Real s950 = (charge*s152*s316*s899)/4.;
 					const Real s951 = s949 + s950;
 					const Real s952 = s203*s941;
 					const Real s953 = s194*s946;
 					const Real s954 = s952 + s953;
-					const Real s955 = (s151*s954)/2.;
-					const Real s956 = (s152*s325*s899)/4.;
+					const Real s955 = (charge*s151*s954)/2.;
+					const Real s956 = (charge*s152*s325*s899)/4.;
 					const Real s957 = s955 + s956;
 					const Real s958 = s205*s941;
 					const Real s959 = s197*s946;
 					const Real s960 = s958 + s959;
-					const Real s961 = (s151*s960)/2.;
-					const Real s962 = (s152*s334*s899)/4.;
+					const Real s961 = (charge*s151*s960)/2.;
+					const Real s962 = (charge*s152*s334*s899)/4.;
 					const Real s963 = s961 + s962;
 					const Real s964 = -(s203*s210*s225*s902);
 					const Real s965 = -(s194*s223*s225*s902);
@@ -2552,14 +2498,14 @@ namespace Repulsor
 					const Real s973 = s970 + s971 + s972;
 					const Real s974 = s194*s973;
 					const Real s975 = s969 + s974;
-					const Real s976 = (s151*s975)/2.;
-					const Real s977 = (s152*s359*s899)/4.;
+					const Real s976 = (charge*s151*s975)/2.;
+					const Real s977 = (charge*s152*s359*s899)/4.;
 					const Real s978 = s976 + s977;
 					const Real s979 = s205*s968;
 					const Real s980 = s197*s973;
 					const Real s981 = s979 + s980;
-					const Real s982 = (s151*s981)/2.;
-					const Real s983 = (s152*s368*s899)/4.;
+					const Real s982 = (charge*s151*s981)/2.;
+					const Real s983 = (charge*s152*s368*s899)/4.;
 					const Real s984 = s982 + s983;
 					const Real s985 = -(s205*s210*s225*s902);
 					const Real s986 = -(s197*s223*s225*s902);
@@ -2573,8 +2519,8 @@ namespace Repulsor
 					const Real s994 = s991 + s992 + s993;
 					const Real s995 = s197*s994;
 					const Real s996 = s990 + s995;
-					const Real s997 = (s151*s996)/2.;
-					const Real s998 = (s152*s393*s899)/4.;
+					const Real s997 = (charge*s151*s996)/2.;
+					const Real s998 = (charge*s152*s393*s899)/4.;
 					const Real s999 = s997 + s998;
 					const Real s1000 = -2*s2*s3*s8;
 					const Real s1001 = 2*s0*s26;
@@ -2621,26 +2567,26 @@ namespace Repulsor
 					const Real s1042 = s1040 + s1041 + s945;
 					const Real s1043 = s1042*s188;
 					const Real s1044 = s1039 + s1043;
-					const Real s1045 = (s1044*s151)/2.;
-					const Real s1046 = (s1030*s152*s264)/4.;
+					const Real s1045 = (charge*s1044*s151)/2.;
+					const Real s1046 = (charge*s1030*s152*s264)/4.;
 					const Real s1047 = s1045 + s1046;
 					const Real s1048 = s1038*s201;
 					const Real s1049 = s1042*s191;
 					const Real s1050 = s1048 + s1049 + s260 + s261;
-					const Real s1051 = (s1050*s151)/2.;
-					const Real s1052 = (s1030*s152*s273)/4.;
+					const Real s1051 = (charge*s1050*s151)/2.;
+					const Real s1052 = (charge*s1030*s152*s273)/4.;
 					const Real s1053 = s1051 + s1052;
 					const Real s1054 = s1038*s203;
 					const Real s1055 = s1042*s194;
 					const Real s1056 = s1054 + s1055;
-					const Real s1057 = (s1056*s151)/2.;
-					const Real s1058 = (s1030*s152*s282)/4.;
+					const Real s1057 = (charge*s1056*s151)/2.;
+					const Real s1058 = (charge*s1030*s152*s282)/4.;
 					const Real s1059 = s1057 + s1058;
 					const Real s1060 = s1038*s205;
 					const Real s1061 = s1042*s197;
 					const Real s1062 = s1060 + s1061;
-					const Real s1063 = (s1062*s151)/2.;
-					const Real s1064 = (s1030*s152*s291)/4.;
+					const Real s1063 = (charge*s1062*s151)/2.;
+					const Real s1064 = (charge*s1030*s152*s291)/4.;
 					const Real s1065 = s1063 + s1064;
 					const Real s1066 = -(s1033*s201*s210*s225);
 					const Real s1067 = -(s1033*s191*s223*s225);
@@ -2653,20 +2599,20 @@ namespace Repulsor
 					const Real s1074 = s1071 + s1072 + s1073 + s912;
 					const Real s1075 = s1074*s191;
 					const Real s1076 = s1070 + s1075 + s312 + s313;
-					const Real s1077 = (s1076*s151)/2.;
-					const Real s1078 = (s1030*s152*s316)/4.;
+					const Real s1077 = (charge*s1076*s151)/2.;
+					const Real s1078 = (charge*s1030*s152*s316)/4.;
 					const Real s1079 = s1077 + s1078;
 					const Real s1080 = s1069*s203;
 					const Real s1081 = s1074*s194;
 					const Real s1082 = s1080 + s1081;
-					const Real s1083 = (s1082*s151)/2.;
-					const Real s1084 = (s1030*s152*s325)/4.;
+					const Real s1083 = (charge*s1082*s151)/2.;
+					const Real s1084 = (charge*s1030*s152*s325)/4.;
 					const Real s1085 = s1083 + s1084;
 					const Real s1086 = s1069*s205;
 					const Real s1087 = s1074*s197;
 					const Real s1088 = s1086 + s1087;
-					const Real s1089 = (s1088*s151)/2.;
-					const Real s1090 = (s1030*s152*s334)/4.;
+					const Real s1089 = (charge*s1088*s151)/2.;
+					const Real s1090 = (charge*s1030*s152*s334)/4.;
 					const Real s1091 = s1089 + s1090;
 					const Real s1092 = -(s1033*s203*s210*s225);
 					const Real s1093 = -(s1033*s194*s223*s225);
@@ -2680,14 +2626,14 @@ namespace Repulsor
 					const Real s1101 = s1098 + s1099 + s1100;
 					const Real s1102 = s1101*s194;
 					const Real s1103 = s1097 + s1102;
-					const Real s1104 = (s1103*s151)/2.;
-					const Real s1105 = (s1030*s152*s359)/4.;
+					const Real s1104 = (charge*s1103*s151)/2.;
+					const Real s1105 = (charge*s1030*s152*s359)/4.;
 					const Real s1106 = s1104 + s1105;
 					const Real s1107 = s1096*s205;
 					const Real s1108 = s1101*s197;
 					const Real s1109 = s1107 + s1108;
-					const Real s1110 = (s1109*s151)/2.;
-					const Real s1111 = (s1030*s152*s368)/4.;
+					const Real s1110 = (charge*s1109*s151)/2.;
+					const Real s1111 = (charge*s1030*s152*s368)/4.;
 					const Real s1112 = s1110 + s1111;
 					const Real s1113 = -(s1033*s205*s210*s225);
 					const Real s1114 = -(s1033*s197*s223*s225);
@@ -2701,8 +2647,8 @@ namespace Repulsor
 					const Real s1122 = s1119 + s1120 + s1121;
 					const Real s1123 = s1122*s197;
 					const Real s1124 = s1118 + s1123;
-					const Real s1125 = (s1124*s151)/2.;
-					const Real s1126 = (s1030*s152*s393)/4.;
+					const Real s1125 = (charge*s1124*s151)/2.;
+					const Real s1126 = (charge*s1030*s152*s393)/4.;
 					const Real s1127 = s1125 + s1126;
 					const Real s1128 = -2*s10*s2*s3;
 					const Real s1129 = -2*s0*s10*s8;
@@ -2749,26 +2695,26 @@ namespace Repulsor
 					const Real s1170 = s1168 + s1169 + s972;
 					const Real s1171 = s1170*s188;
 					const Real s1172 = s1167 + s1171;
-					const Real s1173 = (s1172*s151)/2.;
-					const Real s1174 = (s1158*s152*s264)/4.;
+					const Real s1173 = (charge*s1172*s151)/2.;
+					const Real s1174 = (charge*s1158*s152*s264)/4.;
 					const Real s1175 = s1173 + s1174;
 					const Real s1176 = s1166*s201;
 					const Real s1177 = s1170*s191;
 					const Real s1178 = s1176 + s1177;
-					const Real s1179 = (s1178*s151)/2.;
-					const Real s1180 = (s1158*s152*s273)/4.;
+					const Real s1179 = (charge*s1178*s151)/2.;
+					const Real s1180 = (charge*s1158*s152*s273)/4.;
 					const Real s1181 = s1179 + s1180;
 					const Real s1182 = s1166*s203;
 					const Real s1183 = s1170*s194;
 					const Real s1184 = s1182 + s1183 + s260 + s261;
-					const Real s1185 = (s1184*s151)/2.;
-					const Real s1186 = (s1158*s152*s282)/4.;
+					const Real s1185 = (charge*s1184*s151)/2.;
+					const Real s1186 = (charge*s1158*s152*s282)/4.;
 					const Real s1187 = s1185 + s1186;
 					const Real s1188 = s1166*s205;
 					const Real s1189 = s1170*s197;
 					const Real s1190 = s1188 + s1189;
-					const Real s1191 = (s1190*s151)/2.;
-					const Real s1192 = (s1158*s152*s291)/4.;
+					const Real s1191 = (charge*s1190*s151)/2.;
+					const Real s1192 = (charge*s1158*s152*s291)/4.;
 					const Real s1193 = s1191 + s1192;
 					const Real s1194 = -(s1161*s201*s210*s225);
 					const Real s1195 = -(s1161*s191*s223*s225);
@@ -2781,20 +2727,20 @@ namespace Repulsor
 					const Real s1202 = s1100 + s1200 + s1201;
 					const Real s1203 = s1202*s191;
 					const Real s1204 = s1199 + s1203;
-					const Real s1205 = (s1204*s151)/2.;
-					const Real s1206 = (s1158*s152*s316)/4.;
+					const Real s1205 = (charge*s1204*s151)/2.;
+					const Real s1206 = (charge*s1158*s152*s316)/4.;
 					const Real s1207 = s1205 + s1206;
 					const Real s1208 = s1198*s203;
 					const Real s1209 = s1202*s194;
 					const Real s1210 = s1208 + s1209 + s312 + s313;
-					const Real s1211 = (s1210*s151)/2.;
-					const Real s1212 = (s1158*s152*s325)/4.;
+					const Real s1211 = (charge*s1210*s151)/2.;
+					const Real s1212 = (charge*s1158*s152*s325)/4.;
 					const Real s1213 = s1211 + s1212;
 					const Real s1214 = s1198*s205;
 					const Real s1215 = s1202*s197;
 					const Real s1216 = s1214 + s1215;
-					const Real s1217 = (s1216*s151)/2.;
-					const Real s1218 = (s1158*s152*s334)/4.;
+					const Real s1217 = (charge*s1216*s151)/2.;
+					const Real s1218 = (charge*s1158*s152*s334)/4.;
 					const Real s1219 = s1217 + s1218;
 					const Real s1220 = -(s1161*s203*s210*s225);
 					const Real s1221 = -(s1161*s194*s223*s225);
@@ -2807,14 +2753,14 @@ namespace Repulsor
 					const Real s1228 = s1225 + s1226 + s1227 + s912;
 					const Real s1229 = s1228*s194;
 					const Real s1230 = s1224 + s1229 + s355 + s356;
-					const Real s1231 = (s1230*s151)/2.;
-					const Real s1232 = (s1158*s152*s359)/4.;
+					const Real s1231 = (charge*s1230*s151)/2.;
+					const Real s1232 = (charge*s1158*s152*s359)/4.;
 					const Real s1233 = s1231 + s1232;
 					const Real s1234 = s1223*s205;
 					const Real s1235 = s1228*s197;
 					const Real s1236 = s1234 + s1235;
-					const Real s1237 = (s1236*s151)/2.;
-					const Real s1238 = (s1158*s152*s368)/4.;
+					const Real s1237 = (charge*s1236*s151)/2.;
+					const Real s1238 = (charge*s1158*s152*s368)/4.;
 					const Real s1239 = s1237 + s1238;
 					const Real s1240 = -(s1161*s205*s210*s225);
 					const Real s1241 = -(s1161*s197*s223*s225);
@@ -2828,8 +2774,8 @@ namespace Repulsor
 					const Real s1249 = s1246 + s1247 + s1248;
 					const Real s1250 = s1249*s197;
 					const Real s1251 = s1245 + s1250;
-					const Real s1252 = (s1251*s151)/2.;
-					const Real s1253 = (s1158*s152*s393)/4.;
+					const Real s1252 = (charge*s1251*s151)/2.;
+					const Real s1253 = (charge*s1158*s152*s393)/4.;
 					const Real s1254 = s1252 + s1253;
 					const Real s1255 = -2*s11*s2*s3;
 					const Real s1256 = -2*s0*s11*s8;
@@ -2876,26 +2822,26 @@ namespace Repulsor
 					const Real s1297 = s1295 + s1296 + s993;
 					const Real s1298 = s1297*s188;
 					const Real s1299 = s1294 + s1298;
-					const Real s1300 = (s1299*s151)/2.;
-					const Real s1301 = (s1285*s152*s264)/4.;
+					const Real s1300 = (charge*s1299*s151)/2.;
+					const Real s1301 = (charge*s1285*s152*s264)/4.;
 					const Real s1302 = s1300 + s1301;
 					const Real s1303 = s1293*s201;
 					const Real s1304 = s1297*s191;
 					const Real s1305 = s1303 + s1304;
-					const Real s1306 = (s1305*s151)/2.;
-					const Real s1307 = (s1285*s152*s273)/4.;
+					const Real s1306 = (charge*s1305*s151)/2.;
+					const Real s1307 = (charge*s1285*s152*s273)/4.;
 					const Real s1308 = s1306 + s1307;
 					const Real s1309 = s1293*s203;
 					const Real s1310 = s1297*s194;
 					const Real s1311 = s1309 + s1310;
-					const Real s1312 = (s1311*s151)/2.;
-					const Real s1313 = (s1285*s152*s282)/4.;
+					const Real s1312 = (charge*s1311*s151)/2.;
+					const Real s1313 = (charge*s1285*s152*s282)/4.;
 					const Real s1314 = s1312 + s1313;
 					const Real s1315 = s1293*s205;
 					const Real s1316 = s1297*s197;
 					const Real s1317 = s1315 + s1316 + s260 + s261;
-					const Real s1318 = (s1317*s151)/2.;
-					const Real s1319 = (s1285*s152*s291)/4.;
+					const Real s1318 = (charge*s1317*s151)/2.;
+					const Real s1319 = (charge*s1285*s152*s291)/4.;
 					const Real s1320 = s1318 + s1319;
 					const Real s1321 = -(s1288*s201*s210*s225);
 					const Real s1322 = -(s1288*s191*s223*s225);
@@ -2908,20 +2854,20 @@ namespace Repulsor
 					const Real s1329 = s1121 + s1327 + s1328;
 					const Real s1330 = s1329*s191;
 					const Real s1331 = s1326 + s1330;
-					const Real s1332 = (s1331*s151)/2.;
-					const Real s1333 = (s1285*s152*s316)/4.;
+					const Real s1332 = (charge*s1331*s151)/2.;
+					const Real s1333 = (charge*s1285*s152*s316)/4.;
 					const Real s1334 = s1332 + s1333;
 					const Real s1335 = s1325*s203;
 					const Real s1336 = s1329*s194;
 					const Real s1337 = s1335 + s1336;
-					const Real s1338 = (s1337*s151)/2.;
-					const Real s1339 = (s1285*s152*s325)/4.;
+					const Real s1338 = (charge*s1337*s151)/2.;
+					const Real s1339 = (charge*s1285*s152*s325)/4.;
 					const Real s1340 = s1338 + s1339;
 					const Real s1341 = s1325*s205;
 					const Real s1342 = s1329*s197;
 					const Real s1343 = s1341 + s1342 + s312 + s313;
-					const Real s1344 = (s1343*s151)/2.;
-					const Real s1345 = (s1285*s152*s334)/4.;
+					const Real s1344 = (charge*s1343*s151)/2.;
+					const Real s1345 = (charge*s1285*s152*s334)/4.;
 					const Real s1346 = s1344 + s1345;
 					const Real s1347 = -(s1288*s203*s210*s225);
 					const Real s1348 = -(s1288*s194*s223*s225);
@@ -2934,14 +2880,14 @@ namespace Repulsor
 					const Real s1355 = s1248 + s1353 + s1354;
 					const Real s1356 = s1355*s194;
 					const Real s1357 = s1352 + s1356;
-					const Real s1358 = (s1357*s151)/2.;
-					const Real s1359 = (s1285*s152*s359)/4.;
+					const Real s1358 = (charge*s1357*s151)/2.;
+					const Real s1359 = (charge*s1285*s152*s359)/4.;
 					const Real s1360 = s1358 + s1359;
 					const Real s1361 = s1351*s205;
 					const Real s1362 = s1355*s197;
 					const Real s1363 = s1361 + s1362 + s355 + s356;
-					const Real s1364 = (s1363*s151)/2.;
-					const Real s1365 = (s1285*s152*s368)/4.;
+					const Real s1364 = (charge*s1363*s151)/2.;
+					const Real s1365 = (charge*s1285*s152*s368)/4.;
 					const Real s1366 = s1364 + s1365;
 					const Real s1367 = -(s1288*s205*s210*s225);
 					const Real s1368 = -(s1288*s197*s223*s225);
@@ -2954,8 +2900,8 @@ namespace Repulsor
 					const Real s1375 = s1372 + s1373 + s1374 + s912;
 					const Real s1376 = s1375*s197;
 					const Real s1377 = s1371 + s1376 + s389 + s390;
-					const Real s1378 = (s1377*s151)/2.;
-					const Real s1379 = (s1285*s152*s393)/4.;
+					const Real s1378 = (charge*s1377*s151)/2.;
+					const Real s1379 = (charge*s1285*s152*s393)/4.;
 					const Real s1380 = s1378 + s1379;
 					const Real s1381 = -2*s18*s2;
 					const Real s1382 = -2*s2*s21;
@@ -2999,26 +2945,26 @@ namespace Repulsor
 					const Real s1420 = s1418 + s1419 + s905 + s906;
 					const Real s1421 = s1420*s188;
 					const Real s1422 = s1417 + s1421 + s256 + s257;
-					const Real s1423 = (s1422*s151)/2.;
-					const Real s1424 = (s1408*s152*s264)/4.;
+					const Real s1423 = (charge*s1422*s151)/2.;
+					const Real s1424 = (charge*s1408*s152*s264)/4.;
 					const Real s1425 = s1423 + s1424;
 					const Real s1426 = s1416*s201;
 					const Real s1427 = s1420*s191;
 					const Real s1428 = s1426 + s1427;
-					const Real s1429 = (s1428*s151)/2.;
-					const Real s1430 = (s1408*s152*s273)/4.;
+					const Real s1429 = (charge*s1428*s151)/2.;
+					const Real s1430 = (charge*s1408*s152*s273)/4.;
 					const Real s1431 = s1429 + s1430;
 					const Real s1432 = s1416*s203;
 					const Real s1433 = s1420*s194;
 					const Real s1434 = s1432 + s1433;
-					const Real s1435 = (s1434*s151)/2.;
-					const Real s1436 = (s1408*s152*s282)/4.;
+					const Real s1435 = (charge*s1434*s151)/2.;
+					const Real s1436 = (charge*s1408*s152*s282)/4.;
 					const Real s1437 = s1435 + s1436;
 					const Real s1438 = s1416*s205;
 					const Real s1439 = s1420*s197;
 					const Real s1440 = s1438 + s1439;
-					const Real s1441 = (s1440*s151)/2.;
-					const Real s1442 = (s1408*s152*s291)/4.;
+					const Real s1441 = (charge*s1440*s151)/2.;
+					const Real s1442 = (charge*s1408*s152*s291)/4.;
 					const Real s1443 = s1441 + s1442;
 					const Real s1444 = -(s1411*s201*s210*s225);
 					const Real s1445 = -(s1411*s191*s223*s225);
@@ -3030,20 +2976,20 @@ namespace Repulsor
 					const Real s1451 = s1036 + s1037 + s1449 + s1450;
 					const Real s1452 = s1451*s191;
 					const Real s1453 = s1448 + s1452;
-					const Real s1454 = (s1453*s151)/2.;
-					const Real s1455 = (s1408*s152*s316)/4.;
+					const Real s1454 = (charge*s1453*s151)/2.;
+					const Real s1455 = (charge*s1408*s152*s316)/4.;
 					const Real s1456 = s1454 + s1455;
 					const Real s1457 = s1447*s203;
 					const Real s1458 = s1451*s194;
 					const Real s1459 = s1457 + s1458;
-					const Real s1460 = (s1459*s151)/2.;
-					const Real s1461 = (s1408*s152*s325)/4.;
+					const Real s1460 = (charge*s1459*s151)/2.;
+					const Real s1461 = (charge*s1408*s152*s325)/4.;
 					const Real s1462 = s1460 + s1461;
 					const Real s1463 = s1447*s205;
 					const Real s1464 = s1451*s197;
 					const Real s1465 = s1463 + s1464;
-					const Real s1466 = (s1465*s151)/2.;
-					const Real s1467 = (s1408*s152*s334)/4.;
+					const Real s1466 = (charge*s1465*s151)/2.;
+					const Real s1467 = (charge*s1408*s152*s334)/4.;
 					const Real s1468 = s1466 + s1467;
 					const Real s1469 = -(s1411*s203*s210*s225);
 					const Real s1470 = -(s1411*s194*s223*s225);
@@ -3055,14 +3001,14 @@ namespace Repulsor
 					const Real s1476 = s1164 + s1165 + s1474 + s1475;
 					const Real s1477 = s1476*s194;
 					const Real s1478 = s1473 + s1477;
-					const Real s1479 = (s1478*s151)/2.;
-					const Real s1480 = (s1408*s152*s359)/4.;
+					const Real s1479 = (charge*s1478*s151)/2.;
+					const Real s1480 = (charge*s1408*s152*s359)/4.;
 					const Real s1481 = s1479 + s1480;
 					const Real s1482 = s1472*s205;
 					const Real s1483 = s1476*s197;
 					const Real s1484 = s1482 + s1483;
-					const Real s1485 = (s1484*s151)/2.;
-					const Real s1486 = (s1408*s152*s368)/4.;
+					const Real s1485 = (charge*s1484*s151)/2.;
+					const Real s1486 = (charge*s1408*s152*s368)/4.;
 					const Real s1487 = s1485 + s1486;
 					const Real s1488 = -(s1411*s205*s210*s225);
 					const Real s1489 = -(s1411*s197*s223*s225);
@@ -3074,8 +3020,8 @@ namespace Repulsor
 					const Real s1495 = s1291 + s1292 + s1493 + s1494;
 					const Real s1496 = s1495*s197;
 					const Real s1497 = s1492 + s1496;
-					const Real s1498 = (s1497*s151)/2.;
-					const Real s1499 = (s1408*s152*s393)/4.;
+					const Real s1498 = (charge*s1497*s151)/2.;
+					const Real s1499 = (charge*s1408*s152*s393)/4.;
 					const Real s1500 = s1498 + s1499;
 					const Real s1501 = 2*s2*s3*s8;
 					const Real s1502 = -2*s19*s8;
@@ -3117,26 +3063,26 @@ namespace Repulsor
 					const Real s1538 = s1536 + s1537 + s939 + s940;
 					const Real s1539 = s1538*s188;
 					const Real s1540 = s1535 + s1539;
-					const Real s1541 = (s151*s1540)/2.;
-					const Real s1542 = (s152*s1528*s264)/4.;
+					const Real s1541 = (charge*s151*s1540)/2.;
+					const Real s1542 = (charge*s152*s1528*s264)/4.;
 					const Real s1543 = s1541 + s1542;
 					const Real s1544 = s1534*s201;
 					const Real s1545 = s1538*s191;
 					const Real s1546 = s1544 + s1545 + s256 + s257;
-					const Real s1547 = (s151*s1546)/2.;
-					const Real s1548 = (s152*s1528*s273)/4.;
+					const Real s1547 = (charge*s151*s1546)/2.;
+					const Real s1548 = (charge*s152*s1528*s273)/4.;
 					const Real s1549 = s1547 + s1548;
 					const Real s1550 = s1534*s203;
 					const Real s1551 = s1538*s194;
 					const Real s1552 = s1550 + s1551;
-					const Real s1553 = (s151*s1552)/2.;
-					const Real s1554 = (s152*s1528*s282)/4.;
+					const Real s1553 = (charge*s151*s1552)/2.;
+					const Real s1554 = (charge*s152*s1528*s282)/4.;
 					const Real s1555 = s1553 + s1554;
 					const Real s1556 = s1534*s205;
 					const Real s1557 = s1538*s197;
 					const Real s1558 = s1556 + s1557;
-					const Real s1559 = (s151*s1558)/2.;
-					const Real s1560 = (s152*s1528*s291)/4.;
+					const Real s1559 = (charge*s151*s1558)/2.;
+					const Real s1560 = (charge*s152*s1528*s291)/4.;
 					const Real s1561 = s1559 + s1560;
 					const Real s1562 = -(s1531*s201*s210*s225);
 					const Real s1563 = -(s1531*s191*s223*s225);
@@ -3148,20 +3094,20 @@ namespace Repulsor
 					const Real s1569 = s1068 + s1567 + s1568 + s906;
 					const Real s1570 = s1569*s191;
 					const Real s1571 = s1566 + s1570 + s308 + s309;
-					const Real s1572 = (s151*s1571)/2.;
-					const Real s1573 = (s152*s1528*s316)/4.;
+					const Real s1572 = (charge*s151*s1571)/2.;
+					const Real s1573 = (charge*s152*s1528*s316)/4.;
 					const Real s1574 = s1572 + s1573;
 					const Real s1575 = s1565*s203;
 					const Real s1576 = s1569*s194;
 					const Real s1577 = s1575 + s1576;
-					const Real s1578 = (s151*s1577)/2.;
-					const Real s1579 = (s152*s1528*s325)/4.;
+					const Real s1578 = (charge*s151*s1577)/2.;
+					const Real s1579 = (charge*s152*s1528*s325)/4.;
 					const Real s1580 = s1578 + s1579;
 					const Real s1581 = s1565*s205;
 					const Real s1582 = s1569*s197;
 					const Real s1583 = s1581 + s1582;
-					const Real s1584 = (s151*s1583)/2.;
-					const Real s1585 = (s152*s1528*s334)/4.;
+					const Real s1584 = (charge*s151*s1583)/2.;
+					const Real s1585 = (charge*s152*s1528*s334)/4.;
 					const Real s1586 = s1584 + s1585;
 					const Real s1587 = -(s1531*s203*s210*s225);
 					const Real s1588 = -(s1531*s194*s223*s225);
@@ -3173,14 +3119,14 @@ namespace Repulsor
 					const Real s1594 = s1196 + s1197 + s1592 + s1593;
 					const Real s1595 = s1594*s194;
 					const Real s1596 = s1591 + s1595;
-					const Real s1597 = (s151*s1596)/2.;
-					const Real s1598 = (s152*s1528*s359)/4.;
+					const Real s1597 = (charge*s151*s1596)/2.;
+					const Real s1598 = (charge*s152*s1528*s359)/4.;
 					const Real s1599 = s1597 + s1598;
 					const Real s1600 = s1590*s205;
 					const Real s1601 = s1594*s197;
 					const Real s1602 = s1600 + s1601;
-					const Real s1603 = (s151*s1602)/2.;
-					const Real s1604 = (s152*s1528*s368)/4.;
+					const Real s1603 = (charge*s151*s1602)/2.;
+					const Real s1604 = (charge*s152*s1528*s368)/4.;
 					const Real s1605 = s1603 + s1604;
 					const Real s1606 = -(s1531*s205*s210*s225);
 					const Real s1607 = -(s1531*s197*s223*s225);
@@ -3192,8 +3138,8 @@ namespace Repulsor
 					const Real s1613 = s1323 + s1324 + s1611 + s1612;
 					const Real s1614 = s1613*s197;
 					const Real s1615 = s1610 + s1614;
-					const Real s1616 = (s151*s1615)/2.;
-					const Real s1617 = (s152*s1528*s393)/4.;
+					const Real s1616 = (charge*s151*s1615)/2.;
+					const Real s1617 = (charge*s152*s1528*s393)/4.;
 					const Real s1618 = s1616 + s1617;
 					const Real s1619 = 2*s10*s2*s3;
 					const Real s1620 = -2*s10*s19;
@@ -3235,26 +3181,26 @@ namespace Repulsor
 					const Real s1656 = s1654 + s1655 + s966 + s967;
 					const Real s1657 = s1656*s188;
 					const Real s1658 = s1653 + s1657;
-					const Real s1659 = (s151*s1658)/2.;
-					const Real s1660 = (s152*s1646*s264)/4.;
+					const Real s1659 = (charge*s151*s1658)/2.;
+					const Real s1660 = (charge*s152*s1646*s264)/4.;
 					const Real s1661 = s1659 + s1660;
 					const Real s1662 = s1652*s201;
 					const Real s1663 = s1656*s191;
 					const Real s1664 = s1662 + s1663;
-					const Real s1665 = (s151*s1664)/2.;
-					const Real s1666 = (s152*s1646*s273)/4.;
+					const Real s1665 = (charge*s151*s1664)/2.;
+					const Real s1666 = (charge*s152*s1646*s273)/4.;
 					const Real s1667 = s1665 + s1666;
 					const Real s1668 = s1652*s203;
 					const Real s1669 = s1656*s194;
 					const Real s1670 = s1668 + s1669 + s256 + s257;
-					const Real s1671 = (s151*s1670)/2.;
-					const Real s1672 = (s152*s1646*s282)/4.;
+					const Real s1671 = (charge*s151*s1670)/2.;
+					const Real s1672 = (charge*s152*s1646*s282)/4.;
 					const Real s1673 = s1671 + s1672;
 					const Real s1674 = s1652*s205;
 					const Real s1675 = s1656*s197;
 					const Real s1676 = s1674 + s1675;
-					const Real s1677 = (s151*s1676)/2.;
-					const Real s1678 = (s152*s1646*s291)/4.;
+					const Real s1677 = (charge*s151*s1676)/2.;
+					const Real s1678 = (charge*s152*s1646*s291)/4.;
 					const Real s1679 = s1677 + s1678;
 					const Real s1680 = -(s1649*s201*s210*s225);
 					const Real s1681 = -(s1649*s191*s223*s225);
@@ -3265,20 +3211,20 @@ namespace Repulsor
 					const Real s1686 = s1094 + s1095 + s1684 + s1685;
 					const Real s1687 = s1686*s191;
 					const Real s1688 = s1683 + s1687;
-					const Real s1689 = (s151*s1688)/2.;
-					const Real s1690 = (s152*s1646*s316)/4.;
+					const Real s1689 = (charge*s151*s1688)/2.;
+					const Real s1690 = (charge*s152*s1646*s316)/4.;
 					const Real s1691 = s1689 + s1690;
 					const Real s1692 = s1682*s203;
 					const Real s1693 = s1686*s194;
 					const Real s1694 = s1692 + s1693 + s308 + s309;
-					const Real s1695 = (s151*s1694)/2.;
-					const Real s1696 = (s152*s1646*s325)/4.;
+					const Real s1695 = (charge*s151*s1694)/2.;
+					const Real s1696 = (charge*s152*s1646*s325)/4.;
 					const Real s1697 = s1695 + s1696;
 					const Real s1698 = s1682*s205;
 					const Real s1699 = s1686*s197;
 					const Real s1700 = s1698 + s1699;
-					const Real s1701 = (s151*s1700)/2.;
-					const Real s1702 = (s152*s1646*s334)/4.;
+					const Real s1701 = (charge*s151*s1700)/2.;
+					const Real s1702 = (charge*s152*s1646*s334)/4.;
 					const Real s1703 = s1701 + s1702;
 					const Real s1704 = -(s1649*s203*s210*s225);
 					const Real s1705 = -(s1649*s194*s223*s225);
@@ -3290,14 +3236,14 @@ namespace Repulsor
 					const Real s1711 = s1222 + s1709 + s1710 + s906;
 					const Real s1712 = s1711*s194;
 					const Real s1713 = s1708 + s1712 + s351 + s352;
-					const Real s1714 = (s151*s1713)/2.;
-					const Real s1715 = (s152*s1646*s359)/4.;
+					const Real s1714 = (charge*s151*s1713)/2.;
+					const Real s1715 = (charge*s152*s1646*s359)/4.;
 					const Real s1716 = s1714 + s1715;
 					const Real s1717 = s1707*s205;
 					const Real s1718 = s1711*s197;
 					const Real s1719 = s1717 + s1718;
-					const Real s1720 = (s151*s1719)/2.;
-					const Real s1721 = (s152*s1646*s368)/4.;
+					const Real s1720 = (charge*s151*s1719)/2.;
+					const Real s1721 = (charge*s152*s1646*s368)/4.;
 					const Real s1722 = s1720 + s1721;
 					const Real s1723 = -(s1649*s205*s210*s225);
 					const Real s1724 = -(s1649*s197*s223*s225);
@@ -3309,8 +3255,8 @@ namespace Repulsor
 					const Real s1730 = s1349 + s1350 + s1728 + s1729;
 					const Real s1731 = s1730*s197;
 					const Real s1732 = s1727 + s1731;
-					const Real s1733 = (s151*s1732)/2.;
-					const Real s1734 = (s152*s1646*s393)/4.;
+					const Real s1733 = (charge*s151*s1732)/2.;
+					const Real s1734 = (charge*s152*s1646*s393)/4.;
 					const Real s1735 = s1733 + s1734;
 					const Real s1736 = 2*s11*s2*s3;
 					const Real s1737 = -2*s11*s19;
@@ -3352,26 +3298,26 @@ namespace Repulsor
 					const Real s1773 = s1771 + s1772 + s987 + s988;
 					const Real s1774 = s1773*s188;
 					const Real s1775 = s1770 + s1774;
-					const Real s1776 = (s151*s1775)/2.;
-					const Real s1777 = (s152*s1763*s264)/4.;
+					const Real s1776 = (charge*s151*s1775)/2.;
+					const Real s1777 = (charge*s152*s1763*s264)/4.;
 					const Real s1778 = s1776 + s1777;
 					const Real s1779 = s1769*s201;
 					const Real s1780 = s1773*s191;
 					const Real s1781 = s1779 + s1780;
-					const Real s1782 = (s151*s1781)/2.;
-					const Real s1783 = (s152*s1763*s273)/4.;
+					const Real s1782 = (charge*s151*s1781)/2.;
+					const Real s1783 = (charge*s152*s1763*s273)/4.;
 					const Real s1784 = s1782 + s1783;
 					const Real s1785 = s1769*s203;
 					const Real s1786 = s1773*s194;
 					const Real s1787 = s1785 + s1786;
-					const Real s1788 = (s151*s1787)/2.;
-					const Real s1789 = (s152*s1763*s282)/4.;
+					const Real s1788 = (charge*s151*s1787)/2.;
+					const Real s1789 = (charge*s152*s1763*s282)/4.;
 					const Real s1790 = s1788 + s1789;
 					const Real s1791 = s1769*s205;
 					const Real s1792 = s1773*s197;
 					const Real s1793 = s1791 + s1792 + s256 + s257;
-					const Real s1794 = (s151*s1793)/2.;
-					const Real s1795 = (s152*s1763*s291)/4.;
+					const Real s1794 = (charge*s151*s1793)/2.;
+					const Real s1795 = (charge*s152*s1763*s291)/4.;
 					const Real s1796 = s1794 + s1795;
 					const Real s1797 = -(s1766*s201*s210*s225);
 					const Real s1798 = -(s1766*s191*s223*s225);
@@ -3382,20 +3328,20 @@ namespace Repulsor
 					const Real s1803 = s1115 + s1116 + s1801 + s1802;
 					const Real s1804 = s1803*s191;
 					const Real s1805 = s1800 + s1804;
-					const Real s1806 = (s151*s1805)/2.;
-					const Real s1807 = (s152*s1763*s316)/4.;
+					const Real s1806 = (charge*s151*s1805)/2.;
+					const Real s1807 = (charge*s152*s1763*s316)/4.;
 					const Real s1808 = s1806 + s1807;
 					const Real s1809 = s1799*s203;
 					const Real s1810 = s1803*s194;
 					const Real s1811 = s1809 + s1810;
-					const Real s1812 = (s151*s1811)/2.;
-					const Real s1813 = (s152*s1763*s325)/4.;
+					const Real s1812 = (charge*s151*s1811)/2.;
+					const Real s1813 = (charge*s152*s1763*s325)/4.;
 					const Real s1814 = s1812 + s1813;
 					const Real s1815 = s1799*s205;
 					const Real s1816 = s1803*s197;
 					const Real s1817 = s1815 + s1816 + s308 + s309;
-					const Real s1818 = (s151*s1817)/2.;
-					const Real s1819 = (s152*s1763*s334)/4.;
+					const Real s1818 = (charge*s151*s1817)/2.;
+					const Real s1819 = (charge*s152*s1763*s334)/4.;
 					const Real s1820 = s1818 + s1819;
 					const Real s1821 = -(s1766*s203*s210*s225);
 					const Real s1822 = -(s1766*s194*s223*s225);
@@ -3406,14 +3352,14 @@ namespace Repulsor
 					const Real s1827 = s1242 + s1243 + s1825 + s1826;
 					const Real s1828 = s1827*s194;
 					const Real s1829 = s1824 + s1828;
-					const Real s1830 = (s151*s1829)/2.;
-					const Real s1831 = (s152*s1763*s359)/4.;
+					const Real s1830 = (charge*s151*s1829)/2.;
+					const Real s1831 = (charge*s152*s1763*s359)/4.;
 					const Real s1832 = s1830 + s1831;
 					const Real s1833 = s1823*s205;
 					const Real s1834 = s1827*s197;
 					const Real s1835 = s1833 + s1834 + s351 + s352;
-					const Real s1836 = (s151*s1835)/2.;
-					const Real s1837 = (s152*s1763*s368)/4.;
+					const Real s1836 = (charge*s151*s1835)/2.;
+					const Real s1837 = (charge*s152*s1763*s368)/4.;
 					const Real s1838 = s1836 + s1837;
 					const Real s1839 = -(s1766*s205*s210*s225);
 					const Real s1840 = -(s1766*s197*s223*s225);
@@ -3425,21 +3371,21 @@ namespace Repulsor
 					const Real s1846 = s1369 + s1844 + s1845 + s906;
 					const Real s1847 = s1846*s197;
 					const Real s1848 = s1843 + s1847 + s385 + s386;
-					const Real s1849 = (s151*s1848)/2.;
-					const Real s1850 = (s152*s1763*s393)/4.;
+					const Real s1849 = (charge*s151*s1848)/2.;
+					const Real s1850 = (charge*s152*s1763*s393)/4.;
 					const Real s1851 = s1849 + s1850;
-					buffer__[12*i+0] = charge*((s152*s186*s396)/4. + (s152*s186*s397)/4. + (s10*s152*s186*s433)/4. + (s11*s152*s186*s434)/4. + (s152*s186*s2*s435)/4. + (s0*s152*s186*s436)/4. + (s152*s186*s4*s437)/4. + (s12*s152*s186*s442)/4. + (s14*s152*s186*s443)/4. + (s152*s186*s444*s445)/12. + (s152*s16*s186*s446)/4. + (s152*s186*s447*s448)/12. + (s152*s186*s449*s450)/12. + s440*((s152*s186*s441)/12. + s451) + s432*((s152*s186*s3)/4. + s453) + s266*s454 + s266*s465 + s275*s480 + s275*s481 + s284*s488 + s284*s489 + s293*s496 + s293*s497 + s318*s504 + s318*s506 + s327*s525 + s327*s526 + s336*s533 + s336*s534 + s361*s541 + s361*s542 + s370*s559 + s370*s560 + s395*s567 + s395*s568 + (s152*s186*s438*s6)/4. + (s152*s186*s452*s8)/4. + (s152*s186*s439*s9)/4.);
-					buffer__[12*i+1] = charge*((s152*s396*s431)/4. + (s152*s397*s431)/4. + (s152*s3*s431*s432)/4. + (s10*s152*s431*s433)/4. + (s11*s152*s431*s434)/4. + (s152*s2*s431*s435)/4. + (s0*s152*s431*s436)/4. + (s152*s4*s431*s437)/4. + (s152*s431*s440*s441)/12. + (s12*s152*s431*s442)/4. + (s14*s152*s431*s443)/4. + (s152*s431*s444*s445)/12. + (s152*s16*s431*s446)/4. + (s152*s431*s447*s448)/12. + s449*((s152*s431*s450)/12. + s451) + s454*s479 + s465*s479 + s480*s487 + s481*s487 + s488*s495 + s489*s495 + s496*s503 + s497*s503 + s504*s524 + s506*s524 + s525*s532 + s526*s532 + s533*s540 + s534*s540 + s541*s558 + s542*s558 + s559*s566 + s560*s566 + s567*s584 + s568*s584 + (s152*s431*s438*s6)/4. + s452*(s453 + (s152*s431*s8)/4.) + (s152*s431*s439*s9)/4.);
-					buffer__[12*i+2] = charge*((s152*s396*s618)/4. + (s152*s397*s618)/4. + (s152*s3*s432*s618)/4. + (s11*s152*s434*s618)/4. + (s152*s2*s435*s618)/4. + (s0*s152*s436*s618)/4. + (s152*s4*s437*s618)/4. + (s152*s440*s441*s618)/12. + (s12*s152*s442*s618)/4. + (s14*s152*s443*s618)/4. + (s152*s16*s446*s618)/4. + (s152*s447*s448*s618)/12. + (s152*s449*s450*s618)/12. + (s152*s438*s6*s618)/4. + s433*(s453 + (s10*s152*s618)/4.) + s444*(s451 + (s152*s445*s618)/12.) + s454*s642 + s465*s642 + s480*s648 + s481*s648 + s488*s654 + s489*s654 + s496*s660 + s497*s660 + s504*s674 + s506*s674 + s525*s680 + s526*s680 + s533*s686 + s534*s686 + s541*s705 + s542*s705 + s559*s711 + s560*s711 + s567*s727 + s568*s727 + (s152*s452*s618*s8)/4. + (s152*s439*s618*s9)/4.);
-					buffer__[12*i+3] = charge*((s152*s396*s761)/4. + (s152*s397*s761)/4. + (s152*s3*s432*s761)/4. + (s10*s152*s433*s761)/4. + (s152*s2*s435*s761)/4. + (s0*s152*s436*s761)/4. + (s152*s4*s437*s761)/4. + (s152*s440*s441*s761)/12. + (s12*s152*s442*s761)/4. + (s14*s152*s443*s761)/4. + (s152*s444*s445*s761)/12. + (s152*s16*s446*s761)/4. + (s152*s449*s450*s761)/12. + (s152*s438*s6*s761)/4. + s434*(s453 + (s11*s152*s761)/4.) + s447*(s451 + (s152*s448*s761)/12.) + s454*s785 + s465*s785 + s480*s791 + s481*s791 + s488*s797 + s489*s797 + (s152*s452*s761*s8)/4. + s496*s803 + s497*s803 + s504*s817 + s506*s817 + s525*s823 + s526*s823 + s533*s829 + s534*s829 + s541*s843 + s542*s843 + s559*s849 + s560*s849 + s567*s868 + s568*s868 + (s152*s439*s761*s9)/4.);
-					buffer__[12*i+4] = charge*((s152*s396*s899)/4. + (s152*s397*s899)/4. + (s152*s3*s432*s899)/4. + (s10*s152*s433*s899)/4. + (s11*s152*s434*s899)/4. + (s0*s152*s436*s899)/4. + (s152*s4*s437*s899)/4. + (s12*s152*s442*s899)/4. + (s14*s152*s443*s899)/4. + (s152*s444*s445*s899)/12. + (s152*s16*s446*s899)/4. + (s152*s447*s448*s899)/12. + (s152*s449*s450*s899)/12. + (s152*s438*s6*s899)/4. + (s152*s452*s8*s899)/4. + s435*(s453 + (s152*s2*s899)/4.) + s440*(s451 + (s152*s441*s899)/12.) + (s152*s439*s899*s9)/4. + s454*s918 + s465*s918 + s480*s924 + s481*s924 + s488*s930 + s489*s930 + s496*s936 + s497*s936 + s504*s951 + s506*s951 + s525*s957 + s526*s957 + s533*s963 + s534*s963 + s541*s978 + s542*s978 + s559*s984 + s560*s984 + s567*s999 + s568*s999);
-					buffer__[12*i+5] = charge*((s1030*s152*s396)/4. + (s1030*s152*s397)/4. + (s1030*s152*s3*s432)/4. + (s10*s1030*s152*s433)/4. + (s1030*s11*s152*s434)/4. + (s1030*s152*s2*s435)/4. + (s1030*s152*s4*s437)/4. + (s1030*s152*s440*s441)/12. + (s1030*s12*s152*s442)/4. + (s1030*s14*s152*s443)/4. + (s1030*s152*s444*s445)/12. + (s1030*s152*s16*s446)/4. + (s1030*s152*s447*s448)/12. + s449*((s1030*s152*s450)/12. + s451) + s436*((s0*s1030*s152)/4. + s453) + s1047*s454 + s1047*s465 + s1053*s480 + s1053*s481 + s1059*s488 + s1059*s489 + s1065*s496 + s1065*s497 + s1079*s504 + s1079*s506 + s1085*s525 + s1085*s526 + s1091*s533 + s1091*s534 + s1106*s541 + s1106*s542 + s1112*s559 + s1112*s560 + s1127*s567 + s1127*s568 + (s1030*s152*s438*s6)/4. + (s1030*s152*s452*s8)/4. + (s1030*s152*s439*s9)/4.);
-					buffer__[12*i+6] = charge*((s1158*s152*s396)/4. + (s1158*s152*s397)/4. + (s1158*s152*s3*s432)/4. + (s10*s1158*s152*s433)/4. + (s11*s1158*s152*s434)/4. + (s1158*s152*s2*s435)/4. + (s0*s1158*s152*s436)/4. + (s1158*s152*s440*s441)/12. + (s1158*s12*s152*s442)/4. + (s1158*s14*s152*s443)/4. + (s1158*s152*s16*s446)/4. + (s1158*s152*s447*s448)/12. + (s1158*s152*s449*s450)/12. + s444*((s1158*s152*s445)/12. + s451) + s437*((s1158*s152*s4)/4. + s453) + s1175*s454 + s1175*s465 + s1181*s480 + s1181*s481 + s1187*s488 + s1187*s489 + s1193*s496 + s1193*s497 + s1207*s504 + s1207*s506 + s1213*s525 + s1213*s526 + s1219*s533 + s1219*s534 + s1233*s541 + s1233*s542 + s1239*s559 + s1239*s560 + s1254*s567 + s1254*s568 + (s1158*s152*s438*s6)/4. + (s1158*s152*s452*s8)/4. + (s1158*s152*s439*s9)/4.);
-					buffer__[12*i+7] = charge*((s1285*s152*s396)/4. + (s1285*s152*s397)/4. + (s1285*s152*s3*s432)/4. + (s10*s1285*s152*s433)/4. + (s11*s1285*s152*s434)/4. + (s1285*s152*s2*s435)/4. + (s0*s1285*s152*s436)/4. + (s1285*s152*s4*s437)/4. + (s1285*s152*s440*s441)/12. + (s12*s1285*s152*s442)/4. + (s1285*s14*s152*s443)/4. + (s1285*s152*s444*s445)/12. + (s1285*s152*s16*s446)/4. + (s1285*s152*s449*s450)/12. + s447*((s1285*s152*s448)/12. + s451) + s1302*s454 + s1302*s465 + s1308*s480 + s1308*s481 + s1314*s488 + s1314*s489 + s1320*s496 + s1320*s497 + s1334*s504 + s1334*s506 + s1340*s525 + s1340*s526 + s1346*s533 + s1346*s534 + s1360*s541 + s1360*s542 + s1366*s559 + s1366*s560 + s1380*s567 + s1380*s568 + s438*(s453 + (s1285*s152*s6)/4.) + (s1285*s152*s452*s8)/4. + (s1285*s152*s439*s9)/4.);
-					buffer__[12*i+8] = charge*((s1408*s152*s396)/4. + (s1408*s152*s397)/4. + (s1408*s152*s3*s432)/4. + (s10*s1408*s152*s433)/4. + (s11*s1408*s152*s434)/4. + (s1408*s152*s2*s435)/4. + (s0*s1408*s152*s436)/4. + (s1408*s152*s4*s437)/4. + (s12*s1408*s152*s442)/4. + (s14*s1408*s152*s443)/4. + (s1408*s152*s444*s445)/12. + (s1408*s152*s16*s446)/4. + (s1408*s152*s447*s448)/12. + (s1408*s152*s449*s450)/12. + s440*((s1408*s152*s441)/12. + s451) + s1425*s454 + s1425*s465 + s1431*s480 + s1431*s481 + s1437*s488 + s1437*s489 + s1443*s496 + s1443*s497 + s1456*s504 + s1456*s506 + s1462*s525 + s1462*s526 + s1468*s533 + s1468*s534 + s1481*s541 + s1481*s542 + s1487*s559 + s1487*s560 + s1500*s567 + s1500*s568 + (s1408*s152*s438*s6)/4. + (s1408*s152*s452*s8)/4. + s439*(s453 + (s1408*s152*s9)/4.));
-					buffer__[12*i+9] = charge*((s152*s1528*s396)/4. + (s152*s1528*s397)/4. + (s152*s1528*s3*s432)/4. + (s10*s152*s1528*s433)/4. + (s11*s152*s1528*s434)/4. + (s152*s1528*s2*s435)/4. + (s0*s152*s1528*s436)/4. + (s152*s1528*s4*s437)/4. + (s152*s1528*s440*s441)/12. + (s14*s152*s1528*s443)/4. + (s152*s1528*s444*s445)/12. + (s152*s1528*s16*s446)/4. + (s152*s1528*s447*s448)/12. + s449*((s152*s1528*s450)/12. + s451) + s442*((s12*s152*s1528)/4. + s453) + s1543*s454 + s1543*s465 + s1549*s480 + s1549*s481 + s1555*s488 + s1555*s489 + s1561*s496 + s1561*s497 + s1574*s504 + s1574*s506 + s1580*s525 + s1580*s526 + s1586*s533 + s1586*s534 + s1599*s541 + s1599*s542 + s1605*s559 + s1605*s560 + s1618*s567 + s1618*s568 + (s152*s1528*s438*s6)/4. + (s152*s1528*s452*s8)/4. + (s152*s1528*s439*s9)/4.);
-					buffer__[12*i+10] = charge*((s152*s1646*s396)/4. + (s152*s1646*s397)/4. + (s152*s1646*s3*s432)/4. + (s10*s152*s1646*s433)/4. + (s11*s152*s1646*s434)/4. + (s152*s1646*s2*s435)/4. + (s0*s152*s1646*s436)/4. + (s152*s1646*s4*s437)/4. + (s152*s1646*s440*s441)/12. + (s12*s152*s1646*s442)/4. + (s152*s16*s1646*s446)/4. + (s152*s1646*s447*s448)/12. + (s152*s1646*s449*s450)/12. + s444*((s152*s1646*s445)/12. + s451) + s443*((s14*s152*s1646)/4. + s453) + s1661*s454 + s1661*s465 + s1667*s480 + s1667*s481 + s1673*s488 + s1673*s489 + s1679*s496 + s1679*s497 + s1691*s504 + s1691*s506 + s1697*s525 + s1697*s526 + s1703*s533 + s1703*s534 + s1716*s541 + s1716*s542 + s1722*s559 + s1722*s560 + s1735*s567 + s1735*s568 + (s152*s1646*s438*s6)/4. + (s152*s1646*s452*s8)/4. + (s152*s1646*s439*s9)/4.);
-					buffer__[12*i+11] = charge*((s152*s1763*s396)/4. + (s152*s1763*s397)/4. + (s152*s1763*s3*s432)/4. + (s10*s152*s1763*s433)/4. + (s11*s152*s1763*s434)/4. + (s152*s1763*s2*s435)/4. + (s0*s152*s1763*s436)/4. + (s152*s1763*s4*s437)/4. + (s152*s1763*s440*s441)/12. + (s12*s152*s1763*s442)/4. + (s14*s152*s1763*s443)/4. + (s152*s1763*s444*s445)/12. + (s152*s1763*s449*s450)/12. + s447*((s152*s1763*s448)/12. + s451) + s446*((s152*s16*s1763)/4. + s453) + s1778*s454 + s1778*s465 + s1784*s480 + s1784*s481 + s1790*s488 + s1790*s489 + s1796*s496 + s1796*s497 + s1808*s504 + s1808*s506 + s1814*s525 + s1814*s526 + s1820*s533 + s1820*s534 + s1832*s541 + s1832*s542 + s1838*s559 + s1838*s560 + s1851*s567 + s1851*s568 + (s152*s1763*s438*s6)/4. + (s152*s1763*s452*s8)/4. + (s152*s1763*s439*s9)/4.);
+					buffer__[12*i+0] = charge*((charge*s152*s186*s396)/4. + (charge*s152*s186*s397)/4. + (charge*s10*s152*s186*s433)/4. + (charge*s11*s152*s186*s434)/4. + (charge*s152*s186*s2*s435)/4. + (charge*s0*s152*s186*s436)/4. + (charge*s152*s186*s4*s437)/4. + (charge*s12*s152*s186*s442)/4. + (charge*s14*s152*s186*s443)/4. + (charge*s152*s186*s444*s445)/12. + (charge*s152*s16*s186*s446)/4. + (charge*s152*s186*s447*s448)/12. + (charge*s152*s186*s449*s450)/12. + s440*((charge*s152*s186*s441)/12. + s451) + s432*((charge*s152*s186*s3)/4. + s453) + s266*s454 + s266*s465 + s275*s480 + s275*s481 + s284*s488 + s284*s489 + s293*s496 + s293*s497 + s318*s504 + s318*s506 + s327*s525 + s327*s526 + s336*s533 + s336*s534 + s361*s541 + s361*s542 + s370*s559 + s370*s560 + s395*s567 + s395*s568 + (charge*s152*s186*s438*s6)/4. + (charge*s152*s186*s452*s8)/4. + (charge*s152*s186*s439*s9)/4.);
+					buffer__[12*i+1] = charge*((charge*s152*s396*s431)/4. + (charge*s152*s397*s431)/4. + (charge*s152*s3*s431*s432)/4. + (charge*s10*s152*s431*s433)/4. + (charge*s11*s152*s431*s434)/4. + (charge*s152*s2*s431*s435)/4. + (charge*s0*s152*s431*s436)/4. + (charge*s152*s4*s431*s437)/4. + (charge*s152*s431*s440*s441)/12. + (charge*s12*s152*s431*s442)/4. + (charge*s14*s152*s431*s443)/4. + (charge*s152*s431*s444*s445)/12. + (charge*s152*s16*s431*s446)/4. + (charge*s152*s431*s447*s448)/12. + s449*((charge*s152*s431*s450)/12. + s451) + s454*s479 + s465*s479 + s480*s487 + s481*s487 + s488*s495 + s489*s495 + s496*s503 + s497*s503 + s504*s524 + s506*s524 + s525*s532 + s526*s532 + s533*s540 + s534*s540 + s541*s558 + s542*s558 + s559*s566 + s560*s566 + s567*s584 + s568*s584 + (charge*s152*s431*s438*s6)/4. + s452*(s453 + (charge*s152*s431*s8)/4.) + (charge*s152*s431*s439*s9)/4.);
+					buffer__[12*i+2] = charge*((charge*s152*s396*s618)/4. + (charge*s152*s397*s618)/4. + (charge*s152*s3*s432*s618)/4. + (charge*s11*s152*s434*s618)/4. + (charge*s152*s2*s435*s618)/4. + (charge*s0*s152*s436*s618)/4. + (charge*s152*s4*s437*s618)/4. + (charge*s152*s440*s441*s618)/12. + (charge*s12*s152*s442*s618)/4. + (charge*s14*s152*s443*s618)/4. + (charge*s152*s16*s446*s618)/4. + (charge*s152*s447*s448*s618)/12. + (charge*s152*s449*s450*s618)/12. + (charge*s152*s438*s6*s618)/4. + s433*(s453 + (charge*s10*s152*s618)/4.) + s444*(s451 + (charge*s152*s445*s618)/12.) + s454*s642 + s465*s642 + s480*s648 + s481*s648 + s488*s654 + s489*s654 + s496*s660 + s497*s660 + s504*s674 + s506*s674 + s525*s680 + s526*s680 + s533*s686 + s534*s686 + s541*s705 + s542*s705 + s559*s711 + s560*s711 + s567*s727 + s568*s727 + (charge*s152*s452*s618*s8)/4. + (charge*s152*s439*s618*s9)/4.);
+					buffer__[12*i+3] = charge*((charge*s152*s396*s761)/4. + (charge*s152*s397*s761)/4. + (charge*s152*s3*s432*s761)/4. + (charge*s10*s152*s433*s761)/4. + (charge*s152*s2*s435*s761)/4. + (charge*s0*s152*s436*s761)/4. + (charge*s152*s4*s437*s761)/4. + (charge*s152*s440*s441*s761)/12. + (charge*s12*s152*s442*s761)/4. + (charge*s14*s152*s443*s761)/4. + (charge*s152*s444*s445*s761)/12. + (charge*s152*s16*s446*s761)/4. + (charge*s152*s449*s450*s761)/12. + (charge*s152*s438*s6*s761)/4. + s434*(s453 + (charge*s11*s152*s761)/4.) + s447*(s451 + (charge*s152*s448*s761)/12.) + s454*s785 + s465*s785 + s480*s791 + s481*s791 + s488*s797 + s489*s797 + (charge*s152*s452*s761*s8)/4. + s496*s803 + s497*s803 + s504*s817 + s506*s817 + s525*s823 + s526*s823 + s533*s829 + s534*s829 + s541*s843 + s542*s843 + s559*s849 + s560*s849 + s567*s868 + s568*s868 + (charge*s152*s439*s761*s9)/4.);
+					buffer__[12*i+4] = charge*((charge*s152*s396*s899)/4. + (charge*s152*s397*s899)/4. + (charge*s152*s3*s432*s899)/4. + (charge*s10*s152*s433*s899)/4. + (charge*s11*s152*s434*s899)/4. + (charge*s0*s152*s436*s899)/4. + (charge*s152*s4*s437*s899)/4. + (charge*s12*s152*s442*s899)/4. + (charge*s14*s152*s443*s899)/4. + (charge*s152*s444*s445*s899)/12. + (charge*s152*s16*s446*s899)/4. + (charge*s152*s447*s448*s899)/12. + (charge*s152*s449*s450*s899)/12. + (charge*s152*s438*s6*s899)/4. + (charge*s152*s452*s8*s899)/4. + s435*(s453 + (charge*s152*s2*s899)/4.) + s440*(s451 + (charge*s152*s441*s899)/12.) + (charge*s152*s439*s899*s9)/4. + s454*s918 + s465*s918 + s480*s924 + s481*s924 + s488*s930 + s489*s930 + s496*s936 + s497*s936 + s504*s951 + s506*s951 + s525*s957 + s526*s957 + s533*s963 + s534*s963 + s541*s978 + s542*s978 + s559*s984 + s560*s984 + s567*s999 + s568*s999);
+					buffer__[12*i+5] = charge*((charge*s1030*s152*s396)/4. + (charge*s1030*s152*s397)/4. + (charge*s1030*s152*s3*s432)/4. + (charge*s10*s1030*s152*s433)/4. + (charge*s1030*s11*s152*s434)/4. + (charge*s1030*s152*s2*s435)/4. + (charge*s1030*s152*s4*s437)/4. + (charge*s1030*s152*s440*s441)/12. + (charge*s1030*s12*s152*s442)/4. + (charge*s1030*s14*s152*s443)/4. + (charge*s1030*s152*s444*s445)/12. + (charge*s1030*s152*s16*s446)/4. + (charge*s1030*s152*s447*s448)/12. + s449*((charge*s1030*s152*s450)/12. + s451) + s436*((charge*s0*s1030*s152)/4. + s453) + s1047*s454 + s1047*s465 + s1053*s480 + s1053*s481 + s1059*s488 + s1059*s489 + s1065*s496 + s1065*s497 + s1079*s504 + s1079*s506 + s1085*s525 + s1085*s526 + s1091*s533 + s1091*s534 + s1106*s541 + s1106*s542 + s1112*s559 + s1112*s560 + s1127*s567 + s1127*s568 + (charge*s1030*s152*s438*s6)/4. + (charge*s1030*s152*s452*s8)/4. + (charge*s1030*s152*s439*s9)/4.);
+					buffer__[12*i+6] = charge*((charge*s1158*s152*s396)/4. + (charge*s1158*s152*s397)/4. + (charge*s1158*s152*s3*s432)/4. + (charge*s10*s1158*s152*s433)/4. + (charge*s11*s1158*s152*s434)/4. + (charge*s1158*s152*s2*s435)/4. + (charge*s0*s1158*s152*s436)/4. + (charge*s1158*s152*s440*s441)/12. + (charge*s1158*s12*s152*s442)/4. + (charge*s1158*s14*s152*s443)/4. + (charge*s1158*s152*s16*s446)/4. + (charge*s1158*s152*s447*s448)/12. + (charge*s1158*s152*s449*s450)/12. + s444*((charge*s1158*s152*s445)/12. + s451) + s437*((charge*s1158*s152*s4)/4. + s453) + s1175*s454 + s1175*s465 + s1181*s480 + s1181*s481 + s1187*s488 + s1187*s489 + s1193*s496 + s1193*s497 + s1207*s504 + s1207*s506 + s1213*s525 + s1213*s526 + s1219*s533 + s1219*s534 + s1233*s541 + s1233*s542 + s1239*s559 + s1239*s560 + s1254*s567 + s1254*s568 + (charge*s1158*s152*s438*s6)/4. + (charge*s1158*s152*s452*s8)/4. + (charge*s1158*s152*s439*s9)/4.);
+					buffer__[12*i+7] = charge*((charge*s1285*s152*s396)/4. + (charge*s1285*s152*s397)/4. + (charge*s1285*s152*s3*s432)/4. + (charge*s10*s1285*s152*s433)/4. + (charge*s11*s1285*s152*s434)/4. + (charge*s1285*s152*s2*s435)/4. + (charge*s0*s1285*s152*s436)/4. + (charge*s1285*s152*s4*s437)/4. + (charge*s1285*s152*s440*s441)/12. + (charge*s12*s1285*s152*s442)/4. + (charge*s1285*s14*s152*s443)/4. + (charge*s1285*s152*s444*s445)/12. + (charge*s1285*s152*s16*s446)/4. + (charge*s1285*s152*s449*s450)/12. + s447*((charge*s1285*s152*s448)/12. + s451) + s1302*s454 + s1302*s465 + s1308*s480 + s1308*s481 + s1314*s488 + s1314*s489 + s1320*s496 + s1320*s497 + s1334*s504 + s1334*s506 + s1340*s525 + s1340*s526 + s1346*s533 + s1346*s534 + s1360*s541 + s1360*s542 + s1366*s559 + s1366*s560 + s1380*s567 + s1380*s568 + s438*(s453 + (charge*s1285*s152*s6)/4.) + (charge*s1285*s152*s452*s8)/4. + (charge*s1285*s152*s439*s9)/4.);
+					buffer__[12*i+8] = charge*((charge*s1408*s152*s396)/4. + (charge*s1408*s152*s397)/4. + (charge*s1408*s152*s3*s432)/4. + (charge*s10*s1408*s152*s433)/4. + (charge*s11*s1408*s152*s434)/4. + (charge*s1408*s152*s2*s435)/4. + (charge*s0*s1408*s152*s436)/4. + (charge*s1408*s152*s4*s437)/4. + (charge*s12*s1408*s152*s442)/4. + (charge*s14*s1408*s152*s443)/4. + (charge*s1408*s152*s444*s445)/12. + (charge*s1408*s152*s16*s446)/4. + (charge*s1408*s152*s447*s448)/12. + (charge*s1408*s152*s449*s450)/12. + s440*((charge*s1408*s152*s441)/12. + s451) + s1425*s454 + s1425*s465 + s1431*s480 + s1431*s481 + s1437*s488 + s1437*s489 + s1443*s496 + s1443*s497 + s1456*s504 + s1456*s506 + s1462*s525 + s1462*s526 + s1468*s533 + s1468*s534 + s1481*s541 + s1481*s542 + s1487*s559 + s1487*s560 + s1500*s567 + s1500*s568 + (charge*s1408*s152*s438*s6)/4. + (charge*s1408*s152*s452*s8)/4. + s439*(s453 + (charge*s1408*s152*s9)/4.));
+					buffer__[12*i+9] = charge*((charge*s152*s1528*s396)/4. + (charge*s152*s1528*s397)/4. + (charge*s152*s1528*s3*s432)/4. + (charge*s10*s152*s1528*s433)/4. + (charge*s11*s152*s1528*s434)/4. + (charge*s152*s1528*s2*s435)/4. + (charge*s0*s152*s1528*s436)/4. + (charge*s152*s1528*s4*s437)/4. + (charge*s152*s1528*s440*s441)/12. + (charge*s14*s152*s1528*s443)/4. + (charge*s152*s1528*s444*s445)/12. + (charge*s152*s1528*s16*s446)/4. + (charge*s152*s1528*s447*s448)/12. + s449*((charge*s152*s1528*s450)/12. + s451) + s442*((charge*s12*s152*s1528)/4. + s453) + s1543*s454 + s1543*s465 + s1549*s480 + s1549*s481 + s1555*s488 + s1555*s489 + s1561*s496 + s1561*s497 + s1574*s504 + s1574*s506 + s1580*s525 + s1580*s526 + s1586*s533 + s1586*s534 + s1599*s541 + s1599*s542 + s1605*s559 + s1605*s560 + s1618*s567 + s1618*s568 + (charge*s152*s1528*s438*s6)/4. + (charge*s152*s1528*s452*s8)/4. + (charge*s152*s1528*s439*s9)/4.);
+					buffer__[12*i+10] = charge*((charge*s152*s1646*s396)/4. + (charge*s152*s1646*s397)/4. + (charge*s152*s1646*s3*s432)/4. + (charge*s10*s152*s1646*s433)/4. + (charge*s11*s152*s1646*s434)/4. + (charge*s152*s1646*s2*s435)/4. + (charge*s0*s152*s1646*s436)/4. + (charge*s152*s1646*s4*s437)/4. + (charge*s152*s1646*s440*s441)/12. + (charge*s12*s152*s1646*s442)/4. + (charge*s152*s16*s1646*s446)/4. + (charge*s152*s1646*s447*s448)/12. + (charge*s152*s1646*s449*s450)/12. + s444*((charge*s152*s1646*s445)/12. + s451) + s443*((charge*s14*s152*s1646)/4. + s453) + s1661*s454 + s1661*s465 + s1667*s480 + s1667*s481 + s1673*s488 + s1673*s489 + s1679*s496 + s1679*s497 + s1691*s504 + s1691*s506 + s1697*s525 + s1697*s526 + s1703*s533 + s1703*s534 + s1716*s541 + s1716*s542 + s1722*s559 + s1722*s560 + s1735*s567 + s1735*s568 + (charge*s152*s1646*s438*s6)/4. + (charge*s152*s1646*s452*s8)/4. + (charge*s152*s1646*s439*s9)/4.);
+					buffer__[12*i+11] = charge*((charge*s152*s1763*s396)/4. + (charge*s152*s1763*s397)/4. + (charge*s152*s1763*s3*s432)/4. + (charge*s10*s152*s1763*s433)/4. + (charge*s11*s152*s1763*s434)/4. + (charge*s152*s1763*s2*s435)/4. + (charge*s0*s152*s1763*s436)/4. + (charge*s152*s1763*s4*s437)/4. + (charge*s152*s1763*s440*s441)/12. + (charge*s12*s152*s1763*s442)/4. + (charge*s14*s152*s1763*s443)/4. + (charge*s152*s1763*s444*s445)/12. + (charge*s152*s1763*s449*s450)/12. + s447*((charge*s152*s1763*s448)/12. + s451) + s446*((charge*s152*s16*s1763)/4. + s453) + s1778*s454 + s1778*s465 + s1784*s480 + s1784*s481 + s1790*s488 + s1790*s489 + s1796*s496 + s1796*s497 + s1808*s504 + s1808*s506 + s1814*s525 + s1814*s526 + s1820*s533 + s1820*s534 + s1832*s541 + s1832*s542 + s1838*s559 + s1838*s560 + s1851*s567 + s1851*s568 + (charge*s152*s1763*s438*s6)/4. + (charge*s152*s1763*s452*s8)/4. + (charge*s152*s1763*s439*s9)/4.);
 			},
 			simplices.Dimension(0),
 			ThreadCount()

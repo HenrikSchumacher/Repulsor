@@ -64,7 +64,7 @@ code0=Part[Experimental`OptimizeExpression[A,"OptimizationLevel"->2,
 ]/.Thread[
 	Flatten[dXXnear]->Flatten[Table["P_D_near__["<>NearDim<>"*i+"<>s[j]<>"]",{j,0,neardim-1}]]
 ]/.Thread[
-	Flatten[dXXfar]->Flatten[Table["P_D_far__["<>NearDim<>"*i+"<>s[j]<>"]",{j,0,fardim-1}]]
+	Flatten[dXXfar]->Flatten[Table["P_D_far__["<>FarDim<>"*i+"<>s[j]<>"]",{j,0,fardim-1}]]
 ]/.Power[x_,2]:>HoldForm[x x];
 
 scratchsymbols=Cases[code0,CAssign[symbol_,rhs_]:>symbol,\[Infinity]];
@@ -160,7 +160,7 @@ code0=Part[Experimental`OptimizeExpression[A,"OptimizationLevel"->2,
 ]/.Thread[
 	Flatten[dXXnear]->Flatten[Table["P_D_near__["<>NearDim<>"*i+"<>s[j]<>"]",{j,0,neardim-1}]]
 ]/.Thread[
-	Flatten[dXXfar]->Flatten[Table["P_D_far__["<>NearDim<>"*i+"<>s[j]<>"]",{j,0,fardim-1}]]
+	Flatten[dXXfar]->Flatten[Table["P_D_far__["<>FarDim<>"*i+"<>s[j]<>"]",{j,0,fardim-1}]]
 ]/.Power[x_,2]:>HoldForm[x x];
 
 scratchsymbols=Cases[code0,CAssign[symbol_,rhs_]:>symbol,\[Infinity]];
@@ -269,7 +269,7 @@ Flatten[Table["V_coords__["<>AmbDim<>"*simplices__["<>s[n+1]<>"*i+"<>s[j]<>"]+"<
 ]/.Thread[
 	Flatten[dXXnear]->Flatten[Table["P_D_near__["<>NearDim<>"*i+"<>s[j]<>"]",{j,0,neardim-1}]]
 ]/.Thread[
-	Flatten[dXXfar]->Flatten[Table["P_D_far__["<>NearDim<>"*i+"<>s[j]<>"]",{j,0,fardim-1}]]
+	Flatten[dXXfar]->Flatten[Table["P_D_far__["<>FarDim<>"*i+"<>s[j]<>"]",{j,0,fardim-1}]]
 ]/.Power[x_,2]:>HoldForm[x x];
 
 scratchsymbols=Cases[code0,CAssign[symbol_,rhs_]:>symbol,\[Infinity]];

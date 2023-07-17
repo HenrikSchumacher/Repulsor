@@ -43,7 +43,7 @@ namespace Repulsor
     protected:
         
         
-        mut<Real> metric_data = nullptr;
+        mptr<Real> metric_data = nullptr;
         
         mutable Real sum = Scalar::Zero<Real>;
         
@@ -69,13 +69,13 @@ namespace Repulsor
         mutable Real DX [S_DATA_DIM] = {};
         mutable Real DY [T_DATA_DIM] = {};
         
-        ptr<Real> S_data   = nullptr;
-        mut<Real> S_D_data = nullptr;
-        mut<Real> S_diag   = nullptr;
+        cptr<Real> S_data   = nullptr;
+        mptr<Real> S_D_data = nullptr;
+        mptr<Real> S_diag   = nullptr;
 
-        ptr<Real> T_data   = nullptr;
-        mut<Real> T_D_data = nullptr;
-        mut<Real> T_diag   = nullptr;
+        cptr<Real> T_data   = nullptr;
+        mptr<Real> T_D_data = nullptr;
+        mptr<Real> T_diag   = nullptr;
         
         using Base_T::thread;
         
@@ -152,7 +152,7 @@ namespace Repulsor
         
         force_inline void loadS( const Int i_global )
         {
-            ptr<Real> X = &S_data[S_DATA_DIM * i_global];
+            cptr<Real> X = &S_data[S_DATA_DIM * i_global];
 
             a = X[0];
 #ifdef FarField_S_Copy
@@ -171,7 +171,7 @@ namespace Repulsor
         
         force_inline void loadT( const Int j_global )
         {
-            ptr<Real> Y = &T_data[T_DATA_DIM * j_global];
+            cptr<Real> Y = &T_data[T_DATA_DIM * j_global];
             
             b = Y[0];
 #ifdef FarField_T_Copy
@@ -191,7 +191,7 @@ namespace Repulsor
         {
             if constexpr ( diff_flag )
             {
-                mut<Real> to = &S_D_data[S_DATA_DIM * i_global];
+                mptr<Real> to = &S_D_data[S_DATA_DIM * i_global];
                 
                 for( Int k = 0; k < S_DATA_DIM; ++k )
                 {
@@ -204,7 +204,7 @@ namespace Repulsor
         {
             if constexpr (diff_flag )
             {
-                mut<Real> to = &T_D_data[T_DATA_DIM * j_global];
+                mptr<Real> to = &T_D_data[T_DATA_DIM * j_global];
                 
                 for( Int k = 0; k < T_DATA_DIM; ++k )
                 {

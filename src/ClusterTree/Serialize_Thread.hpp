@@ -6,7 +6,7 @@ private:
         
         //            tree_max_depth = root->max_depth;
         //
-        // We have to allocated these two arrays first, so that ClusterCount() and LeafClusterCount() return correct results.
+        // We have to allocate these two arrays first, so that ClusterCount() and LeafClusterCount() return correct results.
         C_serialized  = Tensor2<SReal,Int>( root->descendant_count, C_proto[0]->Size() );
         leaf_clusters = Tensor1<Int,Int>( root->descendant_leaf_count );
         
@@ -21,16 +21,18 @@ private:
         threads.emplace_back( [=](){ C_next  = Tensor1<Int,Int>( ClusterCount() ); } );
         threads.emplace_back( [=](){ leaf_cluster_lookup = Tensor1<Int,Int>( ClusterCount(), -1 ); } );
         
+        ptic(className()+"::Serialize: allocation");
         for( auto & thread : threads )
         {
             thread.join();
         }
-        
+        ptoc(className()+"::Serialize: allocation");
         
         logprint("Breadth-first scan to serialize the first few levels.");
         
         const Int top_level_count = int_cast<Int>(settings.parallel_perc_depth);
         
+        ptic(className()+"::Serialize: Breadth-first scan to serialize the first few levels.");
         for( Int level = 0; level < top_level_count; ++level )
         {
             for( Cluster_T * C : tree_rows_ptr[level] )
@@ -38,11 +40,13 @@ private:
                 Serialize_Cluster<false>( null, C );
             }
         }
+        ptoc(className()+"::Serialize: Breadth-first scan to serialize the first few levels.");
         
         logprint("Parallel depth-first scans for each subtree.");
         
-        const std::vector<Cluster_T *> & restrict tree_row = tree_rows_ptr[top_level_count];
+        cref<std::vector<Cluster_T *>> tree_row = tree_rows_ptr[top_level_count];
         
+        ptic(className()+"::Serialize: Parallel depth-first scans for each subtree.");
         ParallelDo_Dynamic(
             [=,&tree_row]( const Int thread, const Int i )
             {
@@ -51,9 +55,12 @@ private:
             null, static_cast<Int>(tree_row.size()), one,
             ThreadCount()
         );
+        ptoc(className()+"::Serialize: Parallel depth-first scans for each subtree.");
         
 
         logprint("Reverse breadth-first scans for clean-up.");
+        
+        ptic(className()+"::Serialize: Reverse breadth-first scans for clean-up.");
         for( Int level = top_level_count; level --> 0 ; )
         {
             for( Cluster_T * C : tree_rows_ptr[level] )
@@ -64,6 +71,7 @@ private:
                 }
             }
         }
+        ptoc(className()+"::Serialize: Reverse breadth-first scans for clean-up.");
         
         depth = root->max_depth;
         
@@ -122,7 +130,7 @@ private:
             {
                 Serialize_Cluster<recursive>( thread, L );
                 Serialize_Cluster<recursive>( thread, R );
-
+                
                 Serialize_Cluster_Post(C);
             }
         }
