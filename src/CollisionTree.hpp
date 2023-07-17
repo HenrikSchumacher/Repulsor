@@ -38,7 +38,7 @@ namespace Repulsor
         using PrimitiveCollisionFinder_T = CollisionFinder<AMB_DIM,Real,Int,SReal>;
         
         
-        CollisionTree( const ClusterTree_T & restrict S_, const ClusterTree_T & restrict T_ )
+        CollisionTree( cref<ClusterTree_T> S_, cref<ClusterTree_T> T_ )
         :   Base_T( S_,T_ )
         ,   S( S_ )
         ,   T( T_ )
@@ -70,8 +70,8 @@ namespace Repulsor
         static constexpr Int max_depth = 128;
         static constexpr Int null = static_cast<Int>(0);
         
-        const ClusterTree_T & restrict S; // "left"  BVH (output side of matrix-vector multiplication)
-        const ClusterTree_T & restrict T; // "right" BVH (input  side of matrix-vector multiplication)
+        cref<ClusterTree_T> S; // "left"  BVH (output side of matrix-vector multiplication)
+        cref<ClusterTree_T> T; // "right" BVH (input  side of matrix-vector multiplication)
         
         const Int thread_count = 1;
         
@@ -86,7 +86,7 @@ namespace Repulsor
 
     public:
         
-        const CollisionMatrix_T & PrimitiveCollisionMatrix() const override
+        cref<CollisionMatrix_T> PrimitiveCollisionMatrix() const override
         {
             if( !P_collision_matrix_initialized )
             {
@@ -230,12 +230,12 @@ namespace Repulsor
             return AMB_DIM;
         }
         
-        const ClusterTree_T & GetS() const override
+        cref<ClusterTree_T> GetS() const override
         {
             return S;
         }
         
-        const ClusterTree_T & GetT() const override
+        cref<ClusterTree_T> GetT() const override
         {
             return T;
         }

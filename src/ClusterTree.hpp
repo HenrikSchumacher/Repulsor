@@ -125,16 +125,16 @@ namespace Repulsor
         
         // To allow polymorphism, we require the user to create instances of the desired types for the primitives and the bounding volumes, so that we can Clone() them.
         ClusterTree(
-              const Primitive_T        & restrict P_proto_,
-              const Tensor2<SReal,Int> & restrict P_serialized_,
-              const BoundingVolume_T   & restrict C_proto_,
-              const Tensor1<Int ,Int>  & restrict P_ordering_,
-              const Tensor2<Real,Int>  & restrict P_near_, // data used actual interaction computation; assumed to be of size PrimitiveCount() x NearDim(). For a triangle mesh in 3D, we want to feed each triangles i), area ii) barycenter and iii) normal as a 1 + 3 + 3 = 7 vector
-              const Tensor2<Real,Int>  & restrict P_far_, // data used actual interaction computation; assumed to be of size PrimitiveCount() x FarDim(). For a triangle mesh in 3D, we want to feed each triangles i), area ii) barycenter and iii) orthoprojector onto normal space as a 1 + 3 + 6 = 10 vector
-              const SparseMatrix_T & restrict DiffOp,
-              const SparseMatrix_T & restrict AvOp,
-              const ClusterTreeSettings & restrict settings_ = ClusterTreeSettings()
-              )
+            cref<Primitive_T>         P_proto_,
+            cref<Tensor2<SReal,Int>>  P_serialized_,
+            cref<BoundingVolume_T>    C_proto_,
+            cref<Tensor1<Int ,Int>>   P_ordering_,
+            cref<Tensor2<Real,Int>>   P_near_, // data used actual interaction computation; assumed to be of size PrimitiveCount() x NearDim(). For a triangle mesh in 3D, we want to feed each triangles i), area ii) barycenter and iii) normal as a 1 + 3 + 3 = 7 vector
+            cref<Tensor2<Real,Int>>   P_far_, // data used actual interaction computation; assumed to be of size PrimitiveCount() x FarDim(). For a triangle mesh in 3D, we want to feed each triangles i), area ii) barycenter and iii) orthoprojector onto normal space as a 1 + 3 + 6 = 10 vector
+            cref<SparseMatrix_T>      DiffOp,
+            cref<SparseMatrix_T>      AvOp,
+            cref<ClusterTreeSettings> settings_ = ClusterTreeSettings()
+        )
         :   Base_T( settings_ )
         ,   P_proto      ( ThreadCount() )
         ,   C_proto      ( ThreadCount() )
@@ -347,12 +347,11 @@ namespace Repulsor
                 {
                     const Int j = P_ordering[i];
 
-                    copy_buffer( &P_near_[near_dim * j], P_near.data(i), near_dim );
+                    copy_buffer<VarSize,Sequential>( &P_near_[near_dim * j], P_near.data(i), near_dim );
 
-                    copy_buffer( &P_far_ [ far_dim * j],  P_far.data(i), far_dim  );
+                    copy_buffer<VarSize,Sequential>( &P_far_ [ far_dim * j],  P_far.data(i), far_dim  );
                 },
-                PrimitiveCount(),
-                ThreadCount()
+                PrimitiveCount(), ThreadCount()
             );
             
             ptoc(className()+"::ComputePrimitiveData");
@@ -391,8 +390,7 @@ namespace Repulsor
                             inner__[k] = leaf;
                         }
                     },
-                    LeafClusterCount(),
-                    ThreadCount()
+                    LeafClusterCount(), ThreadCount()
                 );
             }
             
@@ -482,8 +480,7 @@ namespace Repulsor
                                 r_output[to+k] = a * r_input[from+k];
                             }
                         },
-                        PrimitiveCount(),
-                        ThreadCount()
+                        PrimitiveCount(), ThreadCount()
                     );
                 }
 //                ptoc("hi_pre");
@@ -529,8 +526,7 @@ namespace Repulsor
                                 r_output[to+k] = a * r_input[from+k];
                             }
                         },
-                        PrimitiveCount(),
-                        ThreadCount()
+                        PrimitiveCount(), ThreadCount()
                     );
                 }
 //                ptoc("lo_pre");
@@ -601,8 +597,8 @@ namespace Repulsor
                                 
                                 const Int j   = row_size * i;
                                 
-                                copy_buffer( &lo_inner [j], &mi_inner [rp], row_size );
-                                copy_buffer( &lo_values[j], &mi_values[rp], row_size );
+                                copy_buffer<VarSize,Sequential>( &lo_inner [j], &mi_inner [rp], row_size );
+                                copy_buffer<VarSize,Sequential>( &lo_values[j], &mi_values[rp], row_size );
                                 
                             }
                             
@@ -614,12 +610,11 @@ namespace Repulsor
                                 
                                 const Int j   = row_size * (AMB_DIM * i + k - 1);
                                 
-                                copy_buffer( &hi_inner [j], &mi_inner [rp], row_size );
-                                copy_buffer( &hi_values[j], &mi_values[rp], row_size );
+                                copy_buffer<VarSize,Sequential>( &hi_inner [j], &mi_inner [rp], row_size );
+                                copy_buffer<VarSize,Sequential>( &hi_values[j], &mi_values[rp], row_size );
                             }
                         },
-                        primitive_count,
-                        ThreadCount()
+                        primitive_count, ThreadCount()
                     );
                 }
 //                ptoc(tag + ": mi_pre");
@@ -678,8 +673,7 @@ namespace Repulsor
                                 );
                             }
                         },
-                        lo_post.RowCount(),
-                        ThreadCount()
+                        lo_post.RowCount(), ThreadCount()
                     );
                 }
                 
@@ -1195,10 +1189,11 @@ namespace Repulsor
                     ParallelDo(
                         [=]( const Int i )
                         {
-                            copy_buffer( &from[near_dim * inv_ord[i]], &to[near_dim * i], near_dim );
+                            copy_buffer<VarSize,Sequential>(
+                                &from[near_dim * inv_ord[i]], &to[near_dim * i], near_dim
+                            );
                         },
-                        PrimitiveCount(),
-                        ThreadCount()
+                        PrimitiveCount(), ThreadCount()
                     );
                 }
                 else
@@ -1208,8 +1203,7 @@ namespace Repulsor
                         {
                             add_to_buffer( &from[near_dim * inv_ord[i]], &to[near_dim * i], near_dim );
                         },
-                        PrimitiveCount(),
-                        ThreadCount()
+                        PrimitiveCount(), ThreadCount()
                     );
                 }
             }
@@ -1224,7 +1218,7 @@ namespace Repulsor
             
             ptic(className()+"::CollectFarFieldDerivatives");
             
-            const Int far_dim         = FarDim();
+            const Int far_dim = FarDim();
             
             this->RequireBuffers(far_dim);
             
@@ -1246,8 +1240,7 @@ namespace Repulsor
                     {
                         add_to_buffer( &from[far_dim * inv_ord[i]], &to[far_dim * i], far_dim );
                     },
-                    PrimitiveCount(),
-                    ThreadCount()
+                    PrimitiveCount(), ThreadCount()
                 );
             }
             else
@@ -1255,10 +1248,11 @@ namespace Repulsor
                 ParallelDo(
                     [=]( const Int i )
                     {
-                        copy_buffer( &from[far_dim * inv_ord[i]], &to[far_dim * i], far_dim );
+                        copy_buffer<VarSize,Sequential>(
+                            &from[far_dim * inv_ord[i]], &to[far_dim * i], far_dim
+                        );
                     },
-                    PrimitiveCount(),
-                    ThreadCount()
+                    PrimitiveCount(), ThreadCount()
                 );
             }
             

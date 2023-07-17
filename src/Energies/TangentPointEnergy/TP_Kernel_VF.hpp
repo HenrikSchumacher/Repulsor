@@ -63,7 +63,7 @@ namespace Repulsor
         TP_Kernel_VF() = delete;
         
         TP_Kernel_VF(
-            Configurator_T & conf, const Int thread_,
+            mref<Configurator_T> conf, const Int thread_,
             const Real theta_, const Int max_refinement_, const T1 q_half_, const T2 p_half_
         )
         :   Base_T               (conf, thread_, theta_, max_refinement_ )
@@ -76,7 +76,7 @@ namespace Repulsor
         ,   minus_p_half_minus_1 (-p_half-1  )
         {}
         
-        TP_Kernel_VF( TP_Kernel_VF & other, const Int thread_ )
+        TP_Kernel_VF( mref<TP_Kernel_VF> other, const Int thread_ )
         :   Base_T               (other, thread_            )
         ,   q                    (other.q                   )
         ,   q_half               (other.q_half              )
@@ -123,11 +123,10 @@ namespace Repulsor
         const T2   p_half;
         const T2   minus_p_half;
         const T2   minus_p_half_minus_1;
-        
-        
-        Real ij_block [BLOCK_NNZ]  = {};
-        Real ii_block [ROWS][COLS] = {{}};
-        Real jj_block [ROWS][COLS] = {{}};
+                
+        Tiny::Vector<BLOCK_NNZ,Real,Int> ij_block;
+        Tiny::Matrix<ROWS,COLS,Real,Int> ii_block;
+        Tiny::Matrix<ROWS,COLS,Real,Int> jj_block;
         
     protected:
         
@@ -395,7 +394,7 @@ namespace Repulsor
             
             if constexpr ( metric_flag )
             {
-                zerofy_buffer<DIAG_NNZ>( &ii_block[0][0] );
+                ii_block.SetZero();
             }
         }
         
@@ -405,7 +404,7 @@ namespace Repulsor
             
             if constexpr ( metric_flag )
             {
-                add_to_buffer<DIAG_NNZ>( &ii_block[0][0], &S_diag[DIAG_NNZ * i_global] );
+                ii_block.AddTo( &S_diag[DIAG_NNZ * i_global] );
             }
         }
         
@@ -415,9 +414,9 @@ namespace Repulsor
             
             if constexpr ( metric_flag )
             {
-                zerofy_buffer<BLOCK_NNZ>( &ij_block[0] );
+                ij_block.SetZero();
                 
-                zerofy_buffer< DIAG_NNZ>( &jj_block[0][0] );
+                jj_block.SetZero();
             }
         }
 
@@ -428,7 +427,7 @@ namespace Repulsor
             
             if constexpr ( metric_flag )
             {
-                add_to_buffer<DIAG_NNZ>( &jj_block[0][0], &T_diag[DIAG_NNZ * j_global] );
+                jj_block.AddTo( &T_diag[DIAG_NNZ * j_global] );
             }
         }
         

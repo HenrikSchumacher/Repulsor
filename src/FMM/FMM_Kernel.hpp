@@ -45,7 +45,7 @@ namespace Repulsor
 
         FMM_Kernel() = delete;
         
-        explicit FMM_Kernel( Configurator_T & conf, const Int thread_ )
+        explicit FMM_Kernel( mref<Configurator_T> conf, const Int thread_ )
         :   thread        ( thread_              )
         ,   S             ( conf.GetS()          )
         ,   T             ( conf.GetT()          )
@@ -54,7 +54,7 @@ namespace Repulsor
             debug_print(std::string( "Initializing " + this-> ClassName() + " from Configurator_T on thread " + ToString(thread)) );
         }
         
-        FMM_Kernel( const FMM_Kernel & other, const Int thread_ )
+        FMM_Kernel( cref<FMM_Kernel> other, const Int thread_ )
         :   thread        ( thread_              )
         ,   S             ( other.S              )
         ,   T             ( other.T              )
@@ -78,12 +78,12 @@ namespace Repulsor
 
     public:
         
-        const ClusterTree_T & GetS() const
+        cref<ClusterTree_T> GetS() const
         {
             return S;
         }
         
-        const ClusterTree_T & GetT() const
+        cref<ClusterTree_T> GetT() const
         {
             return T;
         }
@@ -95,10 +95,10 @@ namespace Repulsor
         
     protected:
         
-        const ClusterTree_T & S;
-        const ClusterTree_T & T;
+        cref<ClusterTree_T> S;
+        cref<ClusterTree_T> T;
         
-        ValueContainer_T & metric_values;
+        mref<ValueContainer_T> metric_values;
         
     public:
         

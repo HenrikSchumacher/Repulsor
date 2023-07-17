@@ -71,6 +71,8 @@ namespace Repulsor
         {
             // see https://stackoverflow.com/questions/5695548/public-friend-swap-member-function for details
             using std::swap;
+            
+            swap( static_cast<Base_T&>(X), static_cast<Base_T&>(Y) );
 
             swap( X.tree_string,            Y.tree_string           );
             swap( X.inter_idx,              Y.inter_idx             );

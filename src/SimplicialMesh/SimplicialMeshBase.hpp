@@ -57,13 +57,13 @@ namespace Repulsor
         
         virtual Int AmbDim() const = 0;
 
-        virtual const Tensor2<Real,Int> & VertexCoordinates() const = 0;
+        virtual cref<Tensor2<Real,Int>> VertexCoordinates() const = 0;
         
-        virtual const Tensor2<Int,Int> & Simplices() const = 0;
+        virtual cref<Tensor2<Int,Int>> Simplices() const = 0;
 
-        virtual const Tensor1<Real,Int> & VertexCharges() const = 0;
+        virtual cref<Tensor1<Real,Int>> VertexCharges() const = 0;
         
-        virtual const Tensor1<Real,Int> & SimplexCharges() const = 0;
+        virtual cref<Tensor1<Real,Int>> SimplexCharges() const = 0;
         
         virtual Int FarDim() const = 0;
         
@@ -75,7 +75,7 @@ namespace Repulsor
         
         virtual Int DofCount() const = 0;
         
-        virtual const Real * Dofs() const = 0;
+        virtual cptr<Real> Dofs() const = 0;
         
         virtual Int ThreadCount() const
         {
@@ -84,13 +84,13 @@ namespace Repulsor
         
         virtual void SemiStaticUpdate( cptr<ExtReal> V_coords_, const bool transp_ = false ) const = 0;
         
-        virtual const ClusterTreeBase_T & GetClusterTree() const = 0;
+        virtual cref<ClusterTreeBase_T> GetClusterTree() const = 0;
         
-        virtual const BlockClusterTreeBase_T & GetBlockClusterTree() const = 0;
+        virtual cref<BlockClusterTreeBase_T> GetBlockClusterTree() const = 0;
         
-        virtual const CollisionTreeBase_T & GetCollisionTree() const = 0;
+        virtual cref<CollisionTreeBase_T> GetCollisionTree() const = 0;
                 
-        virtual const SparseBinaryMatrix_T & DerivativeAssembler() const = 0;
+        virtual cref<SparseBinaryMatrix_T> DerivativeAssembler() const = 0;
         
         virtual void Assemble_ClusterTree_Derivatives(
             mptr<ExtReal> output,
@@ -120,15 +120,15 @@ namespace Repulsor
         ) = 0;
         
         
-        virtual       SparseMatrix_T & H1Metric() const = 0;
+        virtual mref<SparseMatrix_T> H1Metric() const = 0;
         
 //        virtual std::shared_ptr<Sparse::CholeskyDecomposition<Real,Int,LInt> H1Solver() const = 0;
         
-        virtual const SparseMatrix_T & StiffnessMatrix() const = 0;
+        virtual cref<SparseMatrix_T> StiffnessMatrix() const = 0;
         
-        virtual const SparseMatrix_T & MassMatrix() const = 0;
+        virtual cref<SparseMatrix_T> MassMatrix() const = 0;
         
-        virtual const Tensor1<Int,Int> & NestedDissectionOrdering() const = 0;
+        virtual cref<Tensor1<Int,Int>> NestedDissectionOrdering() const = 0;
         
         virtual void H1Solve( cptr<ExtReal> X, mptr<ExtReal> Y, const Int nrhs ) const = 0;
         
@@ -144,15 +144,15 @@ namespace Repulsor
         
         virtual void  LoadObstacle( std::unique_ptr<SimplicialMeshBase> obstacle ) = 0;
 
-        virtual const SimplicialMeshBase & GetObstacle() const = 0;
+        virtual cref<SimplicialMeshBase> GetObstacle() const = 0;
         
 //        virtual bool  ObstacleInitialized() const = 0;
         
-        virtual const ClusterTreeBase_T & GetObstacleClusterTree() const = 0;
+        virtual cref<ClusterTreeBase_T> GetObstacleClusterTree() const = 0;
         
-        virtual const ObstacleBlockClusterTreeBase_T & GetObstacleBlockClusterTree() const = 0;
+        virtual cref<ObstacleBlockClusterTreeBase_T> GetObstacleBlockClusterTree() const = 0;
         
-        virtual const ObstacleCollisionTreeBase_T & GetObstacleCollisionTree() const = 0;
+        virtual cref<ObstacleCollisionTreeBase_T> GetObstacleCollisionTree() const = 0;
     
             
 //##############################################################################################
@@ -161,7 +161,7 @@ namespace Repulsor
      
     public:
         
-        virtual void WriteToFile( const std::string & file_name ) const = 0;
+        virtual void WriteToFile( cref<std::string> file_name ) const = 0;
         
 //##############################################################################################
 //      Remesher

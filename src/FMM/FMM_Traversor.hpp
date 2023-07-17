@@ -27,13 +27,13 @@ namespace Repulsor
         
         FMM_Traversor() = delete;
         
-        FMM_Traversor( const Pattern_T & pattern_, Kernel_T & kernel_ )
+        FMM_Traversor( cref<Pattern_T> pattern_, mref<Kernel_T> kernel_ )
         :   pattern ( pattern_ )
         ,   kernel  ( kernel_  )
         {}
         
         // Copy constructor
-        FMM_Traversor( const FMM_Traversor & other )
+        FMM_Traversor( cref<FMM_Traversor> other )
         :   pattern ( other.pattern )
         ,   kernel  ( other.kernel  )
         {}
@@ -42,7 +42,7 @@ namespace Repulsor
         
     protected:
     
-        const Pattern_T & pattern;
+        cref<Pattern_T> pattern;
         
         Kernel_T kernel;
         
@@ -58,7 +58,7 @@ namespace Repulsor
                 return static_cast<Real> (0);
             }
 
-            const auto & job_ptr = COND(
+            const auto & restrict job_ptr = COND(
                 symmetricQ,
                 pattern.UpperTriangularJobPtr(),
                 pattern.JobPtr()

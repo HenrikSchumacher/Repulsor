@@ -129,7 +129,7 @@ int main(int argc, const char * argv[])
     mptr<Real> B  = B_buffer.data();
     mptr<Real> X  = X_buffer.data();
     mptr<Real> Y  = Y_buffer.data();
-//    mut<Real> Z  = Z_buffer.data();
+//    mptr<Real> Z  = Z_buffer.data();
     
     tic("tpe.Differential(M)");
     tpe.Differential(M, B );
@@ -140,7 +140,6 @@ int main(int argc, const char * argv[])
     // The operator for the metric.
     auto A = [&]( cptr<Real> X, mptr<Real> Y )
     {
-        
         //Y = alpha * A * X + beta * Y
         tpm.MultiplyMetric( M, Scalar::One<Real>, X, Scalar::Zero<Real>, Y, NRHS );
     };
@@ -178,6 +177,16 @@ int main(int argc, const char * argv[])
     const Int max_iter = 100;
     
     ConjugateGradient<NRHS,Real,Int> CG ( M.VertexCount(), max_iter, thread_count );
+    
+    tic("CG");
+    CG( A, P, B, NRHS, X, NRHS, 0.0001 );
+    toc("CG");
+    
+    print("");
+    
+    dump(CG.IterationCount());
+    dump(CG.RelativeResiduals());
+    
     
     tic("CG");
     CG( A, P, B, NRHS, X, NRHS, 0.0001 );

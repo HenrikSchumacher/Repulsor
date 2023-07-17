@@ -22,7 +22,7 @@ protected:
         const Int L = C_left [C];
         const Int R = C_right[C];
         
-        mut<Real> C_C = C_far.data(C);
+        mptr<Real> C_C = C_far.data(C);
         
         if( L >= 0 && R >= 0 )
         {
@@ -37,8 +37,8 @@ protected:
             }
             #pragma omp taskwait
 
-            ptr<Real> C_L = C_far.data(L);
-            ptr<Real> C_R = C_far.data(R);
+            cptr<Real> C_L = C_far.data(L);
+            cptr<Real> C_R = C_far.data(R);
             
             Real L_weight = C_L[0];
             Real R_weight = C_R[0];
@@ -66,7 +66,7 @@ protected:
             
             for( Int i = begin; i < end; ++i )
             {
-                ptr<Real> P = P_far.data(i);
+                cptr<Real> P = P_far.data(i);
                 
                 const Real a = P[0];
                 

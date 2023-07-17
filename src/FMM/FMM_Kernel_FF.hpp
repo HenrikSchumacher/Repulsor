@@ -51,23 +51,23 @@ namespace Repulsor
         mutable Real b   = Scalar::Zero<Real>;
         
 #ifdef FarField_S_Copy
-        mutable Real x [AMB_DIM] = {};
-        mutable Real P [PROJ_DIM] = {};
+        mutable Tiny::Vector<AMB_DIM, Real,Int> x;
+        mutable Tiny::Vector<PROJ_DIM,Real,Int> P;
 #else
         mutable Real const * restrict x = nullptr;
         mutable Real const * restrict P = nullptr;
 #endif
         
 #ifdef FarField_T_Copy
-        mutable Real y [AMB_DIM] = {};
-        mutable Real Q [PROJ_DIM] = {};
+        mutable Tiny::Vector<AMB_DIM, Real,Int> y;
+        mutable Tiny::Vector<PROJ_DIM,Real,Int> Q;
 #else
         mutable Real const * restrict y = nullptr;
         mutable Real const * restrict Q = nullptr;
 #endif
         
-        mutable Real DX [S_DATA_DIM] = {};
-        mutable Real DY [T_DATA_DIM] = {};
+        mutable Tiny::Vector<S_DATA_DIM,Real,Int> DX;
+        mutable Tiny::Vector<T_DATA_DIM,Real,Int> DY;
         
         cptr<Real> S_data   = nullptr;
         mptr<Real> S_D_data = nullptr;
@@ -83,7 +83,7 @@ namespace Repulsor
         
         FMM_Kernel_FF() = default;
         
-        explicit FMM_Kernel_FF( Configurator_T & conf, Int thread_ )
+        explicit FMM_Kernel_FF( mref<Configurator_T> conf, Int thread_ )
         :   Base_T      ( conf, thread_                                    )
         ,   S_data      ( GetS().ClusterFarFieldData().data()              )
         ,   S_D_data    ( GetS().ThreadClusterDFarFieldData().data(thread) )
@@ -121,7 +121,7 @@ namespace Repulsor
             }
         }
         
-        FMM_Kernel_FF( FMM_Kernel_FF & other, Int thread_ )
+        FMM_Kernel_FF( mref<FMM_Kernel_FF> other, Int thread_ )
         :   Base_T      ( other, thread_                                         )
         ,   metric_data ( other.OffDiag().data()                                 )
         ,   S_data      ( other.S_data                                           )
@@ -156,8 +156,8 @@ namespace Repulsor
 
             a = X[0];
 #ifdef FarField_S_Copy
-            copy_buffer<AMB_DIM >( &X[1],         &x[0] );
-            copy_buffer<PROJ_DIM>( &X[1+AMB_DIM], &P[0] );
+            x.Read( &X[1] );
+            P.Read( &X[1+AMB_DIM] );
 #else
             x = &X[1];
             P = &X[1 + AMB_DIM];
@@ -165,7 +165,7 @@ namespace Repulsor
             
             if constexpr ( diff_flag )
             {
-                zerofy_buffer<S_DATA_DIM>( &DX[0] );
+                DX.SetZero();
             }
         }
         
@@ -175,15 +175,15 @@ namespace Repulsor
             
             b = Y[0];
 #ifdef FarField_T_Copy
-            copy_buffer<AMB_DIM >( &Y[1],         &y[0] );
-            copy_buffer<PROJ_DIM>( &Y[1+AMB_DIM], &Q[0] );
+            y.Read( &Y[1] );
+            Q.Read( &Y[1+AMB_DIM] );
 #else
             y = &Y[1];
             Q = &Y[1 + AMB_DIM];
 #endif
             if constexpr ( diff_flag )
             {
-                zerofy_buffer<T_DATA_DIM>( &DY[0] );
+                DY.SetZero();
             }
         }
             
@@ -191,12 +191,9 @@ namespace Repulsor
         {
             if constexpr ( diff_flag )
             {
-                mptr<Real> to = &S_D_data[S_DATA_DIM * i_global];
-                
-                for( Int k = 0; k < S_DATA_DIM; ++k )
-                {
-                    to[k] += symmetry_factor * DX[k];
-                }
+                combine_buffers<Scalar::Flag::Generic,Scalar::Flag::Plus,S_DATA_DIM>(
+                    symmetry_factor, DX.data(), Scalar::One<Real>, &S_D_data[S_DATA_DIM * i_global]
+                );
             }
         }
         
@@ -204,39 +201,36 @@ namespace Repulsor
         {
             if constexpr (diff_flag )
             {
-                mptr<Real> to = &T_D_data[T_DATA_DIM * j_global];
-                
-                for( Int k = 0; k < T_DATA_DIM; ++k )
-                {
-                    to[k] += symmetry_factor * DY[k];
-                }
+                combine_buffers<Scalar::Flag::Generic,Scalar::Flag::Plus,T_DATA_DIM>(
+                    symmetry_factor, DY.data(), Scalar::One<Real>, &T_D_data[T_DATA_DIM * j_global]
+                );
             }
         }
         
         
     public:
 
-        Values_T & OffDiag()
+        mref<Values_T> OffDiag()
         {
             return this->metric_values.FF;
         }
         
-        const Values_T & OffDiag() const
+        cref<Values_T> OffDiag() const
         {
             return this->metric_values.FF;
         }
         
-        Values_T & Diag()
+        mref<Values_T> Diag()
         {
             return this->metric_values.FF_diag;
         }
         
-        const Values_T & Diag() const
+        cref<Values_T> Diag() const
         {
             return this->metric_values.FF_diag;
         }
 
-        void Reduce( const FMM_Kernel_FF & ker )
+        void Reduce( cref<FMM_Kernel_FF> ker )
         {}
         
         std::string ClassName() const

@@ -58,23 +58,21 @@ namespace Repulsor
         
         TP0_Kernel_MultiplyMetric() = delete;
         
-        explicit TP0_Kernel_MultiplyMetric( Real * restrict const A_ )
+        explicit TP0_Kernel_MultiplyMetric( mptr<Real> A_ )
         :   Base_T( A_ )
         {}
         
         TP0_Kernel_MultiplyMetric(
             cptr<Real>     A_,
-            cref<Real_out> alpha_,
-            cptr<Real_in>  X_,
-            cref<Real_out> beta_,
-                           mptr<Real>      Y_,
+            cref<Real_out> alpha_,  cptr<Real_in> X_,
+            cref<Real_out> beta_,   mptr<Real>    Y_,
             const Int      rhs_count_
         )
         :   Base_T( A_, alpha_, X_, beta_, Y_, rhs_count_ )
         {}
         
         // Copy constructor
-        TP0_Kernel_MultiplyMetric( const TP0_Kernel_MultiplyMetric & other ) : Base_T(other) {}
+        TP0_Kernel_MultiplyMetric( cref<TP0_Kernel_MultiplyMetric> other ) : Base_T(other) {}
         
         ~TP0_Kernel_MultiplyMetric() = default;
         

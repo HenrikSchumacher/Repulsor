@@ -70,13 +70,13 @@ namespace Repulsor
         
         PseudoLaplacian_Kernel_NF() = delete;
         
-        PseudoLaplacian_Kernel_NF( Configurator_T & conf, const Int thread_, const Real s_ )
+        PseudoLaplacian_Kernel_NF( mref<Configurator_T> conf, const Int thread_, const Real s_ )
         :   Base_T ( conf, thread_                   )
         ,   s      ( s_                              )
         ,   s_exp  ( -S_DOM_DIM/two - (s-high_order) )
         {}
         
-        PseudoLaplacian_Kernel_NF( PseudoLaplacian_Kernel_NF & other, const Int thread_ )
+        PseudoLaplacian_Kernel_NF( mref<PseudoLaplacian_Kernel_NF> other, const Int thread_ )
         :   Base_T (other, thread_  )
         ,   s      (other.s         )
         ,   s_exp  (other.s_exp     )
@@ -105,8 +105,8 @@ namespace Repulsor
         const Real s;
         const Real s_exp;
         
-        Real ii_block [BLOCK_NNZ]  = {};
-        Real jj_block [BLOCK_NNZ]  = {};
+        Real ii_block;
+        Real jj_block;
         
     public:
         
@@ -129,10 +129,10 @@ namespace Repulsor
             const Real a_over_b = a/b;
             
             metric_data[BLOCK_NNZ * k_global] = val;
-            ii_block[0] -=   b_over_a * val;
-            jj_block[0]  = - a_over_b * val;
+            ii_block -=   b_over_a * val;
+            jj_block  = - a_over_b * val;
             
-            return 0;
+            return Scalar::Zero<Real>;
         }
         
         
@@ -140,26 +140,26 @@ namespace Repulsor
         {
             this->loadS( i_global );
             
-            ii_block[0] = 0;
+            ii_block = Scalar::Zero<Real>;
         }
         
         force_inline void WriteS( const Int i_global )
         {
             this->writeS( i_global );
             
-            S_diag[DIAG_NNZ * i_global] += ii_block[0];
+            S_diag[DIAG_NNZ * i_global] += ii_block;
         }
         
         force_inline void LoadT( const Int j_global )
         {
             this->loadT( j_global );
             
-            jj_block[0] = 0;
+            jj_block = Scalar::Zero<Real>;
         }
 
         force_inline void WriteT( const Int j_global )
         {
-            T_diag[DIAG_NNZ * j_global] += jj_block[0];
+            T_diag[DIAG_NNZ * j_global] += jj_block;
         }
         
         std::string className() const

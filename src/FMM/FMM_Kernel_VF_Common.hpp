@@ -108,7 +108,8 @@ public:
         
         if constexpr ( metric_flag )
         {
-            copy_buffer<BLOCK_NNZ>( &ij_block[0], &metric_data[BLOCK_NNZ * k_global] );
+            ij_block.Write( &metric_data[BLOCK_NNZ * k_global] );
+//            copy_buffer<BLOCK_NNZ>( &ij_block[0], &metric_data[BLOCK_NNZ * k_global] );
         }
         
         return this->symmetry_factor * sum;

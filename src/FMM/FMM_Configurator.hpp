@@ -40,14 +40,18 @@ namespace Repulsor
 
         FMM_Configurator() = delete;
         
-        FMM_Configurator( const ClusterTree_T & S_, const ClusterTree_T & T_, ValueContainer_T & metric_values_ )
+        FMM_Configurator(
+            cref<ClusterTree_T> S_,
+            cref<ClusterTree_T> T_,
+            mref<ValueContainer_T> metric_values_
+        )
         :   S             ( S_             )
         ,   T             ( T_             )
         ,   metric_values ( metric_values_ )
         {}
         
         // Copy constructor
-        FMM_Configurator( const FMM_Configurator & other )
+        FMM_Configurator( cref<FMM_Configurator> other )
         :   S             ( other.S             )
         ,   T             ( other.T             )
         ,   metric_values ( other.metric_values )
@@ -57,24 +61,24 @@ namespace Repulsor
 
     protected:
 
-        const ClusterTree_T & S;
-        const ClusterTree_T & T;
+        cref<ClusterTree_T> S;
+        cref<ClusterTree_T> T;
         
-        ValueContainer_T & metric_values;
+        mref<ValueContainer_T> metric_values;
 
     public:
         
-        const ClusterTree_T & GetS() const
+        cref<ClusterTree_T> GetS() const
         {
             return S;
         }
         
-        const ClusterTree_T & GetT() const
+        cref<ClusterTree_T> GetT() const
         {
             return T;
         }
         
-        ValueContainer_T & MetricValues()
+        mref<ValueContainer_T> MetricValues()
         {
             return metric_values;
         }

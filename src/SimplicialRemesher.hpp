@@ -606,7 +606,7 @@ namespace Repulsor
         }
         
         
-        virtual const Tensor2<Real,Int> & VertexCoordinates() override
+        virtual cref<Tensor2<Real,Int>> VertexCoordinates() override
         {
             return V_coords;
         }
@@ -617,12 +617,12 @@ namespace Repulsor
 //            return Tensor2<Real,Int>( V_data.data(), vertex_count, V_data.Dimension(1) );
 //        }
         
-        virtual const Tensor2<Real,Int> & VertexData() override
+        virtual cref<Tensor2<Real,Int>> VertexData() override
         {
             return V_data;
         }
         
-        virtual const Tensor2<Int,Int> & Simplices() override
+        virtual cref<Tensor2<Int,Int>> Simplices() override
         {
             return simplices;
         }

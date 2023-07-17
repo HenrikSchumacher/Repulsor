@@ -279,7 +279,7 @@ namespace Repulsor
         template< typename T1, typename T2, int q_flag >
         void VF_Compute( const T1 q_half_, const T2 p_half_ )
         {
-            if constexpr ( S_DOM_DIM == 0 && T_DOM_DIM == 0 )
+            if( bct.VeryNear().NonzeroCount() == 0 )
             {
                 return;
             }
@@ -318,6 +318,11 @@ namespace Repulsor
         template< typename T1, typename T2, int q_flag >
         void NF_Compute( const T1 q_half_, const T2 p_half_ )
         {
+            if( bct.Near().NonzeroCount() == 0 )
+            {
+                return;
+            }
+            
             ptic(ClassName()+"::NF_Compute");
 
             using Kernel_T = TP_Kernel_NF<
@@ -353,6 +358,11 @@ namespace Repulsor
         template< typename T1, typename T2, int q_flag >
         void FF_Compute( const T1 q_half_, const T2 p_half_ )
         {
+            if( bct.Far().NonzeroCount() == 0 )
+            {
+                return;
+            }
+            
             ptic(ClassName()+"::FF_Compute");
             
             using Kernel_T = TP_Kernel_FF<

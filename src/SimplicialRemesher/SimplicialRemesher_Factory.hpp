@@ -38,15 +38,15 @@ namespace Repulsor
 
         template<typename ExtReal, typename ExtInt>
         std::unique_ptr<RemesherBase_T> Make(
-            ptr<ExtReal> vertex_coords, // vertex coordinates; size = vertex_count_ x amb_dim
-            const Int    vertex_count,
-            const Int    amb_dim,
-            const bool   vertex_coords_ColMajorQ, // whether to transpose input; set to false for row-major
-            ptr<ExtInt>  simplices, // simplices; size = simplex_count_ x simplex_size
-            const Int    simplex_count,
-            const Int    simplex_size,
-            const bool   simplices_ColMajorQ, // whether to transpose input; set to false for row-major
-            const Int    thread_count = 1
+            cptr<ExtReal> vertex_coords, // vertex coordinates; size = vertex_count_ x amb_dim
+            const Int     vertex_count,
+            const Int     amb_dim,
+            const bool    vertex_coords_ColMajorQ, // whether to transpose input; set to false for row-major
+            cptr<ExtInt>  simplices, // simplices; size = simplex_count_ x simplex_size
+            const Int     simplex_count,
+            const Int     simplex_size,
+            const bool    simplices_ColMajorQ, // whether to transpose input; set to false for row-major
+            const Int     thread_count = 1
         )
         {
             const Int dom_dim = simplex_size-1;
@@ -79,15 +79,15 @@ namespace Repulsor
         
         template<Int AmbDim, typename ExtReal, typename ExtInt>
         std::unique_ptr<RemesherBase_T> make_1(
-            ptr<ExtReal> v,
-            const Int    v_cnt,
-            const Int    amb_dim,
-            const bool   vertex_coords_ColMajorQ,
-            ptr<ExtInt>  s,
-            const Int    s_cnt,
-            const Int    dom_dim,
-            const bool   simplices_ColMajorQ,
-            const Int    thread_count = 1
+            cptr<ExtReal> v,
+            const Int     v_cnt,
+            const Int     amb_dim,
+            const bool    vertex_coords_ColMajorQ,
+            cptr<ExtInt>  s,
+            const Int     s_cnt,
+            const Int     dom_dim,
+            const bool    simplices_ColMajorQ,
+            const Int     thread_count = 1
         )
         {
             if( amb_dim == AmbDim )
@@ -115,15 +115,15 @@ namespace Repulsor
         
         template<Int DomDim, Int AmbDim, typename ExtInt>
         std::unique_ptr<RemesherBase_T> make_2(
-            ptr<ExtReal> v,
-            const Int    v_cnt,
-            const Int    amb_dim,
-            const bool   vertex_coords_ColMajorQ,
-            ptr<ExtInt>  s,
-            const Int    s_cnt,
-            const Int    dom_dim,
-            const bool   simplices_ColMajorQ,
-            const Int    thread_count = 1
+            cptr<ExtReal> v,
+            const Int     v_cnt,
+            const Int     amb_dim,
+            const bool    vertex_coords_ColMajorQ,
+            cptr<ExtInt>  s,
+            const Int     s_cnt,
+            const Int     dom_dim,
+            const bool    simplices_ColMajorQ,
+            const Int     thread_count = 1
         )
         {
             if( dom_dim == DomDim )

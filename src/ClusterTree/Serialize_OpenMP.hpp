@@ -6,7 +6,7 @@ private:
         
         //            tree_max_depth = root->max_depth;
         //
-        // We have to allocated these two arrays first, so that ClusterCount() and LeafClusterCount() return correct results.
+        // We have to allocate these two arrays first, so that ClusterCount() and LeafClusterCount() return correct results.
         C_serialized  = Tensor2<SReal,Int>( root->descendant_count, C_proto[0]->Size() );
         leaf_clusters = Tensor1<Int,Int>( root->descendant_leaf_count );
         

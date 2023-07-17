@@ -177,6 +177,11 @@ namespace Repulsor
         
         void VF_Compute()
         {
+            if( bct.VeryNear().NonzeroCount() == 0 )
+            {
+                return;
+            }
+            
             ptic(ClassName()+"::VF_Compute");
             
             using Kernel_T = PseudoLaplacian_Kernel_VF<
@@ -208,6 +213,11 @@ namespace Repulsor
         
         void NF_Compute()
         {
+            if( bct.Near().NonzeroCount() == 0 )
+            {
+                return;
+            }
+            
             ptic(ClassName()+"::NF_Compute");
 
             using Kernel_T = PseudoLaplacian_Kernel_NF<
@@ -239,6 +249,11 @@ namespace Repulsor
         
         void FF_Compute()
         {
+            if( bct.Far().NonzeroCount() == 0 )
+            {
+                return;
+            }
+            
             ptic(ClassName()+"::FF_Compute");
             
             using Kernel_T = PseudoLaplacian_Kernel_FF<

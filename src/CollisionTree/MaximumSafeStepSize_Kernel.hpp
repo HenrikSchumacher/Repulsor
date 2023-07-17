@@ -24,8 +24,8 @@ namespace Repulsor
         ~MaximumSafeStepSize_Kernel() = default;
         
         MaximumSafeStepSize_Kernel(
-            const ClusterTree_T & restrict S,
-            const ClusterTree_T & restrict T,
+            cref<ClusterTree_T> S,
+            cref<ClusterTree_T> T,
             const SReal t_init_,
             const SReal TOL
         )
@@ -45,7 +45,7 @@ namespace Repulsor
         {}
         
 
-        MaximumSafeStepSize_Kernel( const MaximumSafeStepSize_Kernel & restrict other )
+        MaximumSafeStepSize_Kernel( cref<MaximumSafeStepSize_Kernel> other )
         :   Base_T( other )
         ,   S_C_ser     ( other.S_C_ser     )
         ,   S_C_up_ser  ( other.S_C_up_ser  )
@@ -65,6 +65,8 @@ namespace Repulsor
         {
             // see https://stackoverflow.com/questions/5695548/public-friend-swap-member-function for details
             using std::swap;
+            
+            swap( static_cast<Base_T&>(X), static_cast<Base_T&>(Y) );
 
             swap( X.S_C_ser,        Y.S_C_ser       );
             swap( X.S_C_up_ser,     Y.S_C_up_ser    );

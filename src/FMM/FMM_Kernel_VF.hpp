@@ -61,41 +61,41 @@ namespace Repulsor
         mutable Real a   = Scalar::Zero<Real>;
         mutable Real b   = Scalar::Zero<Real>;
         
-        mutable Real x [AMB_DIM] = {};
+        mutable Tiny::Vector<AMB_DIM,Real,Int> x;
 #ifdef NearField_S_Copy
-        mutable Real P [PROJ_DIM] = {};
+        mutable Tiny::Vector<PROJ_DIM,Real,Int> P;
 #else
         mutable Real const * restrict P = nullptr;
 #endif
         
-        mutable Real y [AMB_DIM] = {};
+        mutable Tiny::Vector<AMB_DIM,Real,Int> y;
 #ifdef NearField_T_Copy
-        mutable Real Q [PROJ_DIM] = {};
+        mutable Tiny::Vector<PROJ_DIM,Real,Int> Q;
 #else
         mutable Real const * restrict Q = nullptr;
 #endif
         
-        mutable Real DX [S_DATA_DIM] = {};
-        mutable Real DY [T_DATA_DIM] = {};
+        mutable Tiny::Vector<S_DATA_DIM,Real,Int> DX;
+        mutable Tiny::Vector<T_DATA_DIM,Real,Int> DY;
         
-        const  Real * restrict const S_data    = nullptr;
-               Real * restrict const S_D_data  = nullptr;
-               Real * restrict const S_diag    = nullptr;
-        const SReal * restrict const S_ser     = nullptr;
+        cptr< Real> S_data    = nullptr;
+        mptr< Real> S_D_data  = nullptr;
+        mptr< Real> S_diag    = nullptr;
+        cptr<SReal> S_ser     = nullptr;
         
-        const  Real * restrict const T_data    = nullptr;
-               Real * restrict const T_D_data  = nullptr;
-               Real * restrict const T_diag    = nullptr;
-        const SReal * restrict const T_ser     = nullptr;
+        cptr< Real> T_data    = nullptr;
+        mptr< Real> T_D_data  = nullptr;
+        mptr< Real> T_diag    = nullptr;
+        cptr<SReal> T_ser     = nullptr;
 
 #ifdef NearField_S_Copy
-        mutable Real x_buffer [S_DATA_DIM] = {};
+        mutable Tiny::Vector<S_DATA_DIM,Real,Int> x_buffer;
 #else
         mutable Real const * restrict x_buffer  = nullptr;
 #endif
         
 #ifdef NearField_T_Copy
-        mutable Real y_buffer [T_DATA_DIM] = {};
+        mutable Tiny::Vector<T_DATA_DIM,Real,Int> y_buffer;
 #else
         mutable Real const * restrict y_buffer  = nullptr;
 #endif
@@ -104,8 +104,8 @@ namespace Repulsor
         mutable S_Tree_T S_Tree;
         mutable T_Tree_T T_Tree;
         
-        const SReal * restrict const lambda = S_Tree.Center();
-        const SReal * restrict const mu     = T_Tree.Center();
+        cptr<SReal> lambda = S_Tree.Center();
+        cptr<SReal> mu     = T_Tree.Center();
         
         mutable GJK_T gjk;
         
@@ -135,7 +135,7 @@ namespace Repulsor
 //        FMM_Kernel_VF() = default;
         FMM_Kernel_VF() = delete;
         
-        FMM_Kernel_VF( Configurator_T & conf, const Int thread_, const Real theta_, const Int max_refinement_  )
+        FMM_Kernel_VF( mref<Configurator_T> conf, const Int thread_, const Real theta_, const Int max_refinement_  )
         :   Base_T         ( conf, thread_                                       )
         ,   S_data         ( GetS().PrimitiveNearFieldData().data()              )
         ,   S_D_data       ( GetS().ThreadPrimitiveDNearFieldData().data(thread) )
@@ -170,7 +170,7 @@ namespace Repulsor
             }
         }
         
-        FMM_Kernel_VF( FMM_Kernel_VF & other, const Int thread_ )
+        FMM_Kernel_VF( mref<FMM_Kernel_VF> other, const Int thread_ )
         :   Base_T      ( other, thread_                                            )
         ,   metric_data ( other.OffDiag().data()                                    )
         ,   S_data      ( other.S_data                                              )
@@ -228,43 +228,43 @@ namespace Repulsor
 
         force_inline void loadS( const Int i_global )
         {
-            const Real * const X = &S_data[S_DATA_DIM * i_global];
+            cptr<Real> X = &S_data[S_DATA_DIM * i_global];
     
             S_Tree.RequireSimplex(S_ser, i_global);
             
             a = X[0];
         
 #ifdef NearField_S_Copy
-            copy_buffer<S_COORD_DIM>( &X[1],             &x_buffer[0] );
-            copy_buffer<PROJ_DIM   >( &X[1+S_COORD_DIM], &P[0]        );
+            x_buffer.Read( &X[1] );
+            P.Read( &X[1+S_COORD_DIM] );
 #else
             x_buffer = &X[1];
             P        = &X[1+T_COORD_DIM];
 #endif
             if constexpr ( diff_flag )
             {
-                zerofy_buffer<S_DATA_DIM>( &DX[0] );
+                DX.SetZero();
             }
         }
         
         force_inline void loadT( const Int j_global )
         {
-            const Real * const Y = &T_data[T_DATA_DIM * j_global];
+            cptr<Real> Y = &T_data[T_DATA_DIM * j_global];
     
             T_Tree.RequireSimplex(T_ser, j_global);
             
             b = Y[0];
         
 #ifdef NearField_T_Copy
-            copy_buffer<T_COORD_DIM>( &Y[1],             &y_buffer[0] );
-            copy_buffer<PROJ_DIM   >( &Y[1+T_COORD_DIM], &Q[0]        );
+            y_buffer.Read( &Y[1] );
+            Q.Read( &Y[1+T_COORD_DIM] );
 #else
             y_buffer = &Y[1];
             Q        = &Y[1+T_COORD_DIM];
 #endif
             if constexpr ( diff_flag )
             {
-                zerofy_buffer<T_DATA_DIM>( &DY[0] );
+                DY.SetZero();
             }
         }
         
@@ -273,12 +273,9 @@ namespace Repulsor
         {
             if constexpr (diff_flag )
             {
-                Real * restrict const to = &S_D_data[S_DATA_DIM * i_global];
-                
-                for( Int k = 0; k < S_DATA_DIM; ++k )
-                {
-                    to[k] += symmetry_factor * DX[k];
-                }
+                combine_buffers<Scalar::Flag::Generic,Scalar::Flag::Plus,S_DATA_DIM>(
+                    symmetry_factor, DX.data(), Scalar::One<Real>, &S_D_data[S_DATA_DIM * i_global]
+                );
             }
         }
         
@@ -286,33 +283,30 @@ namespace Repulsor
         {
             if constexpr (diff_flag )
             {
-                Real * restrict const to = &T_D_data[T_DATA_DIM * j_global];
-                
-                for( Int k = 0; k < T_DATA_DIM; ++k )
-                {
-                    to[k] += symmetry_factor * DY[k];
-                }
+                combine_buffers<Scalar::Flag::Generic,Scalar::Flag::Plus,T_DATA_DIM>(
+                    symmetry_factor, DY.data(), Scalar::One<Real>, &T_D_data[T_DATA_DIM * j_global]
+                );
             }
         }
         
     public:
         
-        Values_T & OffDiag()
+        mref<Values_T> OffDiag()
         {
             return this->metric_values.VF;
         }
         
-        const Values_T & OffDiag() const
+        cref<Values_T> OffDiag() const
         {
             return this->metric_values.VF;
         }
         
-        Values_T & Diag()
+        mref<Values_T> Diag()
         {
             return this->metric_values.VF_diag;
         }
         
-        const Values_T & Diag() const
+        cref<Values_T> Diag() const
         {
             return this->metric_values.VF_diag;
         }
@@ -362,7 +356,7 @@ namespace Repulsor
             return evaluations;
         }
         
-        void Reduce( const FMM_Kernel_VF & ker )
+        void Reduce( cref<FMM_Kernel_VF> ker )
         {
             max_level_reached = std::max( max_level_reached, ker.MaxLevelReached() );
             

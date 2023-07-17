@@ -28,7 +28,7 @@ namespace Repulsor
         AllPairs_Traversor() = default;
         
         template<typename I0, typename I1>
-        AllPairs_Traversor( const I0 m_, const I1 n_, Kernel_T & kernel_ )
+        AllPairs_Traversor( const I0 m_, const I1 n_, mref<Kernel_T> kernel_ )
         :   m       ( m_      )
         ,   n       ( n_      )
         ,   kernel  ( kernel_ )
@@ -38,7 +38,7 @@ namespace Repulsor
         }
         
         // Copy constructor
-        AllPairs_Traversor( const AllPairs_Traversor & other )
+        AllPairs_Traversor( cref<AllPairs_Traversor> other )
         :   m       ( other.m      )
         ,   n       ( other.n      )
         ,   kernel  ( other.kernel )

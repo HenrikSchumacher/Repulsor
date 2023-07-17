@@ -324,22 +324,18 @@ namespace Repulsor
             
 
             ptic(className()+"::ComputeBlocks: Near field interaction data");
-
+            
             near = Near_Pattern_T( near_idx, S.PrimitiveCount(), T.PrimitiveCount(),
                 thread_count, false, symmetricQ );
-
-            pdump(near.Stats());
-
+            
             ptoc(className()+"::ComputeBlocks: Near field interaction data");
 
             
             ptic(className()+"::ComputeBlocks: Far field interaction data");
-
+            
             far = Far_Pattern_T( far_idx, S.ClusterCount(), T.ClusterCount(),
                     thread_count, false, symmetricQ );
-
-            pdump(far.Stats());
-
+            
             ptoc(className()+"::ComputeBlocks: Far field interaction data");
 
             

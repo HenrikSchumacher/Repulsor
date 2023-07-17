@@ -48,16 +48,16 @@ namespace Repulsor
         }
         
 //        virtual void MultiplyPreconditioner(
-//            const MeshBase_T & restrict M,
-//            const ExtReal alpha, ptr<ExtReal> X,
-//            const ExtReal beta,  mut<ExtReal> Y,
+//            cref<MeshBase_T> restrict M,
+//            cref<ExtReal> alpha, cptr<ExtReal> X,
+//            cref<ExtReal> beta,  mptr<ExtReal> Y,
 //            const Int  rhs_count
 //        ) const = 0;
 //
 //        virtual void SolveMetric(
-//            const MeshBase_T & restrict M,
-//            const ExtReal alpha, ptr<ExtReal> X,
-//            const ExtReal beta,  mut<ExtReal> Y,
+//            cref<MeshBase_T> M,
+//            cref<ExtReal> alpha, cptr<ExtReal> X,
+//            cref<ExtReal> beta,  mptr<ExtReal> Y,
 //            const Int  rhs_count,
 //            const Int  max_iter,
 //            const Real tolerance

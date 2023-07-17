@@ -56,7 +56,7 @@ namespace Repulsor
         
         TP0_Kernel_FF() = delete;
         
-        TP0_Kernel_FF( Configurator_T & conf, const Int thread_, const T1 q_half_, const T2 p_half_ )
+        TP0_Kernel_FF( mref<Configurator_T> conf, const Int thread_, const T1 q_half_, const T2 p_half_ )
         :   Base_T               (conf, thread_ )
         ,   q                    (two*q_half_   )
         ,   q_half               (q_half_       )
@@ -69,7 +69,7 @@ namespace Repulsor
         ,   s_exp                ( -Scalar::Half<Real> * (Scalar::Two<Real> * (s - Scalar::One<Real>) + S_DOM_DIM))
         {}
         
-        TP0_Kernel_FF( TP0_Kernel_FF & other, const Int thread_ )
+        TP0_Kernel_FF( mref<TP0_Kernel_FF> other, const Int thread_ )
         :   Base_T               (other, thread_                )
         ,   q                    (other.q                       )
         ,   q_half               (other.q_half                  )
@@ -114,9 +114,9 @@ namespace Repulsor
         const Real s;
         const Real s_exp;
         
-        Real ij_block [BLOCK_NNZ] = {};
-        Real ii_block [BLOCK_NNZ] = {};
-        Real jj_block [BLOCK_NNZ] = {};
+        Tiny::Vector<BLOCK_NNZ,Real,Int> ij_block;
+        Tiny::Vector< DIAG_NNZ,Real,Int> ii_block;
+        Tiny::Vector< DIAG_NNZ,Real,Int> jj_block;
      
 #include "../../FMM/FMM_Kernel_Common.hpp"
 #include "../../FMM/FMM_Kernel_FF_Common.hpp"
@@ -302,7 +302,7 @@ namespace Repulsor
                 ii_block[1] -=   b_over_a * a_1;
                 jj_block[1]  = - a_over_b * a_1;
                 
-                copy_buffer<BLOCK_NNZ>( &ij_block[0], &metric_data[BLOCK_NNZ * k_global] );
+                ij_block.Write( &metric_data[BLOCK_NNZ * k_global] );
             }
             
             return result;
@@ -315,7 +315,7 @@ namespace Repulsor
             
             if constexpr ( metric_flag )
             {
-                zerofy_buffer<DIAG_NNZ>( &ii_block[0] );
+                ii_block.SetZero();
             }
         }
         
@@ -325,7 +325,7 @@ namespace Repulsor
             
             if constexpr ( metric_flag )
             {
-                add_to_buffer<DIAG_NNZ>( &ii_block[0], &S_diag[DIAG_NNZ * i_global] );
+                ii_block.AddTo( &S_diag[DIAG_NNZ * i_global] );
             }
         }
         
@@ -336,10 +336,10 @@ namespace Repulsor
             if constexpr ( metric_flag )
             {
                 // We can do an overwrite here.
-//                zerofy_buffer<BLOCK_NNZ>( &ij_block[0] );
+//                ij_block.SetZero();
                 
                 // We can do an overwrite here.
-//                zerofy_buffer< DIAG_NNZ>( &jj_block[0] );
+//                jj_block.SetZero();
             }
         }
 
@@ -349,7 +349,7 @@ namespace Repulsor
             
             if constexpr ( metric_flag )
             {
-                add_to_buffer<DIAG_NNZ>( &jj_block[0], &T_diag[DIAG_NNZ * j_global] );
+                jj_block.AddTo( &T_diag[DIAG_NNZ * j_global] );
             }
         }
         

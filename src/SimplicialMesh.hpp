@@ -69,11 +69,11 @@ namespace Repulsor
         SimplicialMesh() = default;
 
         SimplicialMesh(
-            const Tensor2<Real,Int> & restrict V_coords_,
+            cref<Tensor2<Real,Int>> V_coords_,
             // vertex coordinates; assumed to be of size vertex_count_ x AMB_DIM
-            const Tensor2<Int, Int> & restrict simplices_,
+            cref<Tensor2<Int, Int>> simplices_,
             // simplices; assumed to be of size simplex_count_ x (DOM_DIM+1)
-            const Tensor1<Real,Int> & restrict V_charges_,
+            cref<Tensor1<Real,Int>> V_charges_,
             // vertex charges; assumed to be of size DOM_DIM+1
             const Size_T thread_count_ = 1
         )
@@ -248,22 +248,22 @@ namespace Repulsor
             return AMB_DIM;
         }
 
-        virtual const Tensor2<Real,Int> & VertexCoordinates() const override
+        virtual cref<Tensor2<Real,Int>> VertexCoordinates() const override
         {
             return V_coords;
         }
         
-        virtual const Tensor2<Int,Int> & Simplices() const override
+        virtual cref<Tensor2<Int,Int>> Simplices() const override
         {
             return simplices;
         }
         
-        virtual const Tensor1<Real,Int> & VertexCharges() const override
+        virtual cref<Tensor1<Real,Int>> VertexCharges() const override
         {
             return V_charges;
         }
         
-        virtual const Tensor1<Real,Int> & SimplexCharges() const override
+        virtual cref<Tensor1<Real,Int>> SimplexCharges() const override
         {
             return P_charges;
         }
@@ -362,7 +362,7 @@ namespace Repulsor
             Tensor2<SReal,Int> P_velocities_serialized ( SimplexCount(), P_moving.VelocitySize(), 0 );
             mptr<SReal> P_v_ser = P_velocities_serialized.data();
             
-            const Tensor1<Int,Int> & restrict P_ordering = GetClusterTree().PrimitiveOrdering();
+            cref<Tensor1<Int,Int>> P_ordering = GetClusterTree().PrimitiveOrdering();
 
             JobPointers<Int> job_ptr ( SimplexCount(), GetClusterTree().ThreadCount() );
             
@@ -423,7 +423,7 @@ namespace Repulsor
             return t;
         }
         
-        virtual const ClusterTree_T & GetClusterTree() const override
+        virtual cref<ClusterTree_T> GetClusterTree() const override
         {
             static std::string tag ( "ClusterTree" );
             
@@ -549,7 +549,7 @@ namespace Repulsor
             return std::any_cast<ClusterTree_T &>( this->GetPersistentCache(tag) );
         }
 
-        virtual const BlockClusterTree_T & GetBlockClusterTree() const override
+        virtual cref<BlockClusterTree_T> GetBlockClusterTree() const override
         {
             static std::string tag ( "BlockClusterTree" );
             
@@ -576,7 +576,7 @@ namespace Repulsor
             return std::any_cast<BlockClusterTree_T &>( this->GetPersistentCache(tag) );
         }
         
-        virtual const CollisionTree_T & GetCollisionTree() const override
+        virtual cref<CollisionTree_T> GetCollisionTree() const override
         {
             static std::string tag ( "CollisionTree" );
             
@@ -594,7 +594,7 @@ namespace Repulsor
             return std::any_cast<CollisionTree_T &>( this->GetCache(tag) );
         }
         
-        const SparseBinaryMatrix_T & DerivativeAssembler() const override
+        cref<SparseBinaryMatrix_T> DerivativeAssembler() const override
         {
             
             static std::string tag ( "DerivativeAssembler" );
@@ -705,7 +705,7 @@ namespace Repulsor
 
         }
         
-        const Obstacle_T & GetObstacle() const override
+        cref<Obstacle_T> GetObstacle() const override
         {
             static std::string tag ("Obstacle");
 
@@ -720,12 +720,12 @@ namespace Repulsor
             return *std::any_cast<std::shared_ptr<Obstacle_T>>( this->GetPersistentCache(tag) );
         }
         
-        virtual const ClusterTree_T & GetObstacleClusterTree() const override
+        virtual cref<ClusterTree_T> GetObstacleClusterTree() const override
         {
             return *dynamic_cast<const ClusterTree_T *>( & (GetObstacle().GetClusterTree()) );
         }
         
-        virtual const ObstacleBlockClusterTree_T & GetObstacleBlockClusterTree() const override
+        virtual cref<ObstacleBlockClusterTree_T> GetObstacleBlockClusterTree() const override
         {
             static std::string tag ( "ObstacleBlockClusterTree" );
             
@@ -746,7 +746,7 @@ namespace Repulsor
             return std::any_cast<ObstacleBlockClusterTree_T &>( this->GetPersistentCache(tag) );
         }
         
-        virtual const ObstacleCollisionTree_T & GetObstacleCollisionTree() const override
+        virtual cref<ObstacleCollisionTree_T> GetObstacleCollisionTree() const override
         {
             static std::string tag ( "ObstacleCollisionTree" );
             
@@ -771,7 +771,7 @@ namespace Repulsor
      
     public:
         
-        virtual void WriteToFile( const std::string & file_name ) const override
+        virtual void WriteToFile( cref<std::string> file_name ) const override
         {
             ptic(ClassName()+"::WriteToFile");
             

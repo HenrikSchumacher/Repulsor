@@ -362,7 +362,7 @@ public:
         
         RequireSubsimplex();
         
-        mut<SReal> q = &simplex_serialized[0] + 1 + AMB_DIM;
+        mptr<SReal> q = &simplex_serialized[0] + 1 + AMB_DIM;
         
         for( Int i = 0; i < DOM_DIM+1 * AMB_DIM; ++i )
         {
