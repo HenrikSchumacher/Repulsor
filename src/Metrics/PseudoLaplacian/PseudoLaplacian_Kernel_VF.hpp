@@ -87,9 +87,6 @@ namespace Repulsor
         using Base_T::S_diag;
         using Base_T::T_diag;
         
-        using Base_T::DX;
-        using Base_T::DY;
-        
         using Base_T::a;
         using Base_T::x;
         using Base_T::x_buffer;
