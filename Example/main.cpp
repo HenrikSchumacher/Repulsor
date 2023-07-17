@@ -14,6 +14,8 @@
 #define LAPACK_DISABLE_NAN_CHECK
 #define ACCELERATE_NEW_LAPACK
 #include <Accelerate/Accelerate.h>
+
+
 //#include <cblas.h>
 //#include <lapack.h>
 
@@ -34,7 +36,7 @@ using namespace Tools;
 
 // We have to toggle which domain dimensions and ambient dimensions shall be supported by runtime polymorphism before we load Repulsor.hpp
 // You can activate everything you want, but compile times might increase substatially.
-using Int     = Int64;
+using Int     = Int32;
 using LInt    = Int64;
 using ExtInt  = Int64;
 
@@ -324,18 +326,18 @@ int main(int argc, const char * argv[])
     
     
     
-//    print("");
-//    print("Testing remesher.");
-//
-//    std::unique_ptr<Mesh_T::RemesherBase_T> R = M_ptr->CreateRemesher();
-//
-//    std::vector<Int> edges {1,2,3};
-//
-//    R->CollapseEdges( edges );
-//
-//    R->SplitEdges( edges );
+    print("");
+    print("Testing remesher.");
 
-//    R->UnifyEdgeLengths(<#const Real collapse_threshold#>, <#const Real split_threshold#>);
+    std::unique_ptr<Mesh_T::RemesherBase_T> R = M_ptr->CreateRemesher();
+
+    std::vector<Int> edges {1,2,3};
+
+    R->CollapseEdges( edges );
+
+    R->SplitEdges( edges );
+
+//    R->UnifyEdgeLengths(const Real collapse_threshold, <#const Real split_threshold#>);
     
     
     return 0;
