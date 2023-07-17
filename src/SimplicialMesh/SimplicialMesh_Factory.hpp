@@ -47,11 +47,11 @@ namespace Repulsor
             const ExtReal * const vertex_coords, // vertex coordinates; size = vertex_count_ x amb_dim
             const Int             vertex_count,
             const Int             amb_dim,
-            const bool            vertex_coords_transpose, // whether to transpose input; set to false for row-major
+            const bool            vertex_coords_ColMajorQ, // whether to transpose input; set to false for row-major
             const ExtInt  * const simplices, // simplices; size = simplex_count_ x simplex_size
             const Int             simplex_count,
             const Int             simplex_size,
-            const bool            simplices_transpose, // whether to transpose input; set to false for row-major
+            const bool            simplices_ColMajorQ, // whether to transpose input; set to false for row-major
             const Int             thread_count = 1
         )
         {
@@ -75,8 +75,8 @@ namespace Repulsor
             }
             
             return make_1<MaxAmbDim>(
-                vertex_coords, vertex_count, amb_dim, vertex_coords_transpose,
-                simplices, simplex_count, dom_dim, simplices_transpose,
+                vertex_coords, vertex_count, amb_dim, vertex_coords_ColMajorQ,
+                simplices, simplex_count, dom_dim, simplices_ColMajorQ,
                 thread_count
             );
         }
