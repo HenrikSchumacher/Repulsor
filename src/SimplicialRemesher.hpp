@@ -270,11 +270,11 @@ namespace Repulsor
             {
                 if( V_active[v] && (V_parent_simplices[v].Size() > 0) )
                 {
-                    copy_buffer( V_coords.data(v), V_coords.data(v_count), AMB_DIM );
+                    copy_buffer<AMB_DIM,Sequential>( V_coords.data(v), V_coords.data(v_count) );
 
                     if( with_data )
                     {
-                        copy_buffer( V_data.data(v), V_data.data(v_count), V_data.Dimension(1) );
+                        copy_buffer<VarSize,Sequential>( V_data.data(v), V_data.data(v_count), V_data.Dimension(1) );
                     }
                     
                     V_active[v]         = false;
@@ -366,16 +366,16 @@ namespace Repulsor
 //            );
 //        } //CreateMesh
 
-#include "Vertices.hpp"
-#include "Edges.hpp"
-#include "Simplices.hpp"
+#include "SimplicialRemesher/Vertices.hpp"
+#include "SimplicialRemesher/Edges.hpp"
+#include "SimplicialRemesher/Simplices.hpp"
         
-#include "Checks.hpp"
-#include "SplitEdges.hpp"
-#include "CollapseEdges.hpp"
-#include "FlipEdges.hpp"
+#include "SimplicialRemesher/Checks.hpp"
+#include "SimplicialRemesher/SplitEdges.hpp"
+#include "SimplicialRemesher/CollapseEdges.hpp"
+#include "SimplicialRemesher/FlipEdges.hpp"
 
-#include "UnifyEdgeLengths.hpp"
+#include "SimplicialRemesher/UnifyEdgeLengths.hpp"
   
         
 //##############################################################################################
@@ -627,12 +627,12 @@ namespace Repulsor
             return simplices;
         }
         
-        virtual Int DomDim() override
+        virtual Int DomDim() const override
         {
             return DOM_DIM;
         }
         
-        virtual Int AmbDim() override
+        virtual Int AmbDim() const override
         {
             return AMB_DIM;
         }
