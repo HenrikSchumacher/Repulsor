@@ -35,21 +35,13 @@ private:
                         thread,
                         row[i],
                         tree_rows_ptr_mutex,
-                        std::max( one, ThreadCount()/row_size )
+                        std::max( one, ThreadCount() / row_size )
                     );
                 },
                 null, row_size, one,
                 std::min(row_size, ThreadCount() )
            );
         }
-            
-//        for( Int level = 3; level < top_level_count; ++level )
-//        {
-//            for( Cluster_T * C : tree_rows_ptr[level] )
-//            {
-//                Split_Cluster<false>( 0, C, one );
-//            }
-//        }
         
         // Now `tree_rows_ptr` contains all nodes of level at most `top_level_count`.
         // In particular `tree_rows_ptr[top_level_count]` contains all the nodes at level `top_level_count`.
@@ -160,10 +152,10 @@ private:
 
     }
 
-    void Split_Cluster_Post( Cluster_T * C )
+    void Split_Cluster_Post( mptr<Cluster_T> C )
     {
-        const Cluster_T * const L = C->left;
-        const Cluster_T * const R = C->right;
+        cptr<Cluster_T> L = C->left;
+        cptr<Cluster_T> R = C->right;
         
         // collecting statistics for the later serialization
         // counting ourselves as descendant, too!

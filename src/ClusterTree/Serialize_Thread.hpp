@@ -41,7 +41,7 @@ private:
         
         logprint("Parallel depth-first scans for each subtree.");
         
-        std::vector<Cluster_T *> & restrict tree_row = tree_rows_ptr[top_level_count];
+        const std::vector<Cluster_T *> & restrict tree_row = tree_rows_ptr[top_level_count];
         
         ParallelDo_Dynamic(
             [=,&tree_row]( const Int thread, const Int i )
@@ -58,7 +58,7 @@ private:
         {
             for( Cluster_T * C : tree_rows_ptr[level] )
             {
-                if( C->left )
+                if( C->left != nullptr )
                 {
                     Serialize_Cluster_Post( C );
                 }
@@ -139,7 +139,6 @@ private:
 
     void Serialize_Cluster_Post( Cluster_T * C )
     {
-        
         // Cleaning up after ourselves to prevent a destructor cascade.
         delete C->left;
         delete C->right;
