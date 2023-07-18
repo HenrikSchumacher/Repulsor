@@ -24,7 +24,7 @@ private:
         
         for( Int level = 1; level < top_level_count; ++level )
         {
-            std::vector<Cluster_T *> & restrict row = tree_rows_ptr[level];
+            mref<std::vector<Cluster_T *>> row = tree_rows_ptr[level];
 
             const Int row_size  = static_cast<Int>(row.size());
 
@@ -49,7 +49,7 @@ private:
         
         logprint("Parallel depth-first scans to create the subtrees.");
         
-        std::vector<Cluster_T *> & restrict tree_row = tree_rows_ptr[top_level_count];
+        mref<std::vector<Cluster_T *>> tree_row = tree_rows_ptr[top_level_count];
         
         ParallelDo_Dynamic(
             [=,this,&tree_row,&tree_rows_ptr_mutex]( const Int thread, const Int i )
@@ -100,7 +100,7 @@ private:
             const Int  left_ID = thread_cluster_counter(thread,0)+1;
             const Int right_ID = thread_cluster_counter(thread,0)+2;
             
-            Primitive_T & restrict P = *P_proto[thread];
+            mref<Primitive_T> P = *P_proto[thread];
             
             const Int split_index = C_proto[thread]->Split(
                 P,                                                  // prototype for primitves

@@ -230,16 +230,10 @@ namespace Repulsor
         //        mutable std::vector<std::shared_ptr<MultipoleMomentsBase<Real,Int>>> M_ker;
         //        mutable Int moment_degree = 0;
         
-        
-//#include "ClusterTree/Split_OpenMP.hpp"
-//#include "ClusterTree/Serialize_OpenMP.hpp"
-//#include "ClusterTree/ComputeClusterData_OpenMP.hpp"
-//#include "ClusterTree/Percolate_Parallel.hpp"
-        
 #include "ClusterTree/Split_Thread.hpp"
 #include "ClusterTree/Serialize_Thread.hpp"
 #include "ClusterTree/Percolate_DFS.hpp"
-#include "ClusterTree/Percolate_Parallel2.hpp"
+#include "ClusterTree/Percolate_Parallel.hpp"
 #include "ClusterTree/Percolate_Recursive.hpp"
 #include "ClusterTree/ComputeClusterData_Thread.hpp"
 
@@ -468,7 +462,7 @@ namespace Repulsor
                     const Int size = static_cast<Int>(DiffOp.NonzeroCount() / primitive_count);
                     
                     ParallelDo(
-                        [=,this]( const Int i )
+                        [=]( const Int i )
                         {
                             const Int from = size * ord[i];
                             const Int to   = size * i;
@@ -514,7 +508,7 @@ namespace Repulsor
                     const Int size = static_cast<Int>(AvOp.NonzeroCount() / primitive_count);
                     
                     ParallelDo(
-                        [=,this]( const Int i )
+                        [=]( const Int i )
                         {
                             const Int from = size * ord[i];
                             const Int to   = size * i;
@@ -586,7 +580,7 @@ namespace Repulsor
                     mi_outer[mi_pre.RowCount()] = mi_pre.RowCount() * row_size;
 
                     ParallelDo(
-                        [=,this]( const Int i )
+                        [=]( const Int i )
                         {
                             const Int row_base = (AMB_DIM+1) * i;
                             
@@ -644,7 +638,7 @@ namespace Repulsor
                     mptr<Real> mi_values = mi_post.Values().data();
                     
                     ParallelDo(
-                        [=,this]( const Int i )
+                        [=]( const Int i )
                         {
                             const LInt lo_begin = lo_outer[i  ];
                             const LInt lo_end   = lo_outer[i+1];
@@ -1054,8 +1048,8 @@ namespace Repulsor
         } // SemiStaticUpdate
         
         void TakeUpdateVectors(
-            MovingPrimitive_T  & restrict P_moving_,
-            Tensor2<SReal,Int> & restrict P_velocities_serialized_,
+            mref<MovingPrimitive_T> P_moving_,
+            mref<Tensor2<SReal,Int>> P_velocities_serialized_,
             const SReal max_time
         ) const
         {
@@ -1108,8 +1102,8 @@ namespace Repulsor
                     const Int i_begin = JobPointer<Int>(LeafClusterCount(), ThreadCount(), thread     );
                     const Int i_end   = JobPointer<Int>(LeafClusterCount(), ThreadCount(), thread + 1 );
                     
-                         Primitive_T & restrict P_   = *P_proto[thread];
-                    BoundingVolume_T & restrict C_bv = *C_proto[thread];
+                    mref<Primitive_T>      P_   = *P_proto[thread];
+                    mref<BoundingVolume_T> C_bv = *C_proto[thread];
                                        
                     for( Int i = i_begin; i < i_end; ++i )
                     {
@@ -1132,7 +1126,7 @@ namespace Repulsor
 
                 Tensor1<bool,Int> visited( ClusterCount(), false );
 
-                BoundingVolume_T & restrict C_bv = *C_proto[0];
+                mref<BoundingVolume_T> C_bv = *C_proto[0];
 
                 while( (0 <= stack_ptr) && (stack_ptr < 126) )
                 {
@@ -1187,7 +1181,7 @@ namespace Repulsor
                 if( thread == 0 && !addto )
                 {
                     ParallelDo(
-                        [=,this]( const Int i )
+                        [=]( const Int i )
                         {
                             copy_buffer<VarSize,Sequential>(
                                 &from[near_dim * inv_ord[i]], &to[near_dim * i], near_dim
@@ -1199,7 +1193,7 @@ namespace Repulsor
                 else
                 {
                     ParallelDo(
-                        [=,this]( const Int i )
+                        [=]( const Int i )
                         {
                             add_to_buffer( &from[near_dim * inv_ord[i]], &to[near_dim * i], near_dim );
                         },
@@ -1236,7 +1230,7 @@ namespace Repulsor
             if( addto )
             {
                 ParallelDo(
-                    [=,this]( const Int i )
+                    [=]( const Int i )
                     {
                         add_to_buffer( &from[far_dim * inv_ord[i]], &to[far_dim * i], far_dim );
                     },

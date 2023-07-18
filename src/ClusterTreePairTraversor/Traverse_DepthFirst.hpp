@@ -6,7 +6,7 @@ public:
     {
         debug_print(className()+"::Traverse_DepthFirst("+ToString(thread)+")...");
         
-        Kernel_T & restrict K = kernels[thread];
+        mref<Kernel_T> K = kernels[thread];
         
         Int i_stack[max_depth] = {};
         Int j_stack[max_depth] = {};

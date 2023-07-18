@@ -17,7 +17,7 @@ protected:
     {
         ptic(ClassName()+"::ComputeClusterData<"+ToString(leaves_are_singletons)+">");
         
-        const Forest_T & restrict forest = Forest();
+        cref<Forest_T> forest = Forest();
         
         logprint("Parallel reverse depth-first scan to for subtrees.");
         ParallelDo(

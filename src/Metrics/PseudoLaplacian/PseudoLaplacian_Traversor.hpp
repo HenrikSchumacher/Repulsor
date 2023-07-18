@@ -83,14 +83,14 @@ namespace Repulsor
         PseudoLaplacian_Traversor() = delete;
         
         PseudoLaplacian_Traversor(
-              const BlockClusterTree_T & restrict  bct_,
-              ValueContainer_T & restrict  metric_values_,
+              cref<BlockClusterTree_T> bct_,
+              mref<ValueContainer_T>   metric_values_,
               const Real s_
         )
-        :   bct           ( bct_          )
+        :   bct           ( bct_           )
         ,   conf          ( bct.GetS(), bct.GetT(), metric_values_ )
         ,   metric_values ( metric_values_ )
-        ,   s             ( s_            )
+        ,   s             ( s_             )
         {}
 
         ~PseudoLaplacian_Traversor() = default;
@@ -98,11 +98,11 @@ namespace Repulsor
 
     protected:
 
-        const BlockClusterTree_T & restrict  bct;
+        cref<BlockClusterTree_T> bct;
         
         Configurator_T conf;
         
-        ValueContainer_T & restrict metric_values;
+        mref<ValueContainer_T> metric_values;
 
         const Real s;
         

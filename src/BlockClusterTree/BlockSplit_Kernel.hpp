@@ -23,8 +23,8 @@ namespace Repulsor
 //        BlockSplit_Kernel() = default;
         
         BlockSplit_Kernel(
-            const ClusterTree_T & restrict S,
-            const ClusterTree_T & restrict T,
+            cref<ClusterTree_T> S,
+            cref<ClusterTree_T> T,
             const Real far_theta2_,
             const Real near_theta2_
         )
@@ -124,7 +124,7 @@ namespace Repulsor
         mptr<SReal> S_P_serialized = nullptr;
         mptr<SReal> T_P_serialized = nullptr;
         
-        const typename ClusterTree_T::SparseBinaryMatrix_T & restrict A;
+        cref<typename ClusterTree_T::SparseBinaryMatrix_T> A;
         
         Int C_i = -1;
         Int C_j = -1;

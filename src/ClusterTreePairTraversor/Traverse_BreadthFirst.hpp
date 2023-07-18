@@ -6,7 +6,7 @@ public:
     {
         ptic(className()+"::Traverse_BreadthFirst");
         
-        Kernel_T & restrict K = kernels[thread];
+        mref<Kernel_T> K = kernels[thread];
         
         i_queue = std::deque<Int>();
         j_queue = std::deque<Int>();

@@ -41,7 +41,7 @@ namespace Repulsor
         
     public:
         
-        virtual ValueContainer_T compute_metric( const Mesh_T & restrict M ) const override
+        virtual ValueContainer_T compute_metric( cref<Mesh_T> M ) const override
         {
             ValueContainer_T metric_values;
          
@@ -54,7 +54,7 @@ namespace Repulsor
         }
         
         virtual void multiply_metric(
-            const Mesh_T & restrict M,
+            cref<Mesh_T> M,
             const bool VF_flag, const bool NF_flag, const bool FF_flag
         ) const override
         {

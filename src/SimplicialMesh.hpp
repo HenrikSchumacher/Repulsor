@@ -821,16 +821,14 @@ namespace Repulsor
         
     public:
         
-        virtual std::unique_ptr<RemesherBase_T> CreateRemesher() override
+        [[nodiscard]] virtual std::unique_ptr<RemesherBase_T> CreateRemesher() override
         {
             ptic(ClassName()+"::CreateRemesher");
-            
-            Real * null = nullptr;
             
             Remesher_T * R = new Remesher_T(
                 VertexCoordinates().data(), VertexCoordinates().Dimension(0),
                 Simplices().data(),         Simplices().Dimension(0),
-                null,                       0,
+                VertexCharges().data(),     1,
                 ThreadCount()
             );
             

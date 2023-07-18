@@ -28,7 +28,7 @@ namespace Repulsor
         
         virtual ~CollisionTreeBase() = default;
         
-        CollisionTreeBase ( const ClusterTreeBase_T & restrict S, const ClusterTreeBase_T & restrict T )
+        CollisionTreeBase ( cref<ClusterTreeBase_T> S, cref<ClusterTreeBase_T> T )
         {}
 
         

@@ -58,7 +58,7 @@ namespace Repulsor
                 return static_cast<Real> (0);
             }
 
-            const auto & restrict job_ptr = COND(
+            cref<JobPointers<Int>> job_ptr = COND(
                 symmetricQ,
                 pattern.UpperTriangularJobPtr(),
                 pattern.JobPtr()

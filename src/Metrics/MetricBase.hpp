@@ -23,7 +23,7 @@ namespace Repulsor
         
     public:
         
-        virtual ValueContainer_T & MetricValues( const MeshBase_T & restrict M ) const = 0;
+        virtual mref<ValueContainer_T> MetricValues( cref<MeshBase_T> M ) const = 0;
 
         virtual void MultiplyMetric(
             cref<MeshBase_T> M,

@@ -20,9 +20,9 @@ namespace Repulsor
         // In order to prevent GetS() and GetT() shooting a segfault, we have to initialize S and T here. This is the only case in which Traversor owns these raw pointers.
         
         ClusterTreePairTraversor(
-            const ClusterTree_T   & restrict S_,
-            const ClusterTree_T   & restrict T_,
-            std::vector<Kernel_T> & restrict kernels_
+            cref<ClusterTree_T> S_,
+            cref<ClusterTree_T> T_,
+            mref<std::vector<Kernel_T>> kernels_
         )
         :   kernels (kernels_)
         ,   thread_count( static_cast<Int>(kernels.size()) )
@@ -52,7 +52,7 @@ namespace Repulsor
         static constexpr Int   max_depth = 128;
         static constexpr SReal zero      = Scalar::Zero<SReal>;
     
-        std::vector<Kernel_T> & restrict kernels;
+        mref<std::vector<Kernel_T>> kernels;
         
         const Int thread_count = static_cast<Int>(1);
         
