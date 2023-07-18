@@ -3,7 +3,7 @@
 namespace Repulsor
 {
     template<typename ClusterTree_T_>
-    class alignas(OBJECT_ALIGNMENT) ClusterTreePairTraversor_Kernel
+    class alignas(ObjectAlignment) ClusterTreePairTraversor_Kernel
     {
     public:
         

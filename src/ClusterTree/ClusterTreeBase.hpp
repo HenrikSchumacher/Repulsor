@@ -137,7 +137,7 @@ namespace Repulsor
         
         Tensor3<SReal,Int> C_thread_serialized;          // False sharing is unlikely as each thread's slice should already be quite large...
         
-        Tensor2<Int,Int> thread_cluster_counter;                          // TODO: Avoid false sharing!
+        Tensor2<Int,Int> thread_cluster_counter;         // TODO: Avoid false sharing!
         
     public:
 

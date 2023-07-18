@@ -256,7 +256,7 @@ namespace Repulsor
             P_inverse_ordering = Tensor1<Int,Int>( PrimitiveCount() );
             
             // Padding every row to prevent false sharing.
-            thread_cluster_counter = Tensor2<Int,Int>( ThreadCount(), 2 * ALIGNMENT, 0 );
+            thread_cluster_counter = Tensor2<Int,Int>( ThreadCount(), CacheLineWidth, 0 );
             
             C_thread_serialized = Tensor3<SReal,Int>( ThreadCount(), 2*PrimitiveCount(), C_proto[0]->Size() );
             

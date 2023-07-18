@@ -61,7 +61,7 @@ namespace Repulsor
         ,   t_max       ( other.t_max       )
         {}
         
-        friend void swap(MaximumSafeStepSize_Kernel & X, MaximumSafeStepSize_Kernel & Y )
+        friend void swap( mref<MaximumSafeStepSize_Kernel> X, mref<MaximumSafeStepSize_Kernel> Y )
         {
             // see https://stackoverflow.com/questions/5695548/public-friend-swap-member-function for details
             using std::swap;

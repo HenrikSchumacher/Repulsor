@@ -37,7 +37,7 @@ namespace Repulsor
         ~SimplicialRemesher_Factory() = default;
 
         template<typename ExtReal, typename ExtInt>
-        std::unique_ptr<RemesherBase_T> Make(
+        [[nodiscard]] std::unique_ptr<RemesherBase_T> Make(
             cptr<ExtReal> vertex_coords, // vertex coordinates; size = vertex_count_ x amb_dim
             const Int     vertex_count,
             const Int     amb_dim,

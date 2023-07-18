@@ -20,7 +20,7 @@ namespace Repulsor
     };
     
     template<typename ClusterTree_T_>
-    class alignas( OBJECT_ALIGNMENT ) FMM_Configurator
+    class alignas( ObjectAlignment ) FMM_Configurator
     {
     public:
         

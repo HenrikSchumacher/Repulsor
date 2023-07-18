@@ -21,7 +21,7 @@ namespace Repulsor
         
         ~CONCAT(CLASS,_Factory)() = default;
 
-        std::unique_ptr<ROOT> Make( const Int dom_dim, const Int amb_dim, const Real q, const Real p )
+        [[nodiscard]] std::unique_ptr<ROOT> Make( const Int dom_dim, const Int amb_dim, const Real q, const Real p )
         {
             if( (dom_dim < MIN_DOM_DIM) || (dom_dim > MAX_DOM_DIM) )
             {

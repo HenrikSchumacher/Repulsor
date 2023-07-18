@@ -43,7 +43,7 @@ namespace Repulsor
         ~SimplicialMesh_Factory() = default;
 
         template<typename ExtInt>
-        std::unique_ptr<MeshBase_T> Make(
+        [[nodiscard]] std::unique_ptr<MeshBase_T> Make(
             const ExtReal * const vertex_coords, // vertex coordinates; size = vertex_count_ x amb_dim
             const Int             vertex_count,
             const Int             amb_dim,
@@ -158,7 +158,7 @@ namespace Repulsor
         
     public:
         
-        std::unique_ptr<MeshBase_T> Make_FromFile( const std::string & file_name, const Int thread_count )
+        [[nodiscard]] std::unique_ptr<MeshBase_T> Make_FromFile( const std::string & file_name, const Int thread_count )
         {
             ptic(ClassName()+"Make_FromFile");
             

@@ -7,7 +7,7 @@ namespace Repulsor
         bool symmetricQ_,
         bool energy_flag_, bool diff_flag_, bool metric_flag_
     >
-    class alignas( OBJECT_ALIGNMENT ) FMM_Kernel
+    class alignas(ObjectAlignment) FMM_Kernel
     {
     public:
         
