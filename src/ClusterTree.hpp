@@ -335,7 +335,7 @@ namespace Repulsor
             const Int  far_dim =  FarDim();
 
             ParallelDo(
-                [=,this]( const Int i )
+                [=]( const Int i )
                 {
                     const Int j = P_ordering[i];
 
@@ -1238,7 +1238,7 @@ namespace Repulsor
             else
             {
                 ParallelDo(
-                    [=,this]( const Int i )
+                    [=]( const Int i )
                     {
                         copy_buffer<VarSize,Sequential>(
                             &from[far_dim * inv_ord[i]], &to[far_dim * i], far_dim

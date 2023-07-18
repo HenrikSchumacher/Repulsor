@@ -626,7 +626,7 @@ namespace Repulsor
                 mptr<Real> to   = C_out.data();
                 
                 ParallelDo(
-                    [=,this]( const Int i )
+                    [=]( const Int i )
                     {
                         to[i] += from[far_dim * i];
                     },
@@ -668,7 +668,7 @@ namespace Repulsor
                 mptr<Real> to   = P_out.data();
                 
                 ParallelDo(
-                    [=,this]( const Int i )
+                    [=]( const Int i )
                     {
                         to[i] += from[near_dim * i];
                     },
@@ -745,7 +745,7 @@ namespace Repulsor
 
             // Finally, we divide by the dual volumes to obtain the vertex densities.
             ParallelDo(
-                [=,this]( const Int i )
+                [=]( const Int i )
                 {
                     output[i] /= dual_volumes[i];
                 },
