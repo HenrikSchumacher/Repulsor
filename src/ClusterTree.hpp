@@ -5,8 +5,6 @@
 
 #include <thread>
 
-// TODO: pre and post matrices as KernelMatrixCSR?
-
 namespace Repulsor
 {
     template<int AMB_DIM_, typename Real_, typename Int_, typename LInt_, typename SReal_, typename ExtReal_>

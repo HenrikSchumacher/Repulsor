@@ -70,7 +70,7 @@ protected:
         
         if constexpr ( DOM_DIM >=2 )
         {
-            //TODO: This bound should be adapted for boundary verticses.
+            //TODO: This bound should be adapted for boundary vertices.
             if( val_1 <= 3 )
             {
     #ifdef REMESHER_VERBATIM

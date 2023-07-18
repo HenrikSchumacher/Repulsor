@@ -121,13 +121,11 @@ namespace Repulsor
         mutable SparseBinaryMatrix_T C_to_P;
         
         // Container for storing the serialized data of the primitives. Only meant to be accessed by primitive prototypes.
-        // TODO: Make this private somehow?
         mutable Tensor2<SReal,Int> P_serialized;
         mutable Tensor2<SReal,Int> P_velocities_serialized;
         mutable Tensor2<SReal,Int> P_updated_serialized;
         
         // Container for storing the serialized data of the clusters. Only meant to be accessed by bounding volume prototypes.
-        // TODO: Make this private somehow?
         mutable Tensor2<SReal,Int> C_serialized;
         mutable Tensor2<SReal,Int> C_updated_serialized;
         
