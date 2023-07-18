@@ -6,7 +6,7 @@
         alpha_flag, beta_flag,                                        \
         true, true, false, true,                                      \
         true, true,                                                   \
-        false                                                         \
+        true                                                          \
     >
 
 namespace Repulsor
@@ -14,7 +14,7 @@ namespace Repulsor
     template<
         int AMB_DIM_, int MAX_RHS_COUNT_,
         typename Real_, typename Real_in_, typename Real_out_, typename Int_, typename LInt_,
-        int alpha_flag, int beta_flag
+        Scalar::Flag alpha_flag, Scalar::Flag beta_flag
     >
     class TP0_Kernel_MultiplyMetric : public BASE
     
@@ -47,6 +47,7 @@ namespace Repulsor
         using Base_T::X;
         using Base_T::Y;
         using Base_T::x;
+        using Base_T::x_from;
         using Base_T::y;
         
         using Base_T::ReadX;
@@ -110,15 +111,15 @@ namespace Repulsor
 */
             
             const Real a_0 ( a[0] );
-            
+
             LOOP_UNROLL_FULL
             for( Int k = 0; k < MAX_RHS_COUNT; ++k )
             {
                 FMA( a_0, get_x(0,k), get_y(0,k) );
             }
-            
+
             const Real a_1 ( a[1] );
-            
+
             LOOP_UNROLL_FULL
             for( Int j = 1; j < COLS; ++j )
             {

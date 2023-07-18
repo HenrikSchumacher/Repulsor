@@ -42,7 +42,7 @@ namespace Repulsor
         using Kernel_Block_MulAdd_T = ScalarBlockKernel_fixed<
             high_order ? AMB_DIM : 1, high_order ? AMB_DIM : 1, AMB_DIM, true,
             Real, Real, Real, Int, LInt,
-            1,    1,
+            Scalar::Flag::Plus, Scalar::Flag::Plus,
             true, true, false, true,
             true, true,
             false
@@ -51,7 +51,7 @@ namespace Repulsor
         using Kernel_Block_Mul_T = ScalarBlockKernel_fixed<
             high_order ? AMB_DIM : 1, high_order ? AMB_DIM : 1, AMB_DIM, true,
             Real, Real, Real, Int, LInt,
-            1,    0,
+            Scalar::Flag::Plus, Scalar::Flag::Zero,
             true, true, false, true,
             true, true,
             false
@@ -60,7 +60,7 @@ namespace Repulsor
         using Kernel_Diag_MulAdd_T = ScalarBlockKernel_fixed<
             high_order ? AMB_DIM : 1, high_order ? AMB_DIM : 1, AMB_DIM, true,
             Real, Real, Real, Int, LInt,
-            1,    1,
+            Scalar::Flag::Plus, Scalar::Flag::Plus,
             true, true, false, true,
             true, true,
             false

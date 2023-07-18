@@ -44,20 +44,20 @@ namespace Repulsor
         using Kernel_Block_MulAdd_T = TP0_Kernel_MultiplyMetric<
             AMB_DIM,AMB_DIM,
             Real, Real, Real, Int, LInt,
-            1, 1 // <-- this 1 means add-in
+            Scalar::Flag::Plus, Scalar::Flag::Plus // <-- this 1 means add-in
         >;
         
         using Kernel_Block_Mul_T = TP0_Kernel_MultiplyMetric<
             AMB_DIM,AMB_DIM,
             Real, Real, Real, Int, LInt,
-            1, 0 // <-- this 0 means overwrite
+            Scalar::Flag::Plus, Scalar::Flag::Zero // <-- this 0 means overwrite
         >;
 
         
         using Kernel_Diag_MulAdd_T = TP0_Kernel_MultiplyMetric<
             AMB_DIM,AMB_DIM,
             Real, Real, Real, Int, LInt,
-            1, 1 // <-- this 1 means add-in
+            Scalar::Flag::Plus, Scalar::Flag::Plus // <-- this 1 means add-in
         >;
     
         static constexpr Int VF_blk_size = Kernel_Block_MulAdd_T::ROWS * Kernel_Block_MulAdd_T::COLS;

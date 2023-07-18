@@ -43,7 +43,7 @@ namespace Repulsor
         using Kernel_Block_MulAdd_T = ArrowheadBlockKernel_fixed<
             AMB_DIM+1, AMB_DIM+1, AMB_DIM, true,
             Real, Real, Real, Int, LInt,
-            1,    1,                    // CAUTION: We use add-in instead of overwrite!
+            Scalar::Flag::Plus, Scalar::Flag::Plus, // CAUTION: We use add-in instead of overwrite!
                          true,
             true, false, true, true,
             true, false,
@@ -53,7 +53,7 @@ namespace Repulsor
         using Kernel_Block_Mul_T = ArrowheadBlockKernel_fixed<
             AMB_DIM+1, AMB_DIM+1, AMB_DIM, true,
             Real, Real, Real, Int, LInt,
-            1,    0,
+            Scalar::Flag::Plus, Scalar::Flag::Zero,
                          true,
             true, false, true, true,
             true, false,
@@ -63,7 +63,7 @@ namespace Repulsor
         using Kernel_Diag_MulAdd_T = DenseBlockKernel_fixed<
             AMB_DIM+1, AMB_DIM+1, AMB_DIM, true,
             Real, Real, Real, Int, LInt,
-            1,    1,
+            Scalar::Flag::Plus, Scalar::Flag::Plus,
             true, false, true,
             true, false, true, true,
             true, false,
