@@ -317,12 +317,9 @@ namespace Repulsor
             Tensor2<Real,Int> P_near( SimplexCount(), NEAR_DIM );
             Tensor2<Real,Int> P_far ( SimplexCount(), FAR_DIM  );
 
-//            details.ComputeNearFarData( new_V_coords, simplices, P_near, P_far );
             ComputeNearFarData( P_near, P_far );
             
             GetClusterTree().SemiStaticUpdate( P_near, P_far );
-            
-//            dump(GetCollisionTree().PrimitiveCollisionMatrix().NonzeroCount());
             
             ptoc(className()+"::SemiStaticUpdate");
         }
@@ -461,7 +458,6 @@ namespace Repulsor
                     ptoc("Allocations");
 
                     // What remains is to compute P_coords, P_hull_coords, P_near and P_far and the nonzero values of DiffOp.
-//                    details.ComputeNearFarDataOps( V_coords, simplices, P_coords, P_hull_coords, P_near, P_far, DiffOp, AvOp );
                     
                     ComputeNearFarDataOps( P_coords, P_hull_coords, P_near, P_far, DiffOp, AvOp );
 
@@ -629,17 +625,7 @@ namespace Repulsor
             Tensor3<Real,Int> buffer ( SimplexCount(), SIZE, AMB_DIM, Scalar::Zero<Real> );
             
             GetClusterTree().CollectDerivatives();
-            
-            
-//            details.template DNearToHulls<Overwrite>(
-//                V_coords, simplices, GetClusterTree().PrimitiveDNearFieldData(), V_charges, buffer
-//            );
-//
-//            details.template DFarToHulls<AddTo>(
-//                V_coords, simplices, GetClusterTree().PrimitiveDFarFieldData(), V_charges, buffer
-//            );
 
-            // TODO: A single templated function
             details.DNearFarToHulls(
                 V_coords,
                 simplices,
