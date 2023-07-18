@@ -74,7 +74,7 @@ namespace Repulsor
             
             // DEBUG THIS!
             Real global_sum = ParallelDoReduce(
-                [=,&job_ptr]( const Int thread )
+                [=,this,&job_ptr]( const Int thread )
                 {
                     Kernel_T ker ( kernel, thread );
 

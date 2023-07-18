@@ -26,9 +26,9 @@ namespace Repulsor
     private:
         
         
-        const Tensor2<Real,Int> & restrict V_coords;
-        const Tensor2<Int ,Int> & restrict simplices;
-        const Tensor1<Real,Int> & restrict V_charges;
+        cref<Tensor2<Real,Int>> V_coords;
+        cref<Tensor2<Int ,Int>> simplices;
+        cref<Tensor1<Real,Int>> V_charges;
         
         Tiny::Vector<SIZE,Int,Int>   simplex;
         Tiny::Vector<SIZE,Int,Int> s_simplex;
@@ -63,9 +63,9 @@ namespace Repulsor
 //        }
         
         PrimitiveDataKernel(
-            const Tensor2<Real,Int> & restrict V_coords_,
-            const Tensor2<Int ,Int> & restrict simplices_,
-            const Tensor1<Real,Int> & restrict V_charges_
+            cref<Tensor2<Real,Int>> V_coords_,
+            cref<Tensor2<Int ,Int>> simplices_,
+            cref<Tensor1<Real,Int>> V_charges_
         )
         :   V_coords ( V_coords_  )
         ,   simplices( simplices_ )

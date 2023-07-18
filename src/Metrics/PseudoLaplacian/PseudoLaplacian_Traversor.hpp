@@ -416,7 +416,8 @@ namespace Repulsor
             return "PseudoLaplacian_Traversor<"
                 + ToString(S_DOM_DIM)   + ","
                 + ToString(T_DOM_DIM)   + ","
-                + bct.ClassName()       + ","
+//                + bct.ClassName()       + ","
+                + "...,"
                 + ToString(high_order) +
                 + ">";
         }

@@ -536,7 +536,8 @@ namespace Repulsor
             return "TP_Traversor<"
                 + ToString(S_DOM_DIM)   + ","
                 + ToString(T_DOM_DIM)   + ","
-                + bct.ClassName()       + ","
+//                + bct.ClassName()       + ","
+                + "...,"
                 + ToString(energy_flag) + ","
                 + ToString(diff_flag)   + ","
                 + ToString(metric_flag) +

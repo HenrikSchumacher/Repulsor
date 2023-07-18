@@ -217,102 +217,102 @@ namespace Repulsor
         }
 
 
-        const Tensor1<Int,Int> & LeafClusters() const
+        cref<Tensor1<Int,Int>> LeafClusters() const
         {
             return leaf_clusters;
         }
         
-        const Tensor1<Int,Int> & LeafClusterLookup() const
+        cref<Tensor1<Int,Int>> LeafClusterLookup() const
         {
             return leaf_cluster_lookup;
         }
         
-        const Tensor1<Int,Int> & LeafClusterPointers() const
+        cref<Tensor1<Int,Int>> LeafClusterPointers() const
         {
             return leaf_cluster_ptr;
         }
         
-        const Tensor1<Int,Int> & PrimitiveOrdering() const
+        cref<Tensor1<Int,Int>> PrimitiveOrdering() const
         {
             return P_ordering;
         }
         
-        const Tensor1<Int,Int> & PrimitiveInverseOrdering() const
+        cref<Tensor1<Int,Int>> PrimitiveInverseOrdering() const
         {
             return P_inverse_ordering;
         }
         
-        const Tensor1<Int,Int> & ClusterBegin() const
+        cref<Tensor1<Int,Int>> ClusterBegin() const
         {
             return C_begin;
         }
 
-        const Tensor1<Int,Int> & ClusterEnd() const
+        cref<Tensor1<Int,Int>> ClusterEnd() const
         {
             return C_end;
         }
         
-        const Tensor1<Int,Int> & ClusterLeft() const
+        cref<Tensor1<Int,Int>> ClusterLeft() const
         {
             return C_left;
         }
         
-        const Tensor1<Int,Int> & ClusterRight() const
+        cref<Tensor1<Int,Int>> ClusterRight() const
         {
             return C_right;
         }
 
-        const Tensor1<Int,Int> & ClusterNext() const
+        cref<Tensor1<Int,Int>> ClusterNext() const
         {
             return C_next;
         }
         
-        const Tensor1<Int,Int> & ClusterDepths() const
+        cref<Tensor1<Int,Int>> ClusterDepths() const
         {
             return C_depth;
         }
                 
-        Tensor2<SReal,Int> & ClusterSerialized() const
+        mref<Tensor2<SReal,Int>> ClusterSerialized() const
         {
             return C_serialized;
         }
         
-        Tensor2<SReal,Int> & ClusterUpdatedSerialized() const
+        mref<Tensor2<SReal,Int>> ClusterUpdatedSerialized() const
         {
             return C_updated_serialized;
         }
 
-        Tensor2<SReal,Int> & PrimitiveSerialized() const
+        mref<Tensor2<SReal,Int>> PrimitiveSerialized() const
         {
             return P_serialized;
         }
         
-        Tensor2<SReal,Int> & PrimitiveUpdatedSerialized() const
+        mref<Tensor2<SReal,Int>> PrimitiveUpdatedSerialized() const
         {
             return P_updated_serialized;
         }
         
-        Tensor2<SReal,Int> & PrimitiveVelocitiesSerialized() const
+        mref<Tensor2<SReal,Int>> PrimitiveVelocitiesSerialized() const
         {
             return P_velocities_serialized;
         }
         
-        const DataContainer_T & PrimitiveNearFieldData() const
+        cref<DataContainer_T> PrimitiveNearFieldData() const
         {
             return P_near;
         }
         
-        const DataContainer_T & PrimitiveFarFieldData() const
+        cref<DataContainer_T> PrimitiveFarFieldData() const
         {
             return P_far;
         }
         
-        const DataContainer_T & ClusterFarFieldData() const
+        cref<DataContainer_T> ClusterFarFieldData() const
         {
             return C_far;
         }
         
-        virtual const Tensor2<Real,Int> & ClusterMoments() const = 0;
+        virtual cref<Tensor2<Real,Int>> ClusterMoments() const = 0;
         
 //##################################################################################################
 //##        Clustering
@@ -323,66 +323,66 @@ namespace Repulsor
 //##        Matrix multiplication pipeline
 //##################################################################################################
         
-        BufferContainer_T & ClusterInputBuffer() const
+        mref<BufferContainer_T> ClusterInputBuffer() const
         {
             return C_in;
         }
         
-        BufferContainer_T & ClusterOutputBuffer() const
+        mref<BufferContainer_T> ClusterOutputBuffer() const
         {
             return C_out;
         }
         
-        BufferContainer_T & PrimitiveInputBuffer() const
+        mref<BufferContainer_T> PrimitiveInputBuffer() const
         {
             return P_in;
         }
         
-        BufferContainer_T & PrimitiveOutputBuffer() const
+        mref<BufferContainer_T> PrimitiveOutputBuffer() const
         {
             return P_out;
         }
         
 
-        const SparseMatrix_T & LowOrderPreProcessor() const
+        cref<SparseMatrix_T> LowOrderPreProcessor() const
         {
             return lo_pre;
         }
         
 
-        const SparseMatrix_T & LowOrderPostProcessor() const
+        cref<SparseMatrix_T> LowOrderPostProcessor() const
         {
             return lo_post;
         }
         
         
-        const SparseMatrix_T & HighOrderPreProcessor() const
+        cref<SparseMatrix_T> HighOrderPreProcessor() const
         {
             return hi_pre;
         }
         
-        const SparseMatrix_T & HighOrderPostProcessor() const
+        cref<SparseMatrix_T> HighOrderPostProcessor() const
         {
             return hi_post;
         }
         
-        const SparseMatrix_T & MixedOrderPreProcessor() const
+        cref<SparseMatrix_T> MixedOrderPreProcessor() const
         {
             return mi_pre;
         }
         
-        const SparseMatrix_T & MixedOrderPostProcessor() const
+        cref<SparseMatrix_T> MixedOrderPostProcessor() const
         {
             return mi_post;
         }
 
         
-        const SparseBinaryMatrix_T & ClusterToPrimitiveMatrix() const
+        cref<SparseBinaryMatrix_T> ClusterToPrimitiveMatrix() const
         {
             return C_to_P;
         }
         
-        const SparseBinaryMatrix_T & PrimitiveToClusterMatrix() const
+        cref<SparseBinaryMatrix_T> PrimitiveToClusterMatrix() const
         {
             return P_to_C;
         }
@@ -517,7 +517,7 @@ namespace Repulsor
         
     public:
         
-        const SparseBinaryMatrix_T & PrimitiveAdjacencyMatrix() const
+        cref<SparseBinaryMatrix_T> PrimitiveAdjacencyMatrix() const
         {
             std::string tag ("PrimitiveAdjacencyMatrix");
             if( !InPersistentCacheQ(tag))
@@ -542,22 +542,22 @@ namespace Repulsor
         
     public:
         
-        const DataContainer_T & PrimitiveDNearFieldData() const
+        cref<DataContainer_T> PrimitiveDNearFieldData() const
         {
             return P_D_near;
         }
         
-        const DataContainer_T & PrimitiveDFarFieldData() const
+        cref<DataContainer_T> PrimitiveDFarFieldData() const
         {
             return P_D_far;
         }
         
-        DerivativeContainer_T & ThreadPrimitiveDNearFieldData() const
+        mref<DerivativeContainer_T> ThreadPrimitiveDNearFieldData() const
         {
             return thread_P_D_near;
         }
         
-        DerivativeContainer_T & ThreadClusterDFarFieldData() const
+        mref<DerivativeContainer_T> ThreadClusterDFarFieldData() const
         {
             return thread_C_D_far;
         }
@@ -628,7 +628,7 @@ namespace Repulsor
                 mptr<Real> to   = C_out.data();
                 
                 ParallelDo(
-                    [=]( const Int i )
+                    [=,this]( const Int i )
                     {
                         to[i] += from[far_dim * i];
                     },
@@ -639,7 +639,7 @@ namespace Repulsor
             
             //Before percolating the energies down we have to transform them to densities.
             ParallelDo(
-                [=]( const Int i )
+                [=,this]( const Int i )
                 {
                     C_out[i] /= C_far[i][0];
                 },
@@ -655,7 +655,7 @@ namespace Repulsor
             // We have to convert them back to energies before we add the energies from thread_P_D_near.
             
             ParallelDo(
-                [=]( const Int i )
+                [=,this]( const Int i )
                 {
                     P_out[i] *= P_near[i][0];
                 },
@@ -670,7 +670,7 @@ namespace Repulsor
                 mptr<Real> to   = P_out.data();
                 
                 ParallelDo(
-                    [=]( const Int i )
+                    [=,this]( const Int i )
                     {
                         to[i] += from[near_dim * i];
                     },
@@ -694,7 +694,7 @@ namespace Repulsor
             
             // Copy the values to output. We must not forget reorder!
             ParallelDo(
-                [=]( const Int i )
+                [=,this]( const Int i )
                 {
                     const Int j = P_inverse_ordering[i];
                     output[i] = static_cast<ExtReal>(P_out[j]);
@@ -730,7 +730,7 @@ namespace Repulsor
             
             // Divide by primitive volumes to get densities.
             ParallelDo(
-                [=]( const Int j )
+                [=,this]( const Int j )
                 {
                     P_out[j] /= P_near[j][0];
                 },
@@ -747,7 +747,7 @@ namespace Repulsor
 
             // Finally, we divide by the dual volumes to obtain the vertex densities.
             ParallelDo(
-                [=]( const Int i )
+                [=,this]( const Int i )
                 {
                     output[i] /= dual_volumes[i];
                 },

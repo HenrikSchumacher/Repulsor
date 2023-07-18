@@ -35,11 +35,11 @@ namespace Repulsor
 
         virtual const CollisionMatrix_T & ClusterCollisionMatrix() const = 0;
         
-        virtual const CollisionMatrix_T & PrimitiveCollisionMatrix() const = 0;
+        virtual cref<CollisionMatrix_T> PrimitiveCollisionMatrix() const = 0;
         
-        virtual const ClusterTreeBase_T & GetS() const = 0;
+        virtual cref<ClusterTreeBase_T> GetS() const = 0;
         
-        virtual const ClusterTreeBase_T & GetT() const = 0;
+        virtual cref<ClusterTreeBase_T> GetT() const = 0;
 
         virtual SReal MaximumSafeStepSize() const = 0;
         

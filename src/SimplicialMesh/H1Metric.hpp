@@ -169,7 +169,7 @@ public:
 
 
 
-    virtual SparseMatrix_T & H1Metric() const override
+    virtual cref<SparseMatrix_T> H1Metric() const override
     {
         std::string tag ("H1Metric");
         if( !this->InCacheQ(tag))
@@ -187,7 +187,7 @@ public:
     }
 
     
-    virtual const SparseMatrix_T & StiffnessMatrix() const override
+    virtual cref<SparseMatrix_T> StiffnessMatrix() const override
     {
         std::string tag ("StiffnessMatrix");
         if( !this->InCacheQ(tag))
@@ -205,7 +205,7 @@ public:
     }
 
     
-    virtual const SparseMatrix_T & MassMatrix() const override
+    virtual cref<SparseMatrix_T> MassMatrix() const override
     {
         std::string tag ("MassMatrix");
         if( !this->InCacheQ(tag))

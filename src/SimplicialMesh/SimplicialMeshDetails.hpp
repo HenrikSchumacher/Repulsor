@@ -95,7 +95,7 @@ namespace Repulsor
 		mptr<Real> buffer__      = buffer.data();
         
 		ParallelDo(
-			[=]( const Int i )
+			[=,this]( const Int i )
 			{
 				Real charge = 0;
 				for( Int k = 0; k < SIZE; ++k )
@@ -172,7 +172,7 @@ namespace Repulsor
 		mptr<Real> buffer__      = buffer.data();
         
 		ParallelDo(
-			[=]( const Int i )
+			[=,this]( const Int i )
 			{
 				Real charge = 0;
 				for( Int k = 0; k < SIZE; ++k )
@@ -250,7 +250,7 @@ namespace Repulsor
 		mptr<Real> buffer__      = buffer.data();
         
 		ParallelDo(
-			[=]( const Int i )
+			[=,this]( const Int i )
 			{
 				Real charge = 0;
 				for( Int k = 0; k < SIZE; ++k )
@@ -329,7 +329,7 @@ namespace Repulsor
 		mptr<Real> buffer__      = buffer.data();
         
 		ParallelDo(
-			[=]( const Int i )
+			[=,this]( const Int i )
 			{
 				Real charge = 0;
 				for( Int k = 0; k < SIZE; ++k )
@@ -409,7 +409,7 @@ namespace Repulsor
 		mptr<Real> buffer__    = buffer.data();
         
 		ParallelDo(
-			[=]( const Int i )
+			[=,this]( const Int i )
 			{
 				Real charge = 0;
 				for( Int k = 0; k < SIZE; ++k )
@@ -578,7 +578,7 @@ namespace Repulsor
 		mptr<Real> buffer__    = buffer.data();
         
 		ParallelDo(
-			[=]( const Int i )
+			[=,this]( const Int i )
 			{
 				Real charge = 0;
 				for( Int k = 0; k < SIZE; ++k )
@@ -821,7 +821,7 @@ namespace Repulsor
 		mptr<Real> buffer__    = buffer.data();
         
 		ParallelDo(
-			[=]( const Int i )
+			[=,this]( const Int i )
 			{
 				Real charge = 0;
 				for( Int k = 0; k < SIZE; ++k )
@@ -1160,7 +1160,7 @@ namespace Repulsor
         mptr<Real> buffer__    = buffer.data();
 
 		ParallelDo(
-			[=]( const Int i )
+			[=,this]( const Int i )
 			{
 				Real charge = 0;
 				for( Int k = 0; k < SIZE; ++k )
@@ -1513,7 +1513,7 @@ namespace Repulsor
         mptr<Real> buffer__    = buffer.data();
 
 		ParallelDo(
-			[=]( const Int i )
+			[=,this]( const Int i )
 			{
 				Real charge = 0;
 				for( Int k = 0; k < SIZE; ++k )

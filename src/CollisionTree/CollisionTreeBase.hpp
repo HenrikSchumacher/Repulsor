@@ -46,11 +46,11 @@ namespace Repulsor
             return symmetricQetric;
         }
 
-        virtual const CollisionMatrix_T & PrimitiveCollisionMatrix() const = 0;
+        virtual cref<CollisionMatrix_T> PrimitiveCollisionMatrix() const = 0;
         
-        virtual const ClusterTreeBase_T & GetS() const = 0;
+        virtual cref<ClusterTreeBase_T> GetS() const = 0;
         
-        virtual const ClusterTreeBase_T & GetT() const = 0;
+        virtual cref<ClusterTreeBase_T> GetT() const = 0;
 
         virtual ExtReal MaximumSafeStepSize(
             const SReal t_,

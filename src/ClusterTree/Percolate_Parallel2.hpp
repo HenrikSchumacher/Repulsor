@@ -16,7 +16,7 @@ public:
         
         Forest_T(
             TopTreeRows_T && top_tree_rows_,
-            const Tensor1<Int,Int> & restrict C_next,
+            cref<Tensor1<Int,Int>> C_next,
             const Int thread_count_
         ) noexcept
         :   top_tree_rows ( std::move(top_tree_rows_) )

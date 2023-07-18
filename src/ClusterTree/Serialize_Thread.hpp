@@ -12,14 +12,14 @@ private:
         
         std::vector<std::thread> threads;
         threads.reserve(7);
-        threads.emplace_back( [=](){ C_left  = Tensor1<Int,Int>( ClusterCount() ); } );
-        threads.emplace_back( [=](){ C_left  = Tensor1<Int,Int>( ClusterCount() ); } );
-        threads.emplace_back( [=](){ C_right = Tensor1<Int,Int>( ClusterCount() ); } );
-        threads.emplace_back( [=](){ C_begin = Tensor1<Int,Int>( ClusterCount() ); } );
-        threads.emplace_back( [=](){ C_end   = Tensor1<Int,Int>( ClusterCount() ); } );
-        threads.emplace_back( [=](){ C_depth = Tensor1<Int,Int>( ClusterCount() ); } );
-        threads.emplace_back( [=](){ C_next  = Tensor1<Int,Int>( ClusterCount() ); } );
-        threads.emplace_back( [=](){ leaf_cluster_lookup = Tensor1<Int,Int>( ClusterCount(), -1 ); } );
+        threads.emplace_back( [this](){ C_left  = Tensor1<Int,Int>( ClusterCount() ); } );
+        threads.emplace_back( [this](){ C_left  = Tensor1<Int,Int>( ClusterCount() ); } );
+        threads.emplace_back( [this](){ C_right = Tensor1<Int,Int>( ClusterCount() ); } );
+        threads.emplace_back( [this](){ C_begin = Tensor1<Int,Int>( ClusterCount() ); } );
+        threads.emplace_back( [this](){ C_end   = Tensor1<Int,Int>( ClusterCount() ); } );
+        threads.emplace_back( [this](){ C_depth = Tensor1<Int,Int>( ClusterCount() ); } );
+        threads.emplace_back( [this](){ C_next  = Tensor1<Int,Int>( ClusterCount() ); } );
+        threads.emplace_back( [this](){ leaf_cluster_lookup = Tensor1<Int,Int>( ClusterCount(), -1 ); } );
         
         ptic(className()+"::Serialize: allocation");
         for( auto & thread : threads )
@@ -48,7 +48,7 @@ private:
         
         ptic(className()+"::Serialize: Parallel depth-first scans for each subtree.");
         ParallelDo_Dynamic(
-            [=,&tree_row]( const Int thread, const Int i )
+            [=,this,&tree_row]( const Int thread, const Int i )
             {
                 Serialize_Cluster<true>( thread, tree_row[i] );
             },

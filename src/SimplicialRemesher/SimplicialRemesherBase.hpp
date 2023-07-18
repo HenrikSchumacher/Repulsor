@@ -37,21 +37,21 @@ namespace Repulsor
             const Int thread_count_ = 1
         ) = 0;
         
-//        virtual void LoadMesh( const MeshBase_T & M ) = 0;
+//        virtual void LoadMesh( cref<MeshBase_T> M ) = 0;
 //
-//        virtual void LoadMesh( const MeshBase_T & M, const Tensor2<Real,Int> & V_data_ ) = 0;
+//        virtual void LoadMesh( cref<MeshBase_T> M, cref<Tensor2<Real,Int>> V_data_ ) = 0;
 
-//        virtual void LoadMesh( const MeshBase_T & M, const Real * V_data_, const Int data_dim ) = 0;
+//        virtual void LoadMesh( cref<MeshBase_T> M, cptr<Real> V_data_, const Int data_dim ) = 0;
 //        
-//        virtual void LoadMesh_External( const MeshBase_T & M, const ExtReal * V_data_, const Int data_dim ) = 0;
+//        virtual void LoadMesh_External( cref<MeshBase_T> M, cptr<ExtReal> V_data_, const Int data_dim ) = 0;
         
 //        virtual std::unique_ptr<MeshBase_T> CreateMesh() = 0;
 
-        virtual const Tensor2<Real,Int> & VertexCoordinates() = 0;
+        virtual cref<Tensor2<Real,Int>> VertexCoordinates() = 0;
         
-        virtual const Tensor2<Real,Int> & VertexData() = 0;
+        virtual cref<Tensor2<Real,Int>> VertexData() = 0;
         
-        virtual const Tensor2<Int,Int> & Simplices() = 0;
+        virtual cref<Tensor2<Int,Int>> Simplices() = 0;
         
         virtual Int DomDim() const = 0;
         

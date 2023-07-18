@@ -120,7 +120,7 @@ namespace Repulsor
         ) = 0;
         
         
-        virtual mref<SparseMatrix_T> H1Metric() const = 0;
+        virtual cref<SparseMatrix_T> H1Metric() const = 0;
         
 //        virtual std::shared_ptr<Sparse::CholeskyDecomposition<Real,Int,LInt> H1Solver() const = 0;
         

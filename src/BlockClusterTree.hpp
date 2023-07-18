@@ -52,8 +52,8 @@ namespace Repulsor
         virtual ~BlockClusterTree() = default;
         
         BlockClusterTree(
-            const ClusterTree_T & restrict S_,
-            const ClusterTree_T & restrict T_,
+            cref<ClusterTree_T> S_,
+            cref<ClusterTree_T> T_,
             Setting_T settings_ = Setting_T()
         )
         :   S(S_)
@@ -87,8 +87,8 @@ namespace Repulsor
         static constexpr Int null = static_cast<Int>(0);
         
         // Not very elegant to use raw pointers here, but maybe acceptable due to constness.
-        const ClusterTree_T & restrict S; // "left"  BVH (output side of matrix-vector multiplication)
-        const ClusterTree_T & restrict T; // "right" BVH (input  side of matrix-vector multiplication)
+        cref<ClusterTree_T> S; // "left"  BVH (output side of matrix-vector multiplication)
+        cref<ClusterTree_T> T; // "right" BVH (input  side of matrix-vector multiplication)
         
         const Setting_T settings;
         
@@ -150,37 +150,37 @@ namespace Repulsor
         }
 
         
-        virtual const Inter_Pattern_T & PrimitiveIntersectionMatrix() const override
+        virtual cref<Inter_Pattern_T> PrimitiveIntersectionMatrix() const override
         {
             return inter;
         }
         
-        virtual const VeryNear_Pattern_T & VeryNear() const override
+        virtual cref<VeryNear_Pattern_T> VeryNear() const override
         {
             return verynear;
         }
         
-        virtual const Near_Pattern_T & Near() const override
+        virtual cref<Near_Pattern_T> Near() const override
         {
             return near;
         }
         
-        virtual const Far_Pattern_T & Far() const override
+        virtual cref<Far_Pattern_T> Far() const override
         {
             return far;
         }
         
-        virtual const ClusterTree_T & GetS() const override
+        virtual cref<ClusterTree_T> GetS() const override
         {
             return S;
         }
         
-        virtual const ClusterTree_T & GetT() const override
+        virtual cref<ClusterTree_T> GetT() const override
         {
             return T;
         }
 
-        virtual const Setting_T & Settings() const override
+        virtual cref<Setting_T> Settings() const override
         {
             return settings;
         }

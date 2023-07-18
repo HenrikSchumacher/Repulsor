@@ -343,7 +343,7 @@ namespace Repulsor
             const Int  far_dim =  FarDim();
 
             ParallelDo(
-                [=]( const Int i )
+                [=,this]( const Int i )
                 {
                     const Int j = P_ordering[i];
 
@@ -379,7 +379,7 @@ namespace Repulsor
                 mptr<Int> inner__ = C_to_P.Inner().data();
                 
                 ParallelDo(
-                    [=]( const Int i )
+                    [=,this]( const Int i )
                     {
                         const Int leaf  = leaf_clusters[i];
                         const Int begin = C_begin[leaf];
@@ -432,8 +432,8 @@ namespace Repulsor
 
         
         void ComputePrePost(
-            const SparseMatrix_T & restrict DiffOp,
-            const SparseMatrix_T & restrict AvOp
+            cref<SparseMatrix_T> DiffOp,
+            cref<SparseMatrix_T> AvOp
         )
         {
             if( !this->pre_post_initialized )
@@ -468,7 +468,7 @@ namespace Repulsor
                     const Int size = static_cast<Int>(DiffOp.NonzeroCount() / primitive_count);
                     
                     ParallelDo(
-                        [=]( const Int i )
+                        [=,this]( const Int i )
                         {
                             const Int from = size * ord[i];
                             const Int to   = size * i;
@@ -514,7 +514,7 @@ namespace Repulsor
                     const Int size = static_cast<Int>(AvOp.NonzeroCount() / primitive_count);
                     
                     ParallelDo(
-                        [=]( const Int i )
+                        [=,this]( const Int i )
                         {
                             const Int from = size * ord[i];
                             const Int to   = size * i;
@@ -586,7 +586,7 @@ namespace Repulsor
                     mi_outer[mi_pre.RowCount()] = mi_pre.RowCount() * row_size;
 
                     ParallelDo(
-                        [=]( const Int i )
+                        [=,this]( const Int i )
                         {
                             const Int row_base = (AMB_DIM+1) * i;
                             
@@ -644,7 +644,7 @@ namespace Repulsor
                     mptr<Real> mi_values = mi_post.Values().data();
                     
                     ParallelDo(
-                        [=]( const Int i )
+                        [=,this]( const Int i )
                         {
                             const LInt lo_begin = lo_outer[i  ];
                             const LInt lo_end   = lo_outer[i+1];
@@ -1008,8 +1008,8 @@ namespace Repulsor
         // as the preprocessor and postprocessor matrices (that are needed for matrix-vector multiplies of the BCT.)
         
         void SemiStaticUpdate(
-            const Tensor2<Real,Int> & restrict  P_near_,
-            const Tensor2<Real,Int> & restrict  P_far_
+            cref<Tensor2<Real,Int>> P_near_,
+            cref<Tensor2<Real,Int>> P_far_
         ) const override
         {
             if( P_near_.Dimension(0) != PrimitiveCount() )
@@ -1080,7 +1080,7 @@ namespace Repulsor
             
             // TODO: Potentially wasteful code.
             ParallelDo(
-                [=,&P_moving_]( const Int thread )
+                [=,this,&P_moving_]( const Int thread )
                 {
                     const Int i_begin = JobPointer<Int>(PrimitiveCount(), ThreadCount(), thread     );
                     const Int i_end   = JobPointer<Int>(PrimitiveCount(), ThreadCount(), thread + 1 );
@@ -1103,7 +1103,7 @@ namespace Repulsor
             ptic(className()+"::TakeUpdateVectors - Compute the AABBs of the updated leaf clusters.");
             
             ParallelDo(
-                [=]( const Int thread )
+                [=,this]( const Int thread )
                 {
                     const Int i_begin = JobPointer<Int>(LeafClusterCount(), ThreadCount(), thread     );
                     const Int i_end   = JobPointer<Int>(LeafClusterCount(), ThreadCount(), thread + 1 );
@@ -1187,7 +1187,7 @@ namespace Repulsor
                 if( thread == 0 && !addto )
                 {
                     ParallelDo(
-                        [=]( const Int i )
+                        [=,this]( const Int i )
                         {
                             copy_buffer<VarSize,Sequential>(
                                 &from[near_dim * inv_ord[i]], &to[near_dim * i], near_dim
@@ -1199,7 +1199,7 @@ namespace Repulsor
                 else
                 {
                     ParallelDo(
-                        [=]( const Int i )
+                        [=,this]( const Int i )
                         {
                             add_to_buffer( &from[near_dim * inv_ord[i]], &to[near_dim * i], near_dim );
                         },
@@ -1236,7 +1236,7 @@ namespace Repulsor
             if( addto )
             {
                 ParallelDo(
-                    [=]( const Int i )
+                    [=,this]( const Int i )
                     {
                         add_to_buffer( &from[far_dim * inv_ord[i]], &to[far_dim * i], far_dim );
                     },
@@ -1246,7 +1246,7 @@ namespace Repulsor
             else
             {
                 ParallelDo(
-                    [=]( const Int i )
+                    [=,this]( const Int i )
                     {
                         copy_buffer<VarSize,Sequential>(
                             &from[far_dim * inv_ord[i]], &to[far_dim * i], far_dim
@@ -1263,7 +1263,7 @@ namespace Repulsor
         
     
         
-        const Tensor2<Real,Int> & ClusterMoments() const override
+        cref<Tensor2<Real,Int>> ClusterMoments() const override
         {
             return C_moments;
         }

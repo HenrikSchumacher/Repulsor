@@ -29,7 +29,7 @@ private:
             const Int row_size  = static_cast<Int>(row.size());
 
             ParallelDo_Dynamic(
-                [=,&row,&tree_rows_ptr_mutex]( const Int thread, const Int i )
+                [=,this,&row,&tree_rows_ptr_mutex]( const Int thread, const Int i )
                 {
                     Split_Cluster<false>(
                         thread,
@@ -52,7 +52,7 @@ private:
         std::vector<Cluster_T *> & restrict tree_row = tree_rows_ptr[top_level_count];
         
         ParallelDo_Dynamic(
-            [=,&tree_row,&tree_rows_ptr_mutex]( const Int thread, const Int i )
+            [=,this,&tree_row,&tree_rows_ptr_mutex]( const Int thread, const Int i )
             {
                 Split_Cluster<true>( thread, tree_row[i], tree_rows_ptr_mutex, one );
             },

@@ -114,7 +114,7 @@ namespace Repulsor
 //            this->LoadMesh(M);
 //        }
 //
-//        explicit SimplicialRemesher( const Mesh_T & M, const Tensor2<Real,Int> & u )
+//        explicit SimplicialRemesher( cref<Mesh_T> M, cref<Tensor2<Real,Int>> u )
 //        {
 //            Init();
 //

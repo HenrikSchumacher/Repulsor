@@ -55,19 +55,19 @@ namespace Repulsor
 
         virtual LInt FarFieldInteractionCount() const = 0;
         
-        virtual const Inter_Pattern_T & PrimitiveIntersectionMatrix() const = 0;
+        virtual cref<Inter_Pattern_T> PrimitiveIntersectionMatrix() const = 0;
 
-        virtual const VeryNear_Pattern_T & VeryNear() const = 0;
+        virtual cref<VeryNear_Pattern_T> VeryNear() const = 0;
         
-        virtual const Near_Pattern_T & Near() const = 0;
+        virtual cref<Near_Pattern_T> Near() const = 0;
         
-        virtual const Far_Pattern_T & Far() const = 0;
+        virtual cref<Far_Pattern_T> Far() const = 0;
         
-        virtual const ClusterTreeBase_T & GetS() const = 0;
+        virtual cref<ClusterTreeBase_T> GetS() const = 0;
         
-        virtual const ClusterTreeBase_T & GetT() const = 0;
+        virtual cref<ClusterTreeBase_T> GetT() const = 0;
 
-        virtual const Setting_T & Settings() const = 0;
+        virtual cref<Setting_T> Settings() const = 0;
         
         virtual std::string Stats() const = 0;
         

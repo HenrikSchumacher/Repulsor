@@ -293,7 +293,7 @@ namespace Repulsor
             return VertexCount() * AMB_DIM;
         }
         
-        virtual const Real * Dofs() const override
+        virtual cptr<Real> Dofs() const override
         {
             return V_coords.data();
         }

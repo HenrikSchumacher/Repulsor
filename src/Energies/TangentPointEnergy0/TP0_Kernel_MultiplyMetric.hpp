@@ -6,7 +6,7 @@
         alpha_flag, beta_flag,                                        \
         true, true, false, true,                                      \
         true, true,                                                   \
-        true                                                          \
+        false                                                         \
     >
 
 namespace Repulsor

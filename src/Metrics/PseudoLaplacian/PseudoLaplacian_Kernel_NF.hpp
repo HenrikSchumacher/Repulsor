@@ -167,7 +167,8 @@ namespace Repulsor
             return "PseudoLaplacian_Kernel_NF<"
             + ToString(S_DOM_DIM) + ","
             + ToString(T_DOM_DIM) + ","
-            + this->GetS().ClassName() + ","
+//            + this->GetS().ClassName() + ","
+            + "...,"
             + ToString(symmetricQ) + ","
             + ToString(high_order)
             + ">";

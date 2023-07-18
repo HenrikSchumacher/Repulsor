@@ -1,6 +1,6 @@
 public:
 
-    virtual const Tensor1<Int,Int> & NestedDissectionOrdering() const override
+    virtual cref<Tensor1<Int,Int>> NestedDissectionOrdering() const override
     {
         std::string tag ("NestedDissectionOrdering");
         
@@ -20,12 +20,12 @@ public:
             Tensor1<Int,Int> perm_0 = iota<Int>( m );
             Tensor1<Int,Int> perm_1 ( m );
             
-            const SparseMatrix_T & Adj = tree.LowOrderPostProcessor();
+            cref<SparseMatrix_T> Adj = tree.LowOrderPostProcessor();
             
-            const Tensor1<Int,Int> & C_begin = tree.ClusterBegin();
-            const Tensor1<Int,Int> & C_end   = tree.ClusterEnd();
-            const Tensor1<Int,Int> & C_left  = tree.ClusterLeft();
-            const Tensor1<Int,Int> & C_right = tree.ClusterRight();
+            cref<Tensor1<Int,Int>> C_begin = tree.ClusterBegin();
+            cref<Tensor1<Int,Int>> C_end   = tree.ClusterEnd();
+            cref<Tensor1<Int,Int>> C_left  = tree.ClusterLeft();
+            cref<Tensor1<Int,Int>> C_right = tree.ClusterRight();
             
             Tensor1<Int,Int> V_begin ( tree.ClusterCount() );
             Tensor1<Int,Int> V_end   ( tree.ClusterCount() );
