@@ -33,8 +33,8 @@ using Int     = Int64;
 using LInt    = Int64;
 using ExtInt  = Int64;
 
-using Real    = Real64;
-using SReal   = Real64;
+using Real    = Real32;
+using SReal   = Real32;
 using ExtReal = Real64;
 
 
@@ -121,14 +121,14 @@ int main(int argc, const char * argv[])
     
     constexpr Int NRHS = 3 * 1;
     
-    Tensor2<Real,Int> B_buffer  ( M.VertexCount(), NRHS );
-    Tensor2<Real,Int> X_buffer  ( M.VertexCount(), NRHS );
-    Tensor2<Real,Int> Y_buffer  ( M.VertexCount(), NRHS );
-    Tensor2<Real,Int> Z_buffer  ( M.VertexCount(), NRHS );
+    Tensor2<ExtReal,Int> B_buffer  ( M.VertexCount(), NRHS );
+    Tensor2<ExtReal,Int> X_buffer  ( M.VertexCount(), NRHS );
+    Tensor2<ExtReal,Int> Y_buffer  ( M.VertexCount(), NRHS );
+    Tensor2<ExtReal,Int> Z_buffer  ( M.VertexCount(), NRHS );
     
-    mptr<Real> B  = B_buffer.data();
-    mptr<Real> X  = X_buffer.data();
-    mptr<Real> Y  = Y_buffer.data();
+    mptr<ExtReal> B  = B_buffer.data();
+    mptr<ExtReal> X  = X_buffer.data();
+    mptr<ExtReal> Y  = Y_buffer.data();
 //    mptr<Real> Z  = Z_buffer.data();
     
     tic("tpe.Differential(M)");
@@ -138,14 +138,14 @@ int main(int argc, const char * argv[])
     print("");
     
     // The operator for the metric.
-    auto A = [&]( cptr<Real> X, mptr<Real> Y )
+    auto A = [&]( cptr<ExtReal> X, mptr<ExtReal> Y )
     {
         //Y = alpha * A * X + beta * Y
-        tpm.MultiplyMetric( M, Scalar::One<Real>, X, Scalar::Zero<Real>, Y, NRHS );
+        tpm.MultiplyMetric( M, Scalar::One<ExtReal>, X, Scalar::Zero<ExtReal>, Y, NRHS );
     };
 
     // The operator for the preconditioner.
-    auto P = [&]( cptr<Real> X, mptr<Real> Y )
+    auto P = [&]( cptr<ExtReal> X, mptr<ExtReal> Y )
     {
         M.H1Solve( X, Y, NRHS );
         pseudo_lap.MultiplyMetric( M, Scalar::One<Real>, Y, Scalar::Zero<Real>, Y, NRHS );
@@ -176,7 +176,7 @@ int main(int argc, const char * argv[])
     
     const Int max_iter = 100;
     
-    ConjugateGradient<NRHS,Real,Int> CG ( M.VertexCount(), max_iter, thread_count );
+    ConjugateGradient<NRHS,ExtReal,Int> CG ( M.VertexCount(), max_iter, thread_count );
     
     tic("CG");
     CG( A, P, B, NRHS, X, NRHS, 0.0001 );
