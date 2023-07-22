@@ -1,18 +1,19 @@
 #pragma once
 
-#define BASE BlockKernel_fixed_2<                                     \
-        AMB_DIM_+1,AMB_DIM_+1,NRHS,                                   \
-        Scal_, Scal_in_, Scal_out_, Int_, LInt_,                      \
+#define BASE BlockKernel_fixed<                                       \
+        AMB_DIM_+1,AMB_DIM_+1,MAX_RHS_COUNT_, true,                   \
+        Real_, Real_in_, Real_out_, Int_, LInt_,                      \
         alpha_flag, beta_flag,                                        \
+        true, true, false, true,                                      \
         true, true,                                                   \
-        true                                                          \
+        false                                                         \
     >
 
 namespace Repulsor
 {
     template<
-        int AMB_DIM_, int NRHS,
-        typename Scal_, typename Scal_in_, typename Scal_out_, typename Int_, typename LInt_,
+        int AMB_DIM_, int MAX_RHS_COUNT_,
+        typename Real_, typename Real_in_, typename Real_out_, typename Int_, typename LInt_,
         Scalar::Flag alpha_flag, Scalar::Flag beta_flag
     >
     class TP0_Kernel_MultiplyMetric : public BASE
@@ -24,9 +25,9 @@ namespace Repulsor
 
     public:
 
-        using Scal     = Scal_;
-        using Scal_out = Scal_out_;
-        using Scal_in  = Scal_in_;
+        using Real     = Real_;
+        using Real_out = Real_out_;
+        using Real_in  = Real_in_;
         using Int      = Int_;
         using LInt     = LInt_;
         
@@ -35,8 +36,6 @@ namespace Repulsor
         using Base_T::ROWS;
         using Base_T::COLS;
         using Base_T::MAX_RHS_COUNT;
-        
-        using BASE::vecQ;
         
         static constexpr LInt BLOCK_NNZ = 2;
         static constexpr LInt DIAG_NNZ  = 2;
@@ -48,22 +47,26 @@ namespace Repulsor
         using Base_T::X;
         using Base_T::Y;
         using Base_T::x;
+        using Base_T::x_from;
         using Base_T::y;
         
         using Base_T::ReadX;
+        using Base_T::get_x;
+        using Base_T::get_y;
+        using Base_T::FMA;
         
     public:
         
         TP0_Kernel_MultiplyMetric() = delete;
         
-        explicit TP0_Kernel_MultiplyMetric( mptr<Scal> A_ )
+        explicit TP0_Kernel_MultiplyMetric( mptr<Real> A_ )
         :   Base_T( A_ )
         {}
         
         TP0_Kernel_MultiplyMetric(
-            cptr<Scal>     A_,
-            cref<Scal_out> alpha_,  cptr<Scal_in> X_,
-            cref<Scal_out> beta_,   mptr<Scal>    Y_,
+            cptr<Real>     A_,
+            cref<Real_out> alpha_,  cptr<Real_in> X_,
+            cref<Real_out> beta_,   mptr<Real>    Y_,
             const Int      rhs_count_
         )
         :   Base_T( A_, alpha_, X_, beta_, Y_, rhs_count_ )
@@ -92,7 +95,7 @@ namespace Repulsor
         {
             ReadX( j_global );
             
-            cptr<Scal> a = &A_const[BLOCK_NNZ * k_global];
+            cptr<Real> a = &A_const[BLOCK_NNZ * k_global];
             
 /*            The metric block looks like this for AMB_DIM == 3:
 //
@@ -110,35 +113,64 @@ namespace Repulsor
             
             if constexpr ( vec_enabledQ )
             {
-                
-                const Scal a_0 ( a[0] );
+                std::array<vec_T<MAX_RHS_COUNT,Real>,COLS> x_vec;
+                std::array<vec_T<MAX_RHS_COUNT,Real>,ROWS> y_vec;
 
-                y[0] += a_0 * x[0];
-                
-                const Scal a_1 ( a[1] );
-                
+                // This explicity copying is somewhat insane but will probably optimized a bit by the compiler.
+                for( Int j = 0; j < COLS; ++j )
+                {
+                    for( Int k = 0; k < MAX_RHS_COUNT; ++k )
+                    {
+                        x_vec[j][k] = get_x(j,k);
+                    }
+                }
+
+                // This explicity copying is somewhat insane but will probably optimized a bit by the compiler.
+                for( Int j = 0; j < ROWS; ++j )
+                {
+                    for( Int k = 0; k < MAX_RHS_COUNT; ++k )
+                    {
+                        y_vec[j][k] = get_y(j,k);
+                    }
+                }
+
+                const Real a_0 ( a[0] );
+
+                y_vec[0] += a_0 * x_vec[0];
+
+                const Real a_1 ( a[1] );
+
                 for( Int j = 1; j < COLS; ++j )
                 {
-                    y[j] += a_1 * x[j];
+                    y_vec[j] += a_1 * x_vec[j];
+                }
+
+                // This explicity copying is somewhat insane but will probably optimized a bit by the compiler.
+                for( Int j = 0; j < ROWS; ++j )
+                {
+                    for( Int k = 0; k < MAX_RHS_COUNT; ++k )
+                    {
+                        get_y(j,k) = y_vec[j][k];
+                    }
                 }
             }
             else
             {
                 
-                const Scal a_0 ( a[0] );
+                const Real a_0 ( a[0] );
 
                 for( Int k = 0; k < MAX_RHS_COUNT; ++k )
                 {
-                    y[0][k] += a_0 * x[0][k];
+                    FMA( a_0, get_x(0,k), get_y(0,k) );
                 }
 
-                const Scal a_1 ( a[1] );
+                const Real a_1 ( a[1] );
 
                 for( Int j = 1; j < COLS; ++j )
                 {
                     for( Int k = 0; k < MAX_RHS_COUNT; ++k )
                     {
-                        y[j][k] += a_1 * x[j][k];
+                        FMA( a_1, get_x(j,k), get_y(j,k) );
                     }
                 }
             }
@@ -151,7 +183,7 @@ namespace Repulsor
             return "TP0_Kernel_MultiplyMetric<"
                 +ToString(AMB_DIM)
             +","+ToString(MAX_RHS_COUNT)
-            +","+TypeName<Scal>+","+TypeName<Scal_in>+","+TypeName<Scal_out>
+            +","+TypeName<Real>+","+TypeName<Real_in>+","+TypeName<Real_out>
             +","+TypeName<Int>+","+TypeName<LInt>
             +","+ToString(alpha_flag)
             +","+ToString(beta_flag)
@@ -164,3 +196,4 @@ namespace Repulsor
 
 
 #undef BASE
+

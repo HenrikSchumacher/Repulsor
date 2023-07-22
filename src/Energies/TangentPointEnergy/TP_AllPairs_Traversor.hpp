@@ -38,35 +38,42 @@ namespace Repulsor
         
         
         using Kernel_Block_MulAdd_T = ArrowheadBlockKernel_fixed<
-            AMB_DIM+1, AMB_DIM+1, AMB_DIM, true,
+            AMB_DIM+1, AMB_DIM+1, AMB_DIM,
             Real, Real, Real, Int, LInt,
             Scalar::Flag::Plus, Scalar::Flag::Plus, // CAUTION: We use add-in instead of overwrite!
-                         true,
-            true, false, true, true,
-            true, false,
+            true,
+            true, true,
             true
         >;
         
         using Kernel_Block_Mul_T = ArrowheadBlockKernel_fixed<
-            AMB_DIM+1, AMB_DIM+1, AMB_DIM, true,
+            AMB_DIM+1, AMB_DIM+1, AMB_DIM,
             Real, Real, Real, Int, LInt,
             Scalar::Flag::Plus, Scalar::Flag::Zero,
-                         true,
-            true, false, true, true,
-            true, false,
+            true,
+            true, true,
             true
         >;
-        
+  
         using Kernel_Diag_MulAdd_T = DenseBlockKernel_fixed<
-            AMB_DIM+1, AMB_DIM+1, AMB_DIM, true,
+            AMB_DIM+1, AMB_DIM+1, AMB_DIM,
             Real, Real, Real, Int, LInt,
             Scalar::Flag::Plus, Scalar::Flag::Plus,
             true, false, true,
-            true, false, true, true,
-            true, false,
-            1   , 2,
+            true, true,
             true
         >;
+        
+//        using Kernel_Diag_MulAdd_T = DenseBlockKernel_fixed<
+//            AMB_DIM+1, AMB_DIM+1, AMB_DIM, true,
+//            Real, Real, Real, Int, LInt,
+//            Scalar::Flag::Plus, Scalar::Flag::Plus,
+//            true, false, true,
+//            true, false, true, true,
+//            true, false,
+//            1   , 2,
+//            true
+//        >;
 
         static constexpr Int NF_blk_size =    Kernel_Block_Mul_T::ROWS *    Kernel_Block_Mul_T::COLS;
         
