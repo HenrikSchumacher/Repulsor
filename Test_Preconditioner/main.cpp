@@ -33,8 +33,8 @@ using Int     = Int64;
 using LInt    = Int64;
 using ExtInt  = Int64;
 
-using Real    = Real32;
-using SReal   = Real32;
+using Real    = Real64;
+using SReal   = Real64;
 using ExtReal = Real64;
 
 

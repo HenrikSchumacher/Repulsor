@@ -325,20 +325,5 @@ int main(int argc, const char * argv[])
     S.Solve( b.data(), x.data() );
     
     
-    
-    print("");
-    print("Testing remesher.");
-
-    std::unique_ptr<Mesh_T::RemesherBase_T> R = M_ptr->CreateRemesher();
-
-    std::vector<Int> edges {1,2,3};
-
-    R->CollapseEdges( edges );
-
-    R->SplitEdges( edges );
-
-//    R->UnifyEdgeLengths(const Real collapse_threshold, <#const Real split_threshold#>);
-    
-    
     return 0;
 }

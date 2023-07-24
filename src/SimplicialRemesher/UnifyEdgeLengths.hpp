@@ -5,27 +5,32 @@
 public:
         
     virtual bool UnifyEdgeLengths(
-        const Real collapse_threshold,
-        const Real split_threshold,
+        const Real lower_bound,
+        const Real upper_bound,
         const Int  max_iter = 100
     ) override
     {
         ptic(className()+"::UnifyEdgeLengths");
 
-        if( split_threshold < collapse_threshold )
+        if( lower_bound > upper_bound  )
         {
-            eprint(className()+"::UnifyEdgeLengths: split_threshold < collapse_threshold. Aborting");
+            eprint(className()+"::UnifyEdgeLengths: lower_bound > upper_bound. Aborting");
             ptoc(className()+"::UnifyEdgeLengths");
             return 0;
         }
 
-        const Real split_threshold_2    = split_threshold * split_threshold;
-        const Real collapse_threshold_2 = collapse_threshold * collapse_threshold;
+        const Real split_threshold_2    = upper_bound * upper_bound;
+        const Real collapse_threshold_2 = lower_bound * lower_bound;
 
         PairAggregator<Int,Real,Int> splits    (edge_count);
         PairAggregator<Int,Real,Int> collapses (edge_count);
         
-        TwoArrayQuickSort<Real,Int,Int> quick_sort;
+//        TwoArrayQuickSort<Real,Int,Int> quick_sort;
+        
+        
+        TwoArraySort<Real,Int,Int,VarSize,std::less   <Real>> sort;
+        TwoArraySort<Real,Int,Int,VarSize,std::greater<Real>> reverse_sort;
+        
         
         Int total_split_count    = 0;
         Int       split_count    = 1;
@@ -65,7 +70,7 @@ public:
             }
             
             // Order such that shortest edges are collapsed first.
-            quick_sort( collapses.Get_1().data(), collapses.Get_0().data(), collapses.Size(), false);
+            sort( collapses.Get_1().data(), collapses.Get_0().data(), collapses.Size() );
 
             print(className()+"::UnifyEdgeLengths: iteration "+ToString(iter)+":");
             
@@ -74,7 +79,7 @@ public:
             valprint("  collapse_count",collapse_count);
             
             // Order such that longest edges are split first.
-            quick_sort( splits.Get_1().data(), splits.Get_0().data(), splits.Size(), true );
+            reverse_sort( splits.Get_1().data(), splits.Get_0().data(), splits.Size() );
 
             split_count = SplitEdges( splits.Get_0().data(), splits.Size() );
             total_split_count += split_count;

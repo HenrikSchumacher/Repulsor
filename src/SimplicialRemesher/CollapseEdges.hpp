@@ -293,7 +293,7 @@ protected:
 
         } // for( Simplex_T s : VertexParentSimplices(v_1) )
         
-        compressed = false;
+        compressedQ = false;
         
         return v_0;
         

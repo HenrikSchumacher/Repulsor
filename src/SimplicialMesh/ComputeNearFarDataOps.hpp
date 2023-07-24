@@ -23,7 +23,7 @@ protected:
                 mptr< Int> Diff_inner = DiffOp.Inner().data();
                 mptr<Real> Diff_value = DiffOp.Values().data();
     
-                PrimitiveDataKernel_T ker ( V_coords, simplices, V_charges );
+                SimplexDataKernel_T ker ( V_coords, simplices, V_charges );
                 
                 const Int simplex_count = simplices.Dimension(0);
                 const Int i_begin = JobPointer<Int>(simplex_count, ThreadCount(), thread  );
@@ -32,7 +32,7 @@ protected:
                 // Loop over all simplices.
                 for( Int i = i_begin; i < i_end; ++i )
                 {
-                    ker.ReadPrimitive(i);
+                    ker.ReadSimplex(i);
                     
                     Av_outer[i+1] = (i+1) * SIZE;
                     

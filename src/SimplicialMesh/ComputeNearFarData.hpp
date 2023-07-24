@@ -10,14 +10,14 @@ protected:
         ParallelDo(
             [&]( const Int thread )
             {
-                PrimitiveDataKernel_T ker ( V_coords, simplices, V_charges );
+                SimplexDataKernel_T ker ( V_coords, simplices, V_charges );
                 
                 const Int i_begin = JobPointer<Int>(SimplexCount(),ThreadCount(),thread  );
                 const Int i_end   = JobPointer<Int>(SimplexCount(),ThreadCount(),thread+1);
                 
                 for( Int i = i_begin; i < i_end; ++i )
                 {
-                    ker.ReadPrimitive(i);
+                    ker.ReadSimplex(i);
                     
                     ker.WriteNear( P_near.data(i) );
                     ker.WriteFar ( P_far.data(i)  );

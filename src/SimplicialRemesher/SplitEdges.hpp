@@ -168,7 +168,7 @@ protected:
             MarkVertexAsModified(v_0);
             MarkVertexAsModified(v_1);
             
-            compressed = false;
+            compressedQ = false;
             
             return w;
         }

@@ -35,7 +35,7 @@ virtual Int DelaunayFlip( const Int max_iter = 128 ) override
             else
             {
 #ifdef REMESHER_VERBATIM
-                wprint(className()+"::DelaunayFlip: CollapseEdge failed to collapse edge "+ToString(e)+".");
+                wprint(className()+"::DelaunayFlip: CollapseEdge failed to flip edge "+ToString(e)+".");
 #endif
             }
         }
@@ -49,7 +49,7 @@ virtual Int DelaunayFlip( const Int max_iter = 128 ) override
     }
     else
     {
-        wprint(className()+"::DelaunayFlip: Abort after "+ToString(total_flip_count)+" flips  ("+ToString(iter)+" iterations).");
+        wprint(className()+"::DelaunayFlip: Stopped after "+ToString(total_flip_count)+" flips  ("+ToString(iter)+" iterations).");
     }
     
     ptoc(className()+"::DelaunayFlip");
@@ -79,7 +79,7 @@ virtual Int FlipEdges( cptr<Edge_T> e_list, const Int n, const bool check_Delaun
         else
         {
 #ifdef REMESHER_VERBATIM
-            wprint(className()+"::FlipEdges: CollapseEdge failed to collapse edge "+ToString(e_list[i])+".");
+            wprint(className()+"::FlipEdges: CollapseEdge failed to flip edge "+ToString(e_list[i])+".");
 #endif
         }
     }
@@ -254,10 +254,11 @@ Int FlipEdge( const Edge_T e, const bool check_Delaunay = false )
     //              +                               +
     //             v_1                             v_1
     */
-
     
     bool do_flip = false;
     
+    // TODO: Add topological tests!
+    // TODO: I experienced nonmanifold topology after Delaunay flipping a closed mesh with fold-over triangles.
     if( check_Delaunay )
     {
         // Flip only if the sum of angles opposing e is greater than 180 degree.

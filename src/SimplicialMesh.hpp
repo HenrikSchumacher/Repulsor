@@ -1,14 +1,13 @@
 #pragma once
 
 #include "SimplicialMesh/SimplicialMeshBase.hpp"
-#include "SimplicialMesh/PrimitiveDataKernel.hpp"
 
 namespace Repulsor
 {
-    template<typename Real_, typename Int_>
+    template<typename Real_, typename Int_, typename ExtReal_, typename ExtInt_>
     class SimplicialRemesherBase;
     
-    template<int DOM_DIM, int AMB_DIM, typename Real_, typename Int_>
+    template<int DOM_DIM, int AMB_DIM, typename Real_, typename Int_, typename ExtReal_, typename ExtInt_>
     class SimplicialRemesher;
 
     template<int DOM_DIM, int AMB_DIM, typename Real_, typename Int_, typename LInt_, typename SReal_, typename ExtReal_>
@@ -40,7 +39,7 @@ namespace Repulsor
         using SparseMatrix_T          = typename Base_T::SparseMatrix_T;
         using SparseBinaryMatrix_T    = typename Base_T::SparseBinaryMatrix_T;
         
-        using PrimitiveDataKernel_T   = PrimitiveDataKernel<DOM_DIM,AMB_DIM,Real,Int>;
+        using SimplexDataKernel_T     = SimplexDataKernel<DOM_DIM,AMB_DIM,Real,Int>;
         using Primitive_T             = Polytope<DOM_DIM+1,AMB_DIM,GJK_Real,Int,SReal,Real,Int>;
         using MovingPrimitive_T       = MovingPolytope<DOM_DIM+1,AMB_DIM,GJK_Real,Int,SReal,Real,Int>;
         using BoundingVolume_T        = AABB<AMB_DIM,GJK_Real,Int,SReal>;
@@ -53,7 +52,7 @@ namespace Repulsor
         using CollisionTree_T         = CollisionTree    <AMB_DIM,Real,Int,LInt,SReal,ExtReal,true>;
         using ObstacleCollisionTree_T = CollisionTree    <AMB_DIM,Real,Int,LInt,SReal,ExtReal,false>;
 
-        using Remesher_T              = SimplicialRemesher<DOM_DIM,AMB_DIM,Real,Int>;
+        using Remesher_T              = SimplicialRemesher<DOM_DIM,AMB_DIM,Real,Int,Real,Int>;
         
         using RemesherBase_T          = typename Base_T::RemesherBase_T;
         
@@ -812,8 +811,8 @@ namespace Repulsor
             ptic(ClassName()+"::CreateRemesher");
             
             Remesher_T * R = new Remesher_T(
-                VertexCoordinates().data(), VertexCoordinates().Dimension(0),
-                Simplices().data(),         Simplices().Dimension(0),
+                VertexCoordinates().data(), VertexCoordinates().Dimension(0), false,
+                Simplices().data(),         Simplices().Dimension(0),         false,
                 VertexCharges().data(),     1,
                 ThreadCount()
             );

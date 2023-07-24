@@ -11,13 +11,13 @@ protected:
         
         for( Int i = 0; i < S_vertex_count; ++i )
         {
-            Vertex_T v = simplices(s,i);
+            Vertex_T v = simplices[s][i];
             
             V_parent_simplices[v].Insert(s);
             
             for( Int j = i+1; j < S_vertex_count; ++j )
             {
-                Vertex_T w = simplices(s,j);
+                Vertex_T w = simplices[s][j];
                 
                 Edge_T e = RequireEdge(v,w);
                 
@@ -53,10 +53,10 @@ protected:
     Edge_T SimplexFindEdge( const Simplex_T s, const Int k )
     {
         // Find the index of the k-th edge in simplex s.
-        
+                
         const Pair_T p ( std::minmax(
-            simplices( s, tri_i<DOM_DIM>(k) ),
-            simplices( s, tri_j<DOM_DIM>(k) )
+            simplices[s][Tri_i[k]],
+            simplices[s][Tri_j[k]]
         ) );
         
         return ( edge_lookup.count(p) > 0 ) ? edge_lookup[p] : -13;

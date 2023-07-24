@@ -2,7 +2,7 @@
 
 namespace Repulsor
 {
-    template<typename Real_, typename Int_>
+    template<typename Real_, typename Int_,typename ExtReal_,typename ExtInt_>
     class SimplicialRemesherBase;
     
     template<typename Real_, typename Int_, typename LInt_, typename SReal_, typename ExtReal_>
@@ -30,7 +30,7 @@ namespace Repulsor
         using CollisionTreeBase_T            =      CollisionTreeBase<Real,Int,LInt,SReal,ExtReal,true>;
         using ObstacleBlockClusterTreeBase_T =   BlockClusterTreeBase<Real,Int,LInt,SReal,ExtReal,false>;
         using ObstacleCollisionTreeBase_T    =      CollisionTreeBase<Real,Int,LInt,SReal,ExtReal,false>;
-        using RemesherBase_T                 = SimplicialRemesherBase<Real,Int>;
+        using RemesherBase_T                 = SimplicialRemesherBase<Real,Int,Real,Int>;
         
         using TangentVector_T                = Tensor2<ExtReal,Int>;
         using CotangentVector_T              = Tensor2<ExtReal,Int>;
@@ -176,10 +176,15 @@ namespace Repulsor
 //##############################################################################################
         
     public:
+
+        static std::string className()
+        {
+            return std::string("SimplicialMeshBase")+"<"+TypeName<Real>+","+TypeName<Int>+","+TypeName<LInt>+","+TypeName<SReal>+","+TypeName<ExtReal>+">";
+        }
         
         virtual std::string ClassName() const
         {
-            return std::string("SimplicialMeshBase<")+TypeName<Real>+","+TypeName<Int>+","+TypeName<LInt>+","+TypeName<SReal>+","+TypeName<ExtReal>+">";
+            return className();
         }
         
     }; // class SimplicialMeshBase

@@ -34,6 +34,11 @@
 			<key>orderHint</key>
 			<integer>3</integer>
 		</dict>
+		<key>Test_Remesher.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>4</integer>
+		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
@@ -53,6 +58,11 @@
 			<true/>
 		</dict>
 		<key>AF83C2EC293B44B200A23318</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>AF8B89212A6D09F8009498F2</key>
 		<dict>
 			<key>primary</key>
 			<true/>

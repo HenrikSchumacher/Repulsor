@@ -9,22 +9,26 @@ namespace Repulsor
     template<
         int MinDomDim_, int MaxDomDim_,
         int MinAmbDim_, int MaxAmbDim_,
-        typename Real_, typename Int_
+        typename Real_, typename Int_, typename ExtReal_, typename ExtInt_
     >
-    class SimplicialRemesher_Factory< SimplicialRemesherBase<Real_,Int_>, MinDomDim_, MaxDomDim_, MinAmbDim_, MaxAmbDim_ >
+    class SimplicialRemesher_Factory< SimplicialRemesherBase<Real_,Int_,ExtReal_,ExtInt_>, MinDomDim_, MaxDomDim_, MinAmbDim_, MaxAmbDim_ >
     {
         static_assert( MinDomDim_ <= MaxDomDim_, "MinDomDim_ <= MaxDomDim_ required." );
         static_assert( MinAmbDim_ <= MaxAmbDim_, "MinAmbDim_ <= MaxAmbDim_ required." );
         
         ASSERT_FLOAT(Real_);
         ASSERT_INT(Int_);
+        ASSERT_FLOAT(ExtReal_);
+        ASSERT_INT(ExtInt_);
         
     public:
         
         using Real    = Real_;
         using Int     = Int_;
+        using ExtReal = ExtReal_;
+        using ExtInt  = ExtInt_;
         
-        using RemesherBase_T  = SimplicialRemesherBase<Real,Int>;
+        using RemesherBase_T  = SimplicialRemesherBase<Real,Int,ExtReal,ExtInt>;
         
         static constexpr Int MinAmbDim = std::max( Int(1), Int(MinAmbDim_) );
         static constexpr Int MaxAmbDim = std::max( Int(1), Int(MaxAmbDim_) );
@@ -36,7 +40,6 @@ namespace Repulsor
         
         ~SimplicialRemesher_Factory() = default;
 
-        template<typename ExtReal, typename ExtInt>
         [[nodiscard]] std::unique_ptr<RemesherBase_T> Make(
             cptr<ExtReal> vertex_coords, // vertex coordinates; size = vertex_count_ x amb_dim
             const Int     vertex_count,
@@ -46,6 +49,9 @@ namespace Repulsor
             const Int     simplex_count,
             const Int     simplex_size,
             const bool    simplices_ColMajorQ, // whether to transpose input; set to false for row-major
+            cptr<ExtReal> vertex_data,
+            const Int     data_dim,
+            const bool    vertex_data_ColMajorQ,
             const Int     thread_count = 1
         )
         {
@@ -69,40 +75,46 @@ namespace Repulsor
             }
             
             return make_1<MaxAmbDim>(
-                vertex_coords, vertex_count, amb_dim, vertex_coords_ColMajorQ,
-                simplices, simplex_count, dom_dim, simplices_ColMajorQ,
+                vertex_coords, vertex_count,  amb_dim,      vertex_coords_ColMajorQ,
+                simplices,     simplex_count, dom_dim,      simplices_ColMajorQ,
+                vertex_data,                  data_dim,     vertex_data_ColMajorQ,
                 thread_count
             );
         }
         
     private:
         
-        template<Int AmbDim, typename ExtReal, typename ExtInt>
+        template<Int AmbDim>
         std::unique_ptr<RemesherBase_T> make_1(
-            cptr<ExtReal> v,
-            const Int     v_cnt,
+            cptr<ExtReal> vertex_coords,
+            const Int     vertex_count,
             const Int     amb_dim,
             const bool    vertex_coords_ColMajorQ,
-            cptr<ExtInt>  s,
-            const Int     s_cnt,
+            cptr<ExtInt>  simplices,
+            const Int     simplex_count,
             const Int     dom_dim,
             const bool    simplices_ColMajorQ,
+            cptr<ExtReal> vertex_data,
+            const Int     data_dim,
+            const bool    vertex_data_ColMajorQ,
             const Int     thread_count = 1
         )
         {
             if( amb_dim == AmbDim )
             {
                 return make_2<std::min(MaxDomDim,AmbDim-1),AmbDim>(
-                    v, v_cnt, amb_dim, vertex_coords_ColMajorQ,
-                    s, s_cnt, dom_dim, simplices_ColMajorQ,
+                    vertex_coords, vertex_count,  amb_dim,  vertex_coords_ColMajorQ,
+                    simplices,     simplex_count, dom_dim,  simplices_ColMajorQ,
+                    vertex_data,                  data_dim, vertex_data_ColMajorQ,
                     thread_count
                 );
             }
             else if constexpr ( AmbDim > MinAmbDim )
             {
                 return make_1<AmbDim-1>(
-                    v, v_cnt, amb_dim, vertex_coords_ColMajorQ,
-                    s, s_cnt, dom_dim, simplices_ColMajorQ,
+                    vertex_coords, vertex_count,  amb_dim,  vertex_coords_ColMajorQ,
+                    simplices,     simplex_count, dom_dim,  simplices_ColMajorQ,
+                    vertex_data,                  data_dim, vertex_data_ColMajorQ,
                     thread_count
                 );
             }
@@ -113,25 +125,29 @@ namespace Repulsor
             }
         }
         
-        template<Int DomDim, Int AmbDim, typename ExtInt>
+        template<Int DomDim, Int AmbDim>
         std::unique_ptr<RemesherBase_T> make_2(
-            cptr<ExtReal> v,
-            const Int     v_cnt,
+            cptr<ExtReal> vertex_coords,
+            const Int     vertex_count,
             const Int     amb_dim,
             const bool    vertex_coords_ColMajorQ,
-            cptr<ExtInt>  s,
-            const Int     s_cnt,
+            cptr<ExtInt>  simplices,
+            const Int     simplex_count,
             const Int     dom_dim,
             const bool    simplices_ColMajorQ,
+            cptr<ExtReal> vertex_data,
+            const Int     data_dim,
+            const bool    vertex_data_ColMajorQ,
             const Int     thread_count = 1
         )
         {
             if( dom_dim == DomDim )
             {
                 return std::unique_ptr<RemesherBase_T>(
-                    new SimplicialRemesher<DomDim,AmbDim,Real,Int>(
-                        v, v_cnt, vertex_coords_ColMajorQ,
-                        s, s_cnt, simplices_ColMajorQ,
+                    new SimplicialRemesher<DomDim,AmbDim,Real,Int,ExtReal,ExtInt>(
+                        vertex_coords, vertex_count,            vertex_coords_ColMajorQ,
+                        simplices,     simplex_count,           simplices_ColMajorQ,
+                        vertex_data,                  data_dim, vertex_data_ColMajorQ,
                         thread_count
                     )
                 );
@@ -139,8 +155,9 @@ namespace Repulsor
             else if constexpr ( DomDim > MinDomDim )
             {
                 return make_2<DomDim-1,AmbDim>(
-                    v, v_cnt, amb_dim, vertex_coords_ColMajorQ,
-                    s, s_cnt, dom_dim, simplices_ColMajorQ,
+                    vertex_coords, vertex_count,  amb_dim,  vertex_coords_ColMajorQ,
+                    simplices,     simplex_count, dom_dim,  simplices_ColMajorQ,
+                    vertex_data,                  data_dim, vertex_data_ColMajorQ,
                     thread_count
                 );
             }
@@ -161,7 +178,7 @@ namespace Repulsor
         
     public:
         
-        std::string ClassName()
+        static std::string ClassName()
         {
             return std::string("SimplicialRemesher_Factory")+"<"
             + ToString(MinDomDim)+ ","

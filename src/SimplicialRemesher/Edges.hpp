@@ -119,16 +119,13 @@ protected:
     //DONE.
     Real SquaredEdgeLength( const Edge_T e ) const
     {
-        Real L2 = 0.;
+        const Vertex_T v_0 = edges(e,0);
+        const Vertex_T v_1 = edges(e,1);
         
-        cptr<Real> V = V_coords.data(edges(e,0));
-        cptr<Real> W = V_coords.data(edges(e,1));
+        Vector_T V ( V_coords.data(v_0) );
+        Vector_T W ( V_coords.data(v_1) );
         
-        for( Int k = 0; k < AMB_DIM; ++k )
-        {
-            Real delta = V[k] - W[k];
-            L2 += delta * delta;
-        }
+        W -= V;
         
-        return L2;
+        return W.SquaredNorm();
     }

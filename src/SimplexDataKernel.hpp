@@ -4,7 +4,7 @@ namespace Repulsor
 {
     
     template<int DOM_DIM_, int AMB_DIM_, typename Real_, typename Int_>
-    class PrimitiveDataKernel
+    class SimplexDataKernel
     {
     public:
         
@@ -49,7 +49,7 @@ namespace Repulsor
         
     public:
         
-//        PrimitiveDataKernel( const Mesh_T & M_ )
+//        SimplexDataKernel( const Mesh_T & M_ )
 //        :   M ( M_ )
 //        {
 //            if constexpr ( DOM_DIM == 0 )
@@ -62,7 +62,7 @@ namespace Repulsor
 //            }
 //        }
         
-        PrimitiveDataKernel(
+        SimplexDataKernel(
             cref<Tensor2<Real,Int>> V_coords_,
             cref<Tensor2<Int ,Int>> simplices_,
             cref<Tensor1<Real,Int>> V_charges_
@@ -81,9 +81,9 @@ namespace Repulsor
             }
         }
         
-        ~PrimitiveDataKernel() = default;
+        ~SimplexDataKernel() = default;
         
-        void ReadPrimitive( const Int i )
+        void ReadSimplex( const Int i )
         {
             simplex.Read( simplices.data(i) );
             s_simplex.Read( simplex.data()      );
@@ -231,7 +231,31 @@ namespace Repulsor
                 
                 D_f.Write(diff);
             }
+        }
+        
+        void WriteErrorQuadric( mptr<Real> Q_out ) const
+        {
+            Tiny::Matrix<AMB_DIM+1,AMB_DIM+1,Real,Int> Q;
             
+            Tiny::Vector<AMB_DIM,Real,Int> b;
+            
+            Dot<Overwrite>( P, center, b );
+            
+            for( Int i = 0; i < AMB_DIM; ++i )
+            {
+                Q[AMB_DIM][i] = -b[i];
+                Q[i][AMB_DIM] = -b[i];
+                
+                for( Int j = 0; j < AMB_DIM; ++j )
+                {
+                    Q[i][j] = P[i][j];
+                }
+            }
+            
+            Q[AMB_DIM][AMB_DIM] = Dot(b,b);
+            
+                
+            Q.Write( Q_out );
         }
         
         
@@ -261,6 +285,6 @@ namespace Repulsor
         }
         
         
-    }; // class PrimitiveDataKernel
+    }; // class SimplexDataKernel
     
 }

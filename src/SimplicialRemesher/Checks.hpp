@@ -100,3 +100,43 @@ Int CheckEdge( const Edge_T e ) const
     
     return 0;
 }
+
+
+Int CheckSimplex( const Simplex_T s ) const
+{
+    if( s < zero )
+    {
+#ifdef REMESHER_VERBATIM
+        eprint(className()+"::CheckSimplex: Simplex "+ToString(s)+" is invalid.");
+#endif
+        return -11;
+    }
+    
+    if( !S_active[s] )
+    {
+#ifdef REMESHER_VERBATIM
+        eprint(className()+"::CheckSimplex: Simplex "+ToString(s)+" is already deleted.");
+#endif
+        return -2;
+    }
+    
+    bool okay = true;
+    
+    for( Int i = 0; i < S_vertex_count; ++i )
+    {
+        for( Int j = i+1; j < S_vertex_count; ++j )
+        {
+            okay = okay && (simplices[s][i] != simplices[s][j] );
+        }
+    }
+    
+    if( !okay )
+    {
+//#ifdef REMESHER_VERBATIM
+        eprint(className()+"::CheckSimplex: Simplex "+ToString(s)+" containes duplicate vertices.");
+//#endif
+        return -3;
+    }
+    
+    return 0;
+}

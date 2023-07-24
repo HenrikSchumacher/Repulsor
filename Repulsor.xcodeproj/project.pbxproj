@@ -13,6 +13,8 @@
 		AF789CF92A4AC95800546B46 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AF789CF82A4AC95800546B46 /* main.cpp */; };
 		AF789CFD2A4AC9F300546B46 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AF83C2E8293B426000A23318 /* Accelerate.framework */; };
 		AF83C2EA293B426400A23318 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AF83C2E8293B426000A23318 /* Accelerate.framework */; };
+		AF8B89252A6D09F8009498F2 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AF8B89242A6D09F8009498F2 /* main.cpp */; };
+		AF8B89292A6D0A06009498F2 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AF83C2E8293B426000A23318 /* Accelerate.framework */; };
 		AF9C9BCE2A5230B8008AB9E6 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AF9C9BCD2A5230B8008AB9E6 /* main.cpp */; };
 		AF9C9BD22A5230BF008AB9E6 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AF83C2E8293B426000A23318 /* Accelerate.framework */; };
 /* End PBXBuildFile section */
@@ -37,6 +39,15 @@
 			runOnlyForDeploymentPostprocessing = 1;
 		};
 		AF789CF42A4AC95800546B46 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		AF8B89202A6D09F8009498F2 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = /usr/share/man/man1/;
@@ -71,6 +82,8 @@
 		AF83C2E8293B426000A23318 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 		AF88400F28ECEEBA0040A2FC /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		AF88401028ECEEBA0040A2FC /* Repulsor.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Repulsor.hpp; sourceTree = "<group>"; };
+		AF8B89222A6D09F8009498F2 /* Test_Remesher */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Test_Remesher; sourceTree = BUILT_PRODUCTS_DIR; };
+		AF8B89242A6D09F8009498F2 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		AF98B21F28EF0DDC00413977 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		AF9C9BCB2A5230B8008AB9E6 /* Test_Preconditioner */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Test_Preconditioner; sourceTree = BUILT_PRODUCTS_DIR; };
 		AF9C9BCD2A5230B8008AB9E6 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
@@ -100,6 +113,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				AF789CFD2A4AC9F300546B46 /* Accelerate.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AF8B891F2A6D09F8009498F2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AF8B89292A6D0A06009498F2 /* Accelerate.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -145,6 +166,7 @@
 				AF789CF72A4AC95800546B46 /* Example2 */,
 				AF68F6DC2A4FE96E00009C92 /* CoulombPotential */,
 				AF9C9BCC2A5230B8008AB9E6 /* Test_Preconditioner */,
+				AF8B89232A6D09F8009498F2 /* Test_Remesher */,
 				AF47B00428ECEE8800A5FCEA /* Products */,
 				AF83C2E7293B426000A23318 /* Frameworks */,
 				AFC500452A66C7D200B71FA8 /* OptimizationProfiles */,
@@ -158,6 +180,7 @@
 				AF789CF62A4AC95800546B46 /* Example2 */,
 				AF68F6DB2A4FE96E00009C92 /* CoulombPotential */,
 				AF9C9BCB2A5230B8008AB9E6 /* Test_Preconditioner */,
+				AF8B89222A6D09F8009498F2 /* Test_Remesher */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -185,6 +208,14 @@
 				AF83C2E8293B426000A23318 /* Accelerate.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		AF8B89232A6D09F8009498F2 /* Test_Remesher */ = {
+			isa = PBXGroup;
+			children = (
+				AF8B89242A6D09F8009498F2 /* main.cpp */,
+			);
+			path = Test_Remesher;
 			sourceTree = "<group>";
 		};
 		AF9C9BCC2A5230B8008AB9E6 /* Test_Preconditioner */ = {
@@ -257,6 +288,23 @@
 			productReference = AF789CF62A4AC95800546B46 /* Example2 */;
 			productType = "com.apple.product-type.tool";
 		};
+		AF8B89212A6D09F8009498F2 /* Test_Remesher */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AF8B89282A6D09F8009498F2 /* Build configuration list for PBXNativeTarget "Test_Remesher" */;
+			buildPhases = (
+				AF8B891E2A6D09F8009498F2 /* Sources */,
+				AF8B891F2A6D09F8009498F2 /* Frameworks */,
+				AF8B89202A6D09F8009498F2 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Test_Remesher;
+			productName = Test_Remesher;
+			productReference = AF8B89222A6D09F8009498F2 /* Test_Remesher */;
+			productType = "com.apple.product-type.tool";
+		};
 		AF9C9BCA2A5230B8008AB9E6 /* Test_Preconditioner */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = AF9C9BD12A5230B8008AB9E6 /* Build configuration list for PBXNativeTarget "Test_Preconditioner" */;
@@ -292,6 +340,9 @@
 					AF789CF52A4AC95800546B46 = {
 						CreatedOnToolsVersion = 14.3.1;
 					};
+					AF8B89212A6D09F8009498F2 = {
+						CreatedOnToolsVersion = 14.3.1;
+					};
 					AF9C9BCA2A5230B8008AB9E6 = {
 						CreatedOnToolsVersion = 14.3.1;
 					};
@@ -314,6 +365,7 @@
 				AF789CF52A4AC95800546B46 /* Example2 */,
 				AF68F6DA2A4FE96E00009C92 /* CoulombPotential */,
 				AF9C9BCA2A5230B8008AB9E6 /* Test_Preconditioner */,
+				AF8B89212A6D09F8009498F2 /* Test_Remesher */,
 			);
 		};
 /* End PBXProject section */
@@ -340,6 +392,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				AF789CF92A4AC95800546B46 /* main.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AF8B891E2A6D09F8009498F2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AF8B89252A6D09F8009498F2 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -610,6 +670,59 @@
 			};
 			name = Release;
 		};
+		AF8B89262A6D09F8009498F2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = Y6DQ749ZRT;
+				ENABLE_HARDENED_RUNTIME = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				LIBRARY_SEARCH_PATHS = (
+					/opt/homebrew/opt/libomp/lib,
+					/opt/homebrew/Cellar/openblas/0.3.23/lib,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.3;
+				OTHER_LDFLAGS = (
+					"-ldl",
+					"-lm",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					/usr/include,
+					/opt/homebrew/include,
+					/Users/Henrik/github/Geogram/src/lib,
+				);
+			};
+			name = Debug;
+		};
+		AF8B89272A6D09F8009498F2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = Y6DQ749ZRT;
+				ENABLE_HARDENED_RUNTIME = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				LIBRARY_SEARCH_PATHS = (
+					/opt/homebrew/opt/libomp/lib,
+					/opt/homebrew/Cellar/openblas/0.3.23/lib,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.3;
+				OTHER_LDFLAGS = (
+					"-ldl",
+					"-lm",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					/usr/include,
+					/opt/homebrew/include,
+					/Users/Henrik/github/Geogram/src/lib,
+				);
+			};
+			name = Release;
+		};
 		AF9C9BCF2A5230B8008AB9E6 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -674,6 +787,15 @@
 			buildConfigurations = (
 				AF789CFB2A4AC95800546B46 /* Debug */,
 				AF789CFC2A4AC95800546B46 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AF8B89282A6D09F8009498F2 /* Build configuration list for PBXNativeTarget "Test_Remesher" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AF8B89262A6D09F8009498F2 /* Debug */,
+				AF8B89272A6D09F8009498F2 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

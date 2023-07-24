@@ -2,17 +2,23 @@
 
 namespace Repulsor
 {
-    template<typename Real_, typename Int_>
+    
+
+    template<typename Real_, typename Int_, typename ExtReal_, typename ExtInt_>
     class SimplicialRemesherBase
     {
         
         ASSERT_REAL(Real_);
         ASSERT_INT(Int_);
+        ASSERT_REAL(ExtReal_);
+        ASSERT_INT(ExtInt_);
         
     public:
         
-        using Real    = Real_;
-        using Int     = Int_;
+        using Real       = Real_;
+        using Int        = Int_;
+        using ExtReal    = ExtReal_;
+        using ExtInt     = ExtInt_;
         
         using Vertex_T   = Int;
         using Edge_T     = Int;
@@ -31,9 +37,9 @@ namespace Repulsor
         virtual void Compress() = 0;
 
         virtual void LoadMesh(
-            cptr<Real> V_coords_ ,  const Int vertex_count_,
-            cptr<Int>  simplices_,  const Int simplex_count_,
-            cptr<Real> V_data_,     const Int V_data_dim_,
+            cptr<ExtReal> vertex_coords_, const Int vertex_count_,    const bool vertex_coords_ColMajorQ,
+            cptr<ExtInt>  simplices_,     const Int simplex_count_,   const bool simplices_ColMajorQ,
+            cptr<ExtReal> vertex_data_,   const Int vertex_data_dim_, const bool vertex_data_ColMajorQ,
             const Int thread_count_ = 1
         ) = 0;
         
@@ -47,15 +53,23 @@ namespace Repulsor
         
 //        virtual std::unique_ptr<MeshBase_T> CreateMesh() = 0;
 
-        virtual cref<Tensor2<Real,Int>> VertexCoordinates() = 0;
+        virtual cref<Tensor2<Real,Int>> VertexCoordinates() const = 0;
         
-        virtual cref<Tensor2<Real,Int>> VertexData() = 0;
+        virtual cref<Tensor2<Real,Int>> VertexData() const = 0;
         
-        virtual cref<Tensor2<Int,Int>> Simplices() = 0;
+        virtual cref<Tensor3<Real,Int>> VertexErrorQuadrics() const = 0;
+        
+        virtual cref<Tensor3<Real,Int>> SimplexErrorQuadrics() const = 0;
+        
+        virtual cref<Tensor2<Int,Int>> Simplices() const = 0;
+        
+        virtual Tensor1<Real,Int> SquaredEdgeLengths() = 0;
         
         virtual Int DomDim() const = 0;
         
         virtual Int AmbDim() const = 0;
+        
+        virtual Int DataDim() const = 0;
         
         virtual Int SplitEdges( cptr<Edge_T> e_list, const Int n ) = 0;
         
@@ -79,13 +93,20 @@ namespace Repulsor
         
         virtual Int DelaunayFlip( const Int max_iter = 100 ) = 0;
         
+        virtual void TangentialSmoothing( const Int max_iter = 1 ) = 0;
+        
         virtual void SelfCheck() = 0;
         
     public:
+
+        static std::string className()
+        {
+            return std::string("SimplicialRemesherBase")+"<"+TypeName<Real>+","+TypeName<Int>+">";
+        }
         
         virtual std::string ClassName() const
         {
-            return std::string("SimplicialRemesherBase<")+TypeName<Real>+","+TypeName<Int>+">";
+            return className();
         }
         
     }; // class SimplicialRemesherBase

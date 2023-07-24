@@ -30,7 +30,7 @@
     #include "src/CollisionTree.hpp"
 
 
-
+    #include "src/SimplexDataKernel.hpp"
     #include "src/SimplicialMesh/SimplicialMeshDetails.hpp"
     #include "src/SimplicialMesh.hpp"
 
@@ -38,7 +38,7 @@
     // TODO: Finalize this!
     #include "src/SimplicialRemesher/SimplicialRemesherBase.hpp"
     #include "src/SimplicialRemesher.hpp"
-
+    #include "src/SimplicialRemesher/SimplicialRemesher_Factory.hpp"
 
 //    // toggle whether primitive data should be copied by kernels.
 //#define NearField_S_Copy
