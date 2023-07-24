@@ -111,7 +111,7 @@ namespace Repulsor
 */
 
             
-            if constexpr ( vec_enabledQ )
+            if constexpr ( vecQ )
             {
                 std::array<vec_T<MAX_RHS_COUNT,Real>,COLS> x_vec;
                 std::array<vec_T<MAX_RHS_COUNT,Real>,ROWS> y_vec;

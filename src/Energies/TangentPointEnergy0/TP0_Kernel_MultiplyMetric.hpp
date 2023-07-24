@@ -36,8 +36,6 @@ namespace Repulsor
         using Base_T::COLS;
         using Base_T::MAX_RHS_COUNT;
         
-        using BASE::vecQ;
-        
         static constexpr LInt BLOCK_NNZ = 2;
         static constexpr LInt DIAG_NNZ  = 2;
         
@@ -108,38 +106,20 @@ namespace Repulsor
 */
 
             
-            if constexpr ( vec_enabledQ )
-            {
-                
-                const Scal a_0 ( a[0] );
+            const Scal a_0 ( a[0] );
 
-                y[0] += a_0 * x[0];
-                
-                const Scal a_1 ( a[1] );
-                
-                for( Int j = 1; j < COLS; ++j )
-                {
-                    y[j] += a_1 * x[j];
-                }
+            for( Int k = 0; k < MAX_RHS_COUNT; ++k )
+            {
+                y[0][k] += a_0 * x[0][k];
             }
-            else
-            {
-                
-                const Scal a_0 ( a[0] );
 
+            const Scal a_1 ( a[1] );
+
+            for( Int j = 1; j < COLS; ++j )
+            {
                 for( Int k = 0; k < MAX_RHS_COUNT; ++k )
                 {
-                    y[0][k] += a_0 * x[0][k];
-                }
-
-                const Scal a_1 ( a[1] );
-
-                for( Int j = 1; j < COLS; ++j )
-                {
-                    for( Int k = 0; k < MAX_RHS_COUNT; ++k )
-                    {
-                        y[j][k] += a_1 * x[j][k];
-                    }
+                    y[j][k] += a_1 * x[j][k];
                 }
             }
         }
