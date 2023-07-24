@@ -25,7 +25,7 @@ using namespace Tools;
 
 // We have to toggle which domain dimensions and ambient dimensions shall be supported by runtime polymorphism before we load Repulsor.hpp
 // You can activate everything you want, but compile times might increase substatially.
-using Int     = Int32;
+using Int     = Int64;
 using LInt    = Int64;
 using ExtInt  = Int64;
 
@@ -58,13 +58,17 @@ int main(int argc, const char * argv[])
 
     std::string path = home + "/github/BAEMM/Meshes/";
 //    std::string name = "TorusMesh_00038400T.txt";
-    std::string name = "Spot_00005856T.txt";
+//    std::string name = "Spot_00005856T.txt";
+    std::string name = "Spot_00093696T.txt";
     
     
-    using MeshBase_T = SimplicialMeshBase<Real,Int,LInt,SReal,ExtReal>;
-    using Mesh_T     = SimplicialMesh<2,3,Real,Int,LInt,SReal,ExtReal>;
+    using MeshBase_T     = SimplicialMeshBase<Real,Int,LInt,SReal,ExtReal>;
+    using Mesh_T         = SimplicialMesh<2,3,Real,Int,LInt,SReal,ExtReal>;
+    using RemesherBase_T = SimplicialRemesherBase<Real,Int,ExtReal,ExtInt>;
     
     SimplicialMesh_Factory<MeshBase_T,2,2,3,3> mesh_factory;
+    
+    SimplicialRemesher_Factory<RemesherBase_T,2,2,3,3> remesher_factory;
     
     
     tic("Initializing mesh");
@@ -83,7 +87,13 @@ int main(int argc, const char * argv[])
     print("Testing remesher.");
     print("");
     
-    std::unique_ptr<Mesh_T::RemesherBase_T> R = M_ptr->CreateRemesher();
+    
+    std::unique_ptr<RemesherBase_T> R = remesher_factory.Make(
+        M.VertexCoordinates().data(), M.VertexCount(),  M.AmbDim(), false,
+        M.Simplices().data(),         M.SimplexCount(), M.AmbDim(), false,
+        nullptr,                                        0,          false,
+        thread_count
+    );
     
     Tensor1<Real,Int> squared_edge_lengths = R->SquaredEdgeLengths();
     
@@ -109,7 +119,7 @@ int main(int argc, const char * argv[])
     
     print("");
     
-    const Int flip_iter = 3;
+    const Int flip_iter = 10;
     
     print("");
     
@@ -127,20 +137,40 @@ int main(int argc, const char * argv[])
     R->TangentialSmoothing( smooth_iter );
     toc("TangentialSmoothing");
     
+    
+    print("");
+    
+    R->SelfCheck();
+    
+    print("");
+    
+    tic("Compress");
+    R->Compress();
+    toc("Compress");
+    
+    print("");
+    
+    R->SelfCheck();
+    
+    print("");
+    
+    squared_edge_lengths = R->SquaredEdgeLengths();
+    
+    valprint("Minimum edge length            ", std::sqrt(squared_edge_lengths.Min()) );
+    valprint("Maximum edge length            ", std::sqrt(squared_edge_lengths.Max()) );
+
+    print("");
+    
+    // Creating a new mesh object.
+    
     std::unique_ptr<MeshBase_T> N_ptr = mesh_factory.Make(
         R->VertexCoordinates().data(), R->VertexCount(),  R->AmbDim(),   false,
         R->Simplices().data(),         R->SimplexCount(), R->DomDim()+1, false,
         thread_count
     );
     
-    R->SelfCheck();
-    
-    R->Compress();
-    
-    squared_edge_lengths = R->SquaredEdgeLengths();
-    
-    valprint("Minimum edge length            ", std::sqrt(squared_edge_lengths.Min()) );
-    valprint("Maximum edge length            ", std::sqrt(squared_edge_lengths.Max()) );
+    dump(N_ptr->VertexCount());
+    dump(N_ptr->SimplexCount());
     
     return 0;
 }

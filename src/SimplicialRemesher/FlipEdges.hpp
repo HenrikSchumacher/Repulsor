@@ -257,8 +257,6 @@ Int FlipEdge( const Edge_T e, const bool check_Delaunay = false )
     
     bool do_flip = false;
     
-    // TODO: Add topological tests!
-    // TODO: I experienced nonmanifold topology after Delaunay flipping a closed mesh with fold-over triangles.
     if( check_Delaunay )
     {
         // Flip only if the sum of angles opposing e is greater than 180 degree.
