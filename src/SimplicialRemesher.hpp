@@ -70,7 +70,7 @@ namespace Repulsor
         
         static constexpr Int V_max_simplex_valence = (DOM_DIM == 1) ? 2 : (DOM_DIM == 2) ? 9 : 100;
         
-        const Real sqrt_eps = std::sqrt(Scalar::eps<Real>);
+        static constexpr Real sqrt_eps = cSqrt(Scalar::eps<Real>);
         
         
         Tiny::Vector<S_edge_count,Int,Int>    Tri_i;
@@ -429,8 +429,8 @@ namespace Repulsor
 //
 //                    CreateEdge( v_0, v_1 );
 ////
-////                    edges[edge_count][0] = std::min(v_0,v_1);
-////                    edges[edge_count][1] = std::max(v_0,v_1);
+////                    edges[edge_count][0] = Min(v_0,v_1);
+////                    edges[edge_count][1] = Max(v_0,v_1);
 ////
 ////                    E_active[e]       = false;
 ////                    E_active[edge_count] = true;

@@ -82,8 +82,8 @@ namespace Repulsor
         
         using Base_T::thread;
     
-        static const constexpr Real S_scale = Scalar::Inv<Real>(S_DOM_DIM+1);
-        static const constexpr Real T_scale = Scalar::Inv<Real>(T_DOM_DIM+1);
+        static const constexpr Real S_scale = Inv<Real>(S_DOM_DIM+1);
+        static const constexpr Real T_scale = Inv<Real>(T_DOM_DIM+1);
         
     public:
         

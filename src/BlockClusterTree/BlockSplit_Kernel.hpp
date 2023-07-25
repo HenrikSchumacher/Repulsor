@@ -3,36 +3,40 @@
 namespace Repulsor
 {
     template<typename ClusterTree_T_>
-    class BlockSplit_Kernel : public ClusterTreePairTraversor_Kernel<ClusterTree_T_>
+    class BlockSplit_Kernel
     {
-    private:
+    public:
         
-        using Base_T = ClusterTreePairTraversor_Kernel<ClusterTree_T_>;
+        using ClusterTree_T = ClusterTree_T_;
+        using Real          = typename ClusterTree_T::Real;
+        using SReal         = typename ClusterTree_T::SReal;
+        using ExtReal       = typename ClusterTree_T::ExtReal;
+        using Int           = typename ClusterTree_T::Int;
+        using LInt          = typename ClusterTree_T::LInt;
+        
+        static constexpr bool reportQ = false;
         
     public:
         
-        using ClusterTree_T = typename Base_T::ClusterTree_T;
-        using Real    = typename Base_T::Real;
-        using SReal   = typename Base_T::SReal;
-        using ExtReal = typename Base_T::ExtReal;
-        using Int     = typename Base_T::Int;
-        using LInt    = typename Base_T::LInt;
+        BlockSplit_Kernel() = delete;
         
-    public:
-        
-//        BlockSplit_Kernel() = default;
+        ~BlockSplit_Kernel()
+        {
+            PrintStats();
+        }
         
         BlockSplit_Kernel(
             cref<ClusterTree_T> S,
             cref<ClusterTree_T> T,
+            const Int thread_,
             const Real far_theta2_,
             const Real near_theta2_
         )
-        :   Base_T( S, T )
-        ,   inter_idx           ( 1 )
+        :   inter_idx           ( 1 )
         ,   verynear_idx        ( 1 )
         ,   near_idx            ( 2 * ( S.PrimitiveCount() + T.PrimitiveCount() ) )
         ,   far_idx             ( 2 * ( S.PrimitiveCount() + T.PrimitiveCount() ) )
+        ,   thread              ( thread_ )
         ,   S_C_proto           ( S.ClusterPrototype().Clone()              )
         ,   T_C_proto           ( T.ClusterPrototype().Clone()              )
         ,   S_P_proto           ( S.PrimitivePrototype().Clone()            )
@@ -48,11 +52,11 @@ namespace Repulsor
         {}
         
         BlockSplit_Kernel( const BlockSplit_Kernel & other )
-        : Base_T( other )
-        ,   inter_idx           ( other.inter_idx.Capacity()    )
+        :   inter_idx           ( other.inter_idx.Capacity()    )
         ,   verynear_idx        ( other.verynear_idx.Capacity() )
         ,   near_idx            ( other.near_idx.Capacity()     )
         ,   far_idx             ( other.far_idx.Capacity()      )
+        ,   thread              ( other.thread                  )
         ,   S_C_proto           ( other.S_C_proto->Clone()      )
         ,   T_C_proto           ( other.T_C_proto->Clone()      )
         ,   S_P_proto           ( other.S_P_proto->Clone()      )
@@ -72,13 +76,11 @@ namespace Repulsor
             // see https://stackoverflow.com/questions/5695548/public-friend-swap-member-function for details
             using std::swap;
             
-            swap( static_cast<Base_T&>(X), static_cast<Base_T&>(Y) );
-
-            swap( X.tree_string,            Y.tree_string           );
             swap( X.inter_idx,              Y.inter_idx             );
             swap( X.verynear_idx,           Y.verynear_idx          );
             swap( X.near_idx,               Y.near_idx              );
             swap( X.far_idx,                Y.far_idx               );
+            swap( X.thread,                 Y.thread                );
             swap( X.S_C_proto,              Y.S_C_proto             );
             swap( X.T_C_proto,              Y.T_C_proto             );
             swap( X.T_P_proto,              Y.T_P_proto             );
@@ -99,8 +101,6 @@ namespace Repulsor
 
             return *this;
         }
-         
-        ~BlockSplit_Kernel() = default;
         
     public:
         
@@ -110,6 +110,8 @@ namespace Repulsor
         PairAggregator<Int,Int,LInt> far_idx;
 
     protected:
+        
+        Int thread;
         
         std::shared_ptr<typename ClusterTree_T::BoundingVolume_T> S_C_proto;
         std::shared_ptr<typename ClusterTree_T::BoundingVolume_T> T_C_proto;
@@ -135,40 +137,54 @@ namespace Repulsor
         const Real near_theta2;
         const Real intersection_theta2;
         
+        Time start;
+
+        float time_Cluster = 0;
+        float time_admissableQ = 0;
+        float time_FindNonzeroPosition = 0;
+        float time_ComputeLeaf = 0;
+        
     public:
 
         force_inline void LoadClusterS( const Int i )
         {
             C_i = i;
-            S_C_proto->SetPointer(S_C_serialized,i);
+            S_C_proto->Load( S_C_serialized, i );
         }
         
         force_inline void LoadClusterT( const Int j )
         {
             C_j = j;
-            T_C_proto->SetPointer(T_C_serialized,j);
+            T_C_proto->Load(T_C_serialized,j);
         }
         
         force_inline void LoadPrimitiveS( const Int i )
         {
             P_i = i;
-            S_P_proto->SetPointer(S_P_serialized,i);
+            S_P_proto->SetPointer( S_P_serialized, i );
         }
         force_inline void LoadPrimitiveT( const Int j )
         {
             P_j = j;
-            T_P_proto->SetPointer(T_P_serialized,j);
+            T_P_proto->SetPointer( T_P_serialized, j );
         }
         
         force_inline bool AdmissableQ()
         {
-            return G.MultipoleAcceptanceCriterion( *S_C_proto, *T_C_proto, far_theta2 );
+            _tic();
+            
+            const bool result = G.MultipoleAcceptanceCriterion( *S_C_proto, *T_C_proto, far_theta2 );
+            
+            time_Cluster += _toc();
+            
+            return result;
         }
         
         force_inline SReal ClusterScoreS()
         {
-            return S_C_proto-> SquaredRadius();
+            return S_C_proto->SquaredRadius();
         }
+        
         force_inline SReal ClusterScoreT()
         {
             return T_C_proto->SquaredRadius();
@@ -181,11 +197,22 @@ namespace Repulsor
         
         force_inline void ComputeLeaf()
         {
+            _tic();
+            
             const bool neighbor_found = A.FindNonzeroPosition(P_i,P_j).found;
 
+            time_FindNonzeroPosition += _toc();
+            
+            
+            _tic();
+            
             const bool admissableQ = neighbor_found || G.MultipoleAcceptanceCriterion(
                     *S_P_proto, *T_P_proto, near_theta2
             );
+            
+            time_admissableQ += _toc();
+            
+            _tic();
             
             if( admissableQ )
             {
@@ -206,15 +233,28 @@ namespace Repulsor
                     verynear_idx.Push(P_i,P_j);
                 }
             }
+            
+            time_ComputeLeaf += _toc();
         }
         
         force_inline void ComputeLeafSwapped()
         {
+            _tic();
+            
             const bool neighbor_found = A.FindNonzeroPosition(P_i,P_j).found;
+            
+            time_FindNonzeroPosition += _toc();
 
+            _tic();
+            
             const bool admissableQ = neighbor_found || G.MultipoleAcceptanceCriterion(
                 *S_P_proto, *T_P_proto, near_theta2
             );
+            
+            time_admissableQ += _toc();
+            
+            
+            _tic();
             
             if( admissableQ )
             {
@@ -235,6 +275,8 @@ namespace Repulsor
                     verynear_idx.Push(P_j,P_i);
                 }
             }
+            
+            time_ComputeLeaf += _toc();
         }
         
         force_inline void ComputeAdmissable()
@@ -249,16 +291,57 @@ namespace Repulsor
         
     public:
         
-        force_inline std::string ClassName() const
+        
+        void PrintStats()
         {
-            return className();
+            std::stringstream s;
+            
+            s
+            << "\n"
+            << "Report for class                    = " << ClassName() << "\n"
+            << "Thread ID                           = " << thread << "\n"
+            << "time_Cluster                        = " << time_Cluster << "\n"
+            << "time_FindNonzeroPosition            = " << time_FindNonzeroPosition << "\n"
+            << "time_admissableQ                    = " << time_admissableQ << "\n"
+            << "time_ComputeLeaf                    = " << time_ComputeLeaf << "\n"
+//            << "Number of primitive pairs processed = " << primitive_count << "\n"
+            << std::endl;
+            
+            logprint(s.str());
         }
         
     private:
-      
-        std::string className() const
+        
+        void _tic()
         {
-            return std::string("BlockSplit_Kernel<")+this->tree_string+">";
+            if constexpr ( reportQ )
+            {
+                start = Clock::now();
+            }
+        }
+        
+        float _toc()
+        {
+            if constexpr ( reportQ )
+            {
+                return Tools::Duration( start, Clock::now() );
+            }
+            else
+            {
+                return 0;
+            }
+        }
+      
+        static std::string className()
+        {
+            return std::string("BlockSplit_Kernel<...>");
+        }
+        
+    public:
+        
+        std::string ClassName() const
+        {
+            return className();
         }
         
     }; // class BlockSplit_Kernel

@@ -196,10 +196,10 @@ namespace Repulsor
             if constexpr ( q_flag >= 2 )
             {
                 // |P*(y-x)|^{q-2}
-                rCosPhi_q_minus_2 = Power<Real,T1>( std::abs(rCosPhi_2), q_half_minus_1 );
+                rCosPhi_q_minus_2 = Power<Real,T1>( Abs(rCosPhi_2), q_half_minus_1 );
                 
                 // |Q*(y-x)|^{q-2}
-                rCosPsi_q_minus_2 = Power<Real,T1>( std::abs(rCosPsi_2), q_half_minus_1 );
+                rCosPsi_q_minus_2 = Power<Real,T1>( Abs(rCosPsi_2), q_half_minus_1 );
                 
                 // |P*(y-x)|^q
                 rCosPhi_q = rCosPhi_q_minus_2 * rCosPhi_2;
@@ -214,9 +214,9 @@ namespace Repulsor
                 rCosPsi_q_minus_2 = one;
                 
                 // |P*(y-x)|^q
-                rCosPhi_q = Power<Real,T1>( std::abs(rCosPhi_2), q_half );
+                rCosPhi_q = Power<Real,T1>( Abs(rCosPhi_2), q_half );
                 // |Q*(y-x)|^q
-                rCosPsi_q = Power<Real,T1>( std::abs(rCosPsi_2), q_half );
+                rCosPsi_q = Power<Real,T1>( Abs(rCosPsi_2), q_half );
             }
             
             const Real Num = ( rCosPhi_q + rCosPsi_q );

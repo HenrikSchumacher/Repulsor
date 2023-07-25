@@ -105,9 +105,9 @@ public:
             weight = one;
             
             P.SetPointer(&root_serialized[0]);
-            P.Read( input_serialized,k);
+            P.Read( input_serialized, k );
             P.SetPointer(&simplex_serialized[0]);
-            P.Read( input_serialized,k);
+            P.Read( input_serialized, k );
         
             for( Int i = 0; i < DOM_DIM+1; ++i )
             {

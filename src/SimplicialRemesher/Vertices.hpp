@@ -99,13 +99,13 @@ void ComputeVertexPosition( const Vertex_T v_0, const Vertex_T v_1, const Vertex
 //
 //        A.Eigensystem( UT, lambda, sqrt_eps, 100 );
 //
-//        Real lambda_max = std::abs(lambda[0]);
-//        Real lambda_min = std::abs(lambda[0]);
+//        Real lambda_max = Abs(lambda[0]);
+//        Real lambda_min = Abs(lambda[0]);
 //
 //        for( Int i = 1; i < AMB_DIM; ++i )
 //        {
-//            lambda_min = std::min( lambda_min, std::abs(lambda[i]) );
-//            lambda_max = std::max( lambda_max, std::abs(lambda[i]) );
+//            lambda_min = Min( lambda_min, Abs(lambda[i]) );
+//            lambda_max = Max( lambda_max, Abs(lambda[i]) );
 //        }
 //
 //        if( lambda_min > sqrt_eps * lambda_max )
@@ -118,7 +118,7 @@ void ComputeVertexPosition( const Vertex_T v_0, const Vertex_T v_1, const Vertex
 //
 //            for( Int i = 0; i < AMB_DIM; ++i )
 //            {
-//                y[i] = (std::abs(lambda[i]) > Lambda_tol) ? y[i] / lambda[i] : Scalar::Zero<Real>;
+//                y[i] = (Abs(lambda[i]) > Lambda_tol) ? y[i] / lambda[i] : Scalar::Zero<Real>;
 //            }
 //
 //            Dot<Overwrite>( UT, y, x );

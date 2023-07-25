@@ -63,7 +63,7 @@ namespace Repulsor
         
         static constexpr Int  SIZE      = DOM_DIM + 1;
         static constexpr Int  HULL_SIZE = AMB_DIM * SIZE;
-        static constexpr Real nth       = Scalar::Inv<Real>( SIZE );
+        static constexpr Real nth       = Inv<Real>( SIZE );
         
         SimplicialMesh() = default;
 
@@ -202,7 +202,7 @@ namespace Repulsor
         
         static constexpr Real StandardSimplexVolume()
         {
-            return Scalar::Inv<Real>( Factorial(static_cast<Real>(DOM_DIM)) );
+            return Inv<Real>( Factorial(DOM_DIM) );
         }
         
     protected:

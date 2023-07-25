@@ -35,11 +35,11 @@ private:
                         thread,
                         row[i],
                         tree_rows_ptr_mutex,
-                        std::max( one, ThreadCount() / row_size )
+                        Max( one, ThreadCount() / row_size )
                     );
                 },
                 null, row_size, one,
-                std::min(row_size, ThreadCount() )
+                Min(row_size, ThreadCount() )
            );
         }
         
@@ -103,7 +103,7 @@ private:
             mref<Primitive_T> P = *P_proto[thread];
             
             const Int split_index = C_proto[thread]->Split(
-                P,                                                  // prototype for primitves
+                P,                                                  // prototype for primitives
                 P_serialized.data(), begin, end,                    // which primitives are in question
                 P_ordering.data(),                                  // which primitives are in question
                 C_thread_serialized.data(C->thread), C->l_ID,       // where to get   the bounding volume info for current cluster
@@ -161,5 +161,5 @@ private:
         // counting ourselves as descendant, too!
         C->descendant_count = one + L->descendant_count + R->descendant_count;
         C->descendant_leaf_count = L->descendant_leaf_count + R->descendant_leaf_count;
-        C->max_depth = std::max( L->max_depth, R->max_depth );
+        C->max_depth = Max( L->max_depth, R->max_depth );
     }

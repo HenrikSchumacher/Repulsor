@@ -90,7 +90,7 @@ namespace Repulsor
         
         Int ThreadCount() const
         {
-            return std::min( S.ThreadCount(), T.ThreadCount() );
+            return Min( S.ThreadCount(), T.ThreadCount() );
         }
         
     protected:

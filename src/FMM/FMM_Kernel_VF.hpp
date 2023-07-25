@@ -147,9 +147,9 @@ namespace Repulsor
         ,   T_ser          ( GetT().PrimitiveSerialized().data()                 )
         ,   theta          ( theta_                                              )
         ,   theta2         ( theta_ * theta_                                     )
-        ,   max_refinement ( std::min(
+        ,   max_refinement ( Min(
                                   int_cast<typename S_Tree_T::Child_T>(max_refinement_),
-                                  std::min(S_Tree_T::MaxLevel(),S_Tree_T::MaxLevel())
+                                  Min(S_Tree_T::MaxLevel(),S_Tree_T::MaxLevel())
                               )                                                                )
         {
             debug_print(std::string( "Initializing " + this->ClassName() + " from Configurator_T on thread " + ToString(thread)) );
@@ -358,7 +358,7 @@ namespace Repulsor
         
         void Reduce( cref<FMM_Kernel_VF> ker )
         {
-            max_level_reached = std::max( max_level_reached, ker.MaxLevelReached() );
+            max_level_reached = Max( max_level_reached, ker.MaxLevelReached() );
             
             evaluations += ker.EvaluationCount();
         }

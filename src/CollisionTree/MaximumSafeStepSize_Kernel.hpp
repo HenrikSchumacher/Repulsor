@@ -3,19 +3,16 @@
 namespace Repulsor
 {
     template<typename ClusterTree_T_>
-    class MaximumSafeStepSize_Kernel : public ClusterTreePairTraversor_Kernel<ClusterTree_T_>
+    class MaximumSafeStepSize_Kernel
     {
-    private:
-        
-        using Base_T = ClusterTreePairTraversor_Kernel<ClusterTree_T_>;
         
     public:
         
         using ClusterTree_T = ClusterTree_T_;
-        using Real    = typename Base_T::Real;
-        using Int     = typename Base_T::Int;
-        using SReal   = typename Base_T::SReal;
-        using ExtReal = typename Base_T::ExtReal;
+        using Real    = typename ClusterTree_T::Real;
+        using Int     = typename ClusterTree_T::Int;
+        using SReal   = typename ClusterTree_T::SReal;
+        using ExtReal = typename ClusterTree_T::ExtReal;
         
     public:
         
@@ -26,10 +23,11 @@ namespace Repulsor
         MaximumSafeStepSize_Kernel(
             cref<ClusterTree_T> S,
             cref<ClusterTree_T> T,
+            const Int thread_,
             const SReal t_init_,
             const SReal TOL
         )
-        :   Base_T( S, T )
+        :   thread      ( thread_                            )
         ,   S_C_ser     ( S.ClusterSerialized()              )
         ,   S_C_up_ser  ( S.ClusterUpdatedSerialized()       )
         ,   T_C_ser     ( T.ClusterSerialized()              )
@@ -45,8 +43,8 @@ namespace Repulsor
         {}
         
 
-        MaximumSafeStepSize_Kernel( cref<MaximumSafeStepSize_Kernel> other )
-        :   Base_T( other )
+        MaximumSafeStepSize_Kernel( cref<MaximumSafeStepSize_Kernel> other, const Int thread_ )
+        :   thread      ( other.thread      )
         ,   S_C_ser     ( other.S_C_ser     )
         ,   S_C_up_ser  ( other.S_C_up_ser  )
         ,   T_C_ser     ( other.T_C_ser     )
@@ -65,9 +63,8 @@ namespace Repulsor
         {
             // see https://stackoverflow.com/questions/5695548/public-friend-swap-member-function for details
             using std::swap;
-            
-            swap( static_cast<Base_T&>(X), static_cast<Base_T&>(Y) );
 
+            swap( X.thread,         Y.thread        );
             swap( X.S_C_ser,        Y.S_C_ser       );
             swap( X.S_C_up_ser,     Y.S_C_up_ser    );
             swap( X.T_C_ser,        Y.T_C_ser       );
@@ -110,6 +107,7 @@ namespace Repulsor
         
     protected:
         
+        const Int thread;
         cref<Tensor2<SReal,Int>> S_C_ser;
         cref<Tensor2<SReal,Int>> S_C_up_ser;
         cref<Tensor2<SReal,Int>> T_C_ser;
@@ -220,7 +218,7 @@ namespace Repulsor
       
         std::string ClassName() const
         {
-            return "MaximumSafeStepSize_Kernel<"+this->tree_string+">";
+            return "MaximumSafeStepSize_Kernel<...>";
         }
         
     }; // class MaximumSafeStepSize_Kernel

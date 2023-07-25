@@ -68,7 +68,7 @@ protected:
             
             const Real C_mass = L_weight + R_weight;
             C_C[0] = C_mass;
-            const Real C_invmass = Scalar::Inv<Real>(C_mass);
+            const Real C_invmass = Inv(C_mass);
             
             L_weight *= C_invmass;
             R_weight *= C_invmass;
@@ -121,7 +121,7 @@ protected:
                     }
                 }
                 
-                const Real C_invmass = Scalar::Inv<Real>(C_C[0]);
+                const Real C_invmass = Inv(C_C[0]);
                 
                 for( Int j = 1; j < FAR_DIM; ++j )
                 {

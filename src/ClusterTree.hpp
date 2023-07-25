@@ -258,9 +258,14 @@ namespace Repulsor
             
             auto * root = new Cluster_T( thread, 0, 0, PrimitiveCount(), 0 );
             
-            // Initial bounding volume of root node.
+            
+            ptic(className()+"::ComputeClusters: Initial bounding volume of root node");
+            
             C_proto[thread]->SetPointer( C_thread_serialized.data(thread), 0 );
             C_proto[thread]->FromPrimitives( *P_proto[thread], P_serialized.data(), 0, PrimitiveCount(), ThreadCount() );
+            
+            ptoc(className()+"::ComputeClusters: Initial bounding volume of root node");
+            
             
             Split( root );
             

@@ -42,7 +42,7 @@ namespace Repulsor
         :   Base_T( S_,T_ )
         ,   S( S_ )
         ,   T( T_ )
-        ,   thread_count( std::min(S_.ThreadCount(), T_.ThreadCount()) )
+        ,   thread_count( Min(S_.ThreadCount(), T_.ThreadCount()) )
         {
             ptic(className()+"()");
             if constexpr ( symmetricQ )
@@ -98,11 +98,11 @@ namespace Repulsor
                 std::vector<Kernel_T> kernels;
                 kernels.reserve(thread_count);
                 
-                SReal t = std::min( S.UpdateTime(), T.UpdateTime() );
+                SReal t = Min( S.UpdateTime(), T.UpdateTime() );
                 
                 for( Int thread = 0; thread < thread_count; ++thread )
                 {
-                    kernels.emplace_back( S, T, t, static_cast<SReal>(0.0625) );
+                    kernels.emplace_back( S, T, thread, t, static_cast<SReal>(0.0625) );
                 }
                 ptoc(ClassName()+"::PrimitiveCollisionMatrix: Prepare kernels");
                 
@@ -178,12 +178,12 @@ namespace Repulsor
             kernels.reserve( thread_count );
             
             
-            SReal t = std::min( t_, std::min( S.UpdateTime(), T.UpdateTime() ) );
+            SReal t = Min( t_, Min( S.UpdateTime(), T.UpdateTime() ) );
             
             ptic(ClassName()+"::MaximumSafeStepSize: Prepare kernels");
                 for( Int thread = 0; thread < thread_count; ++thread )
                 {
-                    kernels.emplace_back( S, T, t, TOL );
+                    kernels.emplace_back( S, T, thread,t, TOL );
                 }
             ptoc(ClassName()+"::MaximumSafeStepSize: Prepare kernels");
             
@@ -204,12 +204,8 @@ namespace Repulsor
                 for( Int thread = 0; thread < thread_count; ++thread )
                 {
                     SReal s = kernels[thread].MaxTime();
-                    t = std::min( t, s );
+                    t = Min( t, s );
                 }
-//                for( Int thread = 0; thread < thread_count; ++thread )
-//                {
-//                    kernels.emplace_back( S, T, t, TOL );
-//                }
             ptoc(ClassName()+"::MaximumSafeStepSize: Reduce kernels");
             
             

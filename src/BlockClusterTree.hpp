@@ -61,7 +61,7 @@ namespace Repulsor
         ,   settings(settings_)
         ,   near_theta2( pow(settings_.near_field_separation_parameter,2) )
         ,    far_theta2( pow(settings_. far_field_separation_parameter,2) )
-        ,   thread_count( std::min(S_.ThreadCount(), T_.ThreadCount()) )
+        ,   thread_count( Min(S_.ThreadCount(), T_.ThreadCount()) )
 //        ,   symmetricQ( std::addressof(S_) == std::addressof(T_) )
         {
             ptic(className());
@@ -74,7 +74,7 @@ namespace Repulsor
                 }
             }
 
-            if( std::min( S.PrimitiveCount(), T.PrimitiveCount()) > 0 )
+            if( Min( S.PrimitiveCount(), T.PrimitiveCount()) > 0 )
             {
                 ComputeBlocks();
             }
@@ -121,12 +121,12 @@ namespace Repulsor
         
         Real FarFieldSeparationParameter() const override
         {
-            return std::sqrt(far_theta2);
+            return Sqrt(far_theta2);
         }
                         
         Real NearFieldSeparationParameter() const override
         {
-            return std::sqrt(near_theta2);
+            return Sqrt(near_theta2);
         }
         
         LInt PrimitiveIntersectionCount() const override
@@ -237,7 +237,7 @@ namespace Repulsor
             ptic(className()+"::ComputeBlocks: prepare kernels");
             for( Int thread = 0; thread < thread_count; ++thread )
             {
-                kernels.emplace_back( S, T, far_theta2, near_theta2 );
+                kernels.emplace_back( S, T, thread, far_theta2, near_theta2 );
             }
             ptoc(className()+"::ComputeBlocks: prepare kernels");
             

@@ -11,11 +11,11 @@ namespace Repulsor
     {
     public:
         
-        static constexpr Int MIN_AMB_DIM = std::max( Int(1), Int(MIN_AMB_DIM_) );
-        static constexpr Int MAX_AMB_DIM = std::max( Int(1), Int(MAX_AMB_DIM_) );
+        static constexpr Int MIN_AMB_DIM = Max( Int(1), Int(MIN_AMB_DIM_) );
+        static constexpr Int MAX_AMB_DIM = Max( Int(1), Int(MAX_AMB_DIM_) );
         
-        static constexpr Int MIN_DOM_DIM = std::max( Int(0), Int(MIN_DOM_DIM_) );
-        static constexpr Int MAX_DOM_DIM = std::min( Int(MAX_AMB_DIM-1), Int(MAX_DOM_DIM_) );
+        static constexpr Int MIN_DOM_DIM = Max( Int(0), Int(MIN_DOM_DIM_) );
+        static constexpr Int MAX_DOM_DIM = Min( Int(MAX_AMB_DIM-1), Int(MAX_DOM_DIM_) );
         
         CONCAT(CLASS,_Factory)() = default;
         
@@ -50,7 +50,7 @@ namespace Repulsor
         {
             if( amb_dim == AMB_DIM )
             {
-                return make_2<std::min(MAX_DOM_DIM,AMB_DIM-1),AMB_DIM>( dom_dim, amb_dim, q, p );
+                return make_2<Min(MAX_DOM_DIM,AMB_DIM-1),AMB_DIM>( dom_dim, amb_dim, q, p );
             }
             else if constexpr ( AMB_DIM > MIN_AMB_DIM )
             {

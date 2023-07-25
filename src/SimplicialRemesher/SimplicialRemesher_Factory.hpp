@@ -30,11 +30,11 @@ namespace Repulsor
         
         using RemesherBase_T  = SimplicialRemesherBase<Real,Int,ExtReal,ExtInt>;
         
-        static constexpr Int MinAmbDim = std::max( Int(1), Int(MinAmbDim_) );
-        static constexpr Int MaxAmbDim = std::max( Int(1), Int(MaxAmbDim_) );
+        static constexpr Int MinAmbDim = Max( Int(1), Int(MinAmbDim_) );
+        static constexpr Int MaxAmbDim = Max( Int(1), Int(MaxAmbDim_) );
         
-        static constexpr Int MinDomDim = std::max( Int(0), Int(MinDomDim_) );
-        static constexpr Int MaxDomDim = std::min( Int(MaxAmbDim-1), Int(MaxDomDim_) );
+        static constexpr Int MinDomDim = Max( Int(0), Int(MinDomDim_) );
+        static constexpr Int MaxDomDim = Min( Int(MaxAmbDim-1), Int(MaxDomDim_) );
         
         SimplicialRemesher_Factory() = default;
         
@@ -102,7 +102,7 @@ namespace Repulsor
         {
             if( amb_dim == AmbDim )
             {
-                return make_2<std::min(MaxDomDim,AmbDim-1),AmbDim>(
+                return make_2<Min(MaxDomDim,AmbDim-1),AmbDim>(
                     vertex_coords, vertex_count,  amb_dim,  vertex_coords_ColMajorQ,
                     simplices,     simplex_count, dom_dim,  simplices_ColMajorQ,
                     vertex_data,                  data_dim, vertex_data_ColMajorQ,

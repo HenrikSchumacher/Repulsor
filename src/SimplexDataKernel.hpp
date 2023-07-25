@@ -16,7 +16,7 @@ namespace Repulsor
         static constexpr Int SIZE       = DOM_DIM + 1;
         static constexpr Int PROJ_DIM   = (AMB_DIM*(AMB_DIM+1))/2;
         static constexpr Int  HULL_SIZE = AMB_DIM * SIZE;
-        static constexpr Real nth       = Scalar::Inv<Real>( SIZE );
+        static constexpr Real nth       = Inv<Real>( SIZE );
         
         static constexpr Real StandardSimplexVolume()
         {

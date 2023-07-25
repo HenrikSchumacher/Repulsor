@@ -32,11 +32,11 @@ namespace Repulsor
         
         using MeshBase_T  = SimplicialMeshBase<Real,Int,LInt,SReal,ExtReal>;
         
-        static constexpr Int MinAmbDim = std::max( Int(1), Int(MinAmbDim_) );
-        static constexpr Int MaxAmbDim = std::max( Int(1), Int(MaxAmbDim_) );
+        static constexpr Int MinAmbDim = Max( Int(1), Int(MinAmbDim_) );
+        static constexpr Int MaxAmbDim = Max( Int(1), Int(MaxAmbDim_) );
         
-        static constexpr Int MinDomDim = std::max( Int(0), Int(MinDomDim_) );
-        static constexpr Int MaxDomDim = std::min( Int(MaxAmbDim-1), Int(MaxDomDim_) );
+        static constexpr Int MinDomDim = Max( Int(0), Int(MinDomDim_) );
+        static constexpr Int MaxDomDim = Min( Int(MaxAmbDim-1), Int(MaxDomDim_) );
         
         SimplicialMesh_Factory() = default;
         
@@ -98,7 +98,7 @@ namespace Repulsor
         {
             if( amb_dim == AmbDim )
             {
-                return make_2<std::min(MaxDomDim,AmbDim-1),AmbDim>(
+                return make_2<Min(MaxDomDim,AmbDim-1),AmbDim>(
                     v, v_cnt, amb_dim, v_transp, s, s_cnt, dom_dim, s_transp, thread_count
                 );
             }

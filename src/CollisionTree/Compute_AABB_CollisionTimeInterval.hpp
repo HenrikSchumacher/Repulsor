@@ -47,8 +47,8 @@ namespace Repulsor
             const SReal m_0 = Q_max_0 - Q_max_1 - P_min_0 + P_min_1;
             const SReal m_1 = P_max_0 - P_max_1 - Q_min_0 + Q_min_1;
             
-            SReal A = ( m_0 != zero ) ? std::min(one,(Q_max_0 - P_min_0)/m_0) : one;
-            SReal B = ( m_1 != zero ) ? std::min(one,(P_max_0 - Q_min_0)/m_1) : one;
+            SReal A = ( m_0 != zero ) ? Min(one,(Q_max_0 - P_min_0)/m_0) : one;
+            SReal B = ( m_1 != zero ) ? Min(one,(P_max_0 - Q_min_0)/m_1) : one;
             
             if( A > B )
             {
@@ -91,8 +91,8 @@ namespace Repulsor
                 }
             }
             
-            t_0 = std::max(t_0,a);
-            t_1 = std::min(t_1,b);
+            t_0 = Max(t_0,a);
+            t_1 = Min(t_1,b);
         }
         
         if( t_1 < t_0 )

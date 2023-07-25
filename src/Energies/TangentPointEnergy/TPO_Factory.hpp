@@ -11,14 +11,14 @@ namespace Repulsor
     class CONCAT(CLASS,_Factory)<BESH, MIN_DOM_DIM_S_, MAX_DOM_DIM_S_, MIN_DOM_DIM_T_, MAX_DOM_DIM_T_, MIN_AMB_DIM_, MAX_AMB_DIM_ >
     {
     public:
-        static constexpr Int MIN_AMB_DIM = std::max( Int(1), Int(MIN_AMB_DIM_) );
-        static constexpr Int MAX_AMB_DIM = std::max( Int(1), Int(MAX_AMB_DIM_) );
+        static constexpr Int MIN_AMB_DIM = Max( Int(1), Int(MIN_AMB_DIM_) );
+        static constexpr Int MAX_AMB_DIM = Max( Int(1), Int(MAX_AMB_DIM_) );
         
-        static constexpr Int MIN_DOM_DIM_S = std::max( Int(0), Int(MIN_DOM_DIM_S_) );
-        static constexpr Int MAX_DOM_DIM_S = std::min( Int(MAX_AMB_DIM-1), Int(MAX_DOM_DIM_S_) );
+        static constexpr Int MIN_DOM_DIM_S = Max( Int(0), Int(MIN_DOM_DIM_S_) );
+        static constexpr Int MAX_DOM_DIM_S = Min( Int(MAX_AMB_DIM-1), Int(MAX_DOM_DIM_S_) );
 
-        static constexpr Int MIN_DOM_DIM_T = std::max( Int(0), Int(MIN_DOM_DIM_T_) );
-        static constexpr Int MAX_DOM_DIM_T = std::min( Int(MAX_AMB_DIM-1), Int(MAX_DOM_DIM_T_) );
+        static constexpr Int MIN_DOM_DIM_T = Max( Int(0), Int(MIN_DOM_DIM_T_) );
+        static constexpr Int MAX_DOM_DIM_T = Min( Int(MAX_AMB_DIM-1), Int(MAX_DOM_DIM_T_) );
 
         
         CONCAT(CLASS,_Factory)() = default;
@@ -61,7 +61,7 @@ namespace Repulsor
         {
             if( amb_dim == AMB_DIM )
             {
-                return make_2<std::min(MAX_DOM_DIM_T,AMB_DIM-1),AMB_DIM>( dom_dim_S, dom_dim_T, amb_dim, q, p );
+                return make_2<Min(MAX_DOM_DIM_T,AMB_DIM-1),AMB_DIM>( dom_dim_S, dom_dim_T, amb_dim, q, p );
             }
             else if constexpr ( AMB_DIM > MIN_AMB_DIM )
             {
@@ -79,7 +79,7 @@ namespace Repulsor
         {
             if( dom_dim_T == DOM_DIM_T )
             {
-                return make_3<std::min(MAX_DOM_DIM_S,AMB_DIM-1),DOM_DIM_T,AMB_DIM>( dom_dim_S, dom_dim_T, amb_dim, q, p );
+                return make_3<Min(MAX_DOM_DIM_S,AMB_DIM-1),DOM_DIM_T,AMB_DIM>( dom_dim_S, dom_dim_T, amb_dim, q, p );
             }
             else if constexpr ( DOM_DIM_T > MIN_DOM_DIM_T )
             {

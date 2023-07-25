@@ -1,7 +1,5 @@
 #pragma once
 
-#include "ClusterTreePairTraversor/ClusterTreePairTraversor_Kernel.hpp"
-
 namespace Repulsor
 {
     template<typename Kernel_T, bool symmetricQ, bool leaves_are_singletons>
@@ -17,8 +15,6 @@ namespace Repulsor
         
     public:
 
-        // In order to prevent GetS() and GetT() shooting a segfault, we have to initialize S and T here. This is the only case in which Traversor owns these raw pointers.
-        
         ClusterTreePairTraversor(
             cref<ClusterTree_T> S_,
             cref<ClusterTree_T> T_,

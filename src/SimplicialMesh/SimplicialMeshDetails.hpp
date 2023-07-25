@@ -58,7 +58,7 @@ namespace Repulsor
 
 		explicit SimplicialMeshDetails( const Int thread_count_ = 1 ) 
 		:
-			thread_count(std::max(static_cast<Int>(1),thread_count_))
+			thread_count(Max(static_cast<Int>(1),thread_count_))
 		{}
 	
 		Int ThreadCount() const
@@ -135,7 +135,7 @@ namespace Repulsor
 
 		explicit SimplicialMeshDetails( const Int thread_count_ = 1 ) 
 		:
-			thread_count(std::max(static_cast<Int>(1),thread_count_))
+			thread_count(Max(static_cast<Int>(1),thread_count_))
 		{}
 	
 		Int ThreadCount() const
@@ -213,7 +213,7 @@ namespace Repulsor
 
 		explicit SimplicialMeshDetails( const Int thread_count_ = 1 ) 
 		:
-			thread_count(std::max(static_cast<Int>(1),thread_count_))
+			thread_count(Max(static_cast<Int>(1),thread_count_))
 		{}
 	
 		Int ThreadCount() const
@@ -292,7 +292,7 @@ namespace Repulsor
 
 		explicit SimplicialMeshDetails( const Int thread_count_ = 1 ) 
 		:
-			thread_count(std::max(static_cast<Int>(1),thread_count_))
+			thread_count(Max(static_cast<Int>(1),thread_count_))
 		{}
 	
 		Int ThreadCount() const
@@ -372,7 +372,7 @@ namespace Repulsor
 
 		explicit SimplicialMeshDetails( const Int thread_count_ = 1 ) 
 		:
-			thread_count(std::max(static_cast<Int>(1),thread_count_))
+			thread_count(Max(static_cast<Int>(1),thread_count_))
 		{}
 	
 		Int ThreadCount() const
@@ -541,7 +541,7 @@ namespace Repulsor
 
 		explicit SimplicialMeshDetails( const Int thread_count_ = 1 ) 
 		:
-			thread_count(std::max(static_cast<Int>(1),thread_count_))
+			thread_count(Max(static_cast<Int>(1),thread_count_))
 		{}
 	
 		Int ThreadCount() const
@@ -784,7 +784,7 @@ namespace Repulsor
 
 		explicit SimplicialMeshDetails( const Int thread_count_ = 1 ) 
 		:
-			thread_count(std::max(static_cast<Int>(1),thread_count_))
+			thread_count(Max(static_cast<Int>(1),thread_count_))
 		{}
 	
 		Int ThreadCount() const
@@ -1123,7 +1123,7 @@ namespace Repulsor
 
 		explicit SimplicialMeshDetails( const Int thread_count_ = 1 ) 
 		:
-			thread_count(std::max(static_cast<Int>(1),thread_count_))
+			thread_count(Max(static_cast<Int>(1),thread_count_))
 		{}
 	
 		Int ThreadCount() const
@@ -1476,7 +1476,7 @@ namespace Repulsor
 
 		explicit SimplicialMeshDetails( const Int thread_count_ = 1 ) 
 		:
-			thread_count(std::max(static_cast<Int>(1),thread_count_))
+			thread_count(Max(static_cast<Int>(1),thread_count_))
 		{}
 	
 		Int ThreadCount() const

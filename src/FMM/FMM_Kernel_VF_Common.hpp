@@ -20,7 +20,7 @@ public:
                 if( S_Tree.Level() >= this->max_refinement )
                 {
                     // If at lowest level and inadmissable then we just compute the energy and move up.
-                    this->max_level_reached = std::max( this->max_level_reached,this->max_refinement );
+                    this->max_level_reached = Max( this->max_level_reached,this->max_refinement );
                     ++this->evaluations;
                     sum += compute();
                     S_Tree.ToParent();
@@ -41,7 +41,7 @@ public:
                     {
 //                        logprint("admissable");
                         // We compute energy, go to parent, and prepare the next child of the parent.
-                        this->max_level_reached = std::max( this->max_level_reached, S_Tree.Level() );
+                        this->max_level_reached = Max( this->max_level_reached, S_Tree.Level() );
                         ++this->evaluations;
                         sum += compute();
                         S_Tree.ToParent();
