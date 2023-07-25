@@ -71,7 +71,7 @@ namespace Repulsor
         ,   intersection_theta2 ( other.near_theta2             )
         {}
         
-        friend void swap(BlockSplit_Kernel &X, BlockSplit_Kernel &Y )
+        friend void swap( BlockSplit_Kernel &X, BlockSplit_Kernel &Y )
         {
             // see https://stackoverflow.com/questions/5695548/public-friend-swap-member-function for details
             using std::swap;
@@ -137,12 +137,12 @@ namespace Repulsor
         const Real near_theta2;
         const Real intersection_theta2;
         
-        Time start;
-
-        float time_Cluster = 0;
-        float time_admissableQ = 0;
-        float time_FindNonzeroPosition = 0;
-        float time_ComputeLeaf = 0;
+//        Time start;
+//
+//        float time_Cluster = 0;
+//        float time_admissableQ = 0;
+//        float time_FindNonzeroPosition = 0;
+//        float time_ComputeLeaf = 0;
         
     public:
 
@@ -171,11 +171,11 @@ namespace Repulsor
         
         force_inline bool AdmissableQ()
         {
-            _tic();
+//            _tic();
             
             const bool result = G.MultipoleAcceptanceCriterion( *S_C_proto, *T_C_proto, far_theta2 );
             
-            time_Cluster += _toc();
+//            time_Cluster += _toc();
             
             return result;
         }
@@ -197,22 +197,22 @@ namespace Repulsor
         
         force_inline void ComputeLeaf()
         {
-            _tic();
+//            _tic();
             
             const bool neighbor_found = A.FindNonzeroPosition(P_i,P_j).found;
 
-            time_FindNonzeroPosition += _toc();
-            
-            
-            _tic();
+//            time_FindNonzeroPosition += _toc();
+//
+//
+//            _tic();
             
             const bool admissableQ = neighbor_found || G.MultipoleAcceptanceCriterion(
                     *S_P_proto, *T_P_proto, near_theta2
             );
             
-            time_admissableQ += _toc();
-            
-            _tic();
+//            time_admissableQ += _toc();
+//
+//            _tic();
             
             if( admissableQ )
             {
@@ -234,27 +234,27 @@ namespace Repulsor
                 }
             }
             
-            time_ComputeLeaf += _toc();
+//            time_ComputeLeaf += _toc();
         }
         
         force_inline void ComputeLeafSwapped()
         {
-            _tic();
+//            _tic();
             
             const bool neighbor_found = A.FindNonzeroPosition(P_i,P_j).found;
             
-            time_FindNonzeroPosition += _toc();
-
-            _tic();
+//            time_FindNonzeroPosition += _toc();
+//
+//            _tic();
             
             const bool admissableQ = neighbor_found || G.MultipoleAcceptanceCriterion(
                 *S_P_proto, *T_P_proto, near_theta2
             );
             
-            time_admissableQ += _toc();
-            
-            
-            _tic();
+//            time_admissableQ += _toc();
+//
+//
+//            _tic();
             
             if( admissableQ )
             {
@@ -276,7 +276,7 @@ namespace Repulsor
                 }
             }
             
-            time_ComputeLeaf += _toc();
+//            time_ComputeLeaf += _toc();
         }
         
         force_inline void ComputeAdmissable()
@@ -294,43 +294,46 @@ namespace Repulsor
         
         void PrintStats()
         {
-            std::stringstream s;
-            
-            s
-            << "\n"
-            << "Report for class                    = " << ClassName() << "\n"
-            << "Thread ID                           = " << thread << "\n"
-            << "time_Cluster                        = " << time_Cluster << "\n"
-            << "time_FindNonzeroPosition            = " << time_FindNonzeroPosition << "\n"
-            << "time_admissableQ                    = " << time_admissableQ << "\n"
-            << "time_ComputeLeaf                    = " << time_ComputeLeaf << "\n"
-//            << "Number of primitive pairs processed = " << primitive_count << "\n"
-            << std::endl;
-            
-            logprint(s.str());
+//            if constexpr ( reportQ )
+//            {
+//                std::stringstream s;
+//
+//                s
+//                << "\n"
+//                << "Report for class                    = " << ClassName() << "\n"
+//                << "Thread ID                           = " << thread << "\n"
+//                << "time_Cluster                        = " << time_Cluster << "\n"
+//                << "time_FindNonzeroPosition            = " << time_FindNonzeroPosition << "\n"
+//                << "time_admissableQ                    = " << time_admissableQ << "\n"
+//                << "time_ComputeLeaf                    = " << time_ComputeLeaf << "\n"
+//    //            << "Number of primitive pairs processed = " << primitive_count << "\n"
+//                << std::endl;
+//
+//                logprint(s.str());
+//            }
         }
         
     private:
         
-        void _tic()
-        {
-            if constexpr ( reportQ )
-            {
-                start = Clock::now();
-            }
-        }
-        
-        float _toc()
-        {
-            if constexpr ( reportQ )
-            {
-                return Tools::Duration( start, Clock::now() );
-            }
-            else
-            {
-                return 0;
-            }
-        }
+//        void _tic()
+//        {
+//            if constexpr ( reportQ )
+//            {
+//                start = Clock::now();
+//            }
+//        }
+//        
+//        float _toc()
+//        {
+//            if constexpr ( reportQ )
+//            {
+//                return Tools::Duration( start, Clock::now() );
+//            }
+//            else
+//            {
+//                return 0;
+//            }
+//        }
       
         static std::string className()
         {
