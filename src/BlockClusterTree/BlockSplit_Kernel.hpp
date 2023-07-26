@@ -199,7 +199,7 @@ namespace Repulsor
         {
 //            _tic();
             
-            const bool neighbor_found = A.FindNonzeroPosition(P_i,P_j).found;
+            const bool neighbor_found = A.NonzeroPositionQ(P_i,P_j);
 
 //            time_FindNonzeroPosition += _toc();
 //
@@ -241,7 +241,7 @@ namespace Repulsor
         {
 //            _tic();
             
-            const bool neighbor_found = A.FindNonzeroPosition(P_i,P_j).found;
+            const bool neighbor_found = A.NonzeroPositionQ(P_i,P_j);
             
 //            time_FindNonzeroPosition += _toc();
 //
@@ -322,7 +322,7 @@ namespace Repulsor
 //                start = Clock::now();
 //            }
 //        }
-//        
+//
 //        float _toc()
 //        {
 //            if constexpr ( reportQ )

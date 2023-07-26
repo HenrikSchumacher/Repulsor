@@ -181,7 +181,7 @@ namespace Repulsor
         
         force_inline void ComputeLeaf()
         {
-            if( !A.FindNonzeroPosition(P_i,P_j).found )
+            if( !A.NonzeroPositionQ(P_i,P_j) )
             {
                 t_max = C.FindMaximumSafeStepSize(
                     S_P_ser.data(P_i), S_P_v_ser.data(P_i),
@@ -193,7 +193,7 @@ namespace Repulsor
         
         force_inline void ComputeLeafSwapped()
         {
-            if( !A.FindNonzeroPosition(P_i,P_j).found )
+            if( !A.NonzeroPositionQ(P_i,P_j) )
             {
                 t_max = C.FindMaximumSafeStepSize(
                     S_P_ser.data(P_i), S_P_v_ser.data(P_i),
