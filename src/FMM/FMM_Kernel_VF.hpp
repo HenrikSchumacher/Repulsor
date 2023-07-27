@@ -271,7 +271,7 @@ namespace Repulsor
         
         force_inline void writeS( const Int i_global )
         {
-            if constexpr (diff_flag )
+            if constexpr (diff_flag)
             {
                 combine_buffers<Scalar::Flag::Generic,Scalar::Flag::Plus,S_DATA_DIM>(
                     symmetry_factor, DX.data(), Scalar::One<Real>, &S_D_data[S_DATA_DIM * i_global]
@@ -281,7 +281,7 @@ namespace Repulsor
         
         force_inline void writeT( const Int j_global )
         {
-            if constexpr (diff_flag )
+            if constexpr (diff_flag)
             {
                 combine_buffers<Scalar::Flag::Generic,Scalar::Flag::Plus,T_DATA_DIM>(
                     symmetry_factor, DY.data(), Scalar::One<Real>, &T_D_data[T_DATA_DIM * j_global]

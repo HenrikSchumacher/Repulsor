@@ -112,16 +112,26 @@ namespace Repulsor
             {
                 y[0][k] += a_0 * x[0][k];
             }
+            
+//            combine_buffers<Scalar::Flag::Generic,Scalar::Flag::Plus,NRHS>(
+//                a_0, &x[0][0], Scalar::One<Scal>, &y[0][0]
+//            );
+            
 
             const Scal a_1 ( a[1] );
 
             for( Int j = 1; j < COLS; ++j )
             {
-                for( Int k = 0; k < MAX_RHS_COUNT; ++k )
+                for( Int k = 0; k < NRHS; ++k )
                 {
                     y[j][k] += a_1 * x[j][k];
                 }
             }
+            
+//            // For some reason this is slower than the above loop.
+//            combine_buffers<Scalar::Flag::Generic,Scalar::Flag::Plus,(COLS-1)*NRHS>(
+//                a_1, &x[1][0], Scalar::One<Scal>, &y[1][0]
+//            );
         }
         
     public:
@@ -130,7 +140,7 @@ namespace Repulsor
         {
             return "TP0_Kernel_MultiplyMetric<"
                 +ToString(AMB_DIM)
-            +","+ToString(MAX_RHS_COUNT)
+            +","+ToString(NRHS)
             +","+TypeName<Scal>+","+TypeName<Scal_in>+","+TypeName<Scal_out>
             +","+TypeName<Int>+","+TypeName<LInt>
             +","+ToString(alpha_flag)
