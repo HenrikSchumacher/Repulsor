@@ -23,8 +23,6 @@
 #include "../submodules/Tensors/MyBLAS.hpp"
 #include "../submodules/Tensors/Sparse.hpp"
 
-
-
 //#include "../submodules/Tensors/ConjugateGradient.hpp"
 //#include "../submodules/Tensors/GMRES.hpp"
 //#include "../submodules/Tensors/Sparse.hpp"
