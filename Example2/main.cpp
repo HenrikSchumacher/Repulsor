@@ -18,8 +18,8 @@
 //#include <lapack.h>
 
 #include "../Repulsor.hpp"
-#include "../Tensors/MyBLAS.hpp"
-#include "../Tensors/Sparse.hpp"
+#include "../submodules/Tensors/MyBLAS.hpp"
+#include "../submodules/Tensors/Sparse.hpp"
 
 
 using namespace Repulsor;

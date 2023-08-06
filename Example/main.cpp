@@ -20,14 +20,14 @@
 //#include <lapack.h>
 
 #include "../Repulsor.hpp"
-#include "../Tensors/MyBLAS.hpp"
-#include "../Tensors/Sparse.hpp"
+#include "../submodules/Tensors/MyBLAS.hpp"
+#include "../submodules/Tensors/Sparse.hpp"
 
 
 
-//#include "../Tensors/ConjugateGradient.hpp"
-//#include "../Tensors/GMRES.hpp"
-//#include "../Tensors/Sparse.hpp"
+//#include "../submodules/Tensors/ConjugateGradient.hpp"
+//#include "../submodules/Tensors/GMRES.hpp"
+//#include "../submodules/Tensors/Sparse.hpp"
 
 using namespace Repulsor;
 using namespace Tensors;

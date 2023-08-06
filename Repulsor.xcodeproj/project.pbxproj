@@ -87,7 +87,6 @@
 		AF9C9BCD2A5230B8008AB9E6 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		AFA60FCE2906739700CF0C41 /* Meshes.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Meshes.hpp; sourceTree = "<group>"; };
 		AFBAFE592A8004CC00F734EE /* submodules */ = {isa = PBXFileReference; lastKnownFileType = folder; path = submodules; sourceTree = "<group>"; };
-		AFC500462A66C7D200B71FA8 /* Repulsor.profdata */ = {isa = PBXFileReference; lastKnownFileType = file; path = Repulsor.profdata; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -146,6 +145,7 @@
 			isa = PBXGroup;
 			children = (
 				AFA60FCE2906739700CF0C41 /* Meshes.hpp */,
+				AF3DADB728ECF0470089476A /* main.cpp */,
 			);
 			path = Example;
 			sourceTree = "<group>";
@@ -154,10 +154,9 @@
 			isa = PBXGroup;
 			children = (
 				AF1EE677293F489C0099FA59 /* Experiments */,
-				AF3DADB028ECEFFC0089476A /* src */,
 				AF88400F28ECEEBA0040A2FC /* LICENSE */,
 				AFBAFE592A8004CC00F734EE /* submodules */,
-				AF3DADB728ECF0470089476A /* main.cpp */,
+				AF3DADB028ECEFFC0089476A /* src */,
 				AF88401028ECEEBA0040A2FC /* Repulsor.hpp */,
 				AF98B21F28EF0DDC00413977 /* README.md */,
 				AF3DADB628ECF0470089476A /* Example */,
@@ -167,7 +166,6 @@
 				AF8B89232A6D09F8009498F2 /* Test_Remesher */,
 				AF47B00428ECEE8800A5FCEA /* Products */,
 				AF83C2E7293B426000A23318 /* Frameworks */,
-				AFC500452A66C7D200B71FA8 /* OptimizationProfiles */,
 			);
 			sourceTree = "<group>";
 		};
@@ -222,14 +220,6 @@
 				AF9C9BCD2A5230B8008AB9E6 /* main.cpp */,
 			);
 			path = Test_Preconditioner;
-			sourceTree = "<group>";
-		};
-		AFC500452A66C7D200B71FA8 /* OptimizationProfiles */ = {
-			isa = PBXGroup;
-			children = (
-				AFC500462A66C7D200B71FA8 /* Repulsor.profdata */,
-			);
-			path = OptimizationProfiles;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -725,7 +715,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CLANG_USE_OPTIMIZATION_PROFILE = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = Y6DQ749ZRT;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -739,7 +728,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CLANG_USE_OPTIMIZATION_PROFILE = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = Y6DQ749ZRT;
