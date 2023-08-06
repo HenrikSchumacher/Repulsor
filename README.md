@@ -13,7 +13,7 @@ or clone as usual and then run the following to connect all submodules to their 
 
 Pull changes from the remote repositories of any submodule by executing
 
-    git submodule update --remote --recursive
+    git submodule update --remote --recursive --merge
     
     
 # Trouble shooting
