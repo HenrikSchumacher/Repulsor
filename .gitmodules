@@ -1,10 +1,9 @@
-[submodule "submodules/GJK"]
-	path = submodules/GJK
-	url = git@github.com:HenrikSchumacher/GJK.git
-	branch = main
-	update = merge
 [submodule "submodules/Tensors"]
 	path = submodules/Tensors
 	url = git@github.com:HenrikSchumacher/Tensors.git
 	branch = main
 	update = merge
+[submodule "submodules/GJK"]
+	path = submodules/GJK
+	url = git@github.com:HenrikSchumacher/GJK.git
+	branch = main
