@@ -7,3 +7,4 @@
 	path = submodules/GJK
 	url = git@github.com:HenrikSchumacher/GJK.git
 	branch = main
+	update = merge
