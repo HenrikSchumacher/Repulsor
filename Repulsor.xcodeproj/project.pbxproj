@@ -69,8 +69,6 @@
 
 /* Begin PBXFileReference section */
 		AF1EE676293F488D0099FA59 /* godbolt_gemm.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = godbolt_gemm.hpp; sourceTree = "<group>"; };
-		AF3DADAE28ECEFAF0089476A /* GJK */ = {isa = PBXFileReference; lastKnownFileType = folder; path = GJK; sourceTree = "<group>"; };
-		AF3DADAF28ECEFAF0089476A /* Tensors */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Tensors; sourceTree = "<group>"; };
 		AF3DADB028ECEFFC0089476A /* src */ = {isa = PBXFileReference; lastKnownFileType = folder; path = src; sourceTree = "<group>"; };
 		AF3DADB528ECF0470089476A /* Example */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Example; sourceTree = BUILT_PRODUCTS_DIR; };
 		AF3DADB728ECF0470089476A /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
@@ -88,6 +86,7 @@
 		AF9C9BCB2A5230B8008AB9E6 /* Test_Preconditioner */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Test_Preconditioner; sourceTree = BUILT_PRODUCTS_DIR; };
 		AF9C9BCD2A5230B8008AB9E6 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		AFA60FCE2906739700CF0C41 /* Meshes.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Meshes.hpp; sourceTree = "<group>"; };
+		AFBAFE592A8004CC00F734EE /* submodules */ = {isa = PBXFileReference; lastKnownFileType = folder; path = submodules; sourceTree = "<group>"; };
 		AFC500462A66C7D200B71FA8 /* Repulsor.profdata */ = {isa = PBXFileReference; lastKnownFileType = file; path = Repulsor.profdata; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -146,7 +145,6 @@
 		AF3DADB628ECF0470089476A /* Example */ = {
 			isa = PBXGroup;
 			children = (
-				AF3DADB728ECF0470089476A /* main.cpp */,
 				AFA60FCE2906739700CF0C41 /* Meshes.hpp */,
 			);
 			path = Example;
@@ -156,10 +154,10 @@
 			isa = PBXGroup;
 			children = (
 				AF1EE677293F489C0099FA59 /* Experiments */,
-				AF3DADAE28ECEFAF0089476A /* GJK */,
-				AF3DADAF28ECEFAF0089476A /* Tensors */,
 				AF3DADB028ECEFFC0089476A /* src */,
 				AF88400F28ECEEBA0040A2FC /* LICENSE */,
+				AFBAFE592A8004CC00F734EE /* submodules */,
+				AF3DADB728ECF0470089476A /* main.cpp */,
 				AF88401028ECEEBA0040A2FC /* Repulsor.hpp */,
 				AF98B21F28EF0DDC00413977 /* README.md */,
 				AF3DADB628ECF0470089476A /* Example */,

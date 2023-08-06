@@ -7,9 +7,9 @@
     #include <tuple>
     #include <unordered_map>
 
-    #include "Tensors/Tensors.hpp"
-    #include "Tensors/Sparse.hpp"
-    #include "GJK/GJK.hpp"
+    #include "submodules/Tensors/Tensors.hpp"
+    #include "submodules/Tensors/Sparse.hpp"
+    #include "submodules/GJK/GJK.hpp"
 
     namespace Repulsor {
         
@@ -48,7 +48,7 @@
 //#define FarField_S_Copy
 //#define FarField_T_Copy
 
-#include "src/FMM.hpp"
+    #include "src/FMM.hpp"
     #include "src/Energies.hpp"
     #include "src/Metrics.hpp"
 
