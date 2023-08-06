@@ -2,7 +2,9 @@
 	path = submodules/Tensors
 	url = git@github.com:HenrikSchumacher/Tensors.git
 	branch = main
+	update = merge
 [submodule "GJK"]
 	path = submodules/GJK
 	url = git@github.com:HenrikSchumacher/GJK.git
 	branch = main
+	update = merge
