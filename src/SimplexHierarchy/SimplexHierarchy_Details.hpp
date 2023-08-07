@@ -13,7 +13,7 @@ protected:
     static constexpr SReal one  = Scalar::One<SReal>;
     static constexpr SReal half = Scalar::Half<SReal>;
     static constexpr SReal two  = Scalar::Two<SReal>;
-    static constexpr SReal nth  = Scalar::Inv<SReal>(DOM_DIM+1);
+    static constexpr SReal nth  = Inv<SReal>(DOM_DIM+1);
 
     SReal root_serialized    [SIZE] = {};
     SReal simplex_serialized [SIZE] = {};
@@ -189,7 +189,7 @@ public:
 
             for( Int i = 0; i < DOM_DIM+1; ++i )
             {
-                center[i] = Scalar::Inv<SReal>(DOM_DIM+1);
+                center[i] = Inv<SReal>(DOM_DIM+1);
             
                 for( Int j = 0; j < DOM_DIM+1; ++j )
                 {

@@ -23,7 +23,7 @@
 (*		const Int thread_count = 1;*)
 (**)
 (*		static constexpr Int  SIZE = ",ToString[n+1],";*)
-(*		static constexpr Real nth  = Scalar::Inv<Real>( ",ToString[n+1]," );*)
+(*		static constexpr Real nth  = Inv<Real>( ",ToString[n+1]," );*)
 (**)
 (*	public:*)
 (**)

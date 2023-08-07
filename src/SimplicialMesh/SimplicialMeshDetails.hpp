@@ -52,7 +52,7 @@ namespace Repulsor
 		const Int thread_count = 1;
 
 		static constexpr Int  SIZE = 1;
-		static constexpr Real nth  = Scalar::Inv<Real>( 1 );
+		static constexpr Real nth  = Inv<Real>( 1 );
 
 	public:
 
@@ -129,7 +129,7 @@ namespace Repulsor
 		const Int thread_count = 1;
 
 		static constexpr Int  SIZE = 1;
-		static constexpr Real nth  = Scalar::Inv<Real>( 1 );
+		static constexpr Real nth  = Inv<Real>( 1 );
 
 	public:
 
@@ -207,7 +207,7 @@ namespace Repulsor
 		const Int thread_count = 1;
 
 		static constexpr Int  SIZE = 1;
-		static constexpr Real nth  = Scalar::Inv<Real>( 1 );
+		static constexpr Real nth  = Inv<Real>( 1 );
 
 	public:
 
@@ -286,7 +286,7 @@ namespace Repulsor
 		const Int thread_count = 1;
 
 		static constexpr Int  SIZE = 1;
-		static constexpr Real nth  = Scalar::Inv<Real>( 1 );
+		static constexpr Real nth  = Inv<Real>( 1 );
 
 	public:
 
@@ -366,7 +366,7 @@ namespace Repulsor
 		const Int thread_count = 1;
 
 		static constexpr Int  SIZE = 2;
-		static constexpr Real nth  = Scalar::Inv<Real>( 2 );
+		static constexpr Real nth  = Inv<Real>( 2 );
 
 	public:
 
@@ -535,7 +535,7 @@ namespace Repulsor
 		const Int thread_count = 1;
 
 		static constexpr Int  SIZE = 2;
-		static constexpr Real nth  = Scalar::Inv<Real>( 2 );
+		static constexpr Real nth  = Inv<Real>( 2 );
 
 	public:
 
@@ -778,7 +778,7 @@ namespace Repulsor
 		const Int thread_count = 1;
 
 		static constexpr Int  SIZE = 2;
-		static constexpr Real nth  = Scalar::Inv<Real>( 2 );
+		static constexpr Real nth  = Inv<Real>( 2 );
 
 	public:
 
@@ -1117,7 +1117,7 @@ namespace Repulsor
 		const Int thread_count = 1;
 
 		static constexpr Int  SIZE = 3;
-		static constexpr Real nth  = Scalar::Inv<Real>( 3 );
+		static constexpr Real nth  = Inv<Real>( 3 );
 
 	public:
 
@@ -1470,7 +1470,7 @@ namespace Repulsor
 		const Int thread_count = 1;
 
 		static constexpr Int  SIZE = 3;
-		static constexpr Real nth  = Scalar::Inv<Real>( 3 );
+		static constexpr Real nth  = Inv<Real>( 3 );
 
 	public:
 

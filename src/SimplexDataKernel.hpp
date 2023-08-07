@@ -20,7 +20,7 @@ namespace Repulsor
         
         static constexpr Real StandardSimplexVolume()
         {
-            return Scalar::Inv<Real>( Factorial(static_cast<Real>(DOM_DIM)) );
+            return Inv<Real>( Factorial(static_cast<Real>(DOM_DIM)) );
         }
         
     private:
