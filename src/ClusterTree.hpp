@@ -3,8 +3,6 @@
 #include "ClusterTree/Cluster.hpp"
 #include "ClusterTree/ClusterTreeBase.hpp"
 
-#include <thread>
-
 namespace Repulsor
 {
     template<int AMB_DIM_, typename Real_, typename Int_, typename LInt_, typename SReal_, typename ExtReal_>
@@ -98,11 +96,11 @@ namespace Repulsor
         
         using Base_T::buffer_dim;
         
-        //        using Base_T::stack_array;
-        //        using Base_T::queue_array;
-        
         using Base_T::C_to_P;
+        using Base_T::ClusterToPrimitiveMatrix;
         using Base_T::P_to_C;
+        using Base_T::PrimitiveToClusterMatrix;
+        
         using Base_T::hi_pre;
         using Base_T::lo_pre;
         using Base_T::mi_pre;
@@ -364,8 +362,6 @@ namespace Repulsor
             
             P_to_C = SparseBinaryMatrix_T(
                 ClusterCount(), PrimitiveCount(), PrimitiveCount(), ThreadCount() );
-            
-            P_to_C.Outer()[0] = 0;
             
             C_to_P = SparseBinaryMatrix_T(
                 PrimitiveCount(), ClusterCount(), PrimitiveCount(), ThreadCount() );
@@ -694,7 +690,7 @@ namespace Repulsor
             {
                 case 1:
                 {
-                    P_to_C.template Dot<1>(
+                    PrimitiveToClusterMatrix().template Dot<1>(
                         Scalar::One<Real>,         P_in.data(),
                         static_cast<Real>(add_to), C_in.data(),
                         1
@@ -703,7 +699,7 @@ namespace Repulsor
                 }
                 case AMB_DIM:
                 {
-                    P_to_C.template Dot<AMB_DIM>(
+                    PrimitiveToClusterMatrix().template Dot<AMB_DIM>(
                         Scalar::One<Real>,         P_in.data(),
                         static_cast<Real>(add_to), C_in.data(),
                         AMB_DIM
@@ -712,7 +708,7 @@ namespace Repulsor
                 }
                 case AMB_DIM * AMB_DIM:
                 {
-                    P_to_C.template Dot<AMB_DIM * AMB_DIM>(
+                    PrimitiveToClusterMatrix().template Dot<AMB_DIM * AMB_DIM>(
                         Scalar::One<Real>,         P_in.data(),
                         static_cast<Real>(add_to), C_in.data(),
                         AMB_DIM * AMB_DIM
@@ -721,7 +717,7 @@ namespace Repulsor
                 }
                 case (AMB_DIM + 1) * AMB_DIM:
                 {
-                    P_to_C.template Dot<(AMB_DIM + 1) * AMB_DIM>(
+                    PrimitiveToClusterMatrix().template Dot<(AMB_DIM + 1) * AMB_DIM>(
                         Scalar::One<Real>,         P_in.data(),
                         static_cast<Real>(add_to), C_in.data(),
                         (AMB_DIM + 1) * AMB_DIM
@@ -730,7 +726,7 @@ namespace Repulsor
                 }
                 case FAR_DIM:
                 {
-                    C_to_P.template Dot<FAR_DIM>(
+                    ClusterToPrimitiveMatrix().template Dot<FAR_DIM>(
                         Scalar::One<Real>,         C_out.data(),
                         static_cast<Real>(add_to), P_out.data(),
                         FAR_DIM
@@ -739,7 +735,7 @@ namespace Repulsor
                 }
                 default:
                 {
-                    P_to_C.template Dot<0>(
+                    PrimitiveToClusterMatrix().template Dot<0>(
                         Scalar::One<Real>,         P_in.data(),
                         static_cast<Real>(add_to), C_in.data(),
                         buffer_dim
@@ -759,7 +755,7 @@ namespace Repulsor
             {
                 case 1:
                 {
-                    C_to_P.template Dot<1>(
+                    ClusterToPrimitiveMatrix().template Dot<1>(
                         Scalar::One<Real>,         C_out.data(),
                         static_cast<Real>(add_to), P_out.data(),
                         1
@@ -768,7 +764,7 @@ namespace Repulsor
                 }
                 case AMB_DIM:
                 {
-                    C_to_P.template Dot<AMB_DIM>(
+                    ClusterToPrimitiveMatrix().template Dot<AMB_DIM>(
                         Scalar::One<Real>,         C_out.data(),
                         static_cast<Real>(add_to), P_out.data(),
                         AMB_DIM
@@ -777,7 +773,7 @@ namespace Repulsor
                 }
                 case AMB_DIM * AMB_DIM:
                 {
-                    C_to_P.template Dot<AMB_DIM * AMB_DIM>(
+                    ClusterToPrimitiveMatrix().template Dot<AMB_DIM * AMB_DIM>(
                         Scalar::One<Real>,         C_out.data(),
                         static_cast<Real>(add_to), P_out.data(),
                         AMB_DIM * AMB_DIM
@@ -786,7 +782,7 @@ namespace Repulsor
                 }
                 case (AMB_DIM + 1) * AMB_DIM:
                 {
-                    C_to_P.template Dot<(AMB_DIM + 1) * AMB_DIM>(
+                    ClusterToPrimitiveMatrix().template Dot<(AMB_DIM + 1) * AMB_DIM>(
                         Scalar::One<Real>,         C_out.data(),
                         static_cast<Real>(add_to), P_out.data(),
                         (AMB_DIM + 1) * AMB_DIM
@@ -795,7 +791,7 @@ namespace Repulsor
                 }
                 case FAR_DIM:
                 {
-                    C_to_P.template Dot<FAR_DIM>(
+                    ClusterToPrimitiveMatrix().template Dot<FAR_DIM>(
                         Scalar::One<Real>,         C_out.data(),
                         static_cast<Real>(add_to), P_out.data(),
                         FAR_DIM
@@ -804,7 +800,7 @@ namespace Repulsor
                 }
                 default:
                 {
-                    C_to_P.template Dot<0>(
+                    ClusterToPrimitiveMatrix().template Dot<0>(
                         Scalar::One<Real>,         C_out.data(),
                         static_cast<Real>(add_to), P_out.data(),
                         buffer_dim

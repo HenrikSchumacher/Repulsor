@@ -1,6 +1,6 @@
 public:
 
-    virtual cref<Tensor1<Int,Int>> NestedDissectionOrdering() const override
+    virtual cref<Tensor1<Int,Int>> NestedDissectionOrdering( const Int local_thread_count = 1 ) const override
     {
         std::string tag ("NestedDissectionOrdering");
         
@@ -12,7 +12,6 @@ public:
             
             // Single-threaded is actually faster here.
             // TODO: Maybe this is just because of the mutex?
-            constexpr Int local_thread_count = 1;
             
             const Int m = VertexCount();
             const Int n = SimplexCount();
@@ -68,6 +67,8 @@ public:
                 v.SetZero();
                 
                 debug_print("Compute indicators.");
+                
+//                ptic("Compute indicators");
                 ParallelDo(
                     [&]( const Int k )
                     {
@@ -97,8 +98,8 @@ public:
                     },
                     static_cast<Int>(queue_0.size()), local_thread_count
                 );
-                    
-
+//                ptoc("Compute indicators");
+                
                 Adj.template Dot_<2>(
                     Scalar::One <Real>, v.data(), 2,
                     Scalar::Zero<Real>, w.data(), 2,
@@ -106,6 +107,7 @@ public:
                 );
 
                 debug_print("Compute types.");
+//                ptic("Compute types");
                 ParallelDo(
                     [&]( const Int i )
                     {
@@ -119,8 +121,10 @@ public:
                     },
                     m, ThreadCount()
                 );
+//                ptoc("Compute types");
                 
                 debug_print("Modify permutation.");
+//                ptic("Modify permutation");
                 ParallelDo(
                     [&]( const Int k )
                     {
@@ -183,7 +187,8 @@ public:
                     },
                     static_cast<Int>(queue_0.size()), local_thread_count
                 );
-            
+//                ptoc("Modify permutation");
+                
                 debug_print("Swapping.");
                 
                 std::swap( queue_0, queue_1 );
@@ -195,9 +200,7 @@ public:
                 ++level;
             }
             
-            this->SetPersistentCache( tag,
-               std::any( std::move(perm_0) )
-            );
+            this->SetPersistentCache( tag, std::any( std::move(perm_0) ) );
             
             ptoc(ClassName()+"::"+tag);
         }

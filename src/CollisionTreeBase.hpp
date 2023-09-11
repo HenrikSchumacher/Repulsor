@@ -1,11 +1,9 @@
 #pragma once
 
-#define CLASS CollisionTreeBase
-
 namespace Repulsor
 {
     template<typename Real, typename Int, typename SReal, typename ExtReal>
-    class CLASS
+    class CollisionTreeBase
     {
         ASSERT_FLOAT(Real   );
         ASSERT_INT  (Int    );
@@ -18,9 +16,9 @@ namespace Repulsor
         
         using CollisionMatrix_T = SparseMatrixCSR<SReal,Int,Int>;
         
-        CLASS () {}
+        CollisionTreeBase () {}
         
-        virtual ~CLASS() = default;
+        virtual ~CollisionTreeBase() = default;
         
     protected:
         
@@ -51,11 +49,9 @@ namespace Repulsor
         
         virtual std::string ClassName() const
         {
-            return TO_STD_STRING(CLASS) + "<"+TypeName<Real>+","+TypeName<Int>+","+TypeName<LInt>+","+TypeName<SReal>+","+TypeName<ExtReal>+">";
+            return TO_STD_STRING(CollisionTreeBase) + "<"+TypeName<Real>+","+TypeName<Int>+","+TypeName<LInt>+","+TypeName<SReal>+","+TypeName<ExtReal>+">";
         }
 
-    }; // CLASS
+    }; // CollisionTreeBase
     
 } // namespace Repulsor
-
-#undef CLASS

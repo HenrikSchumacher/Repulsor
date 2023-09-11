@@ -21,6 +21,9 @@
 
     #include "src/Enums.hpp"
     #include "src/Settings.hpp"
+
+//    #include "src/SpaceFillingCurve.hpp"
+
     //#include "src/MultipoleMoments.hpp"
     #include "src/SimplexHierarchy.hpp"
     #include "src/ClusterTree.hpp"
