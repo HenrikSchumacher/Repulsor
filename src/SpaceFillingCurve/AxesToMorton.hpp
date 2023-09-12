@@ -67,16 +67,10 @@ public:
             }
         }
         
-//        dump(M);
-        
-        constexpr BitField_T mask (~UInt(0));
+        constexpr BitField_T mask ( ~UInt(0) );
         
         for( Int i = 0; i < n; ++i )
         {
             m[n-1-i] = static_cast<UInt>( ( M >> (bit_count * i) & mask ).to_ullong() );
         }
-        
-//        dump(static_cast<Int>(m[0]));
-//        dump(static_cast<Int>(m[1]));
-//        dump(static_cast<Int>(m[2]));
     }
