@@ -1,6 +1,5 @@
 #pragma once
 
-#include "BoundingVolumeHierarchy/Cluster.hpp"
 #include "BoundingVolumeHierarchy/Settings.hpp"
 #include "BoundingVolumeHierarchy/BoundingVolumeHierarchyBase.hpp"
 
@@ -23,13 +22,12 @@ namespace Repulsor
         using SReal   = SReal_;
         using ExtReal = ExtReal_;
         using LInt    = LInt_;
+
+        static constexpr Int AMB_DIM = AMB_DIM_;
         
         using Base_T               = BoundingVolumeHierarchyBase<Real,Int,LInt,SReal,ExtReal>;
         
-        using SparseMatrix_T       = typename Base_T::SparseMatrix_T;
         using SparseBinaryMatrix_T = typename Base_T::SparseBinaryMatrix_T;
-        
-        static constexpr Int AMB_DIM = AMB_DIM_;
         
         using Cluster_T         = Cluster<Int>;
         
@@ -44,7 +42,51 @@ namespace Repulsor
         using Base_T::ClusterCount;
         using Base_T::LeafClusterCount;
         
-    protected:
+    private:
+        
+        template<typename Int>
+        struct Cluster // slim POD container to hold only the data relevant for the construction phase in the tree, before it is serialized
+        {
+            ASSERT_SIGNED_INT(Int);
+            
+        public:
+            
+            Cluster() = default;
+
+            Cluster( Int thread_, Int l_ID_, Int begin_, Int end_, Int depth_ )
+            :   thread(thread_)
+            ,   l_ID(l_ID_)
+            ,   begin(begin_)
+            ,   end(end_)
+            ,   depth(depth_)
+            ,   max_depth(depth_)
+            ,   descendant_count(0)
+            ,   descendant_leaf_count(0)
+            ,   left(nullptr)
+            ,   right(nullptr)
+            {}
+            
+            ~Cluster() = default;
+            
+            const Int thread = -1;               // thread that created this cluster
+            const Int l_ID = -1;                 // local ID of cluster within this thread
+            const Int begin = 0;                 // position of first primitive in cluster relative to array ordering
+            const Int end = 0;                   // position behind last primitive in cluster relative to array ordering
+            const Int depth = 0;                 // depth within the tree -- not absolutely necessary but nice to have for plotting images
+            
+            Int max_depth = 0;              // maximal depth of all descendants of this cluster
+            Int descendant_count = 0;       // number of descendents of cluster, _this cluster included_
+            Int descendant_leaf_count = 0;  // number of leaf descendents of cluster
+            
+            Int g_ID = 0;                   // global ID of cluster
+            Int leafs_before_count = 0;     // number of leafs before cluster
+            
+            Cluster<Int> * left  = nullptr; // left child
+            Cluster<Int> * right = nullptr; // right child
+            
+        }; //Cluster
+        
+    private:
             
         static constexpr Int null = static_cast<Int>(0);
         static constexpr Int one  = static_cast<Int>(1);
@@ -99,24 +141,28 @@ namespace Repulsor
         :   Base_T       ( settings_                )
         ,   P_proto      ( ThreadCount()            )
         ,   C_proto      ( ThreadCount()            )
-        ,   P_serialized ( std::move(P_serialized_) )
-        ,   P_ordering   ( ( P_ordering_.Dimension(0) == P_serialized.Dimension(0) )
-                               ? std::move( P_ordering_ )
-                               : iota<Int,Int>( P_serialized.Dimension(0) )
-            )
 //        ,   Adj          ( std::move(Adj_)          )
         {
             ptic(className()+"()");
             
-            if( P_serialized.Dimension(0) != Adj.RowCount() )
-            {
-                eprint(className()+": Number of primitives does not match size of adjacency matrix.");
-            }
             
-            if( Adj.RowCount() != Adj.RowColCount() )
-            {
-                eprint(className()+": adjacency matrix must be a square matrix.");
-            }
+            P_serialized = std::move(P_serialized_);
+            
+            P_ordering   =  (
+                ( P_ordering_.Dimension(0) == P_serialized.Dimension(0) )
+                ? std::move( P_ordering_ )
+                : iota<Int,Int>( P_serialized.Dimension(0) )
+            );
+            
+//            if( P_serialized.Dimension(0) != Adj.RowCount() )
+//            {
+//                eprint(className()+": Number of primitives does not match size of adjacency matrix.");
+//            }
+//
+//            if( Adj.RowCount() != Adj.RowColCount() )
+//            {
+//                eprint(className()+": adjacency matrix must be a square matrix.");
+//            }
             
             ParallelDo(
                 [&,this]( const Int thread )
@@ -163,10 +209,8 @@ namespace Repulsor
         
         std::vector<std::vector<Cluster_T *>> tree_rows_ptr;
         
-    public:
-        
-#include "BoundingVolumeHierarchy/Split_Thread.hpp"
-#include "BoundingVolumeHierarchy/Serialize_Thread.hpp"
+#include "BoundingVolumeHierarchy/Split.hpp"
+#include "BoundingVolumeHierarchy/Serialize.hpp"
         
     private:
         
@@ -191,10 +235,8 @@ namespace Repulsor
             
             
             ptic(className()+"::ComputeClusters: Initial bounding volume of root node");
-            
             C_proto[thread]->SetPointer( C_thread_serialized.data(thread), 0 );
             C_proto[thread]->FromPrimitives( *P_proto[thread], P_serialized.data(), 0, PrimitiveCount(), ThreadCount() );
-            
             ptoc(className()+"::ComputeClusters: Initial bounding volume of root node");
             
             
@@ -227,116 +269,6 @@ namespace Repulsor
         const Primitive_T & PrimitivePrototype() const
         {
             return *P_proto[0];
-        }
-      
-    protected:
-        
-        void ComputePrimitiveToClusterMatrix()
-        {
-            ptic(className()+"::ComputePrimitiveToClusterMatrix");
-            
-            SparseBinaryMatrix_T P_to_C (
-                ClusterCount(), PrimitiveCount(), PrimitiveCount(), ThreadCount() );
-            
-            SparseBinaryMatrix_T C_to_P SparseBinaryMatrix_T(
-                PrimitiveCount(), ClusterCount(), PrimitiveCount(), ThreadCount() );
-            
-            C_to_P.Outer()[PrimitiveCount()] = PrimitiveCount();
-            
-            {
-                mptr<Int> inner__ = C_to_P.Inner().data();
-                
-                ParallelDo(
-                    [=,this]( const Int i )
-                    {
-                        const Int leaf  = leaf_clusters[i];
-                        const Int begin = C_begin[leaf];
-                        const Int end   = C_end  [leaf];
-
-                        for( Int k = begin; k < end; ++k )
-                        {
-                            inner__[k] = leaf;
-                        }
-                    },
-                    LeafClusterCount(), ThreadCount()
-                );
-            }
-            
-            {
-                mptr<LInt> i = C_to_P.Outer().data();
-                mptr< Int> j = P_to_C.Inner().data();
-                
-                const Int primitive_count = PrimitiveCount();
-                
-                for( Int k = 0; k < primitive_count; ++k )
-                {
-                    i[k] = k;
-                    j[k] = k;
-                }
-            }
-            
-            {
-                Int cluster_count = ClusterCount();
-                
-                mptr<LInt> outer__ = P_to_C.Outer().data();
-                cptr< Int> left__  = C_left.data();
-                cptr< Int> begin__ = C_begin.data();
-                cptr< Int> end__   = C_end.data();
-                
-                for ( Int C = 0; C < cluster_count; ++C )
-                {
-                    outer__[C+1] =
-                        outer__[C]
-                        +
-                        static_cast<LInt>(left__[C] < 0)
-                        *
-                        static_cast<LInt>(end__[C] - begin__[C]);
-                }
-            }
-            
-            this->SetCache(
-                std::string("PrimitiveToCluster"),
-                std::any( std::move( P_to_C ) )
-            );
-            
-            this->SetCache(
-                std::string("ClusterToPrimitiveMatrix"),
-                std::any( std::move( C_to_P ) )
-            );
-            
-            ptoc(className()+"::ComputePrimitiveToCluster");
-        }
-        
-    public:
-        
-        
-//        cref<SparseBinaryMatrix_T> PrimitiveAdjacencyMatrix() const
-//        {
-//            return Adj;
-//        }
-        
-        cref<SparseBinaryMatrix_T> ClusterToPrimitiveMatrix() const
-        {
-            std::string tag ("ClusterToPrimitiveMatrix");
-            
-            if( !this->InCacheQ(tag))
-            {
-                ComputePrimitiveToClusterMatrix();
-            }
-            
-            return std::any_cast<cref<SparseBinaryMatrix_T>>( this->GetCache(tag) );
-        }
-        
-        cref<SparseBinaryMatrix_T> PrimitiveToClusterMatrix() const
-        {
-            std::string tag ("PrimitiveToClusterMatrix");
-            
-            if( !this->InCacheQ(tag))
-            {
-                ComputePrimitiveToClusterMatrix();
-            }
-            
-            return std::any_cast<cref<SparseBinaryMatrix_T>>( this->GetCache(tag) );
         }
 
     public:

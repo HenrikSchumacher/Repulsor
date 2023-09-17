@@ -197,11 +197,116 @@ namespace Repulsor
             return P_serialized;
         }
   
-//        cref<SparseBinaryMatrix_T> PrimitiveAdjacencyMatrix() const = 0;
+    protected:
         
-        cref<SparseBinaryMatrix_T> ClusterToPrimitiveMatrix() const = 0;
+        void ComputePrimitiveToClusterMatrix()
+        {
+            ptic(className()+"::ComputePrimitiveToClusterMatrix");
+            
+            SparseBinaryMatrix_T P_to_C (
+                ClusterCount(), PrimitiveCount(), PrimitiveCount(), ThreadCount() );
+            
+            SparseBinaryMatrix_T C_to_P (
+                PrimitiveCount(), ClusterCount(), PrimitiveCount(), ThreadCount() );
+            
+            C_to_P.Outer()[PrimitiveCount()] = PrimitiveCount();
+            
+            {
+                mptr<Int> inner__ = C_to_P.Inner().data();
+                
+                ParallelDo(
+                    [=,this]( const Int i )
+                    {
+                        const Int leaf  = leaf_clusters[i];
+                        const Int begin = C_begin[leaf];
+                        const Int end   = C_end  [leaf];
+
+                        for( Int k = begin; k < end; ++k )
+                        {
+                            inner__[k] = leaf;
+                        }
+                    },
+                    LeafClusterCount(), ThreadCount()
+                );
+            }
+            
+            {
+                mptr<LInt> i = C_to_P.Outer().data();
+                mptr< Int> j = P_to_C.Inner().data();
+                
+                const Int primitive_count = PrimitiveCount();
+                
+                for( Int k = 0; k < primitive_count; ++k )
+                {
+                    i[k] = k;
+                    j[k] = k;
+                }
+            }
+            
+            {
+                Int cluster_count = ClusterCount();
+                
+                mptr<LInt> outer__ = P_to_C.Outer().data();
+                cptr< Int> left__  = C_left.data();
+                cptr< Int> begin__ = C_begin.data();
+                cptr< Int> end__   = C_end.data();
+                
+                for ( Int C = 0; C < cluster_count; ++C )
+                {
+                    outer__[C+1] =
+                        outer__[C]
+                        +
+                        static_cast<LInt>(left__[C] < 0)
+                        *
+                        static_cast<LInt>(end__[C] - begin__[C]);
+                }
+            }
+            
+            this->SetCache(
+                std::string("PrimitiveToCluster"),
+                std::any( std::move( P_to_C ) )
+            );
+            
+            this->SetCache(
+                std::string("ClusterToPrimitiveMatrix"),
+                std::any( std::move( C_to_P ) )
+            );
+            
+            ptoc(className()+"::ComputePrimitiveToCluster");
+        }
         
-        cref<SparseBinaryMatrix_T> PrimitiveToClusterMatrix() const = 0;
+    public:
+        
+        
+    //        cref<SparseBinaryMatrix_T> PrimitiveAdjacencyMatrix() const
+    //        {
+    //            return Adj;
+    //        }
+        
+        cref<SparseBinaryMatrix_T> ClusterToPrimitiveMatrix() const
+        {
+            std::string tag ("ClusterToPrimitiveMatrix");
+            
+            if( !this->InCacheQ(tag))
+            {
+                ComputePrimitiveToClusterMatrix();
+            }
+            
+            return std::any_cast<cref<SparseBinaryMatrix_T>>( this->GetCache(tag) );
+        }
+        
+        cref<SparseBinaryMatrix_T> PrimitiveToClusterMatrix() const
+        {
+            std::string tag ("PrimitiveToClusterMatrix");
+            
+            if( !this->InCacheQ(tag))
+            {
+                ComputePrimitiveToClusterMatrix();
+            }
+            
+            return std::any_cast<cref<SparseBinaryMatrix_T>>( this->GetCache(tag) );
+        }
+      
         
 //################################################################################################
 //##        General reports
