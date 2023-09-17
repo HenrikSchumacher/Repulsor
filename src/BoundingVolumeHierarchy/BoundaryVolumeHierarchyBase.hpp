@@ -196,33 +196,12 @@ namespace Repulsor
         {
             return P_serialized;
         }
+  
+//        cref<SparseBinaryMatrix_T> PrimitiveAdjacencyMatrix() const = 0;
         
-//#############################################################################################
-//##        Neighbors
-//#############################################################################################
+        cref<SparseBinaryMatrix_T> ClusterToPrimitiveMatrix() const = 0;
         
-        
-    public:
-        
-        cref<SparseBinaryMatrix_T> PrimitiveAdjacencyMatrix() const
-        {
-            std::string tag ("PrimitiveAdjacencyMatrix");
-            if( !InPersistentCacheQ(tag))
-            {
-                ptic(ClassName()+"::" + tag );
-                // We compute product of S->lo_pre and  S->lo_post because it is basically the primitive-primitive adjacency matrix, we two primitives are supposed to be adjacencent if they share a common degree of freedom.
-//
-                SparseBinaryMatrix_T P_adjacency_matrix = lo_pre.DotBinary(lo_post);
-
-                ptoc(ClassName()+"::" + tag );
-                
-                this->SetPersistentCache(tag, std::any( std::move(P_adjacency_matrix) ) );
-            }
-            
-            return std::any_cast<const SparseBinaryMatrix_T & >(this->GetPersistentCache(tag));
-        }
-        
-        
+        cref<SparseBinaryMatrix_T> PrimitiveToClusterMatrix() const = 0;
         
 //################################################################################################
 //##        General reports
@@ -231,6 +210,7 @@ namespace Repulsor
         virtual std::string Stats() const = 0;
         
     private:
+        
         std::string className() const
         {
             return std::string("BoundingVolumeHierarchyBase<")+TypeName<Real>+","+TypeName<Int>+","+TypeName<LInt>+","+TypeName<SReal>+","+TypeName<ExtReal>+">";

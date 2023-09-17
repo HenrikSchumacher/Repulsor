@@ -242,7 +242,6 @@ namespace Repulsor
             
             // Request some temporary memory for threads.
             
-            //        P_ordering         = iota<Int>   ( PrimitiveCount() );
             P_inverse_ordering = Tensor1<Int,Int>( PrimitiveCount() );
             
             // Padding every row to prevent false sharing.

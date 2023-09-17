@@ -1,10 +1,18 @@
 #pragma once
 
-#include "BoundingVolumeHierarchy/Node.hpp"
+#include "BoundingVolumeHierarchy/Cluster.hpp"
+#include "BoundingVolumeHierarchy/Settings.hpp"
 #include "BoundingVolumeHierarchy/BoundingVolumeHierarchyBase.hpp"
 
 namespace Repulsor
 {
+    
+    // A very general BVH.
+    // Using PolytopeBases as primitive.
+    // - The number of vertices in the polytope is expected to be the same for all primitives,
+    //   but need not be known at compile time.
+    // Using arbitrary descendants of BoundingVolumeBase as bounding volume.
+    
     template<int AMB_DIM_, typename Real_, typename Int_, typename LInt_, typename SReal_, typename ExtReal_>
     class BoundingVolumeHierarchy : public BoundingVolumeHierarchyBase<Real_,Int_,LInt_,SReal_,ExtReal_>
     {
@@ -25,20 +33,8 @@ namespace Repulsor
         
         using Cluster_T         = Cluster<Int>;
         
-        using       Primitive_T =       PolytopeBase<AMB_DIM,GJK_Real,Int,SReal>;
-        using MovingPrimitive_T = MovingPolytopeBase<AMB_DIM,GJK_Real,Int,SReal>;
-        
-        using BoundingVolume_T  = AABB<AMB_DIM,GJK_Real,Int,SReal>;
-        
-        
-        using DataContainer_T   = typename Base_T::DataContainer_T;
-        using BufferContainer_T = typename Base_T::BufferContainer_T;
-        
-        // In principle, ThreadTensor3<Real,Int> should have better scaling on multiple socket machines, because I tried to encourages that the thread-local arrays are allocated on local RAM. -- On my tiny Quad Core however, it performs a bit _WORSE_ than Tensor3<Real,Int>.
-        using DerivativeContainer_T = typename Base_T::DerivativeContainer_T;
-        
-        static constexpr Int  FAR_DIM = 1 + AMB_DIM + (AMB_DIM * (AMB_DIM + 1)) / 2;
-        static constexpr Int NEAR_DIM = 1 + AMB_DIM + (AMB_DIM * (AMB_DIM + 1)) / 2;
+        using Primitive_T       = PolytopeBase<AMB_DIM,GJK_Real,Int,SReal>;
+        using BoundingVolume_T  = BoundingVolumeBase<AMB_DIM,GJK_Real,Int,SReal>;
         
     public:
         
@@ -47,7 +43,6 @@ namespace Repulsor
         using Base_T::PrimitiveCount;
         using Base_T::ClusterCount;
         using Base_T::LeafClusterCount;
-        //        using Base_T::RequireClusterMoments;
         
     protected:
             
@@ -59,16 +54,6 @@ namespace Repulsor
         using Base_T::P_score_buffer;
         using Base_T::P_perm_buffer;
         using Base_T::P_serialized;
-        using Base_T::P_updated_serialized;
-        using Base_T::P_velocities_serialized;
-        using Base_T::P_near;
-        using Base_T::P_D_near;
-        using Base_T::P_far;
-        using Base_T::P_D_far;
-        using Base_T::thread_P_D_near;
-        using Base_T::P_moments;
-        using Base_T::P_in;
-        using Base_T::P_out;
         
         using Base_T::C_begin;
         using Base_T::C_end;
@@ -78,13 +63,7 @@ namespace Repulsor
         using Base_T::C_desc_count;
         using Base_T::C_next;
         using Base_T::C_serialized;
-        using Base_T::C_updated_serialized;
         using Base_T::C_thread_serialized;
-        using Base_T::C_far;
-        using Base_T::thread_C_D_far;
-        using Base_T::C_moments;
-        using Base_T::C_in;
-        using Base_T::C_out;
         
         using Base_T::leaf_clusters;
         using Base_T::leaf_cluster_ptr;
@@ -94,26 +73,15 @@ namespace Repulsor
         using Base_T::depth;
         using Base_T::settings;
         
-        using Base_T::buffer_dim;
-        
-        //        using Base_T::stack_array;
-        //        using Base_T::queue_array;
-        
-        using Base_T::C_to_P;
-        using Base_T::P_to_C;
-        using Base_T::hi_pre;
-        using Base_T::lo_pre;
-        using Base_T::mi_pre;
-        using Base_T::hi_post;
-        using Base_T::lo_post;
-        using Base_T::mi_post;
+//        SparseBinaryMatrix_T Adj;
+        SparseBinaryMatrix_T C_to_P;
+        SparseBinaryMatrix_T P_to_C;
         
     public:
         
         BoundingVolumeHierarchy()
         :   P_proto (1)
         ,   C_proto (1)
-        ,   P_moving(1)
         {
             ptic(className()+" default constructor");
             ptoc(className()+" default constructor");
@@ -121,29 +89,33 @@ namespace Repulsor
         
         // To allow polymorphism, we require the user to create instances of the desired types for the primitives and the bounding volumes, so that we can Clone() them.
         BoundingVolumeHierarchy(
-            cref<Primitive_T>         P_proto_,
-            cref<Tensor2<SReal,Int>>  P_serialized_,
-            cref<BoundingVolume_T>    C_proto_,
-            cref<Tensor1<Int ,Int>>   P_ordering_,
-            cref<SparseBinaryMatrix_T>      Adj,
+            cref<Primitive_T>             P_proto_,
+            const Tensor2<SReal,Int>   && P_serialized_,
+            cref<BoundingVolume_T>        C_proto_,
+            const Tensor1<Int,Int>     && P_ordering_,     // User may provide a preordering.
+//            const SparseBinaryMatrix_T && Adj_,            // User has to provided adjacency matrix of the primitives.
             cref<BoundingVolumeHierarchySettings> settings_ = BoundingVolumeHierarchySettings()
         )
-        :   Base_T( settings_ )
-        ,   P_proto      ( ThreadCount() )
-        ,   C_proto      ( ThreadCount() )
-        ,   P_moving     ( ThreadCount() )
+        :   Base_T       ( settings_                )
+        ,   P_proto      ( ThreadCount()            )
+        ,   C_proto      ( ThreadCount()            )
+        ,   P_serialized ( std::move(P_serialized_) )
+        ,   P_ordering   ( ( P_ordering_.Dimension(0) == P_serialized.Dimension(0) )
+                               ? std::move( P_ordering_ )
+                               : iota<Int,Int>( P_serialized.Dimension(0) )
+            )
+//        ,   Adj          ( std::move(Adj_)          )
         {
             ptic(className()+"()");
             
-            P_serialized = P_serialized_;   // It's a unneccessary copy, but not too expensive.
-            
-            if( P_ordering_.Dimension(0) == P_serialized.Dimension(0) )
+            if( P_serialized.Dimension(0) != Adj.RowCount() )
             {
-                P_ordering = P_ordering_;
+                eprint(className()+": Number of primitives does not match size of adjacency matrix.");
             }
-            else
+            
+            if( Adj.RowCount() != Adj.RowColCount() )
             {
-                P_ordering = iota<Int,Int>( P_serialized.Dimension(0) );
+                eprint(className()+": adjacency matrix must be a square matrix.");
             }
             
             ParallelDo(
@@ -186,10 +158,8 @@ namespace Repulsor
         
         // Each thread gets its own bounding volume prototype to avoid sharing conflicts.
         std::vector<std::shared_ptr<BoundingVolume_T>> C_proto;
-//        std::vector<std::shared_ptr<BoundingVolume_T>> C_proto_updated;
         // False sharing prevented by alignment of PrimitiveBase.
-        
-//        mutable std::vector<std::shared_ptr<MovingPrimitive_T>> P_moving;
+    
         
         std::vector<std::vector<Cluster_T *>> tree_rows_ptr;
         
@@ -206,7 +176,6 @@ namespace Repulsor
             
             // Request some temporary memory for threads.
             
-            //        P_ordering         = iota<Int>   ( PrimitiveCount() );
             P_inverse_ordering = Tensor1<Int,Int>( PrimitiveCount() );
             
             // Padding every row to prevent false sharing.
@@ -266,16 +235,16 @@ namespace Repulsor
         {
             ptic(className()+"::ComputePrimitiveToClusterMatrix");
             
-            P_to_C = SparseBinaryMatrix_T(
+            SparseBinaryMatrix_T P_to_C (
                 ClusterCount(), PrimitiveCount(), PrimitiveCount(), ThreadCount() );
             
-            C_to_P = SparseBinaryMatrix_T(
+            SparseBinaryMatrix_T C_to_P SparseBinaryMatrix_T(
                 PrimitiveCount(), ClusterCount(), PrimitiveCount(), ThreadCount() );
             
-            ClusterToPrimitiveMatrix().Outer()[PrimitiveCount()] = PrimitiveCount();
+            C_to_P.Outer()[PrimitiveCount()] = PrimitiveCount();
             
             {
-                mptr<Int> inner__ = ClusterToPrimitiveMatrix().Inner().data();
+                mptr<Int> inner__ = C_to_P.Inner().data();
                 
                 ParallelDo(
                     [=,this]( const Int i )
@@ -294,7 +263,7 @@ namespace Repulsor
             }
             
             {
-                mptr<LInt> i = ClusterToPrimitiveMatrix().Outer().data();
+                mptr<LInt> i = C_to_P.Outer().data();
                 mptr< Int> j = P_to_C.Inner().data();
                 
                 const Int primitive_count = PrimitiveCount();
@@ -325,9 +294,51 @@ namespace Repulsor
                 }
             }
             
-            ptoc(className()+"::ComputePrimitiveToClusterMatrix");
+            this->SetCache(
+                std::string("PrimitiveToCluster"),
+                std::any( std::move( P_to_C ) )
+            );
+            
+            this->SetCache(
+                std::string("ClusterToPrimitiveMatrix"),
+                std::any( std::move( C_to_P ) )
+            );
+            
+            ptoc(className()+"::ComputePrimitiveToCluster");
         }
         
+    public:
+        
+        
+//        cref<SparseBinaryMatrix_T> PrimitiveAdjacencyMatrix() const
+//        {
+//            return Adj;
+//        }
+        
+        cref<SparseBinaryMatrix_T> ClusterToPrimitiveMatrix() const
+        {
+            std::string tag ("ClusterToPrimitiveMatrix");
+            
+            if( !this->InCacheQ(tag))
+            {
+                ComputePrimitiveToClusterMatrix();
+            }
+            
+            return std::any_cast<cref<SparseBinaryMatrix_T>>( this->GetCache(tag) );
+        }
+        
+        cref<SparseBinaryMatrix_T> PrimitiveToClusterMatrix() const
+        {
+            std::string tag ("PrimitiveToClusterMatrix");
+            
+            if( !this->InCacheQ(tag))
+            {
+                ComputePrimitiveToClusterMatrix();
+            }
+            
+            return std::any_cast<cref<SparseBinaryMatrix_T>>( this->GetCache(tag) );
+        }
+
     public:
         
         

@@ -13,7 +13,7 @@ namespace Repulsor
 //        TreePercolationAlgorithm tree_perc_alg = TreePercolationAlgorithm::Sequential;
         TreePercolationAlgorithm tree_perc_alg = TreePercolationAlgorithm::Parallel;
 
-        BoundingVolumeType bounding_volume_type = BoundingVolumeType::AABB;
+        BoundingVolumeType bounding_volume_type = BoundingVolumeType::AABB_LongestAxisSplit;
         
     }; // ClusterTreeSettings
     

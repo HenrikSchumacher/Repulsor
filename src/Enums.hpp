@@ -4,7 +4,7 @@ namespace Repulsor
 {
     enum class BoundingVolumeType
     {
-        AABB,
+//        AABB,
         AABB_LongestAxisSplit,
         AABB_MedianSplit,
         AABB_PreorderedSplit
