@@ -138,35 +138,16 @@ namespace Repulsor
         {
             ptic(className()+"()");
             
-            logprint("A");
-            
             P_serialized = P_serialized_;   // It's a unneccessary copy, but not too expensive.
-            
-            logprint("B");
-            
-            logdump(P_ordering_.Dimension(0))
-            logdump(P_serialized.Dimension(0))
             
             if( P_ordering_.Dimension(0) == P_serialized.Dimension(0) )
             {
-                logprint("B.1");
                 P_ordering = P_ordering_;
             }
             else
             {
-                logprint("B.2");
-//                P_ordering = iota<Int,Int>( P_serialized.Dimension(0) );
-                
-                
-                
-                P_ordering = Tensor1<Int,Int>( P_serialized.Dimension(0) );
-                
-                logprint("B.3");
-                P_ordering.iota();
-                logprint("B.4");
+                P_ordering = iota<Int,Int>( P_serialized.Dimension(0) );
             }
-            
-            logprint("C");
             
             ParallelDo(
                 [&,this]( const Int thread )
@@ -177,8 +158,6 @@ namespace Repulsor
                 },
                 ThreadCount()
             );
-            
-            logprint("D");
             
             this->ComputeClusters();
             
