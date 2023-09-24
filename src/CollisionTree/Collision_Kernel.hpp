@@ -60,7 +60,7 @@ namespace Repulsor
         ,   triples     ( other.triples     )
         {}
         
-        friend void swap( mref<Collision_Kernel> X, mref<Collision_Kernel> Y)
+        friend void swap( Collision_Kernel & X, Collision_Kernel & Y)
         {
             // see https://stackoverflow.com/questions/5695548/public-friend-swap-member-function for details
             using std::swap;

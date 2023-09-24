@@ -71,7 +71,7 @@ namespace Repulsor
         ,   intersection_theta2 ( other.near_theta2             )
         {}
         
-        friend void swap( BlockSplit_Kernel &X, BlockSplit_Kernel &Y )
+        friend void swap( BlockSplit_Kernel & X, BlockSplit_Kernel & Y )
         {
             // see https://stackoverflow.com/questions/5695548/public-friend-swap-member-function for details
             using std::swap;
