@@ -12,10 +12,13 @@
 #define TOOLS_DEBUG 
 
 #define LAPACK_DISABLE_NAN_CHECK
+
+// Use these while on a mac.
 #define ACCELERATE_NEW_LAPACK
 #include <Accelerate/Accelerate.h>
 
 
+// Use these under Windows or Linux, e.g. together OpenBLAS, Intel oneMKL, AMD AOCL-BLAS.
 //#include <cblas.h>
 //#include <lapack.h>
 
@@ -109,7 +112,7 @@ int main(int argc, const char * argv[])
     // Some quite decent settings for 2-dimensional surfaces.
     M.cluster_tree_settings.split_threshold                        =  2;
     M.cluster_tree_settings.thread_count                           =  0; // take as many threads as there are used by SimplicialMesh M
-    M.block_cluster_tree_settings.far_field_separation_parameter   =  0.25;
+    M.block_cluster_tree_settings.far_field_separation_parameter   =  0.25; // the theta from the talks
     M.adaptivity_settings.theta                                    = 10.0;
 
     tic("Creating ClusterTree");
@@ -188,7 +191,7 @@ int main(int argc, const char * argv[])
     toc("tpm.MetricValues(M)");
 
     tic("tpm.MultiplyMetric");
-    tpm.MultiplyMetric(M, alpha, X, beta, Y);
+    tpm.MultiplyMetric(M, alpha, X, beta, Y); // compute Y = alpha * A * x + beta * Y.
     toc("tpm.MultiplyMetric");
 
     tic("tpm.MultiplyMetric");
