@@ -134,7 +134,7 @@ protected:
     
 public:
 
-    virtual std::shared_ptr<Solver_T> H1Solver() const override
+    virtual mref<Solver_T> H1Solver() const override
     {
         std::string tag ("H1Solver");
         if( !this->InCacheQ(tag))
@@ -159,13 +159,13 @@ public:
             ptoc(ClassName()+"::"+tag);
         }
         
-        return std::any_cast<std::shared_ptr<Solver_T>>( this->GetCache(tag) );
+        return *std::any_cast<std::shared_ptr<Solver_T>>( this->GetCache(tag) );
     }
 
-    virtual void H1Solve( cptr<ExtReal> X, mptr<ExtReal> Y, const Int nrhs ) const override
-    {
-        H1Solver()->template Solve<Parallel>( X, Y, nrhs );
-    }
+//    virtual void H1Solve( cptr<ExtReal> X, mptr<ExtReal> Y, const Int nrhs ) const override
+//    {
+//        H1Solver().template Solve<Parallel>( X, Y, nrhs );
+//    }
 
 
 

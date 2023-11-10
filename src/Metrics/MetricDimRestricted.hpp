@@ -84,6 +84,9 @@ namespace Repulsor
         // Actual implementation to be specified by descendants.
         virtual ValueContainer_T compute_metric( cref<Mesh_T> M ) const = 0;
         
+        using Base_T::iter;
+        using Base_T::rel_residuals;
+        
         
     public:
         
@@ -135,6 +138,7 @@ namespace Repulsor
             
             ptoc(ClassName()+"::MultiplyMetric");
         }
+    
         
         
         // Actual implementation to be specified by descendants.
@@ -143,6 +147,105 @@ namespace Repulsor
             const bool VF_flag, const bool NF_flag, const bool FF_flag
         ) const = 0;
 
+        
+    public:
+        
+        virtual void MultiplyPreconditioner(
+            cref<MeshBase_T> M, cptr<ExtReal> X, mptr<ExtReal> Y, const Int rhs_count
+        ) const override
+        {
+            // Do a down cast and delegate implementation further to descendant class.
+            const Mesh_T * Q = dynamic_cast<const Mesh_T *>(&M);
+                        
+            if( Q != nullptr )
+            {
+                MultiplyPreconditioner(*Q, X, Y, rhs_count );
+            }
+            else
+            {
+                eprint(ClassName()+"::MultiplyPreconditioner: Input could not be downcast to compatible type. Doing nothing.");
+            }
+        }
+
+        
+        void MultiplyPreconditioner(
+            cref<Mesh_T> M, cptr<ExtReal> X, mptr<ExtReal> Y, const Int rhs_count
+        ) const
+        {
+            ptic(ClassName()+"::MultiplyPreconditioner");
+
+            multiply_preconditioner(M, X, Y, rhs_count );
+            
+            ptoc(ClassName()+"::MultiplyPreconditioner");
+        }
+        
+        
+        virtual void multiply_preconditioner(
+            cref<Mesh_T> M, cptr<ExtReal> X, mptr<ExtReal> Y, const Int rhs_count
+        ) const = 0;
+        
+        
+        virtual void Solve(
+            cref<MeshBase_T> M, cptr<ExtReal> B, mptr<ExtReal> X, const Int  rhs_count,
+            const Int  max_iter,
+            const Real tolerance
+        ) const override
+        {
+            // Do a down cast and delegate implementation further to descendant class.
+            const Mesh_T * Q = dynamic_cast<const Mesh_T *>(&M);
+                        
+            if( Q != nullptr )
+            {
+                Solve(*Q, B, X, rhs_count, max_iter, tolerance );
+            }
+            else
+            {
+                eprint(ClassName()+"::Solve: Input could not be downcast to compatible type. Doing nothing.");
+            }
+        }
+        
+        void Solve(
+            cref<Mesh_T> M, cptr<ExtReal> B, mptr<ExtReal> X, const Int rhs_count,
+            const Int  max_iter,
+            const Real tolerance
+        ) const
+        {
+            ptic(ClassName()+"::Solve");
+            // The operator for the metric.
+            auto A = [&M,rhs_count,this]( cptr<ExtReal> X_, mptr<ExtReal> Y_ )
+            {
+                // Forward operator.
+                MultiplyMetric( M, Scalar::One<ExtReal>, X_, Scalar::Zero<ExtReal>, Y_, rhs_count );
+            };
+
+            // The operator for the preconditioner.
+            auto P = [&M,rhs_count,this]( cptr<ExtReal> X_, mptr<ExtReal> Y_ )
+            {
+                MultiplyPreconditioner( M, X_, Y_, rhs_count );
+            };
+            
+            
+            if( rhs_count == AMB_DIM )
+            {
+                ConjugateGradient<AMB_DIM,ExtReal,Int> CG ( M.VertexCount(), max_iter, rhs_count, M.ThreadCount() );
+                
+                CG( A, P, B, rhs_count, X, rhs_count, tolerance );
+                
+                iter          = CG.IterationCount();
+                rel_residuals = CG.RelativeResiduals();
+            }
+            else
+            {
+                ConjugateGradient<VarSize,ExtReal,Int> CG ( M.VertexCount(), max_iter, rhs_count, M.ThreadCount() );
+                CG( A, P, B, rhs_count, X, rhs_count, tolerance );
+                
+                iter          = CG.IterationCount();
+                rel_residuals = CG.RelativeResiduals();
+            }
+            
+            ptoc(ClassName()+"::Solve");
+        }
+        
     public:
         
         static std::string className()

@@ -122,17 +122,15 @@ namespace Repulsor
         
         virtual cref<SparseMatrix_T> H1Metric() const = 0;
         
-//        virtual std::shared_ptr<Sparse::CholeskyDecomposition<Real,Int,LInt> H1Solver() const = 0;
-        
         virtual cref<SparseMatrix_T> StiffnessMatrix() const = 0;
         
         virtual cref<SparseMatrix_T> MassMatrix() const = 0;
         
         virtual cref<Tensor1<Int,Int>> NestedDissectionOrdering( const Int local_thread_count = 1 ) const = 0;
         
-        virtual void H1Solve( cptr<ExtReal> X, mptr<ExtReal> Y, const Int nrhs ) const = 0;
+//        virtual void H1Solve( cptr<ExtReal> X, mptr<ExtReal> Y, const Int nrhs ) const = 0;
         
-        virtual std::shared_ptr<Sparse::CholeskyDecomposition<Real,Int,LInt>> H1Solver() const = 0;
+        virtual mref<Sparse::CholeskyDecomposition<Real,Int,LInt>> H1Solver() const = 0;
         
 //#######################################################################################
 //      Obstacle

@@ -72,18 +72,18 @@ public:
             // Order such that shortest edges are collapsed first.
             sort( collapses.Get_1().data(), collapses.Get_0().data(), collapses.Size() );
 
-            print(className()+"::UnifyEdgeLengths: iteration "+ToString(iter)+":");
+//            print(className()+"::UnifyEdgeLengths: iteration "+ToString(iter)+":");
             
             collapse_count = CollapseEdges( collapses.Get_0().data(), collapses.Size() );
             total_collapse_count += collapse_count;
-            valprint("  collapse_count",collapse_count);
+//            valprint("  collapse_count",collapse_count);
             
             // Order such that longest edges are split first.
             reverse_sort( splits.Get_1().data(), splits.Get_0().data(), splits.Size() );
 
             split_count = SplitEdges( splits.Get_0().data(), splits.Size() );
             total_split_count += split_count;
-            valprint("  split_count   ",split_count);
+//            valprint("  split_count   ",split_count);
             
             ++iter;
         }
@@ -93,10 +93,10 @@ public:
             wprint(className()+"::UnifyEdgeLengths: "+ToString(collapses.Size())+" short edges could not be collapsed.");
         }
                    
-       if( splits.Size() > 0 )
-       {
+        if( splits.Size() > 0 )
+        {
            wprint(className()+"::UnifyEdgeLengths: "+ToString(splits.Size())+" long  edges could not be split.");
-       }
+        }
 
         ptoc(className()+"::UnifyEdgeLengths");
 

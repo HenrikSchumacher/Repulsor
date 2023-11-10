@@ -18,9 +18,9 @@
 
 #include "../Repulsor.hpp"
 #include "../submodules/Tensors/MyBLAS.hpp"
-#include "../submodules/Tensors/Sparse.hpp"
-#include "../submodules/Tensors/ConjugateGradient.hpp"
-#include "../submodules/Tensors/GMRES.hpp"
+//#include "../submodules/Tensors/Sparse.hpp"
+//#include "../submodules/Tensors/ConjugateGradient.hpp"
+//#include "../submodules/Tensors/GMRES.hpp"
 
 using namespace Repulsor;
 using namespace Tensors;
@@ -68,39 +68,37 @@ int main(int argc, const char * argv[])
     using MeshBase_T = SimplicialMeshBase<Real,Int,LInt,SReal,ExtReal>;
     using Mesh_T     = SimplicialMesh<2,3,Real,Int,LInt,SReal,ExtReal>;
 
-    const Real q = 6;
-    const Real p = 12;
-    
-    const Real s = (p - 2) / q;
-    
     SimplicialMesh_Factory<MeshBase_T,2,2,3,3> mesh_factory;
-    
-    TangentPointEnergy0<Mesh_T>       tpe        (q,p);
-    TangentPointMetric0<Mesh_T>       tpm        (q,p);
-    PseudoLaplacian    <Mesh_T,false> pseudo_lap (2-s);
     
     tic("Initializing mesh");
     std::unique_ptr<MeshBase_T> M_ptr = mesh_factory.Make_FromFile( path + name, thread_count );
     
     auto & M = *M_ptr;
-
-    dump(M.ThreadCount());
-
-    toc("Initializing mesh");
-
+    
     // Some quite decent settings for 2-dimensional surfaces.
     M.cluster_tree_settings.split_threshold                        =  2;
     M.cluster_tree_settings.thread_count                           =  0; // take as many threads as there are used by SimplicialMesh M
     M.block_cluster_tree_settings.far_field_separation_parameter   =  0.25;
     M.adaptivity_settings.theta                                    = 10.0;
+    
+
+    dump(M.ThreadCount());
+
+    toc("Initializing mesh");
+    
+    const Real q = 6;
+    const Real p = 12;
+    
+    TangentPointEnergy0<Mesh_T> tpe (q,p);
+    TangentPointMetric0<Mesh_T> tpm (q,p);
 
     
     tic("Creating ClusterTree");
-    M.GetClusterTree();           // Not necessary. Will automatically called by al routines that require it.
+    M.GetClusterTree();           // Not necessary. Will automatically called by all routines that require it.
     toc("Creating ClusterTree");
 
     tic("Creating BlockClusterTree");
-    M.GetBlockClusterTree();      // Not necessary. Will automatically called by al routines that require it.
+    M.GetBlockClusterTree();      // Not necessary. Will automatically called by all routines that require it.
     toc("Creating BlockClusterTree");
 
     print("");
@@ -108,9 +106,9 @@ int main(int argc, const char * argv[])
     
     double en;
 
-    tic("tpe.Energy(M)");
+    tic("tpe.Energy");
     en = tpe.Value(M);
-    toc("tpe.Energy(M)");
+    toc("tpe.Energy");
 
     dump(en);
 
@@ -119,85 +117,43 @@ int main(int argc, const char * argv[])
 
     
     
-    constexpr Int NRHS = 3 * 1;
+    constexpr Int NRHS = 3;
     
-    Tensor2<ExtReal,Int> B_buffer  ( M.VertexCount(), NRHS );
-    Tensor2<ExtReal,Int> X_buffer  ( M.VertexCount(), NRHS );
-    Tensor2<ExtReal,Int> Y_buffer  ( M.VertexCount(), NRHS );
-    Tensor2<ExtReal,Int> Z_buffer  ( M.VertexCount(), NRHS );
+    Tensor2<ExtReal,Int> B  ( M.VertexCount(), NRHS );
+    Tensor2<ExtReal,Int> X  ( M.VertexCount(), NRHS );
+    Tensor2<ExtReal,Int> Y  ( M.VertexCount(), NRHS );
     
-    mptr<ExtReal> B  = B_buffer.data();
-    mptr<ExtReal> X  = X_buffer.data();
-    mptr<ExtReal> Y  = Y_buffer.data();
-//    mptr<Real> Z  = Z_buffer.data();
-    
-    tic("tpe.Differential(M)");
-    tpe.Differential(M, B );
-    toc("tpe.Differential(M)");
+//    X.Read(B.data());
 
+    X.SetZero();
+    
+    tic("tpe.Differential");
+    tpe.Differential( M, B.data() );
+    toc("tpe.Differential");
+    
+    
+    tpm.MultiplyMetric( M, 1., B.data(), 0, Y.data(), NRHS );
+    
     print("");
     
-    // The operator for the metric.
-    auto A = [&]( cptr<ExtReal> X, mptr<ExtReal> Y )
-    {
-        //Y = alpha * A * X + beta * Y
-        tpm.MultiplyMetric( M, Scalar::One<ExtReal>, X, Scalar::Zero<ExtReal>, Y, NRHS );
-    };
+    const Int  max_iter  = 100;
+    const Real tolerance = 0.00001;
+    
+    tic("Solving for gradient");
+    tpm.Solve(M, B.data(), X.data(), NRHS, max_iter, tolerance );
+    toc("Solving for gradient");
+    
+    dump(tpm.CG_IterationCount());
+    dump(tpm.CG_RelativeResiduals());
+    
+    tpm.MultiplyMetric( M, 1., X.data(), 0, Y.data(), NRHS );
 
-    // The operator for the preconditioner.
-    auto P = [&]( cptr<ExtReal> X, mptr<ExtReal> Y )
-    {
-        M.H1Solve( X, Y, NRHS );
-        pseudo_lap.MultiplyMetric( M, Scalar::One<Real>, Y, Scalar::Zero<Real>, Y, NRHS );
-        M.H1Solve( Y, Y, NRHS );
-    };
-
-    print("");
     
-    tic("P (first)");
-    P(B,X);
-    toc("P (first)");
+    dump(B.MaxNorm());
     
-    tic("A (first)");
-    A(X,Y);
-    toc("A (first)");
+    Y-=B;
     
-    print("");
-    
-    tic("P (second)");
-    P(B,X);
-    toc("P (second)");
-    
-    tic("A (second)");
-    A(X,Y);
-    toc("A (second)");
-    
-    print("");
-    
-    const Int max_iter = 100;
-    
-    ConjugateGradient<NRHS,ExtReal,Int> CG ( M.VertexCount(), max_iter, thread_count );
-    
-    tic("CG");
-    CG( A, P, B, NRHS, X, NRHS, 0.0001 );
-    toc("CG");
-    
-    print("");
-    
-    dump(CG.IterationCount());
-    dump(CG.RelativeResiduals());
-    
-    
-    tic("CG");
-    CG( A, P, B, NRHS, X, NRHS, 0.0001 );
-    toc("CG");
-    
-    print("");
-    
-    dump(CG.IterationCount());
-    dump(CG.RelativeResiduals());
-    
-    print("");
+    dump(Y.MaxNorm());
     
     return 0;
 }

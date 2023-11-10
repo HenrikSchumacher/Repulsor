@@ -21,6 +21,9 @@ namespace Repulsor
         
     protected:
         
+        mutable Int iter = 0;
+        mutable ConjugateGradient<VarSize,Real,Int>::RealVector_T rel_residuals;
+        
     public:
         
         virtual mref<ValueContainer_T> MetricValues( cref<MeshBase_T> M ) const = 0;
@@ -47,21 +50,35 @@ namespace Repulsor
             this->MultiplyMetric( M, alpha, X.data(), beta, Y.data(), X.Dimension(1), VF_flag, NF_flag, FF_flag );
         }
         
-//        virtual void MultiplyPreconditioner(
-//            cref<MeshBase_T> restrict M,
-//            cref<ExtReal> alpha, cptr<ExtReal> X,
-//            cref<ExtReal> beta,  mptr<ExtReal> Y,
-//            const Int  rhs_count
-//        ) const = 0;
-//
-//        virtual void SolveMetric(
-//            cref<MeshBase_T> M,
-//            cref<ExtReal> alpha, cptr<ExtReal> X,
-//            cref<ExtReal> beta,  mptr<ExtReal> Y,
-//            const Int  rhs_count,
-//            const Int  max_iter,
-//            const Real tolerance
-//        ) const = 0;
+        virtual void MultiplyPreconditioner(
+            cref<MeshBase_T> M, cptr<ExtReal> X, mptr<ExtReal> Y, const Int rhs_count
+        ) const = 0;
+
+        virtual void Solve(
+            cref<MeshBase_T> M, cptr<ExtReal> B, mptr<ExtReal> X, const Int  rhs_count,
+            const Int  max_iter,
+            const Real tolerance
+        ) const = 0;
+        
+    
+        ExtReal FrobeniusNorm( cref<MeshBase_T> M, cptr<ExtReal> X, const Int rhs_count ) const
+        {
+            Tensor2<ExtReal,Int> Y ( M.VertexCount(), rhs_count );
+            
+            MultiplyMetric(M, Scalar::One<ExtReal>, X, Scalar::Zero<ExtReal>, Y.data(), rhs_count );
+            
+            return Sqrt( dot_buffers( X, Y.data(), M.VertexCount() * rhs_count, M.ThreadCount() ) );
+        }
+        
+        Int CG_IterationCount() const
+        {
+            return iter;
+        }
+        
+        ConjugateGradient<VarSize,Real,Int>::RealVector_T CG_RelativeResiduals() const
+        {
+            return rel_residuals;
+        }
         
     public:
 

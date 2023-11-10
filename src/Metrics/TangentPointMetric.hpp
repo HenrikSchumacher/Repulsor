@@ -27,9 +27,11 @@ namespace Repulsor
         using BASE::MetricValues;
         
         CLASS( const Real q_, const Real p_ )
-        :   BASE ()
-        ,   q    ( static_cast<Real>(q_) )
-        ,   p    ( static_cast<Real>(p_) )
+        :   BASE       (                             )
+        ,   q          ( static_cast<Real>(q_)       )
+        ,   p          ( static_cast<Real>(p_)       )
+        ,   s          ( (p - Scalar::Two<Real>) / q )
+        ,   pseudo_lap ( Scalar::Two<Real> - s       )
         {}
         
         virtual ~CLASS() = default;
@@ -38,6 +40,9 @@ namespace Repulsor
         
         const Real q;
         const Real p;
+        const Real s;
+        
+        const PseudoLaplacian<Mesh_T,false> pseudo_lap;
         
     public:
         
@@ -62,6 +67,18 @@ namespace Repulsor
                 traversor ( M.GetBlockClusterTree(), MetricValues(M), q, p );
             
             (void)traversor.MultiplyMetric(VF_flag,NF_flag,FF_flag);
+        }
+        
+        using BASE::MultiplyMetric;
+        
+        void multiply_preconditioner(
+            cref<Mesh_T> M, cptr<ExtReal> X, mptr<ExtReal> Y, const Int rhs_count
+        ) const override
+        {
+            // TODO: Once the solver works better, make these calls Parallel.
+            M.H1Solver().template Solve<Sequential>( X, Y, rhs_count );
+            pseudo_lap.MultiplyMetric( M, Scalar::One<Real>, Y, Scalar::Zero<Real>, Y, rhs_count );
+            M.H1Solver().template Solve<Sequential>( Y, Y, rhs_count );
         }
         
     public:

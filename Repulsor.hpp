@@ -9,6 +9,7 @@
 
     #include "submodules/Tensors/Tensors.hpp"
     #include "submodules/Tensors/Sparse.hpp"
+    #include "submodules/Tensors/ConjugateGradient.hpp"
     #include "submodules/GJK/GJK.hpp"
 
     namespace Repulsor {

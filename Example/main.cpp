@@ -301,29 +301,11 @@ int main(int argc, const char * argv[])
     
     print("");
     print("");
-    
-    // A = M.StiffnessMatrix() + M.MassMatrix()
-    auto A = M.H1Metric();
-    
-    auto perm = M.NestedDissectionOrdering();
-    
-//    print( perm.ToString() );
-    
-    Sparse::CholeskyDecomposition<Real,Int,LInt> S (
-        A.Outer().data(), A.Inner().data(), perm.data(), A.RowCount(), A.ThreadCount()
-    );
-
-    S.SymbolicFactorization();
-
-    S.NumericFactorization( A.Values().data(), Scalar::Zero<Real> );
-    
-
-//    print( S.GetPermutation().GetPermutation().ToString() );
 
     Tensor1<Real,Int> b ( M.VertexCount(), 1 );
     Tensor1<Real,Int> x ( M.VertexCount(), 0 );
 
-    S.Solve( b.data(), x.data() );
+    M.H1Solver().Solve( b.data(), x.data() );
     
     
     return 0;
