@@ -55,6 +55,8 @@ namespace Repulsor
         Separated
     };
     
+    // TODO: This works well for AMB_DIM = 2 and AMB_DIM = 3. But AMB_DIM >= 4 seems to be problematic.
+    
     template<int AMB_DIM, typename Real_, typename Int_>
     class alignas(ObjectAlignment) GJK
     {
