@@ -10,15 +10,18 @@
     #include "submodules/Tensors/Tensors.hpp"
     #include "submodules/Tensors/Sparse.hpp"
     #include "submodules/Tensors/ConjugateGradient.hpp"
-    #include "submodules/GJK/GJK.hpp"
 
     namespace Repulsor {
         
         using namespace Tools;
         using namespace Tensors;
-        using namespace GJK;
         
+        using GJK_Real = double;
     }
+
+//    #include "src/GJK.hpp"
+    #include "src/GJK_Old.hpp"
+    #include "src/CollisionFinder.hpp"
 
     #include "src/Enums.hpp"
     #include "src/Settings.hpp"

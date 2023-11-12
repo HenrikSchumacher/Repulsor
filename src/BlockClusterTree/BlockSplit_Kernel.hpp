@@ -118,7 +118,9 @@ namespace Repulsor
         std::shared_ptr<typename ClusterTree_T::Primitive_T>      S_P_proto;
         std::shared_ptr<typename ClusterTree_T::Primitive_T>      T_P_proto;
         
-        GJK_Algorithm<ClusterTree_T::AMB_DIM,GJK_Real,Int> G;
+//        GJK_Algorithm<ClusterTree_T::AMB_DIM,GJK_Real,Int> G;
+        
+        GJK<ClusterTree_T::AMB_DIM,GJK_Real,Int> G;
         
         mptr<SReal> S_C_serialized = nullptr;
         mptr<SReal> T_C_serialized = nullptr;
@@ -197,22 +199,11 @@ namespace Repulsor
         
         force_inline void ComputeLeaf()
         {
-//            _tic();
-            
             const bool neighbor_found = A.NonzeroPositionQ(P_i,P_j);
-
-//            time_FindNonzeroPosition += _toc();
-//
-//
-//            _tic();
             
             const bool admissableQ = neighbor_found || G.MultipoleAcceptanceCriterion(
                     *S_P_proto, *T_P_proto, near_theta2
             );
-            
-//            time_admissableQ += _toc();
-//
-//            _tic();
             
             if( admissableQ )
             {
@@ -233,28 +224,15 @@ namespace Repulsor
                     verynear_idx.Push(P_i,P_j);
                 }
             }
-            
-//            time_ComputeLeaf += _toc();
         }
         
         force_inline void ComputeLeafSwapped()
         {
-//            _tic();
-            
             const bool neighbor_found = A.NonzeroPositionQ(P_i,P_j);
-            
-//            time_FindNonzeroPosition += _toc();
-//
-//            _tic();
             
             const bool admissableQ = neighbor_found || G.MultipoleAcceptanceCriterion(
                 *S_P_proto, *T_P_proto, near_theta2
             );
-            
-//            time_admissableQ += _toc();
-//
-//
-//            _tic();
             
             if( admissableQ )
             {
@@ -263,7 +241,7 @@ namespace Repulsor
             else
             {
                 const bool intersectingQ = (!G.SeparatedQ()) && G.IntersectingQ(
-                    *S_P_proto, *T_P_proto//, intersection_theta2
+                    *S_P_proto, *T_P_proto, intersection_theta2
                 );
                 
                 if( intersectingQ )
@@ -275,8 +253,6 @@ namespace Repulsor
                     verynear_idx.Push(P_j,P_i);
                 }
             }
-            
-//            time_ComputeLeaf += _toc();
         }
         
         force_inline void ComputeAdmissable()

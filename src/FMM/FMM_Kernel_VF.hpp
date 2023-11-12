@@ -50,7 +50,8 @@ namespace Repulsor
         using S_Tree_T = SimplexHierarchy<S_DOM_DIM,AMB_DIM,GJK_Real,Int,SReal>;
         using T_Tree_T = SimplexHierarchy<T_DOM_DIM,AMB_DIM,GJK_Real,Int,SReal>;
         
-        using GJK_T    = GJK_Algorithm<AMB_DIM,GJK_Real,Int>;
+//        using GJK_T    = GJK_Algorithm<AMB_DIM,GJK_Real,Int>;
+        using GJK_T    = GJK<AMB_DIM,GJK_Real,Int>;
         
     protected:
         

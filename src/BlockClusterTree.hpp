@@ -37,7 +37,8 @@ namespace Repulsor
         using Primitive_T       = typename ClusterTree_T::Primitive_T;
         using BoundingVolume_T  = typename ClusterTree_T::BoundingVolume_T;
         
-        using GJK_T             = GJK_Algorithm<AMB_DIM,GJK_Real,Int>;
+//        using GJK_T             = GJK_Algorithm<AMB_DIM,GJK_Real,Int>;
+        using GJK_T             = GJK<AMB_DIM,GJK_Real,Int>;
     
         using BlockClusterTreeBase_T::AmbDim;
         using BlockClusterTreeBase_T::ThreadCount;
