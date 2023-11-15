@@ -616,7 +616,7 @@ namespace Repulsor
         {
             separatedQ = false;
             
-            Int iter = static_cast<Int>(0);
+            Int iter = 0;
 
             int in_simplex;
 
@@ -1127,8 +1127,3 @@ namespace Repulsor
     }; // GJK
 
 } // namespace Repulsor
-
-
-
-
-

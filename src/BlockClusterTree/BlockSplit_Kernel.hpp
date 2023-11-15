@@ -193,7 +193,7 @@ namespace Repulsor
             else
             {
                 const bool intersectingQ = (!G.SeparatedQ()) && G.IntersectingQ(
-                    *S_P_proto, *T_P_proto, intersection_theta2
+                    *S_P_proto, *T_P_proto, intersection_theta2, true
                 );
                 
                 if( intersectingQ )
@@ -222,7 +222,7 @@ namespace Repulsor
             else
             {
                 const bool intersectingQ = (!G.SeparatedQ()) && G.IntersectingQ(
-                    *S_P_proto, *T_P_proto, intersection_theta2
+                    *S_P_proto, *T_P_proto, intersection_theta2, true
                 );
                 
                 if( intersectingQ )
