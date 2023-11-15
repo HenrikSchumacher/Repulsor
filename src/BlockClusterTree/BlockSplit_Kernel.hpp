@@ -14,20 +14,14 @@ namespace Repulsor
         using Int           = typename ClusterTree_T::Int;
         using LInt          = typename ClusterTree_T::LInt;
         
-        static constexpr bool reportQ = false;
-        
     public:
         
         BlockSplit_Kernel() = delete;
         
-        ~BlockSplit_Kernel()
-        {
-            PrintStats();
-        }
+        ~BlockSplit_Kernel() = default;
         
         BlockSplit_Kernel(
-            cref<ClusterTree_T> S,
-            cref<ClusterTree_T> T,
+            cref<ClusterTree_T> S, cref<ClusterTree_T> T,
             const Int thread_,
             const Real far_theta2_,
             const Real near_theta2_
@@ -118,8 +112,6 @@ namespace Repulsor
         std::shared_ptr<typename ClusterTree_T::Primitive_T>      S_P_proto;
         std::shared_ptr<typename ClusterTree_T::Primitive_T>      T_P_proto;
         
-//        GJK_Algorithm<ClusterTree_T::AMB_DIM,GJK_Real,Int> G;
-        
         GJK<ClusterTree_T::AMB_DIM,GJK_Real,Int> G;
         
         mptr<SReal> S_C_serialized = nullptr;
@@ -138,13 +130,6 @@ namespace Repulsor
         const Real far_theta2;
         const Real near_theta2;
         const Real intersection_theta2;
-        
-//        Time start;
-//
-//        float time_Cluster = 0;
-//        float time_admissableQ = 0;
-//        float time_FindNonzeroPosition = 0;
-//        float time_ComputeLeaf = 0;
         
     public:
 
@@ -173,11 +158,7 @@ namespace Repulsor
         
         force_inline bool AdmissableQ()
         {
-//            _tic();
-            
             const bool result = G.MultipoleAcceptanceCriterion( *S_C_proto, *T_C_proto, far_theta2 );
-            
-//            time_Cluster += _toc();
             
             return result;
         }
@@ -202,7 +183,7 @@ namespace Repulsor
             const bool neighbor_found = A.NonzeroPositionQ(P_i,P_j);
             
             const bool admissableQ = neighbor_found || G.MultipoleAcceptanceCriterion(
-                    *S_P_proto, *T_P_proto, near_theta2
+                *S_P_proto, *T_P_proto, near_theta2
             );
             
             if( admissableQ )
@@ -263,53 +244,8 @@ namespace Repulsor
         {
             far_idx.Push(C_j,C_i);
         }
-
-        
-    public:
-        
-        
-        void PrintStats()
-        {
-//            if constexpr ( reportQ )
-//            {
-//                std::stringstream s;
-//
-//                s
-//                << "\n"
-//                << "Report for class                    = " << ClassName() << "\n"
-//                << "Thread ID                           = " << thread << "\n"
-//                << "time_Cluster                        = " << time_Cluster << "\n"
-//                << "time_FindNonzeroPosition            = " << time_FindNonzeroPosition << "\n"
-//                << "time_admissableQ                    = " << time_admissableQ << "\n"
-//                << "time_ComputeLeaf                    = " << time_ComputeLeaf << "\n"
-//    //            << "Number of primitive pairs processed = " << primitive_count << "\n"
-//                << std::endl;
-//
-//                logprint(s.str());
-//            }
-        }
         
     private:
-        
-//        void _tic()
-//        {
-//            if constexpr ( reportQ )
-//            {
-//                start = Clock::now();
-//            }
-//        }
-//
-//        float _toc()
-//        {
-//            if constexpr ( reportQ )
-//            {
-//                return Tools::Duration( start, Clock::now() );
-//            }
-//            else
-//            {
-//                return 0;
-//            }
-//        }
       
         static std::string className()
         {

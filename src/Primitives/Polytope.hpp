@@ -151,7 +151,6 @@ namespace Repulsor
         //Computes support vector supp of dir.
         virtual Real MinSupportVector( cptr<Real> dir, mptr<Real> supp ) const override
         {
-//            ptic(ClassName()+"::MinSupportVector");
             // apply dot product with direction to all the points that span the convex hull
             cptr<SReal> A = &this->serialized_data[1 + AMB_DIM];
 
@@ -173,16 +172,12 @@ namespace Repulsor
 
             copy_buffer<AMB_DIM>( &A[ AMB_DIM * pos ], supp );
 
-//            ptoc(ClassName()+"::MinSupportVector");
-            
             return minimum;
         }
         
         //Computes support vector supp of dir.
         virtual Real MaxSupportVector( cptr<Real> dir, mptr<Real> supp ) const override
         {
-//            ptic(ClassName()+"::MaxSupportVector");
-            
             // apply dot product with direction to all the points that span the convex hull
             cptr<SReal> A = &this->serialized_data[1 + AMB_DIM];
 
@@ -203,8 +198,6 @@ namespace Repulsor
             }
 
             copy_buffer<AMB_DIM>( &A[ AMB_DIM * pos ], supp );
-
-//            ptoc(ClassName()+"::MaxSupportVector");
             
             return maximum;
         }
@@ -212,8 +205,6 @@ namespace Repulsor
         // Computes only the values of min/max support function. Usefull to compute bounding boxes.
         virtual void MinMaxSupportValue( cptr<Real> dir, mref<Real> min_val, mref<Real> max_val ) const override
         {
-//            ptic(ClassName()+"::MinMaxSupportValue");
-            
             // apply dot product with direction to all the points that span the convex hull
             cptr<SReal> A = &this->serialized_data[1 + AMB_DIM];
 
@@ -229,8 +220,6 @@ namespace Repulsor
                 min_val = Min( min_val, value );
                 max_val = Max( max_val, value );
             }
-            
-//            ptoc(ClassName()+"::MinMaxSupportValue");
         }
         
         
