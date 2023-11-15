@@ -151,13 +151,13 @@ namespace Repulsor
         force_inline void LoadClusterS( const Int i )
         {
             C_i = i;
-            S_C_proto->Load( S_C_serialized, i );
+            S_C_proto->SetPointer( S_C_serialized, i );
         }
         
         force_inline void LoadClusterT( const Int j )
         {
             C_j = j;
-            T_C_proto->Load(T_C_serialized,j);
+            T_C_proto->SetPointer( T_C_serialized, j );
         }
         
         force_inline void LoadPrimitiveS( const Int i )

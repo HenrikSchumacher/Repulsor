@@ -59,7 +59,56 @@ namespace Repulsor
     public:
         
         virtual Int Split(
-            PrimitiveSerialized<AMB_DIM,Real,Int,SReal> & P,                          // primitive prototype; to be "mapped" over P_serialized, thus not const.
+            mref<PrimitiveSerialized<AMB_DIM,Real,Int,SReal>> P,           // primitive prototype; to be "mapped" over P_serialized, thus not const.
+            mptr<SReal> P_serialized, const Int begin, const Int end,      // which _P_rimitives are in question
+            mptr<Int>   P_ordering,                                        // to keep track of the permutation of the primitives
+            mptr<SReal> C_data,       const Int C_ID,                      // where to get   the bounding volume info for _C_urrent bounding volume
+            mptr<SReal> L_serialized, const Int L_ID,                      // where to store the bounding volume info for _L_eft  child (if successful!)
+            mptr<SReal> R_serialized, const Int R_ID,                      // where to store the bounding volume info for _R_ight child (if successful!)
+            mptr<SReal> score,                                             // some scratch buffer for one scalar per primitive
+            mptr<Int>   perm,                                              // some scratch buffer for one Int per primitive (for storing local permutation)
+            mptr<Int>   inv_perm,                                          // some scratch buffer for one Int per primitive (for storing inverse of local permutation)
+            Int thread_count = 1                                           // how many threads to utilize
+        ) override
+        {
+            return split(
+                  P,P_serialized,begin,end,
+                  P_ordering,
+                  C_data,       C_ID,
+                  L_serialized, L_ID,
+                  R_serialized, R_ID,
+                  score, perm, inv_perm, thread_count
+            );
+        }
+        
+        virtual Int Split(
+            mref<PolytopeBase<AMB_DIM,Real,Int,SReal>> P,                  // primitive prototype; to be "mapped" over P_serialized, thus not const.
+            mptr<SReal> P_serialized, const Int begin, const Int end,      // which _P_rimitives are in question
+            mptr<Int>   P_ordering,                                        // to keep track of the permutation of the primitives
+            mptr<SReal> C_data,       const Int C_ID,                      // where to get   the bounding volume info for _C_urrent bounding volume
+            mptr<SReal> L_serialized, const Int L_ID,                      // where to store the bounding volume info for _L_eft  child (if successful!)
+            mptr<SReal> R_serialized, const Int R_ID,                      // where to store the bounding volume info for _R_ight child (if successful!)
+            mptr<SReal> score,                                             // some scratch buffer for one scalar per primitive
+            mptr<Int>   perm,                                              // some scratch buffer for one Int per primitive (for storing local permutation)
+            mptr<Int>   inv_perm,                                          // some scratch buffer for one Int per primitive (for storing inverse of local permutation)
+            Int thread_count = 1                                           // how many threads to utilize
+        ) override
+        {
+            return split(
+                  P,P_serialized,begin,end,
+                  P_ordering,
+                  C_data,       C_ID,
+                  L_serialized, L_ID,
+                  R_serialized, R_ID,
+                  score, perm, inv_perm, thread_count
+            );
+        }
+        
+    protected:
+        
+        template<typename Primitive_T>
+        Int split(
+            mref<Primitive_T> P,                                         // primitive prototype; to be "mapped" over P_serialized, thus not const.
             mptr<SReal> P_serialized, const Int begin, const Int end,    // which _P_rimitives are in question
             mptr<Int>   P_ordering,                                      // to keep track of the permutation of the primitives
             mptr<SReal> C_data,       const Int C_ID,                    // where to get   the bounding volume info for _C_urrent bounding volume
@@ -68,13 +117,9 @@ namespace Repulsor
             mptr<SReal> score,                                           // some scratch buffer for one scalar per primitive
             mptr<Int>   perm,                                            // some scratch buffer for one Int per primitive (for storing local permutation)
             mptr<Int>   inv_perm,                                        // some scratch buffer for one Int per primitive (for storing inverse of local permutation)
-            Int thread_count = 1                                         // how many threads to utilize
-        ) override
+            Int thread_count                                             // how many threads to utilize
+        )
         {
-//            ptic(ClassName()+"::Split");
-//            valprint("begin",begin);
-//            valprint("end",end);
-            
             Int P_Size = P.Size();
             
             SetPointer( C_data, C_ID );
@@ -157,11 +202,11 @@ namespace Repulsor
             SetPointer( R_serialized, R_ID );
             FromPrimitives( P, P_serialized, split_index, end,           thread_count );
             
-//            ptoc(ClassName()+"::Split");
-            
             return split_index;
             
         } // Split
+        
+    public:
         
         virtual std::string ClassName() const override
         {

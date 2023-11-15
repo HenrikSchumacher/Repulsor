@@ -19,8 +19,8 @@
         using GJK_Real = double;
     }
 
-//    #include "src/GJK.hpp"
-    #include "src/GJK_Old.hpp"
+//    #include "src/GJK_Old.hpp"
+    #include "src/GJK.hpp"
     #include "src/CollisionFinder.hpp"
 
     #include "src/Enums.hpp"

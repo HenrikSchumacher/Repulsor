@@ -3,8 +3,8 @@
 #include "Primitives/PrimitiveBase.hpp"
 #include "Primitives/PrimitiveSerialized.hpp"
 
-//#include "Primitives/ConvexHull.hpp"
-//#include "Primitives/Ellipsoid.hpp"
+#include "Primitives/ConvexHull.hpp"
+#include "Primitives/Ellipsoid.hpp"
 #include "Primitives/MovingPolytopeBase.hpp"
 #include "Primitives/MovingPolytopeExt.hpp"
 #include "Primitives/MovingPolytope.hpp"

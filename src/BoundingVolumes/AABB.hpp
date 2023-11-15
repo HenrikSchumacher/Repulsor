@@ -129,22 +129,19 @@ namespace Repulsor
         // array p is supposed to represent a matrix of size N x AMB_DIM
         void FromPrimitives(
             mref<PolytopeBase<AMB_DIM,Real,Int,SReal>> P,  // primitive prototype
-            mptr<SReal> P_serialized,                // serialized data of primitives
-            const Int begin,                           // which _P_rimitives are in question
-            const Int end,                             // which _P_rimitives are in question
-            Int thread_count = 1                       // how many threads to utilize
+            mptr<SReal> P_serialized,                      // serialized data of primitives
+            const Int begin,                               // which _P_rimitives are in question
+            const Int end,                                 // which _P_rimitives are in question
+            Int thread_count = 1                           // how many threads to utilize
         ) const
         {
-//            ptic(ClassName()+"::FromPrimitives (PolytopeBase)");
+            using Vector_T = std::array<SReal,AMB_DIM>;
             
-            std::array<SReal,AMB_DIM> lower;
-            std::array<SReal,AMB_DIM> upper;
-            
-            for( Int k = 0; k < AMB_DIM; ++k )
-            {
-                lower[k] = Scalar::Max<SReal>;
-                upper[k] = Scalar::Min<SReal>;
-            }
+            Vector_T lower;
+            Vector_T upper;
+         
+            lower.fill( Scalar::Max<SReal> );
+            upper.fill( Scalar::Min<SReal> );
             
             if( thread_count <= 1 )
             {
@@ -156,22 +153,19 @@ namespace Repulsor
             }
             else
             {
-                std::vector<std::array<SReal,AMB_DIM>> thread_lower ( thread_count );
-                std::vector<std::array<SReal,AMB_DIM>> thread_upper ( thread_count );
+                std::vector<Vector_T> thread_lower ( thread_count );
+                std::vector<Vector_T> thread_upper ( thread_count );
                 
                 ParallelDo(
                     [&]( const Int thread )
                     {
                         std::shared_ptr<PolytopeBase<AMB_DIM,Real,Int,SReal>> Q = P.Clone();
                         
-                        std::array<SReal,AMB_DIM> L;
-                        std::array<SReal,AMB_DIM> U;
+                        Vector_T L;
+                        Vector_T U;
                         
-                        for( Int k = 0; k < AMB_DIM; ++k )
-                        {
-                            L[k] = Scalar::Max<SReal>;
-                            U[k] = Scalar::Min<SReal>;
-                        }
+                        L.fill( Scalar::Max<SReal> );
+                        U.fill( Scalar::Min<SReal> );
                         
                         const Int i_begin = begin + JobPointer( end - begin, thread_count, thread    );
                         const Int i_end   = begin + JobPointer( end - begin, thread_count, thread +1 );
@@ -184,8 +178,6 @@ namespace Repulsor
                         
                         thread_lower[thread] = L;
                         thread_upper[thread] = U;
-//                        copy_buffer<AMB_DIM>( &L[0], &thread_lower[thread][0] );
-//                        copy_buffer<AMB_DIM>( &U[0], &thread_upper[thread][0] );
                         
                     },
                     thread_count
@@ -217,31 +209,25 @@ namespace Repulsor
             serialized_data[0] = r2;
             copy_buffer<AMB_DIM>( &lower[0], &serialized_data[1          ] );
             copy_buffer<AMB_DIM>( &upper[0], &serialized_data[1 + AMB_DIM] );
-            
-//            ptoc(ClassName()+"::FromPrimitives (PolytopeBase)");
         }
         
         // array p is supposed to represent a matrix of size N x AMB_DIM
         virtual void FromPrimitives(
-            mref<PrimitiveSerialized<AMB_DIM,Real,Int,SReal>> P,      // primitive prototype
-            mptr<SReal> P_serialized,                  // serialized data of primitives
-            const Int begin,                           // which _P_rimitives are in question
-            const Int end,                             // which _P_rimitives are in question
-            Int thread_count = 1                       // how many threads to utilize
+            mref<PrimitiveSerialized<AMB_DIM,Real,Int,SReal>> P,    // primitive prototype
+            mptr<SReal> P_serialized,                               // serialized data of primitives
+            const Int begin,                                        // which _P_rimitives are in question
+            const Int end,                                          // which _P_rimitives are in question
+            Int thread_count = 1                                    // how many threads to utilize
         ) const override
         {
-//            ptic(ClassName()+"::FromPrimitives (PrimitiveSerialized)");
-
-            std::array<SReal,AMB_DIM> lower;
-            std::array<SReal,AMB_DIM> upper;
+            using Vector_T = std::array<SReal,AMB_DIM>;
             
-            for( Int k = 0; k < AMB_DIM; ++k )
-            {
-                lower[k] = Scalar::Max<SReal>;
-                upper[k] = Scalar::Min<SReal>;
-            }
+            Vector_T lower;
+            Vector_T upper;
 
-
+            lower.fill( Scalar::Max<SReal> );
+            upper.fill( Scalar::Min<SReal> );
+            
             if( thread_count <= 1 )
             {
                 for( Int i = begin; i < end; ++i )
@@ -262,8 +248,8 @@ namespace Repulsor
             }
             else
             {
-                std::vector<std::array<SReal,AMB_DIM>> thread_lower ( thread_count );
-                std::vector<std::array<SReal,AMB_DIM>> thread_upper ( thread_count );
+                std::vector<Vector_T> thread_lower ( thread_count );
+                std::vector<Vector_T> thread_upper ( thread_count );
 
                 ParallelDo(
                     [&]( const Int thread )
@@ -275,14 +261,11 @@ namespace Repulsor
 
                         std::shared_ptr<PrimitiveSerialized<AMB_DIM,Real,Int,SReal>> Q = P.Clone();
 
-                        std::array<SReal,AMB_DIM> L;
-                        std::array<SReal,AMB_DIM> U;
+                        Vector_T L;
+                        Vector_T U;
                         
-                        for( Int k = 0; k < AMB_DIM; ++k )
-                        {
-                            L[k] = Scalar::Max<SReal>;
-                            U[k] = Scalar::Min<SReal>;
-                        }
+                        L.fill( Scalar::Max<SReal> );
+                        U.fill( Scalar::Min<SReal> );
 
                         for( Int i = i_begin; i < i_end; ++i )
                         {
@@ -302,10 +285,6 @@ namespace Repulsor
 
                         thread_lower[thread] = L;
                         thread_upper[thread] = U;
-                        
-//                        copy_buffer<AMB_DIM>( &L[0], &thread_lower[thread][0] );
-//                        copy_buffer<AMB_DIM>( &U[0], &thread_upper[thread][0] );
-
                     },
                     thread_count
                 );
@@ -336,8 +315,6 @@ namespace Repulsor
             serialized_data[0] = r2;
             copy_buffer<AMB_DIM>( &lower[0], &serialized_data[1          ] );
             copy_buffer<AMB_DIM>( &upper[0], &serialized_data[1 + AMB_DIM] );
-            
-//            ptoc(ClassName()+"::FromPrimitives (PrimitiveSerialized)");
         }
         
         
@@ -347,15 +324,15 @@ namespace Repulsor
             cptr<SReal> x = serialized_data + 1;
             cptr<SReal> L = serialized_data + 1 + AMB_DIM;
             
-            Real R1;
             Real R2 = Scalar::Zero<Real>;
             
             for( Int k = 0; k < AMB_DIM; ++k )
             {
-                Real x_k = static_cast<Real>(x[k]);
-                Real L_k = static_cast<Real>(L[k]);
+                const Real x_k = static_cast<Real>(x[k]);
+                const Real L_k = static_cast<Real>(L[k]);
                 
-                R1   = v[k] * L_k;
+                const Real R1  = v[k] * L_k;
+                
                 R2  += v[k] * x_k + Abs(R1);
                 s[k] = x_k + Sign(R1) * L_k;
             }
@@ -370,15 +347,15 @@ namespace Repulsor
             cptr<SReal> x = serialized_data + 1;
             cptr<SReal> L = serialized_data + 1 + AMB_DIM;
             
-            Real R1;
             Real R2 = Scalar::Zero<Real>;
             
             for( Int k = 0; k < AMB_DIM; ++k )
             {
-                Real x_k = static_cast<Real>(x[k]);
-                Real L_k = static_cast<Real>(L[k]);
+                const Real x_k = static_cast<Real>(x[k]);
+                const Real L_k = static_cast<Real>(L[k]);
                 
-                R1   = v[k] * L_k;
+                const Real R1  = v[k] * L_k;
+                
                 R2  += v[k] * x_k - Abs(R1);
                 s[k] = x_k - Sign(R1) * L_k;
             }
@@ -415,7 +392,7 @@ namespace Repulsor
             {
                 Real x = static_cast<Real>(
                     Max(
-                             Scalar::Zero<SReal>,
+                        Scalar::Zero<SReal>,
                         Max( P_x[k]-P_L[k], Q_x[k]-Q_L[k] )
                         -
                         Min( P_x[k]+P_L[k], Q_x[k]+Q_L[k] )

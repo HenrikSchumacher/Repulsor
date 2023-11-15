@@ -419,7 +419,7 @@ namespace Repulsor
             
             for( Int i = 0; i < AMB_DIM; ++i )
             {
-                s[i] = static_cast<Real>(x[i]);
+                supp[i] = static_cast<Real>(x[i]);
             }
             
             for( Int i = 0; i < AMB_DIM; ++i )
@@ -459,13 +459,13 @@ namespace Repulsor
             
             for( Int i = 0; i < AMB_DIM; ++i )
             {
-                s[i] = static_cast<Real>(x[i]);
+                supp[i] = static_cast<Real>(x[i]);
             }
             
             for( Int i = 0; i < AMB_DIM; ++i )
             {
                 // Multiply v with i-th row.
-                R1 = static_cast<Real>(A[AMB_DIM *i]) * v[0];
+                R1 = static_cast<Real>(A[AMB_DIM *i]) * dir[0];
 
                 for( Int j = 1; j < AMB_DIM; ++j )
                 {
@@ -485,7 +485,7 @@ namespace Repulsor
             return R3;
         }
                 
-        virtual void MinMaxSupportValue( cptr<Real> dir, mref<min_val>, mref<Real> max_val ) const override
+        virtual void MinMaxSupportValue( cptr<Real> dir, mref<Real> min_val, mref<Real> max_val ) const override
         {
             min_val = MinSupportVector( dir, &this->Real_buffer[0] );
             max_val = MaxSupportVector( dir, &this->Real_buffer[AMB_DIM] );

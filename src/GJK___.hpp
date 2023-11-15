@@ -1,10 +1,12 @@
 #pragma once
 
+// TODO: Does not seem to work correctly.
+
 #include "Primitives/PrimitiveBase.hpp"
 #include "Primitives/PrimitiveSerialized.hpp"
 
-#include "Primitives/ConvexHull.hpp"
-#include "Primitives/Ellipsoid.hpp"
+//#include "Primitives/ConvexHull.hpp"
+//#include "Primitives/Ellipsoid.hpp"
 #include "Primitives/MovingPolytopeBase.hpp"
 #include "Primitives/MovingPolytopeExt.hpp"
 #include "Primitives/MovingPolytope.hpp"
@@ -55,8 +57,6 @@ namespace Repulsor
         Separated
     };
     
-    // TODO: This works well for AMB_DIM = 2 and AMB_DIM = 3. But AMB_DIM >= 4 seems to be problematic.
-    
     template<int AMB_DIM, typename Real_, typename Int_>
     class alignas(ObjectAlignment) GJK
     {
@@ -68,8 +68,14 @@ namespace Repulsor
         using Int  = Int_;
         using Real = Real_;
         
+        using Vector_T = Tiny::Vector<AMB_DIM  ,Real,Int>;
+        using Lambda_T = Tiny::Vector<AMB_DIM+1,Real,Int>;
+        
+        using IntVec_T = Tiny::Vector<AMB_DIM+1,Int,Int>;
+        
         using PrimitiveBase_T = PrimitiveBase<AMB_DIM,Real,Int>;
         using Op = Tensors::Op;
+        using Flag = Scalar::Flag;
         
         static constexpr Real eps = cSqrt(std::numeric_limits<Real>::epsilon());
         static constexpr Real eps_squared = eps * eps;
@@ -81,28 +87,28 @@ namespace Repulsor
         static constexpr Real zero      = Scalar::Zero<Real>;
         static constexpr Real one       = Scalar::One <Real>;
         
-        Real coords   [AMB_DIM+1][AMB_DIM  ] = {};  //  position of the corners of the simplex; only the first simplex_size rows are defined.
-        Real P_supp   [AMB_DIM+1][AMB_DIM  ] = {};  //  support points of the simplex in primitive P
-        Real Q_supp   [AMB_DIM+1][AMB_DIM  ] = {};  //  support points of the simplex in primitive Q
+        std::array<Vector_T,AMB_DIM+1> coords = {{}};  //  position of the corners of the simplex; only the first simplex_size rows are defined.
+        std::array<Vector_T,AMB_DIM+1> P_supp = {{}};  //  support points of the simplex in primitive P
+        std::array<Vector_T,AMB_DIM+1> Q_supp = {{}};  //  support points of the simplex in primitive Q
 
-        Real dots     [AMB_DIM+1][AMB_DIM+1] = {};  // simplex_size x simplex_size matrix of dots products of  the vectors coords[0],..., coords[simplex_size-1];
-        Real Gram     [AMB_DIM  ][AMB_DIM  ] = {};  // Gram matrix of size = (simplex_size-1) x (simplex_size-1) of frame spanned by the vectors coords[i] - coords[simplex_size-1];
+        Tiny::Matrix<AMB_DIM+1,AMB_DIM+1,Real,Int> dots;  // simplex_size x simplex_size matrix of dots products of  the vectors coords[0],..., coords[simplex_size-1];
+        Tiny::Matrix<AMB_DIM  ,AMB_DIM  ,Real,Int> G   ;  // Gram matrix of size = (simplex_size-1) x (simplex_size-1) of frame spanned by the vectors coords[i] - coords[simplex_size-1];
         
-        Real g        [AMB_DIM  ][AMB_DIM  ] = {}; // The local contiguous gram matrix for facets of size > 3.
-        Real v                   [AMB_DIM  ] = {}; // current direction vector (quite hot)
-        Real p                   [AMB_DIM  ] = {}; // just a buffer for storing current support point of p.
-        Real Lambda              [AMB_DIM+1] = {}; // For the right hand sides of the linear equations to solve in DistanceSubalgorithm.
-        Real best_lambda         [AMB_DIM+1] = {};
-        Real facet_closest_point [AMB_DIM  ] = {};
+        Vector_T v;  // current direction vector (quite hot)
         
-        Int facet_sizes    [FACE_COUNT] = {};
-        Int facet_vertices [FACE_COUNT][AMB_DIM+1] = {};
-        Int facet_faces    [FACE_COUNT][AMB_DIM+1] = {};
-        bool visited       [FACE_COUNT] = {};
+        Lambda_T Lambda;        // For the right hand sides of the linear equations to solve in DistanceSubalgorithm.
+        Lambda_T best_lambda;
         
-        Real dotvv         = std::numeric_limits<Real>::max();
-        Real olddotvv      = std::numeric_limits<Real>::max();
-        Real dotvw         = zero;
+        std::array<Int     ,FACE_COUNT> facet_sizes;
+        std::array<IntVec_T,FACE_COUNT> facet_vertices;
+        std::array<IntVec_T,FACE_COUNT> facet_faces;
+        
+        std::array<bool    ,FACE_COUNT> visited = {};
+        
+        
+        Real vv            = Scalar::Max<Real>;
+        Real oldvv         = Scalar::Max<Real>;
+        Real vw            = zero;
         Real TOL_squared   = zero;
         Real theta_squared = one;
         
@@ -123,12 +129,12 @@ namespace Repulsor
             {
                 Int i = 0;
                 
-                mptr<Int> vertices = &facet_vertices[facet][0];
-                mptr<Int> faces    = &facet_faces   [facet][0];
+                mref<IntVec_T> vertices = facet_vertices[facet];
+                mref<IntVec_T> faces    = facet_faces   [facet];
 
                 for( Int vertex = 0; vertex < AMB_DIM+1; ++vertex )
                 {
-                    if( bit(facet,vertex) )
+                    if( get_bit(facet,vertex) )
                     {
                         vertices[i] = vertex;
                         faces[i] = set_bit_to_zero(facet,vertex);
@@ -150,23 +156,23 @@ namespace Repulsor
 
         GJK( const GJK & other ) : GJK() {};
         
-        GJK( GJK  && other ) : GJK() {};
+        GJK( GJK && other ) : GJK() {};
         
         ~GJK() = default;
         
-        constexpr Int AmbDim() const
+        static constexpr Int AmbDim()
         {
             return AMB_DIM;
         }
         
-        Int Size() const
+        Int SimplexSize() const
         {
             return simplex_size;
         }
         
         Real LeastSquaredDistance() const
         {
-            return dotvv;
+            return vv;
         }
         
         bool SeparatedQ() const
@@ -177,7 +183,7 @@ namespace Repulsor
         template<typename ExtReal>
         void WriteClosestPoint( mptr<ExtReal> vec ) const
         {
-            copy_buffer<AMB_DIM>( &v[0], vec );
+            v.Write(vec);
         }
 
         Int SubCallCount() const
@@ -187,19 +193,25 @@ namespace Repulsor
 
     protected:
         
-        static bool bit( const Int n, const Int k )
-        {
-            return ( (n & (1 << k)) >> k );
-        }
         
-        static  Int set_bit_to_zero( const Int n, const Int k )
+        static Int set_bit_to_zero( const Int n, const Int k )
         {
             return (n ^ (1 << k));
         }
         
+        void Compute_dots()
+        {
+            // update matrix of dot products
+
+            for( Int i = 0; i < simplex_size+1; ++i )
+            {
+                dots[i][simplex_size] = Dot( coords[i], coords[simplex_size] );
+            }
+        }
+        
         int Compute_Gram()
         {
-            // Computes Gram matrix Gram[i][i] = <coords[i] - coords[0], coords[j] - coords[0]>.
+            // Computes Gram matrix G[i][i] = <coords[i] - coords[0], coords[j] - coords[0]>.
             // However, we do that in a convoluted way to save a few flops.
             
             for( Int i = 0; i < simplex_size; ++i )
@@ -209,124 +221,51 @@ namespace Repulsor
 
                 Lambda[i] = R2;
 
-                Gram[i][i] = dots[i][i] + R2 - R1;
+                G[i][i] = dots[i][i] + R2 - R1;
 
                 // This is to guarantee that the current facet has full rank.
-                // If g is not of full rank, then most recently added point (w) was already contained in the old simplex.
+                // If G is not of full rank, then most recently added point (w) was already contained in the old simplex.
                 // (If another point were a problem, then the code below would have aborted already the previous GJK iteration.
-                if( Gram[i][i] <= 0 )
+                if( G[i][i] <= 0 )
                 {
                     return 1;
                 }
 
                 for( Int j = i+1; j < simplex_size; ++j )
                 {
-                    Gram[i][j] = dots[i][j] - dots[j][simplex_size] + R2;
+                    G[i][j] = dots[i][j] - dots[j][simplex_size] + R2;
                 }
             }
-
             return 0;
         }
         
-        
-        template<Int SIMPLEX_SIZE>
         int Push()
         {
-            if constexpr ( SIMPLEX_SIZE < AMB_DIM )
-            {
-                if( SIMPLEX_SIZE < simplex_size )
-                {
-                    return Push<SIMPLEX_SIZE+1>();
-                }
-            }
-            
             // Pushes most recent difference of support points (i.e. w = P_supp[simplex_size] - Q_supp[simplex_size] )
             // into the simplex coords.
 
-            for( Int k = 0; k < AMB_DIM; ++k)
-            {
-                coords[SIMPLEX_SIZE][k] = P_supp[SIMPLEX_SIZE][k] - Q_supp[SIMPLEX_SIZE][k];
-            }
-
-            // update matrix of dot products
-
-            for( Int i = 0; i < SIMPLEX_SIZE+1; ++i )
-            {
-                dots[i][SIMPLEX_SIZE] = coords[i][0] * coords[SIMPLEX_SIZE][0];
-
-                for( Int k = 1; k < AMB_DIM; ++k )
-                {
-                    dots[i][SIMPLEX_SIZE] += coords[i][k] * coords[SIMPLEX_SIZE][k];
-                }
-            }
+            LinearCombine<Flag::Plus,Flag::Minus>(
+                one, P_supp[simplex_size], -one, Q_supp[simplex_size], coords[simplex_size]
+            );
             
-            for( Int i = 0; i < SIMPLEX_SIZE; ++i )
-            {
-                const Real R1 = dots[i][SIMPLEX_SIZE];
-                const Real R2 = dots[SIMPLEX_SIZE][SIMPLEX_SIZE] - R1;
-
-                Lambda[i] = R2;
-
-                Gram[i][i] = dots[i][i] + R2 - R1;
-
-                // This is to guarantee that the current facet has full rank.
-                // If g is not of full rank, then most recently added point (w) was already contained in the old simplex.
-                // (If another point were a problem, then the code below would have aborted already the previous GJK iteration.
-                if( Gram[i][i] <= 0 )
-                {
-                    ++simplex_size;
-                    return 1;
-                }
-
-                for( Int j = i+1; j < SIMPLEX_SIZE; ++j )
-                {
-                    Gram[i][j] = dots[i][j] - dots[j][SIMPLEX_SIZE] + R2;
-                }
-            }
+            Compute_dots();
+            
+            int stat = Compute_Gram();
             
             ++simplex_size;
             
-            return 0;
+            return stat;
         }
 
-        
-        template<Int SIMPLEX_SIZE = 1>
-        void Deflate()
-        {
-            if constexpr ( SIMPLEX_SIZE < AMB_DIM )
-            {
-                if( SIMPLEX_SIZE < simplex_size )
-                {
-                    return Deflate<SIMPLEX_SIZE+1>();
-                }
-            }
-            
-            cptr<Int> vertices = facet_vertices[closest_facet];
-            
-            // Deleting superfluous vertices in simplex and writing everything to the beginning of the array.
-            
-            for( Int i = 0; i < SIMPLEX_SIZE; ++i )
-            {
-                const Int i_i = vertices[i];
-                
-                copy_buffer<AMB_DIM>( &coords[i_i][0], &coords[i][0] );
-                copy_buffer<AMB_DIM>( &Q_supp[i_i][0], &Q_supp[i][0] );
-
-                for( Int j = i; j < SIMPLEX_SIZE; ++j )
-                {
-                    dots[i][j] = dots[i_i][vertices[j]];
-                }
-            }
-        }
         Int PrepareDistanceSubalgorithm()
         {
             // Compute starting facet.
-            Int facet = (static_cast<Int>(1) << simplex_size) - static_cast<Int>(1) ;
+            const Int facet = (static_cast<Int>(1) << simplex_size) - static_cast<Int>(1) ;
             
             closest_facet = facet;
-            olddotvv = dotvv;
+            oldvv = vv;
             
-            dotvv = std::numeric_limits<Real>::max();
+            vv = Scalar::Max<Real>;
             
             // Mark subsimplices of `facet` that do not contain the last vertex of the simplex as visited before starting.
             // Facet itself is marked as unvisited; if `facet` is a reasonable starting facet, it _must_ be visited.
@@ -337,32 +276,27 @@ namespace Repulsor
 
             for( Int i = 0; i < facet; ++i )
             {
-                visited[i] = !bit(i,top_index);
+                visited[i] = !get_bit(i,top_index);
             }
+            
             return facet;
         }
         
-        void HandlePoints(
-            cref<PrimitiveBase_T> P,
-            cref<PrimitiveBase_T> Q
-        )
+        void HandlePoints( const PrimitiveBase_T & P, const PrimitiveBase_T & Q )
         {
             // In the case that both primitives are points, we have to take care that witnesses are computed correctly.
             simplex_size = 1;
             best_lambda[1] = 1;
             
-            P.InteriorPoint(&P_supp[0][0]);
-            Q.InteriorPoint(&Q_supp[0][0]);
+            P.InteriorPoint( &P_supp[0][0] );
+            Q.InteriorPoint( &Q_supp[0][0] );
 
-            dotvv = 0;
             
-            for( Int k = 0; k < AMB_DIM; ++k )
-            {
-                v[k] = P_supp[0][k] - Q_supp[0][k];
-                dotvv += v[k] * v[k];
-            }
+            LinearCombine<Flag::Plus,Flag::Minus>( one, P_supp[0], -one, Q_supp[0], v );
             
-            separatedQ = dotvv > zero;
+            vv = v.SquaredNorm();
+            
+            separatedQ = vv > zero;
         }
         
         // ################################################################
@@ -372,152 +306,120 @@ namespace Repulsor
         template<Int FACET_SIZE>
         void DistanceSubalgorithm( const Int facet, const Int facet_size )
         {
-            if constexpr ( FACET_SIZE <= AMB_DIM )
+            if( FACET_SIZE < facet_size )
             {
-                if( FACET_SIZE < facet_size )
+                if constexpr ( (1 <= FACET_SIZE) && (FACET_SIZE+1 <= AMB_DIM) )
                 {
                     DistanceSubalgorithm<FACET_SIZE+1>( facet, facet_size );
-                    return;
                 }
+                return;
             }
             
             ++sub_calls;
             
-//            const Int facet_size = facet_sizes[facet];
-            cptr<Int> vertices = &facet_vertices[facet][0];
-            cptr<Int> faces    = &facet_faces   [facet][0];
-            
-            Real lambda [AMB_DIM+1] = {}; // The local contiguous version of Lambda for facets of size > 3.
+            cref<IntVec_T> vertices = facet_vertices[facet];
+            cref<IntVec_T> faces    = facet_faces   [facet];
             
             visited[facet] = true;
             
-            bool interior = true;
+            bool interiorQ = true;
             
-            constexpr Int LAST = FACET_SIZE - 1;
-
+            // The local contiguous version of Lambda for facets of size > 1.
+            Lambda_T lambda = {};
             
             // Compute lambdas.
-            
-            if constexpr ( FACET_SIZE == 1 )
+            if constexpr ( FACET_SIZE  == 1 )
             {
+                const Int i_0 = vertices[0];
                 
-                const Int i_last = vertices[LAST];
-                
-                if( dots[i_last][i_last] < dotvv )
+                if( dots[i_0][i_0] < vv )
                 {
                     closest_facet     = facet;
-                    dotvv             = dots[i_last][i_last];
-                    best_lambda[LAST] = one;
+                    vv             = dots[i_0][i_0];
+                    best_lambda[0]    = one;
 
-                    copy_buffer<AMB_DIM>( &coords[i_last][0], &v[0]);
+                    v = coords[i_0];
                 }
-                
                 return;
             }
             else if constexpr ( FACET_SIZE == 2 )
             {
                 // Setting up linear system for the barycenter coordinates lambda.
-
+                
                 // Find first vertex in facet.
                 const Int i_0 = vertices[0];
 
-                lambda[0] = Lambda[i_0] / Gram[i_0][i_0];
+                lambda[0] = Lambda[i_0] / G[i_0][i_0];
                 lambda[1] = one - lambda[0];
 
-                interior = (lambda[0] > eps) && (lambda[1] > eps);
+                interiorQ = (lambda[0] > eps) && (lambda[1] > eps);
             }
             else if constexpr ( FACET_SIZE == 3 )
             {
                 // Setting up linear system for the barycenter coordinates lambda.
-
+                
                 // Find first two vertices in facet.
                 const Int i_0 = vertices[0];
                 const Int i_1 = vertices[1];
 
                 // Using Cramer's rule to solve the linear system.
-                const Real inv_det = one / ( Gram[i_0][i_0] * Gram[i_1][i_1] - Gram[i_0][i_1] * Gram[i_0][i_1] );
+                const Real inv_det = one / ( G[i_0][i_0] * G[i_1][i_1] - G[i_0][i_1] * G[i_0][i_1] );
 
-                lambda[0] = ( Gram[i_1][i_1] * Lambda[i_0] - Gram[i_0][i_1] * Lambda[i_1] ) * inv_det;
-                lambda[1] = ( Gram[i_0][i_0] * Lambda[i_1] - Gram[i_0][i_1] * Lambda[i_0] ) * inv_det;
+                lambda[0] = ( G[i_1][i_1] * Lambda[i_0] - G[i_0][i_1] * Lambda[i_1] ) * inv_det;
+                lambda[1] = ( G[i_0][i_0] * Lambda[i_1] - G[i_0][i_1] * Lambda[i_0] ) * inv_det;
                 lambda[2] = one - lambda[0] - lambda[1];
 
                 // Check the barycentric coordinates for positivity ( and compute the 0-th coordinate).
-                interior = (lambda[0] > eps) && (lambda[1] > eps) && (lambda[2] > eps);
+                interiorQ = (lambda[0] > eps) && (lambda[1] > eps) && (lambda[2] > eps);
             }
-            else
+            else if constexpr ( (3 < FACET_SIZE) && (FACET_SIZE <= AMB_DIM) )
             {
-                // Setting up linear system for the barycenter coordinates lambda.
+                constexpr Int n = FACET_SIZE - 1;
                 
-                for( Int i = 0; i < LAST; ++i )
+                Tiny::SelfAdjointMatrix<n,Real,Int> A;
+                
+                Tiny::Vector<n,Real,Int> mu;
+                
+                for( Int i = 0; i < n; ++i )
                 {
                     const Int i_i = vertices[i];
                     
-                    lambda[i] = Lambda[i_i];
+                    mu[i] = Lambda[i_i];
                     
-                    g[i][i] = Gram[i_i][i_i];
+                    A[i][i] = G[i_i][i_i];
                     
-                    for( Int j = i+1; j < LAST; ++j )
+                    for( Int j = i+1; j < n; ++j )
                     {
-                        Int j_j = vertices[j];
-                        g[j][i] = g[i][j] = Gram[i_i][j_j];
+                        const Int j_j = vertices[j];
+                        
+                        A[i][j] = G[i_i][j_j];
                     }
                 }
+
+                // Linear solve.
                 
-                // Cholesky decomposition
-                for( Int k = 0; k < LAST; ++k )
-                {
-                    const Real a = g[k][k] = Sqrt(g[k][k]);
-                    const Real ainv = one/a;
-
-                    for( Int j = k+1; j < LAST; ++j )
-                    {
-                        g[k][j] *= ainv;
-                    }
-
-                    for( Int i = k+1; i < LAST; ++i )
-                    {
-                        for( Int j = i; j < LAST; ++j )
-                        {
-                            g[i][j] -= g[k][i] * g[k][j];
-                        }
-                    }
-                }
-
-                // Lower triangular back substitution
-                for( Int i = 0; i < LAST; ++i )
-                {
-                    for( Int j = 0; j < i; ++j )
-                    {
-                        lambda[i] -= g[j][i] * lambda[j];
-                    }
-                    lambda[i] /= g[i][i];
-                }
-
-                // Upper triangular back substitution
-                for( Int i = LAST; i --> 0; )
-                {
-                    for( Int j = i+1; j < LAST; ++j )
-                    {
-                        lambda[i] -= g[i][j] * lambda[j];
-                    }
-                    lambda[i] /= g[i][i];
-                }
+                A.Cholesky();
+                
+                A.CholeskySolve(mu);
                 
                 // Check the barycentric coordinates for positivity ( and compute the 0-th coordinate).
-
-                lambda[LAST] = one;
                 
-                for( Int k = 0; k < LAST; ++k)
+                Real mu_n = one;
+                
+                for( Int k = 0; k < n; ++k )
                 {
-                    lambda[LAST] -= lambda[k];
-                    interior = interior && ( lambda[k] > eps );
+                    mu_n -= lambda[k];
+                    interiorQ = interiorQ && ( mu[k] > eps );
                 }
-                interior = interior && (lambda[LAST] > eps );
+                
+                mu.Write( lambda.data() );
+                lambda[n] = mu_n;
+                
+                interiorQ = interiorQ && (mu_n > eps );
             }
             
-            // If we arrive here, then facet_size > 1.
-            
-            if( interior )
+            // If we arrive here, then FACET_SIZE > 1.
+            if( interiorQ )
             {
                 // If the nearest point on `facet` lies in the interior, there is no point in searching its faces;
                 // we simply mark them as visited.
@@ -527,43 +429,43 @@ namespace Repulsor
                     visited[ faces[j] ] = true;
                 }
                 
-                Real facet_squared_dist = zero;
+                // Computing closest point z on facet.
                 
-                // Computing facet_closest_point.
-                for( Int k = 0; k < AMB_DIM; ++k )
+                Vector_T z = {};
+                
+                for( Int j = 0; j < facet_size; ++j )
                 {
-                    Real x = lambda[0] * coords[ vertices[0] ][ k ];
-                    
-                    for( Int j = 1; j < FACET_SIZE; ++j )
-                    {
-                        x += lambda[j] * coords[ vertices[j] ][ k ];
-                    }
-                    
-                    facet_squared_dist += x * x;
-                    facet_closest_point[k] = x;
+                    axpy( lambda[j], coords[ vertices[j] ], z );
                 }
                 
-                if( facet_squared_dist < dotvv )
+                const Real zz = z.SquaredNorm();
+                
+                if( zz < vv )
                 {
                     closest_facet = facet;
-                    dotvv = facet_squared_dist;
-                    copy_buffer<AMB_DIM>  ( &facet_closest_point[0], &v[0]           );
-                    copy_buffer<AMB_DIM+1>( &lambda[0],              &best_lambda[0] );
+                    vv         = zz;
+                    v             = z;
+                    best_lambda   = lambda;
                 }
             }
             else
             {
-                // Try to visit all faces of `facet`.
+                // We have to visit all faces of `facet` and lock for the minimizer there.
                 for( Int j = 0; j < FACET_SIZE; ++j )
                 {
                     const Int face = faces[j];
                     
                     if( !visited[face] )
                     {
-                        // We may ignore the error code of DistanceSubalgorithm because the faces of the simplex should be nondegenerate if we arrive here.
-                        if constexpr ( FACET_SIZE > 1 )
+                        if constexpr ( FACET_SIZE - 1 >= 1 )
                         {
-                            DistanceSubalgorithm<FACET_SIZE-1>( face, facet_sizes[face] );
+                            if( (FACET_SIZE - 1) != facet_sizes[face] )
+                            {
+                                eprint("!!!");
+                            }
+                            
+                            DistanceSubalgorithm<FACET_SIZE - 1>( face, FACET_SIZE - 1 );
+                            
                         }
                     }
                 }
@@ -606,8 +508,8 @@ namespace Repulsor
         
         //Compute(P, Q, true, reuse_direction_, zero, theta_squared_ );
         void Compute(
-            cref<PrimitiveBase_T> P,
-            cref<PrimitiveBase_T> Q,
+            const PrimitiveBase_T & P,
+            const PrimitiveBase_T & Q,
             const bool collision_only  = false,
             const bool reuse_direction = false,
             const Real TOL_squared_    = zero,
@@ -616,7 +518,7 @@ namespace Repulsor
         {
             separatedQ = false;
             
-            Int iter = static_cast<Int>(0);
+            Int iter = 0;
 
             int in_simplex;
 
@@ -657,32 +559,29 @@ namespace Repulsor
                 P.InteriorPoint(&v[0]);
                 Q.InteriorPoint(&Q_supp[0][0]);
                 
-                for( Int k = 0; k < AMB_DIM; ++k )
-                {
-                    v[k] -= Q_supp[0][k];
-                }
+                v -= Q_supp[0];
             }
             
-            olddotvv = dotvv = dot_buffers<AMB_DIM>(v,v);
+            oldvv = vv = v.SquaredNorm();
 
             // Unrolling the first iteration to avoid a call to DistanceSubalgorithm.
             
             // We use w = p-q, but do not define it explicitly.
             Real a = P.MinSupportVector( &v[0], &P_supp[0][0] );
             Real b = Q.MaxSupportVector( &v[0], &Q_supp[0][0] );
-            dotvw  = a-b;
+            vw  = a-b;
             
-            Push<0>();
+            Push();
             
             closest_facet = 1;
-            dotvv = dots[0][0];
+            vv = dots[0][0];
             best_lambda[0] = one;
 
-            copy_buffer<AMB_DIM>( &coords[0][0], v );
+            v = coords[0];
         
             while( true )
             {
-                if( theta_squared * dotvv < TOL_squared )
+                if( theta_squared * vv < TOL_squared )
                 {
                     reason = GJK_Reason::CollisionTolerance;
                     break;
@@ -705,9 +604,9 @@ namespace Repulsor
                 // We use w = p-q, but do not define it explicitly.
                 a = P.MinSupportVector( &v[0], &P_supp[simplex_size][0] );
                 b = Q.MaxSupportVector( &v[0], &Q_supp[simplex_size][0] );
-                dotvw = a-b;
+                vw = a-b;
             
-                if( collision_only && (dotvw > zero) && (theta_squared * dotvw * dotvw > TOL_squared) )
+                if( collision_only && (vw > zero) && (theta_squared * vw * vw > TOL_squared) )
                 {
                     separatedQ = true;
                     reason = GJK_Reason::Separated;
@@ -715,13 +614,13 @@ namespace Repulsor
                 }
                 
                 
-                if( Abs(dotvv - dotvw) <= eps * dotvv )
+                if( Abs(vv - vw) <= eps * vv )
                 {
                     reason = GJK_Reason::SmallResidual;
                     break;
                 }
                 
-                in_simplex = Push<1>();
+                in_simplex = Push();
                 
                 if( in_simplex  )
                 {
@@ -734,29 +633,43 @@ namespace Repulsor
                 
                 Int initial_facet = PrepareDistanceSubalgorithm();
                 
-                // This computes closest_facet, v, and dotvv of the current simplex.
+                // This computes closest_facet, v, and vv of the current simplex.
                 // If the simplex is degenerate, DistanceSubalgorithm terminates early and returns 1. Otherwise it returns 0.
-                DistanceSubalgorithm<2>( initial_facet, facet_sizes[initial_facet] );
+                DistanceSubalgorithm<1>( initial_facet, facet_sizes[initial_facet] );
                 
                 simplex_size = facet_sizes[closest_facet];
                 
-                Deflate();
+                cref<IntVec_T> vertices = facet_vertices[closest_facet];
                 
-                if( Abs(olddotvv - dotvv) <= eps * dotvv )
+                // Deleting superfluous vertices in simplex and writing everything to the beginning of the array.
+                
+                for( Int i = 0; i < simplex_size; ++i )
+                {
+                    const Int i_i = vertices[i];
+                    
+                    coords[i] = coords[i_i];
+                    Q_supp[i] = Q_supp[i_i];
+
+                    for( Int j = i; j < simplex_size; ++j )
+                    {
+                        dots[i][j] = dots[i_i][vertices[j]];
+                    }
+                }
+
+                if( Abs(oldvv - vv) <= eps * vv )
                 {
                     reason = GJK_Reason::SmallProgress;
                     break;
                 }
                 
             } // while( true )
-            
-            separatedQ = separatedQ || ( TOL_squared < theta_squared * dotvv );
+
+            separatedQ = separatedQ || ( TOL_squared < theta_squared * vv );
             
             if( iter >= max_iter)
             {
 //                wprint(ClassName()+"::Compute: Stopped because iter = " + ToString(iter) + " >= " + ToString(max_iter) + " = max_iter iterations reached.");
             }
-            
             
         } // Compute
 
@@ -765,8 +678,8 @@ namespace Repulsor
         // ################################################################
         
         bool IntersectingQ(
-            cref<PrimitiveBase_T> P,
-            cref<PrimitiveBase_T> Q,
+            const PrimitiveBase_T & P,
+            const PrimitiveBase_T & Q,
             const Real theta_squared_ = one,
             const bool reuse_direction_ = false
         )
@@ -786,11 +699,28 @@ namespace Repulsor
             return !separatedQ;
         }
         
+//        bool IntersectingQ(
+//            const PrimitiveBase_T & P,
+//            const PrimitiveBase_T & Q,
+//            const Real theta_squared_
+//        )
+//        {
+//            return IntersectingQ(P,Q,theta_squared_,false);
+//        }
+        
+//        bool IntersectingQ(
+//            const PrimitiveBase_T & P,
+//            const PrimitiveBase_T & Q
+//        )
+//        {
+//            return IntersectingQ(P,Q,one,false);
+//        }
+        
         // Faster overloads for AABBs.
         template<typename SReal>
         bool IntersectingQ(
-            cref<AABB<AMB_DIM,Real,Int,SReal>> P,
-            cref<AABB<AMB_DIM,Real,Int,SReal>> Q,
+            const AABB<AMB_DIM,Real,Int,SReal> & P,
+            const AABB<AMB_DIM,Real,Int,SReal> & Q,
             const Real theta_squared_ = one
         )
         {
@@ -802,22 +732,22 @@ namespace Repulsor
         // ################################################################
         
         Real SquaredDistance(
-            cref<PrimitiveBase_T> P,
-            cref<PrimitiveBase_T> Q,
+            const PrimitiveBase_T & P,
+            const PrimitiveBase_T & Q,
             const bool reuse_direction_ = false
         )
         {
             Compute(P, Q, false, reuse_direction_, zero );
             
-            return dotvv;
+            return vv;
         }
         
         
         // Faster overload for AABBs.
         template<typename SReal>
         Real SquaredDistance(
-            cref<AABB<AMB_DIM,Real,Int,SReal>> P,
-            cref<AABB<AMB_DIM,Real,Int,SReal>> Q
+            const AABB<AMB_DIM,Real,Int,SReal> & P,
+            const AABB<AMB_DIM,Real,Int,SReal> & Q
         )
         {
             return AABB_SquaredDistance(P,Q);
@@ -828,8 +758,8 @@ namespace Repulsor
         // ##########################################################################
         
         Real Witnesses(
-            cref<PrimitiveBase_T> P, mptr<Real> x,
-            cref<PrimitiveBase_T> Q, mptr<Real> y,
+            const PrimitiveBase_T & P, Real * restrict const x,
+            const PrimitiveBase_T & Q, Real * restrict const y,
             const bool reuse_direction_ = false
         )
         {
@@ -840,10 +770,10 @@ namespace Repulsor
             
             Compute(P, Q, false, reuse_direction_, zero );
 
-            for( Int k = 0; k < AMB_DIM; ++k )
-            {
-                y[k] = best_lambda[0] * Q_supp[0][k];
-            }
+            
+            // TODO: Unify?
+            y  = Q_supp[0];
+            y *= best_lambda[0];
             
             switch( simplex_size )
             {
@@ -853,20 +783,14 @@ namespace Repulsor
                 }
                 case 2:
                 {
-                    for( Int k = 0; k < AMB_DIM; ++k )
-                    {
-                        y[k] += best_lambda[1] * Q_supp[1][k];
-                    }
+                    axpy( best_lambda[1], Q_supp[1], y );
                     break;
                 }
                 case 3:
                 {
                     for( Int j = 1; j < 3; ++j )
                     {
-                        for( Int k = 0; k < AMB_DIM; ++k )
-                        {
-                            y[k] += best_lambda[j] * Q_supp[j][k];
-                        }
+                        axpy( best_lambda[j], Q_supp[j], y );
                     }
                     break;
                 }
@@ -874,10 +798,7 @@ namespace Repulsor
                 {
                     for( Int j = 1; j < 4; ++j )
                     {
-                        for( Int k = 0; k < AMB_DIM; ++k )
-                        {
-                            y[k] += best_lambda[j] * Q_supp[j][k];
-                        }
+                        axpy( best_lambda[j], Q_supp[j], y );
                     }
                     break;
                 }
@@ -885,10 +806,7 @@ namespace Repulsor
                 {
                     for( Int j = 1; j < 5; ++j )
                     {
-                        for( Int k = 0; k < AMB_DIM; ++k )
-                        {
-                            y[k] += best_lambda[j] * Q_supp[j][k];
-                        }
+                        axpy( best_lambda[j], Q_supp[j], y );
                     }
                     break;
                 }
@@ -896,20 +814,15 @@ namespace Repulsor
                 {
                     for( Int j = 1; j < simplex_size; ++j )
                     {
-                        for( Int k = 0; k < AMB_DIM; ++k )
-                        {
-                            y[k] += best_lambda[j] * Q_supp[j][k];
-                        }
+                        axpy( best_lambda[j], Q_supp[j], y );
                     }
                 }
             }
             
-            for( Int k = 0; k < AMB_DIM; ++k )
-            {
-                x[k] = y[k] + v[k];
-            }
+            x  = y;
+            x += v;
             
-            return dotvv;
+            return vv;
         } // Witnesses
         
         // ################################################################
@@ -917,8 +830,8 @@ namespace Repulsor
         // ################################################################
         
         bool Offset_IntersectingQ(
-            cref<PrimitiveBase_T> P, const Real P_offset,
-            cref<PrimitiveBase_T> Q, const Real Q_offset,
+            const PrimitiveBase_T & P, const Real P_offset,
+            const PrimitiveBase_T & Q, const Real Q_offset,
             const bool reuse_direction_ = false
         )
         {
@@ -934,8 +847,8 @@ namespace Repulsor
         // ################################################################
         
         Real Offset_SquaredDistance(
-            cref<PrimitiveBase_T> P, const Real P_offset,
-            cref<PrimitiveBase_T> Q, const Real Q_offset,
+            const PrimitiveBase_T & P, const Real P_offset,
+            const PrimitiveBase_T & Q, const Real Q_offset,
             const bool reuse_direction_ = false
         )
         {
@@ -943,7 +856,7 @@ namespace Repulsor
             
             Compute(P, Q, false, reuse_direction_, min_dist * min_dist );
             
-            const Real dist = Ramp( Sqrt(dotvv) - P_offset - Q_offset );
+            const Real dist = Ramp( Sqrt(vv) - P_offset - Q_offset );
             
             return dist * dist;
         }
@@ -953,8 +866,8 @@ namespace Repulsor
         // ##########################################################################
         
         Real Offset_Witnesses(
-            cref<PrimitiveBase_T> P, const Real P_offset, mptr<Real> x,
-            cref<PrimitiveBase_T> Q, const Real Q_offset, mptr<Real> y,
+            const PrimitiveBase_T & P, const Real P_offset, Real * restrict const x,
+            const PrimitiveBase_T & Q, const Real Q_offset, Real * restrict const y,
             const bool reuse_direction_ = false
         )
         {
@@ -969,7 +882,7 @@ namespace Repulsor
             
             Compute(P, Q, false, reuse_direction_, min_dist * min_dist );
             
-            const Real dist0 = Sqrt(dotvv);
+            const Real dist0 = Sqrt(vv);
                   Real dist = dist0 - P_offset - Q_offset;
                   Real x_scale;
                   Real y_scale;
@@ -995,10 +908,7 @@ namespace Repulsor
 
             // Compute y = best_lambda * Q_supp;
             
-            for( Int k = 0; k < AMB_DIM; ++k )
-            {
-                y[k] = y_scale * v[k] + best_lambda[0] * Q_supp[0][k];
-            }
+            LinearCombine( y_scale, v, best_lambda[0], Q_supp[0], y );
             
             switch( simplex_size )
             {
@@ -1008,20 +918,14 @@ namespace Repulsor
                 }
                 case 2:
                 {
-                    for( Int k = 0; k < AMB_DIM; ++k )
-                    {
-                        y[k] += best_lambda[1] * Q_supp[1][k];
-                    }
+                    axpy( best_lambda[1], Q_supp[1], y );
                     break;
                 }
                 case 3:
                 {
                     for( Int j = 1; j < 3; ++j )
                     {
-                        for( Int k = 0; k < AMB_DIM; ++k )
-                        {
-                            y[k] += best_lambda[j] * Q_supp[j][k];
-                        }
+                        axpy( best_lambda[j], Q_supp[j], y );
                     }
                     break;
                 }
@@ -1029,10 +933,7 @@ namespace Repulsor
                 {
                     for( Int j = 1; j < 4; ++j )
                     {
-                        for( Int k = 0; k < AMB_DIM; ++k )
-                        {
-                            y[k] += best_lambda[j] * Q_supp[j][k];
-                        }
+                        axpy( best_lambda[j], Q_supp[j], y );
                     }
                     break;
                 }
@@ -1040,10 +941,7 @@ namespace Repulsor
                 {
                     for( Int j = 1; j < 5; ++j )
                     {
-                        for( Int k = 0; k < AMB_DIM; ++k )
-                        {
-                            y[k] += best_lambda[j] * Q_supp[j][k];
-                        }
+                        axpy( best_lambda[j], Q_supp[j], y );
                     }
                     break;
                 }
@@ -1051,18 +949,13 @@ namespace Repulsor
                 {
                     for( Int j = 1; j < simplex_size; ++j )
                     {
-                        for( Int k = 0; k < AMB_DIM; ++k )
-                        {
-                            y[k] += best_lambda[j] * Q_supp[j][k];
-                        }
+                        axpy( best_lambda[j], Q_supp[j], y );
                     }
                 }
             }
             
-            for( Int k = 0; k < AMB_DIM; ++k )
-            {
-                x[k] = y[k] + x_scale * v[k];
-            }
+
+            LinearCombine<Flag::Plus,Flag::Generic>( one, y, x_scale, v, x );
             
             return dist * dist;
             
@@ -1073,8 +966,8 @@ namespace Repulsor
         // ########################################################################
         
         Real InteriorPoints_SquaredDistance(
-            cref<PrimitiveBase_T> P,
-            cref<PrimitiveBase_T> Q
+            const PrimitiveBase_T & P,
+            const PrimitiveBase_T & Q
         )
         {
             P.InteriorPoint( &coords[0][0] );
@@ -1097,8 +990,8 @@ namespace Repulsor
         // ########################################################################
         
         bool MultipoleAcceptanceCriterion(
-            cref<PrimitiveBase_T> P,
-            cref<PrimitiveBase_T> Q,
+            const PrimitiveBase_T & P,
+            const PrimitiveBase_T & Q,
             const Real theta_squared_,
             const bool reuse_direction_ = false
         )
@@ -1111,8 +1004,8 @@ namespace Repulsor
         // Faster overload for AABBs.
         template<typename SReal>
         bool MultipoleAcceptanceCriterion(
-            cref<AABB<AMB_DIM,Real,Int,SReal>> P,
-            cref<AABB<AMB_DIM,Real,Int,SReal>> Q,
+            const AABB<AMB_DIM,Real,Int,SReal> & P,
+            const AABB<AMB_DIM,Real,Int,SReal> & Q,
             const Real theta_squared_
         )
         {
@@ -1127,8 +1020,6 @@ namespace Repulsor
     }; // GJK
 
 } // namespace Repulsor
-
-
 
 
 

@@ -280,6 +280,8 @@ namespace Repulsor
             
             for( Int thread = 0; thread < thread_count; ++thread )
             {
+                intersection_count += static_cast<Size_T>( kernels[thread].inter_idx.Size() );
+                
                    inter_idx[thread] = std::move( kernels[thread].inter_idx    );
                 verynear_idx[thread] = std::move( kernels[thread].verynear_idx );
                     near_idx[thread] = std::move( kernels[thread].near_idx     );
@@ -293,7 +295,7 @@ namespace Repulsor
                     + "\n"
                 );
                 
-                intersection_count += static_cast<size_t>(inter_idx[thread].Size());
+                
             }
             
             if( intersection_count > 0 )
