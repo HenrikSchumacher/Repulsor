@@ -12,12 +12,17 @@
 #define TOOLS_DEBUG
 
 #define LAPACK_DISABLE_NAN_CHECK
-#define ACCELERATE_NEW_LAPACK
-#include <Accelerate/Accelerate.h>
 
+#ifdef __APPLE__
+    #define ACCELERATE_NEW_LAPACK
+    #include <Accelerate/Accelerate.h>
+#else
+    #include <cblas.h>
+    #include <lapack.h>
 
-//#include <cblas.h>
-//#include <lapack.h>
+//#include <mkl_cblas.h>
+//#include <mkl_lapack.h>
+#endif
 
 #include "../Repulsor.hpp"
 #include "../src/SpaceFillingCurve.hpp"

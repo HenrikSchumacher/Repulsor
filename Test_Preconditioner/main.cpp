@@ -9,18 +9,19 @@
 //#define TOOLS_DEBUG
 
 #define LAPACK_DISABLE_NAN_CHECK
-#define ACCELERATE_NEW_LAPACK
-#include <Accelerate/Accelerate.h>
 
-//#define LAPACK_DISABLE_NAN_CHECK
-//#include <cblas.h>
-//#include <lapack.h>
+#ifdef __APPLE__
+    #define ACCELERATE_NEW_LAPACK
+    #include <Accelerate/Accelerate.h>
+#else
+    #include <cblas.h>
+    #include <lapack.h>
+
+//#include <mkl_cblas.h>
+//#include <mkl_lapack.h>
+#endif
 
 #include "../Repulsor.hpp"
-#include "../submodules/Tensors/MyBLAS.hpp"
-//#include "../submodules/Tensors/Sparse.hpp"
-//#include "../submodules/Tensors/ConjugateGradient.hpp"
-//#include "../submodules/Tensors/GMRES.hpp"
 
 using namespace Repulsor;
 using namespace Tensors;
