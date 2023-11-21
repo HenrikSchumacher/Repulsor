@@ -9,12 +9,12 @@ StringJoin[
 "
 	template<AddTo_T addtoQ> 
 	void ",name,"( 
-		const Tensor2<Real,Int> & restrict V_coords, 
-		const Tensor2<Int ,Int> & restrict simplices, 
-		const Tensor2<Real,Int> & restrict P_D_far,
-		const Tensor1<Real,Int> & restrict V_charges,
+        cref<Tensor2<Real,Int>> V_coords,
+        cref<Tensor2<Int ,Int>> simplices,
+        cref<Tensor2<Real,Int>> P_D_far,
+        cref<Tensor1<Real,Int>> V_charges,
         // cppcheck-suppress [constParameter]
-		      Tensor3<Real,Int> & restrict buffer
+        cref<Tensor3<Real,Int>> buffer
 	) const
     {
         ptic(ClassName()+\"::",name,"\");
@@ -83,12 +83,12 @@ codestringAddTo=StringCases[StringReplace[GenerateCode[CBlock[code1],Indent->5],
 StringJoin["
 	template<AddTo_T addtoQ> 
 	void ",name,"( 
-		const Tensor2<Real,Int> & restrict V_coords, 
-		const Tensor2<Int ,Int> & restrict simplices, 
-		const Tensor2<Real,Int> & restrict P_D_far, 
-		const Tensor1<Real,Int> & restrict V_charges,
+        cref<Tensor2<Real,Int>> V_coords,
+        cref<Tensor2<Int ,Int>> simplices,
+        cref<Tensor2<Real,Int>> P_D_far,
+        cref<Tensor1<Real,Int>> V_charges,
         // cppcheck-suppress [constParameter]
-		      Tensor3<Real,Int> & restrict buffer
+        mref<Tensor3<Real,Int>> buffer
 	) const
     {
         ptic(ClassName()+\"::"<>name<>"\");
@@ -200,12 +200,12 @@ codestringAddTo=StringCases[StringReplace[GenerateCode[CBlock[code1],Indent->5],
 StringJoin["
 	template<AddTo_T addtoQ> 
 	void ",name,"( 
-		const Tensor2<Real,Int> & restrict V_coords, 
-		const Tensor2<Int ,Int> & restrict simplices, 
-		const Tensor2<Real,Int> & restrict P_D_far, 
-		const Tensor1<Real,Int> & restrict V_charges,
+        cref<Tensor2<Real,Int>> V_coords,
+        cref<Tensor2<Int ,Int>> simplices,
+        cref<Tensor2<Real,Int>> P_D_far,
+        cref<Tensor1<Real,Int>> V_charges,
         // cppcheck-suppress [constParameter]
-		      Tensor3<Real,Int> & restrict buffer
+        mref<Tensor3<Real,Int>> buffer
 	) const
     {
         ptic(ClassName()+\"::"<>name<>"\");
@@ -342,12 +342,12 @@ codestringAddTo=StringCases[StringReplace[GenerateCode[CBlock[code1],Indent->5],
 StringJoin["
 	template<AddTo_T addtoQ> 
     void ",name,"( 
-		const Tensor2<Real,Int> & restrict V_coords, 
-		const Tensor2<Int ,Int> & restrict simplices, 
-		const Tensor2<Real,Int> & restrict P_D_far, 
-		const Tensor1<Real,Int> & restrict V_charges,
+        cref<Tensor2<Real,Int>> V_coords,
+        cref<Tensor2<Int ,Int>> simplices,
+        cref<Tensor2<Real,Int>> P_D_far,
+        cref<Tensor1<Real,Int>> V_charges,
         // cppcheck-suppress [constParameter]
-		      Tensor3<Real,Int> & restrict buffer
+        mref<Tensor3<Real,Int>> buffer
 	) const
     {
         ptic(ClassName()+\"::"<>name<>"\");

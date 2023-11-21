@@ -127,7 +127,7 @@ namespace Repulsor
 
                 for( Int j = 0; j < AMB_DIM; ++j )
                 {
-                    const SReal * restrict const vec = covariance + AMB_DIM * j;
+                    cptr<SReal> vec = covariance + AMB_DIM * j;
 
                     SReal x = p[0] * vec[0];
 
