@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../submodules/Tensors/Tensors.hpp"
+
 #include "Primitives/PrimitiveBase.hpp"
 #include "Primitives/PrimitiveSerialized.hpp"
 
