@@ -357,7 +357,9 @@ namespace Repulsor
 
                     if( with_data )
                     {
-                        copy_buffer<VarSize,Sequential>( V_data.data(v), V_data.data(vertex_count), V_data.Dimension(1) );
+                        copy_buffer<VarSize,Sequential>( 
+                            V_data.data(v), V_data.data(vertex_count), V_data.Dimension(1)
+                        );
                     }
                     
 //                    copy_buffer<(AMB_DIM+1)*(AMB_DIM+1)>( V_quadrics.data(v), V_quadrics.data(v_count) );

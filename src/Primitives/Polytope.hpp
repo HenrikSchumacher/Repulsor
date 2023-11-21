@@ -2,12 +2,12 @@
 
 
 #define CLASS Polytope
-#define BASE  PolytopeExt<AMB_DIM,Real,Int,SReal,ExtReal,Int>
+#define BASE  PolytopeExt<AMB_DIM_,Real,Int,SReal,ExtReal,Int>
 
 namespace Repulsor
 {
     
-    template<int POINT_COUNT,int AMB_DIM,typename Real,typename Int,typename SReal,
+    template<int POINT_COUNT, int AMB_DIM_, typename Real ,typename Int, typename SReal,
                 typename ExtReal = SReal,typename ExtInt = Int>
     class CLASS : public BASE
     {
@@ -25,6 +25,8 @@ namespace Repulsor
         
     public:
         
+        static constexpr Int AMB_DIM = AMB_DIM_;
+        
         CLASS() : BASE() {}
         
         // Copy constructor
@@ -37,19 +39,15 @@ namespace Repulsor
         
         static constexpr Int SIZE = 1 + AMB_DIM + POINT_COUNT * AMB_DIM;
         
-        virtual constexpr Int Size() const override
+        virtual Int Size() const override
         {
             return SIZE;
         }
         
-        virtual constexpr Int PointCount() const override
+        virtual Int PointCount() const override
         {
             return POINT_COUNT;
         }
-        
-//    protected:
-//
-//        mutable SReal self_buffer [SIZE];
         
 #include "Primitive_Common.hpp"
         
@@ -260,123 +258,123 @@ namespace Repulsor
 
     }; // Polytope
     
-//    template <int AMB_DIM, typename Real, typename Int, typename SReal,
-//        typename ExtReal = SReal, typename ExtInt = Int>
-//    [[nodiscard]] std::shared_ptr<BASE> MakePolytope( const Int P_size )
-//    {
-//        BASE * r;
-//        switch(  P_size  )
-//        {
-//            case 1:
-//            {
-//                r = new Polytope<1,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>();
-//                break;
-//            }
-//            case 2:
-//            {
-//                r = new Polytope<2,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>();
-//                break;
-//            }
-//            case 3:
-//            {
-//                r = new Polytope<3,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>();
-//                break;
-//            }
-//            case 4:
-//            {
-//                r = new Polytope<4,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>();
-//                break;
-//            }
-//            case 5:
-//            {
-//                r = new Polytope<5,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>();
-//                break;
-//            }
-//            case 6:
-//            {
-//                r = new Polytope<6,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>();
-//                break;
-//            }
-//            case 7:
-//            {
-//                r = new Polytope<7,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>();
-//                break;
-//            }
-//            case 8:
-//            {
-//                r = new Polytope<8,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>();
-//                break;
-//            }
-//            case 9:
-//            {
-//                r = new Polytope<9,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>();
-//                break;
-//            }
-//            case 10:
-//            {
-//                r = new Polytope<10,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>();
-//                break;
-//            }
-//            case 11:
-//            {
-//                r = new Polytope<11,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>();
-//                break;
-//            }
-//            case 12:
-//            {
-//                r = new Polytope<12,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>();
-//                break;
-//            }
-//            case 13:
-//            {
-//                r = new Polytope<13,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>();
-//                break;
-//            }
-//            case 14:
-//            {
-//                r = new Polytope<14,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>();
-//                break;
-//            }
-//            case 15:
-//            {
-//                r = new Polytope<15,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>();
-//                break;
-//            }
-//            case 16:
-//            {
-//                r = new Polytope<16,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>();
-//                break;
-//            }
-//            case 17:
-//            {
-//                r = new Polytope<17,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>();
-//                break;
-//            }
-//            case 18:
-//            {
-//                r = new Polytope<18,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>();
-//                break;
-//            }
-//            case 19:
-//            {
-//                r = new Polytope<19,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>();
-//                break;
-//            }
-//            case 20:
-//            {
-//                r = new Polytope<20,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>();
-//                break;
-//            }
-//            default:
-//            {
-//                eprint("MakePolytope: Number of vertices of polytope = " + ToString( P_size ) + " is not in the range from 1 to 20. Returning nullptr.");
-//                return nullptr;
-//            }
-//        }
-//        
-//        return std::shared_ptr<BASE>(r);
-//        
-//    } // MakePolytope
+    template <int AMB_DIM_, typename Real, typename Int, typename SReal,
+        typename ExtReal = SReal, typename ExtInt = Int>
+    [[nodiscard]] std::shared_ptr<BASE> MakePolytope( const Int P_size )
+    {
+        BASE * r;
+        switch(  P_size  )
+        {
+            case 1:
+            {
+                r = new Polytope<1,AMB_DIM_,Real,Int,SReal,ExtReal,ExtInt>();
+                break;
+            }
+            case 2:
+            {
+                r = new Polytope<2,AMB_DIM_,Real,Int,SReal,ExtReal,ExtInt>();
+                break;
+            }
+            case 3:
+            {
+                r = new Polytope<3,AMB_DIM_,Real,Int,SReal,ExtReal,ExtInt>();
+                break;
+            }
+            case 4:
+            {
+                r = new Polytope<4,AMB_DIM_,Real,Int,SReal,ExtReal,ExtInt>();
+                break;
+            }
+            case 5:
+            {
+                r = new Polytope<5,AMB_DIM_,Real,Int,SReal,ExtReal,ExtInt>();
+                break;
+            }
+            case 6:
+            {
+                r = new Polytope<6,AMB_DIM_,Real,Int,SReal,ExtReal,ExtInt>();
+                break;
+            }
+            case 7:
+            {
+                r = new Polytope<7,AMB_DIM_,Real,Int,SReal,ExtReal,ExtInt>();
+                break;
+            }
+            case 8:
+            {
+                r = new Polytope<8,AMB_DIM_,Real,Int,SReal,ExtReal,ExtInt>();
+                break;
+            }
+            case 9:
+            {
+                r = new Polytope<9,AMB_DIM_,Real,Int,SReal,ExtReal,ExtInt>();
+                break;
+            }
+            case 10:
+            {
+                r = new Polytope<10,AMB_DIM_,Real,Int,SReal,ExtReal,ExtInt>();
+                break;
+            }
+            case 11:
+            {
+                r = new Polytope<11,AMB_DIM_,Real,Int,SReal,ExtReal,ExtInt>();
+                break;
+            }
+            case 12:
+            {
+                r = new Polytope<12,AMB_DIM_,Real,Int,SReal,ExtReal,ExtInt>();
+                break;
+            }
+            case 13:
+            {
+                r = new Polytope<13,AMB_DIM_,Real,Int,SReal,ExtReal,ExtInt>();
+                break;
+            }
+            case 14:
+            {
+                r = new Polytope<14,AMB_DIM_,Real,Int,SReal,ExtReal,ExtInt>();
+                break;
+            }
+            case 15:
+            {
+                r = new Polytope<15,AMB_DIM_,Real,Int,SReal,ExtReal,ExtInt>();
+                break;
+            }
+            case 16:
+            {
+                r = new Polytope<16,AMB_DIM_,Real,Int,SReal,ExtReal,ExtInt>();
+                break;
+            }
+            case 17:
+            {
+                r = new Polytope<17,AMB_DIM_,Real,Int,SReal,ExtReal,ExtInt>();
+                break;
+            }
+            case 18:
+            {
+                r = new Polytope<18,AMB_DIM_,Real,Int,SReal,ExtReal,ExtInt>();
+                break;
+            }
+            case 19:
+            {
+                r = new Polytope<19,AMB_DIM_,Real,Int,SReal,ExtReal,ExtInt>();
+                break;
+            }
+            case 20:
+            {
+                r = new Polytope<20,AMB_DIM_,Real,Int,SReal,ExtReal,ExtInt>();
+                break;
+            }
+            default:
+            {
+                eprint("MakePolytope: Number of vertices of polytope = " + ToString( P_size ) + " is not in the range from 1 to 20. Returning nullptr.");
+                return nullptr;
+            }
+        }
+        
+        return std::shared_ptr<BASE>(r);
+        
+    } // MakePolytope
     
 } // namespace Repulsor
 
