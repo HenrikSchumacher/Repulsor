@@ -64,13 +64,13 @@ public:
             
             // Abusing serialized_data temporily as working space.
             mref<SReal> r2 = serialized_data[0];
-            SReal * restrict const average    = serialized_data + 1;
-            SReal * restrict const covariance = serialized_data + 1 + AMB_DIM + AMB_DIM;
+            mptr<SReal> average    = serialized_data + 1;
+            mptr<SReal> covariance = serialized_data + 1 + AMB_DIM + AMB_DIM;
             
             // Compute average of the points
             for( Int i = 0; i < n; ++i )
             {
-                const Real * restrict const p = coords_in + AMB_DIM * i;
+                cptr<Real> p = coords_in + AMB_DIM * i;
 
                 for( Int k = 0; k < AMB_DIM; ++k )
                 {
@@ -85,7 +85,7 @@ public:
             // Compute covariance matrix.
             for( Int i = 0; i < n; ++i )
             {
-                const Real * restrict const p = coords_in + AMB_DIM * i;
+                cptr<Real> p = coords_in + AMB_DIM * i;
 
                 for( Int k1 = 0; k1 < AMB_DIM; ++k1 )
                 {
@@ -107,8 +107,8 @@ public:
             }
             
             // Abusing serialized_data temporily as working space.
-                  SReal * restrict const box_min = serialized_data + 1;
-                  SReal * restrict const box_max = serialized_data + 1 + AMB_DIM;
+            mptr<SReal> box_min = serialized_data + 1;
+            mptr<SReal> box_max = serialized_data + 1 + AMB_DIM;
             
             (void)SymmetricEigenSolve( covariance, box_min );
             
@@ -123,11 +123,11 @@ public:
             // TODO: Can this loop be parallelized?
             for( Int i = 0; i < n; ++i )
             {
-                const Real * restrict const p = coords_in + AMB_DIM * i;
+                cptr<Real> p = coords_in + AMB_DIM * i;
 
                 for( Int j = 0; j < AMB_DIM; ++j )
                 {
-                    const Real * restrict const vec = covariance + AMB_DIM * j;
+                    cptr<Real> vec = covariance + AMB_DIM * j;
 
                     Real x = p[0] * vec[0];
 
@@ -153,8 +153,8 @@ public:
                 box_max[k]  = diff;
             }
             
-            Real * restrict const center    = serialized_data + 1;
-            Real * restrict const rotationT = serialized_data + 1 + AMB_DIM + AMB_DIM;
+            mptr<Real> center    = serialized_data + 1;
+            mptr<Real> rotationT = serialized_data + 1 + AMB_DIM + AMB_DIM;
             
             for( Int j = 0; j < AMB_DIM; ++j )
             {
@@ -171,7 +171,7 @@ public:
         // array p is supposed to represent a matrix of size N x AMB_DIM
         virtual void FromPrimitives(
             PrimitiveSerialized<AMB_DIM,Real,Int,SReal> & P,      // primitive prototype
-            SReal * const P_serialized,                  // serialized data of primitives
+            mptr<SReal> P_serialized,                  // serialized data of primitives
             const Int begin,                           // which _P_rimitives are in question
             const Int end,                             // which _P_rimitives are in question
             Int thread_count = 1                       // how many threads to utilize
@@ -189,15 +189,15 @@ public:
             
             // Abusing serialized_data temporily as working space.
             mref<SReal> r2 = serialized_data[0];
-            SReal * restrict const average    = serialized_data + 1;
-            SReal * restrict const covariance = serialized_data + 1 + AMB_DIM + AMB_DIM;
+            mptr<SReal> average    = serialized_data + 1;
+            mptr<SReal> covariance = serialized_data + 1 + AMB_DIM + AMB_DIM;
             
             const Int P_Size = P.Size();
             
             // Compute average of the InterPoints of all primitives.
             for( Int i = begin; i < end; ++i )
             {
-                const SReal * restrict const p = P_serialized + 1 + P_Size * i;
+                cptr<SReal> p = P_serialized + 1 + P_Size * i;
 
                 for( Int k = 0; k < AMB_DIM; ++k )
                 {
@@ -212,7 +212,7 @@ public:
             // Compute covariance matrix.
             for( Int i = begin; i < end; ++i )
             {
-                const SReal * restrict const p = P_serialized + 1 + P_Size * i;
+                cptr<SReal> p = P_serialized + 1 + P_Size * i;
 
                 for( Int k1 = 0; k1 < AMB_DIM; ++k1 )
                 {
@@ -234,8 +234,8 @@ public:
             }
             
             // Abusing serialized_data temporily as working space.
-                  SReal * restrict const box_min = serialized_data + 1;
-                  SReal * restrict const box_max = serialized_data + 1 + AMB_DIM;
+            mptr<SReal> box_min = serialized_data + 1;
+            mptr<SReal> box_max = serialized_data + 1 + AMB_DIM;
         
             (void)SymmetricEigenSolve( covariance, box_min );
             
@@ -276,8 +276,8 @@ public:
             
             // Rotate this->buffer so that it falls onto the true center of the bounding box.
             
-            SReal * restrict const center    = serialized_data + 1;
-            SReal * restrict const rotationT = serialized_data + 1 + AMB_DIM + AMB_DIM;
+            mptr<SReal> center    = serialized_data + 1;
+            mptr<SReal> rotationT = serialized_data + 1 + AMB_DIM + AMB_DIM;
             
             for( Int j = 0; j < AMB_DIM; ++j )
             {
@@ -330,13 +330,13 @@ public:
         
         
         //Computes support vector supp of dir.
-        virtual Real MaxSupportVector( const Real * const dir, Real * const supp ) const override
+        virtual Real MaxSupportVector( cptr<Real> dir, mptr<SReal> supp ) const override
         {
-            const SReal * restrict const x = serialized_data + 1;
-            const SReal * restrict const L = serialized_data + 1 + AMB_DIM;
-            const SReal * restrict const A = serialized_data + 1 + AMB_DIM + AMB_DIM;
-            const  Real * restrict const v = dir;
-                   Real * restrict const s = supp;
+            cptr<SReal> x = serialized_data + 1;
+            cptr<SReal> L = serialized_data + 1 + AMB_DIM;
+            cptr<SReal> A = serialized_data + 1 + AMB_DIM + AMB_DIM;
+            cptr<Real> v = dir;
+            mptr<Real> s = supp;
 
             Real R1;
             Real R2;
@@ -372,13 +372,13 @@ public:
         
         
         //Computes support vector supp of dir.
-        virtual Real MinSupportVector( const Real * const dir, Real * const supp ) const override
+        virtual Real MinSupportVector( cptr<Real> dir, mptr<Real> supp ) const override
         {
-            const SReal * restrict const x = serialized_data + 1;
-            const SReal * restrict const L = serialized_data + 1 + AMB_DIM;
-            const SReal * restrict const A = serialized_data + 1 + AMB_DIM + AMB_DIM;
-            const  Real * restrict const v = dir;
-                   Real * restrict const s = supp;
+            cptr<SReal> x = serialized_data + 1;
+            cptr<SReal> L = serialized_data + 1 + AMB_DIM;
+            cptr<SReal> A = serialized_data + 1 + AMB_DIM + AMB_DIM;
+            cptr< Real> v = dir;
+            mptr< Real> s = supp;
 
             Real R1;
             Real R2;

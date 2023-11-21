@@ -41,9 +41,9 @@ namespace Repulsor
         
     public:
         
-        virtual void FromCoordinates( const ExtReal * const hull_coords_, const Int i = 0 ) const = 0;
+        virtual void FromCoordinates( cptr<ExtReal> hull_coords_, const Int i = 0 ) const = 0;
         
-        virtual void FromIndexList( const ExtReal * const coords_, const ExtInt * const tuples, const Int i = 0 ) const = 0;
+        virtual void FromIndexList( cptr<ExtReal> coords_, cptr<ExtInt> tuples, const Int i = 0 ) const = 0;
         
         virtual std::string ClassName() const override
         {

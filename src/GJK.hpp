@@ -32,6 +32,9 @@
 
 namespace Repulsor
 {
+    using namespace Tensors;
+    using namespace Tools;
+    
     // some template magic
     template<typename Int>
     constexpr Int face_count(Int amb_dim)
