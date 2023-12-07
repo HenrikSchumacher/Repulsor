@@ -40,7 +40,7 @@ namespace Repulsor
         virtual ~SimplicialMeshBase() = default;
         
         explicit SimplicialMeshBase( const Int thread_count_ )
-        :   thread_count( Max( static_cast<Int>(1), thread_count_) )
+        :   thread_count( Ramp_1(thread_count_) )
         {};
         
         mutable      ClusterTreeSettings       cluster_tree_settings;

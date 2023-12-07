@@ -187,8 +187,8 @@ namespace Repulsor
                 {
                     for( Int k = 0; k < AMB_DIM; ++k )
                     {
-                        lower[k] = std::min( lower[k], thread_lower[thread][k] );
-                        upper[k] = std::max( upper[k], thread_upper[thread][k] );
+                        lower[k] = Min( lower[k], thread_lower[thread][k] );
+                        upper[k] = Max( upper[k], thread_upper[thread][k] );
                     }
                 }
             }
@@ -293,8 +293,8 @@ namespace Repulsor
                 {
                     for( Int k = 0; k < AMB_DIM; ++k )
                     {
-                        lower[k] = std::min( lower[k], thread_lower[thread][k] );
-                        upper[k] = std::max( upper[k], thread_upper[thread][k] );
+                        lower[k] = Min( lower[k], thread_lower[thread][k] );
+                        upper[k] = Max( upper[k], thread_upper[thread][k] );
                     }
                 }
             }

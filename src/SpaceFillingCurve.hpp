@@ -190,8 +190,8 @@ namespace Repulsor
                     
                         for( Int k = 0; k < n; ++k )
                         {
-                            lower_loc[k] = std::min( lower_loc[k], x[k] );
-                            upper_loc[k] = std::max( upper_loc[k], x[k] );
+                            lower_loc[k] = Min( lower_loc[k], x[k] );
+                            upper_loc[k] = Max( upper_loc[k], x[k] );
                         }
                     }
                     
@@ -205,8 +205,8 @@ namespace Repulsor
             {
                 for( Int k = 0; k < n; ++k )
                 {
-                    lower[k] = std::min( lower[k], thread_lower[thread][k] );
-                    upper[k] = std::max( upper[k], thread_upper[thread][k] );
+                    lower[k] = Min( lower[k], thread_lower[thread][k] );
+                    upper[k] = Max( upper[k], thread_upper[thread][k] );
                 }
             }
 
@@ -218,7 +218,7 @@ namespace Repulsor
             {
                 mid[k] = Scalar::Half<Real> * ( lower[k] + upper[k] );
                 
-                L = std::max( L, upper[k] - lower[k] );
+                L = Max( L, upper[k] - lower[k] );
             }
             
             scale = (Scalar::One<Real> - static_cast<Real>(128) * Scalar::eps<Real> ) / L;

@@ -54,10 +54,7 @@ protected:
     {
         // Find the index of the k-th edge in simplex s.
                 
-        const Pair_T p ( std::minmax(
-            simplices[s][Tri_i[k]],
-            simplices[s][Tri_j[k]]
-        ) );
+        const Pair_T p { MinMax( simplices[s][Tri_i[k]], simplices[s][Tri_j[k]] ) };
         
         return ( edge_lookup.count(p) > 0 ) ? edge_lookup[p] : -13;
     }

@@ -65,7 +65,7 @@ namespace Repulsor
                 }
             }
             
-            count = Max( static_cast<Int>(1), count );
+            count = Ramp_1(count);
             
             scale_buffer<AMB_DIM>( Inv<Real>(count), point );
         }

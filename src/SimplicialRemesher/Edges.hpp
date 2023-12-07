@@ -6,7 +6,7 @@ protected:
 
     Edge_T CreateEdge( const Vertex_T v_0, const Vertex_T v_1 )
     {
-        Pair_T p ( std::minmax(v_0,v_1) );
+        Pair_T p { MinMax(v_0,v_1) };
         
         Edge_T e = edge_count++;
         
@@ -64,7 +64,7 @@ protected:
     //DONE.
     Edge_T FindEdge( const Vertex_T v_0, const Vertex_T v_1 )
     {
-        const Pair_T p ( std::minmax(v_0,v_1) );
+        const Pair_T p { MinMax(v_0,v_1) };
         
         return ( edge_lookup.count(p) > 0) ? edge_lookup[p] : -1;
     }
@@ -72,23 +72,23 @@ protected:
     //DONE.
     void LookupErase( const Edge_T e )
     {
-        edge_lookup.erase( std::minmax( edges(e,0), edges(e,1) ) );
+        edge_lookup.erase( MinMax( edges(e,0), edges(e,1) ) );
     }
     
     void LookupErase( const Vertex_T v_0, const Vertex_T v_1 )
     {
-        edge_lookup.erase( std::minmax(v_0, v_1) );
+        edge_lookup.erase( MinMax(v_0, v_1) );
     }
     
     //DONE.
     void LookupInsert( const Edge_T e )
     {
-        edge_lookup.insert( { std::minmax( edges(e,0), edges(e,1) ), e } );
+        edge_lookup.insert( { MinMax( edges(e,0), edges(e,1) ), e } );
     }
     
     void LookupInsert( const Edge_T e, const Vertex_T v_0, const Vertex_T v_1 )
     {
-        edge_lookup.insert( { std::minmax(v_0, v_1), e } );
+        edge_lookup.insert( { MinMax(v_0, v_1), e } );
     }
     
     //DONE.
