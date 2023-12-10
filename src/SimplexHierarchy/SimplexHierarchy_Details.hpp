@@ -118,7 +118,7 @@ public:
             {
                 for( Int j = 0; j < DOM_DIM+1; ++j )
                 {
-                    corners[i][j] = static_cast<SReal>(i == j);
+                    corners[i][j] = KroneckerDelta<SReal>(i,j);
                 }
             }
 
@@ -193,7 +193,7 @@ public:
             
                 for( Int j = 0; j < DOM_DIM+1; ++j )
                 {
-                    corners[i][j] = static_cast<SReal>(i == j);
+                    corners[i][j] = KroneckerDelta<SReal>(i,j);
                 }
             }
             

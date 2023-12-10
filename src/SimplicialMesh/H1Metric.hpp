@@ -28,7 +28,7 @@ protected:
                 {
                     for( Int j = 0; j < DOM_DIM; ++j )
                     {
-                        id[i][j] = Int(i==j);
+                        id[i][j] = KroneckerDelta<Int>(i,j);
                     }
                 }
                 
