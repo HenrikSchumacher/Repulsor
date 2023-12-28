@@ -28,7 +28,8 @@ protected:
                 
                 Tiny::Matrix<SIZE,SIZE,Real,Int> mass;
                 
-                const Real m_factor = c_0 / StandardSimplexVolume() / Factorial(static_cast<Real>(DOM_DIM + 2));
+                const Real m_factor = Frac<Real>( c_0 ,
+                    StandardSimplexVolume<Real>(DOM_DIM) * Factorial<Real>(DOM_DIM + 2) );
                 
                 for( Int i = 0; i < SIZE; ++i )
                 {
@@ -67,7 +68,7 @@ protected:
                     g.Cholesky();
                     
                     // Compute simplex area
-                    Real a = StandardSimplexVolume();
+                    Real a = StandardSimplexVolume<Real>(DOM_DIM);
                     
                     for( Int l = 0; l < DOM_DIM; ++l )
                     {

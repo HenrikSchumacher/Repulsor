@@ -18,11 +18,6 @@ namespace Repulsor
         static constexpr Int  HULL_SIZE = AMB_DIM * SIZE;
         static constexpr Real nth       = Inv<Real>( SIZE );
         
-        static constexpr Real StandardSimplexVolume()
-        {
-            return Inv<Real>( Factorial(static_cast<Real>(DOM_DIM)) );
-        }
-        
     private:
         
         
@@ -108,7 +103,7 @@ namespace Repulsor
             center *= nth;
             charge *= nth;
             
-            a = charge * StandardSimplexVolume();
+            a = charge * StandardSimplexVolume<Real>(DOM_DIM);
             
             if constexpr ( DOM_DIM > 0 )
             {

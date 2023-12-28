@@ -199,12 +199,7 @@ namespace Repulsor
         using Base_T::cluster_tree_settings;
         using Base_T::adaptivity_settings;
         using Base_T::ThreadCount;
-        
-        static constexpr Real StandardSimplexVolume()
-        {
-            return Inv<Real>( Factorial(DOM_DIM) );
-        }
-        
+
     protected:
 
         
