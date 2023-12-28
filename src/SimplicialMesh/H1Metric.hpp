@@ -24,13 +24,7 @@ protected:
                 Tiny::Matrix<DOM_DIM,DOM_DIM,Real,Int> g_inv;
                 Tiny::Matrix<DOM_DIM,DOM_DIM,Real,Int> id;
                 
-                for( Int i = 0; i < DOM_DIM; ++i )
-                {
-                    for( Int j = 0; j < DOM_DIM; ++j )
-                    {
-                        id[i][j] = KroneckerDelta<Int>(i,j);
-                    }
-                }
+                id.SetIdentity();
                 
                 Tiny::Matrix<SIZE,SIZE,Real,Int> mass;
                 
@@ -40,7 +34,7 @@ protected:
                 {
                     for( Int j = 0; j < SIZE; ++j )
                     {
-                        mass[i][j] = m_factor * (Scalar::One<Real> + Delta<Real>(i,j) );
+                        mass[i][j] = m_factor * (Scalar::One<Real> + KroneckerDelta<Real>(i,j) );
                     }
                 }
                 
