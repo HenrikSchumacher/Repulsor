@@ -78,7 +78,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		AF1EE676293F488D0099FA59 /* godbolt_gemm.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = godbolt_gemm.hpp; sourceTree = "<group>"; };
 		AF3DADB028ECEFFC0089476A /* src */ = {isa = PBXFileReference; lastKnownFileType = folder; path = src; sourceTree = "<group>"; };
 		AF3DADB528ECF0470089476A /* Example */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Example; sourceTree = BUILT_PRODUCTS_DIR; };
 		AF3DADB728ECF0470089476A /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
@@ -152,14 +151,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		AF1EE677293F489C0099FA59 /* Experiments */ = {
-			isa = PBXGroup;
-			children = (
-				AF1EE676293F488D0099FA59 /* godbolt_gemm.hpp */,
-			);
-			path = Experiments;
-			sourceTree = "<group>";
-		};
 		AF3DADB628ECF0470089476A /* Example */ = {
 			isa = PBXGroup;
 			children = (
@@ -172,7 +163,6 @@
 		AF47AFFA28ECEE8800A5FCEA = {
 			isa = PBXGroup;
 			children = (
-				AF1EE677293F489C0099FA59 /* Experiments */,
 				AF88400F28ECEEBA0040A2FC /* LICENSE */,
 				AFBAFE592A8004CC00F734EE /* submodules */,
 				AF3DADB028ECEFFC0089476A /* src */,
@@ -363,7 +353,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastUpgradeCheck = 1500;
+				LastUpgradeCheck = 1510;
 				TargetAttributes = {
 					AF3DADB428ECF0470089476A = {
 						CreatedOnToolsVersion = 14.0.1;
@@ -545,7 +535,7 @@
 				GCC_WARN_UNUSED_VALUE = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "";
-				LIBRARY_SEARCH_PATHS = /opt/homebrew/Cellar/openblas/0.3.24/lib;
+				LIBRARY_SEARCH_PATHS = /opt/homebrew/Cellar/openblas/0.3.25/lib;
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -630,7 +620,7 @@
 				GCC_WARN_UNUSED_VALUE = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "";
-				LIBRARY_SEARCH_PATHS = /opt/homebrew/Cellar/openblas/0.3.24/lib;
+				LIBRARY_SEARCH_PATHS = /opt/homebrew/Cellar/openblas/0.3.25/lib;
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
