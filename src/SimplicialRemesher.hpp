@@ -29,6 +29,8 @@ namespace Repulsor
     {
     public:
         
+        static_assert( DOM_DIM  > 0, "Remeshing for domain dimension 0 does not make sense." );
+        
         using Base_T     = SimplicialRemesherBase<Real_,Int_,ExtReal_,ExtInt_>;
         
         using Real       = typename Base_T::Real;
@@ -71,7 +73,6 @@ namespace Repulsor
         static constexpr Int V_max_simplex_valence = (DOM_DIM == 1) ? 2 : (DOM_DIM == 2) ? 9 : 100;
         
         static constexpr Real sqrt_eps = cSqrt(Scalar::eps<Real>);
-        
         
         Tiny::Vector<S_edge_count,Int,Int>    Tri_i;
         Tiny::Vector<S_edge_count,Int,Int>    Tri_j;
@@ -569,7 +570,7 @@ namespace Repulsor
                                     eprint(className()+"::SelfCheck: simplex "+ToString(s)+" does not know about its child vertex "+ToString(v)+".");
                                     
                                     print(
-                                          "V_parent_simplices[v] = " + V_parent_simplices[v].ToString()
+                                          "V_parent_simplices[v] = " + ToString(V_parent_simplices[v])
                                     );
                                 }
                                 ++simplices_agnostic_of_their_child_vertices;

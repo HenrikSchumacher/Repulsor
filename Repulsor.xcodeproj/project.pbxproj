@@ -353,7 +353,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastUpgradeCheck = 1510;
+				LastUpgradeCheck = 1520;
 				TargetAttributes = {
 					AF3DADB428ECF0470089476A = {
 						CreatedOnToolsVersion = 14.0.1;
@@ -546,6 +546,7 @@
 					"-ffast-math",
 					"-fno-math-errno",
 					"-pthread",
+					"-fenable-matrix",
 				);
 				OTHER_LDFLAGS = (
 					"-ldl",
@@ -631,6 +632,7 @@
 					"-ffast-math",
 					"-fno-math-errno",
 					"-pthread",
+					"-fenable-matrix",
 				);
 				OTHER_LDFLAGS = (
 					"-ldl",
@@ -737,10 +739,6 @@
 				DEVELOPMENT_TEAM = Y6DQ749ZRT;
 				ENABLE_HARDENED_RUNTIME = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
-				LIBRARY_SEARCH_PATHS = (
-					/opt/homebrew/opt/libomp/lib,
-					/opt/homebrew/Cellar/openblas/0.3.23/lib,
-				);
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
 				OTHER_LDFLAGS = (
 					"-ldl",
@@ -764,10 +762,6 @@
 				DEVELOPMENT_TEAM = Y6DQ749ZRT;
 				ENABLE_HARDENED_RUNTIME = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
-				LIBRARY_SEARCH_PATHS = (
-					/opt/homebrew/opt/libomp/lib,
-					/opt/homebrew/Cellar/openblas/0.3.23/lib,
-				);
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
 				OTHER_LDFLAGS = (
 					"-ldl",

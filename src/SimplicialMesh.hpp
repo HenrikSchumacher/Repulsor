@@ -803,18 +803,29 @@ namespace Repulsor
         
         [[nodiscard]] virtual std::unique_ptr<RemesherBase_T> CreateRemesher() override
         {
+            if constexpr( DOM_DIM > 0 )
+            {
             ptic(ClassName()+"::CreateRemesher");
             
-            Remesher_T * R = new Remesher_T(
-                VertexCoordinates().data(), VertexCoordinates().Dimension(0), false,
-                Simplices().data(),         Simplices().Dimension(0),         false,
-                VertexCharges().data(),     1,
-                ThreadCount()
-            );
-            
-            ptoc(ClassName()+"::CreateRemesher");
-            
-            return std::unique_ptr<RemesherBase_T>(R);
+                Remesher_T * R = new Remesher_T(
+                    VertexCoordinates().data(),
+                    VertexCoordinates().Dimension(0), false,
+                    Simplices().data(),
+                    Simplices().Dimension(0),         false,
+                    VertexCharges().data(),     1,
+                    ThreadCount()
+                );
+                
+                ptoc(ClassName()+"::CreateRemesher");
+                
+                return std::unique_ptr<RemesherBase_T>(R);
+                
+            }
+            else
+            {
+                wprint(ClassName()+"::CreateRemesher: Remesher does not make sense for meshes with domain dimension 0. Returning nullptr.");
+                return std::unique_ptr<RemesherBase_T>(nullptr);
+            }
         }
         
 //##############################################################################################
