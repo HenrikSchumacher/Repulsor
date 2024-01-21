@@ -13,30 +13,25 @@
 
 #define LAPACK_DISABLE_NAN_CHECK
 
-// Use these while on a mac.
+/// Use these while on a mac. Don't forget to issue the
+/// compiler flag `-framework Accelerate`.
 #define ACCELERATE_NEW_LAPACK
 #include <Accelerate/Accelerate.h>
 
-
-// Use these under Windows or Linux, e.g. together OpenBLAS, Intel oneMKL, AMD AOCL-BLAS.
+/// Use these instead of Accelerate under Windows or Linux, e.g. together with OpenBLAS, Intel oneMKL, AMD AOCL-BLAS. Of course, your path variables or compiler flags should hint the compiler to these files. And you also have to link the according libraries.
 //#include <cblas.h>
 //#include <lapack.h>
 
 #include "../Repulsor.hpp"
-#include "../submodules/Tensors/MyBLAS.hpp"
 #include "../submodules/Tensors/Sparse.hpp"
-
-//#include "../submodules/Tensors/ConjugateGradient.hpp"
-//#include "../submodules/Tensors/GMRES.hpp"
-//#include "../submodules/Tensors/Sparse.hpp"
 
 using namespace Repulsor;
 using namespace Tensors;
 using namespace Tools;
 
 
-// We have to toggle which domain dimensions and ambient dimensions shall be supported by runtime polymorphism before we load Repulsor.hpp
-// You can activate everything you want, but compile times might increase substatially.
+/// We have to toggle which domain dimensions and ambient dimensions shall be supported by runtime polymorphism before we load Repulsor.hpp
+/// You can activate everything you want, but compile times might increase substatially.
 using Int     = Int32;
 using LInt    = Int64;
 using ExtInt  = Int64;
@@ -71,31 +66,37 @@ int main(int argc, const char * argv[])
     
 #include "Meshes.hpp"
     
-    // Meaning of template parameters:
+    /// Meaning of template parameters:
     
-    // SimplicialMeshBase<Real, Int, SReal, ExtReal>;
-    //
-    // Real    = floating point type used for computations regarding energy and metric
-    // Int     = signed integer type used internally, in particular as indices for sparse arrays.
-    //           Int = int       corresponds to MKL's  LP64 mode
-    //           Int = long long corresponds to MKL's ILP64 mode
-    // SReal   = ("short real") floating point type for storage of clustering information
-    // ExtReal = ("external real") floating point type that is used by the outer world, e.g. for submitting the mesh's vertex coordinates and vectors to multiply against the metric.
+    /// `SimplicialMeshBase<Real, Int, SReal, ExtReal>`;
+    ///
+    /// `Real`  = floating point type used for computations regarding energy and metric
+    /// `Int`   = signed integer type used internally, in particular as indices for sparse arrays.
+    ///           `Int = int`       corresponds to MKL's  LP64 mode
+    ///           `Int = long long` corresponds to MKL's ILP64 mode
+    /// `SReal` = ("short real") floating point type for storage of clustering information. Typically we want to use `SReal = double.`
+    /// `ExtReal` = ("external real") floating point type that is used by the outer world, e.g. for submitting the mesh's vertex coordinates and vectors to multiply against the metric.
     
     using Mesh_T         = SimplicialMeshBase<Real,Int,LInt,SReal,ExtReal>;
+    
+    /// `SimplicialMesh_Factory<Mesh_T,n_min,n_max,m_min,m_max>`
+    /// is a factory that can create meshes with base type `Mesh_T` and domain dimension from `n_min` to `n_max` and with ambient dimension from `m_min` to `m_max`.
+    /// The main purpose of this factory is to tell the compiler which template instantiations of `SimplicialMesh` it shall generate. So this factory is basically about saving compile time.
+    /// The narrower these intervals are, the less code has to compiled.
+    /// The wieder these intervals are, the more flexible the runtime polumorphism will be.
+    /// Note that with obstacles you might want to use meshes of various dimensions,
+    /// so you have to use an according factory.
+
     using Mesh_Factory_T = SimplicialMesh_Factory<Mesh_T,2,2,3,3>;
     
     using Energy_T       = EnergyBase<Mesh_T>;
     using Metric_T       = MetricBase<Mesh_T>;
     
-    // Create a factory that can make instances of SimplicialMesh with domain dimension in the range 2,...,2 and ambient dimension in the range 3,...,3.
-    // (The main purpose of this factory is to tell the compiler which template instantiations of SimplicialMesh it shall generate. Note that with obstacles one might want to use meshes of various dimensions. So this factory basically about saving compile time.)
+    /// Create a factory that can make instances of SimplicialMesh with domain dimension in the range 2,...,2 and ambient dimension in the range 3,...,3.
+
     Mesh_Factory_T mesh_factory;
 
-
-    // This factory allows run-time polymorphism. But know that all specializations of SimplicialMesh in theses ranges have to be compiled! That may lead to horrific compile times, thus the ability to restrict the ranges in the factory.
-
-    // Initialize mesh by the mesh_factory to allow runtime polymorphism.
+    /// Initialize mesh by the mesh_factory to allow runtime polymorphism.
     tic("Initializing mesh");
     std::unique_ptr<Mesh_T> M_ptr = mesh_factory.Make(
         &vertex_coordinates[0][0],  vertex_count, amb_dim,   false,
@@ -109,18 +110,26 @@ int main(int argc, const char * argv[])
 
     toc("Initializing mesh");
 
-    // Some quite decent settings for 2-dimensional surfaces.
+    /// Some quite decent settings for 2-dimensional surfaces.
     M.cluster_tree_settings.split_threshold                        =  2;
-    M.cluster_tree_settings.thread_count                           =  0; // take as many threads as there are used by SimplicialMesh M
-    M.block_cluster_tree_settings.far_field_separation_parameter   =  0.25; // the theta from the talks
+    
+    /// Take as many threads as there are used by SimplicialMesh M
+    M.cluster_tree_settings.thread_count                           =  0;
+    
+    /// Set the separation parameters.
+    M.block_cluster_tree_settings.far_field_separation_parameter   =  0.25;
     M.adaptivity_settings.theta                                    = 10.0;
 
     tic("Creating ClusterTree");
-    M.GetClusterTree();           // Not necessary. Will automatically called by al routines that require it.
+    /// It is not necessary to call this separately.
+    /// It will automatically be called by all routines that require it.
+    M.GetClusterTree();
     toc("Creating ClusterTree");
 
     tic("Creating BlockClusterTree");
-    M.GetBlockClusterTree();      // Not necessary. Will automatically called by al routines that require it.
+    /// It is not necessary to call this separately.
+    /// It will automatically be called by all routines that require it.
+    M.GetBlockClusterTree();
     toc("Creating BlockClusterTree");
 
     valprint("M.GetClusterTree().ThreadCount()",M.GetClusterTree().ThreadCount());
@@ -134,7 +143,7 @@ int main(int argc, const char * argv[])
     const Real q = 6;
     const Real p = 12;
 
-    // Again some factories.
+    /// Again some factories.
     TangentPointEnergy_Factory<Mesh_T,2,2,3,3> TPE_factory;
     TangentPointMetric_Factory<Mesh_T,2,2,3,3> TPM_factory;
 
@@ -147,7 +156,7 @@ int main(int argc, const char * argv[])
     const auto & tpm = *tpm_ptr;
 
     double en;
-    // Mesh_T::CotangentVector_T is Tensor2<Real,Int> in this case. It is a simple container class for heap-allocated matrices.
+    /// `Mesh_T::CotangentVector_T` is `Tensor2<Real,Int>` in this case. It is a simple container class for heap-allocated matrices.
     Mesh_T::CotangentVector_T diff;
 
     tic("tpe.Energy(M)");
@@ -175,23 +184,27 @@ int main(int argc, const char * argv[])
     dump(en);
     print("");
 
-    // Mesh_T::TangentVector_T and Mesh_T::CotangentVector_T are both Tensor2<Real,Int> in this example.
+    /// Mesh_T::TangentVector_T and Mesh_T::CotangentVector_T are both Tensor2<Real,Int> in this example.
     Mesh_T::TangentVector_T   X ( M.VertexCount(), M.AmbDim() );
     Mesh_T::CotangentVector_T Y ( M.VertexCount(), M.AmbDim() );
 
-    // Load some random data into U.
+    /// Load some random data into U.
     X.Random();
 
     const Real alpha = 1.0;
     const Real beta  = 0.0;
-    //Performs generalized matrix-matrix product Y = alpha * A * X + beta * Y, where A is the tangent-point metric.
+    
+    ///Performs generalized matrix-matrix product Y = alpha * A * X + beta * Y, where A is the tangent-point metric.
 
     tic("tpm.MetricValues(M)");
-    tpm.MetricValues(M);         // Not necessary. Will automatically called by all routines that require it.
+    /// It is not necessary to call this separately.
+    /// It will automatically be called by all routines that require it.
+    tpm.MetricValues(M);
     toc("tpm.MetricValues(M)");
 
     tic("tpm.MultiplyMetric");
-    tpm.MultiplyMetric(M, alpha, X, beta, Y); // compute Y = alpha * A * x + beta * Y.
+    /// Compute Y = alpha * A * x + beta * Y.
+    tpm.MultiplyMetric(M, alpha, X, beta, Y);
     toc("tpm.MultiplyMetric");
 
     tic("tpm.MultiplyMetric");
@@ -204,7 +217,7 @@ int main(int argc, const char * argv[])
     print("");
 
 
-    // Initialize mesh by the factory to allow runtime polymorphism.
+    /// Initialize mesh by the factory to allow runtime polymorphism.
     tic("Initialize obstacle mesh");
     std::unique_ptr<Mesh_T> Q_ptr = mesh_factory.Make(
         &obstacle_vertex_coordinates[0][0], obstacle_vertex_count,  amb_dim,   false,
@@ -214,19 +227,20 @@ int main(int argc, const char * argv[])
     toc("Initialize obstacle mesh");
     print("");
 
-    // Load obstacle into mesh.
+    /// Load obstacle into mesh.
     tic("Load obstacle");
     M.LoadObstacle( std::move(Q_ptr) );
     toc("Load obstacle");
     print("");
 
     tic("Create obstacle trees");
-    M.GetObstacleBlockClusterTree();    // Not necessary. Will automatically called by all routines that require it.
+    /// It is not necessary to call this separately.
+    /// It will automatically be called by all routines that require it.
+    M.GetObstacleBlockClusterTree();
     toc("Create obstacle trees");
     print("");
 
-    // Compute tangent-point energy between mesh and obstacle.
-
+    /// Compute tangent-point energy between mesh and obstacle.
     TangentPointObstacleEnergy_Factory<Mesh_T,2,2,2,2,3,3> TPOE_factory;
 
     std::unique_ptr<Energy_T> tpo_ptr = TPOE_factory.Make( dom_dim, dom_dim, amb_dim, q, p );
@@ -238,9 +252,8 @@ int main(int argc, const char * argv[])
     toc("Compute tangent-point energy between mesh and obstacle");
     dump(en);
     print("");
-//
-    //Compute derivative also of this energy.
 
+    ///Compute derivative also of this energy.
     tic("Compute derivative of obstacle energy");
     diff = tpo.Differential(M);
     toc("Compute derivative of obstacle energy");

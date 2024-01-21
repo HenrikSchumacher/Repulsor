@@ -12,13 +12,18 @@
 #define TOOLS_ENABLE_PROFILER // enable profiler
 
 #define LAPACK_DISABLE_NAN_CHECK
+
+/// Use these while on a mac. Don't forget to issue the
+/// compiler flag `-framework Accelerate`.
 #define ACCELERATE_NEW_LAPACK
 #include <Accelerate/Accelerate.h>
+
+
+/// Use these instead of Accelerate under Windows or Linux, e.g. together with OpenBLAS, Intel oneMKL, AMD AOCL-BLAS. Of course, your path variables or compiler flags should hint the compiler to these files. And you also have to link the according libraries.
 //#include <cblas.h>
 //#include <lapack.h>
 
 #include "../Repulsor.hpp"
-#include "../submodules/Tensors/MyBLAS.hpp"
 #include "../submodules/Tensors/Sparse.hpp"
 
 
@@ -84,23 +89,29 @@ int main(int argc, const char * argv[])
     
     print("");
     
-    // Some quite decent settings for 2-dimensional surfaces.
+    /// Some quite decent settings for 2-dimensional surfaces.
     M.cluster_tree_settings.split_threshold                        =  2;
-    M.cluster_tree_settings.thread_count                           =  0; // take as many threads as there are used by SimplicialMesh M
+    /// Take as many threads as there are used by SimplicialMesh M
+    M.cluster_tree_settings.thread_count                           =  0;
+    /// Set the separation parameters.
     M.block_cluster_tree_settings.far_field_separation_parameter   =  0.25;
     M.adaptivity_settings.theta                                    = 10.0;
 
     tic("GetClusterTree");
-    M.GetClusterTree();           // Not necessary. Will automatically called by all routines that require it.
+    /// It is not necessary to call this separately.
+    /// It will automatically be called by all routines that require it.
+    M.GetClusterTree();
     toc("GetClusterTree");
 
     tic("GetBlockClusterTree");
-    M.GetBlockClusterTree();      // Not necessary. Will automatically called by all routines that require it.
+    /// It is not necessary to call this separately.
+    /// It will automatically be called by all routines that require it.
+    M.GetBlockClusterTree();
     toc("GetBlockClusterTree");
 //
     
     double en;
-    // Mesh_T::CotangentVector_T is Tensor2<REAL,INT> in this case. It is a simple container class for heap-allocated matrices.
+    /// `Mesh_T::CotangentVector_T` is `Tensor2<REAL,INT>` in this case. It is a simple container class for heap-allocated matrices.
     Mesh_T::CotangentVector_T diff;
 
     tic("tpe.Energy(M)");
@@ -119,7 +130,6 @@ int main(int argc, const char * argv[])
     tic("MaximumSafeStepSize");
     Tensor2<Real,Int> V ( M.VertexCount(), M.AmbDim() );
     V.Random();
-//    V.Fill(1.);
     const Real t = M.MaximumSafeStepSize(V.data(), 1.);
     toc("MaximumSafeStepSize");
     dump(t);
@@ -138,11 +148,15 @@ int main(int argc, const char * argv[])
     
     
     tic("GetClusterTree");
-    M.GetClusterTree();           // Not necessary. Will automatically called by all routines that require it.
+    /// It is not necessary to call this separately.
+    /// It will automatically be called by all routines that require it.
+    M.GetClusterTree();
     toc("GetClusterTree");
 
     tic("GetBlockClusterTree");
-    M.GetBlockClusterTree();      // Not necessary. Will automatically called by all routines that require it.
+    /// It is not necessary to call this separately.
+    /// It will automatically be called by all routines that require it.
+    M.GetBlockClusterTree();
     toc("GetBlockClusterTree");
     
     tic("tpe.Energy(M)");

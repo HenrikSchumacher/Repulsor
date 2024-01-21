@@ -3,27 +3,22 @@
 #include <sys/types.h>
 #include <pwd.h>
 
-// We have to toggle which domain dimensions and ambient dimensions shall be supported by runtime polymorphism before we load Repulsor.hpp
-// You can activate everything you want, but compile times might increase substatially.
-
 //#define NDEBUG
-//#define TOOLS_DEBUG
+#define TOOLS_DEBUG
 
 #define TOOLS_ENABLE_PROFILER // enable profiler
 
-
 #define LAPACK_DISABLE_NAN_CHECK
 
-#ifdef __APPLE__
-    #define ACCELERATE_NEW_LAPACK
-    #include <Accelerate/Accelerate.h>
-#else
-    #include <cblas.h>
-    #include <lapack.h>
+/// Use these while on a mac. Don't forget to issue the
+/// compiler flag `-framework Accelerate`.
+#define ACCELERATE_NEW_LAPACK
+#include <Accelerate/Accelerate.h>
 
-//#include <mkl_cblas.h>
-//#include <mkl_lapack.h>
-#endif
+
+/// Use these instead of Accelerate under Windows or Linux, e.g. together with OpenBLAS, Intel oneMKL, AMD AOCL-BLAS. Of course, your path variables or compiler flags should hint the compiler to these files. And you also have to link the according libraries.
+//#include <cblas.h>
+//#include <lapack.h>
 
 #include "../Repulsor.hpp"
 
