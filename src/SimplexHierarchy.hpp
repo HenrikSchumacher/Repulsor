@@ -4,9 +4,12 @@
 namespace Repulsor
 {
 
-    template<int DOM_DIM, int AMB_DIM, typename Real, typename Int, typename SReal>
+    template<int DOM_DIM_, int AMB_DIM_, typename Real, typename Int, typename SReal>
     class alignas(ObjectAlignment) SimplexHierarchy
     {
+        
+        static constexpr Int DOM_DIM = DOM_DIM_;
+        static constexpr Int AMB_DIM = AMB_DIM_;
         
 #include "SimplexHierarchy/SimplexHierarchy_Details.hpp"
         

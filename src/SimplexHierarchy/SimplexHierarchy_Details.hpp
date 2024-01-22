@@ -73,17 +73,17 @@ public:
     }
 
 
-    constexpr Int VertexCount() const
+    static constexpr Int VertexCount()
     {
         return DOM_DIM+1;
     }
 
-    constexpr Int DomDim() const
+    static constexpr Int DomDim()
     {
         return DOM_DIM;
     }
     
-    constexpr Int AmbDim() const
+    static constexpr Int AmbDim()
     {
         return AMB_DIM;
     }
@@ -91,9 +91,6 @@ public:
 
     void RequireSimplex( const SReal * input_serialized, const Int k )
     {
-//        if( simplex_id != k )
-//        {
-        
             current_simplex_computed = false;
             simplex_id = k;
             level  = 0;
@@ -121,8 +118,6 @@ public:
                     corners[i][j] = KroneckerDelta<SReal>(i,j);
                 }
             }
-
-//        }
     }
     
     void RequireSubsimplex()
@@ -243,17 +238,17 @@ public:
         return former_child_id;
     }
 
-    const SReal * Center() const
+    cptr<SReal> Center() const
     {
         return &center[0];
     }
 
-    const SReal * BarycentricCoordinates() const
+    cptr<SReal> BarycentricCoordinates() const
     {
         return &corners[0][0];
     }
 
-    const SReal * SimplexSerialized() const
+    cptr<SReal> SimplexSerialized() const
     {
         return simplex_serialized;
     }
@@ -404,5 +399,5 @@ public:
     
     std::string ClassName() const
     {
-        return TO_STD_STRING(CLASS)+"<"+ToString(DOM_DIM)+","+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+">";
+        return std::string("SimplexHierarchy")+"<"+ToString(DOM_DIM)+","+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+">";
     }

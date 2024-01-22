@@ -1,13 +1,14 @@
 #pragma once
 
 namespace Repulsor
-{
-    
-#define DOM_DIM 1
-    
-    template<int AMB_DIM, typename Real, typename Int, typename SReal>
-    class alignas(ObjectAlignment) SimplexHierarchy<DOM_DIM,AMB_DIM,Real,Int,SReal>
+{    
+    template<int AMB_DIM_, typename Real, typename Int, typename SReal>
+    class alignas(ObjectAlignment) SimplexHierarchy<1,AMB_DIM_,Real,Int,SReal>
     {
+    public:
+        
+        static constexpr Int DOM_DIM = 1;
+        static constexpr Int AMB_DIM = AMB_DIM_;
         
 #include "SimplexHierarchy_Details.hpp"
         
@@ -124,7 +125,5 @@ namespace Repulsor
         }
         
     }; // SimplexHierarchy
-    
-#undef DOM_DIM
     
 } // namespace Repulsor
