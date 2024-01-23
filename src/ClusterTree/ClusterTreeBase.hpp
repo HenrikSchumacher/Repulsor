@@ -522,7 +522,7 @@ namespace Repulsor
             {
                 ptic(ClassName()+"::" + tag );
                 // We compute product of S->lo_pre and  S->lo_post because it is basically the primitive-primitive adjacency matrix, we two primitives are supposed to be adjacencent if they share a common degree of freedom.
-//
+                
                 SparseBinaryMatrix_T P_adjacency_matrix = lo_pre.DotBinary(lo_post);
 
                 ptoc(ClassName()+"::" + tag );
