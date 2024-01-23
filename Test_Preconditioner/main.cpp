@@ -1,24 +1,28 @@
+#include <filesystem>
 #include <iostream>
 
-#include <sys/types.h>
-#include <pwd.h>
-
-//#define REMESHER_VERBATIM
-
-#define TOOLS_ENABLE_PROFILER // enable profiler
 //#define TOOLS_DEBUG
 
-#define LAPACK_DISABLE_NAN_CHECK
+#define TOOLS_ENABLE_PROFILER
 
 #ifdef __APPLE__
+/// Use these while on a mac. Don't forget to issue the compiler flag `-framework Accelerate`.
+///
     #define ACCELERATE_NEW_LAPACK
     #include <Accelerate/Accelerate.h>
 #else
+/// Use these instead of Accelerate under Windows or Linux, e.g. together with OpenBLAS, Intel oneMKL, AMD AOCL-BLAS. Of course, your path variables or compiler flags should hint the compiler to these files. And you also have to link the according libraries.
+
+/// This should work for OpenBLAS.
+
     #include <cblas.h>
     #include <lapack.h>
 
-//#include <mkl_cblas.h>
-//#include <mkl_lapack.h>
+/// Use this with Intel oneMKL. Check their documentation if you are unsure.
+
+    //#include <mkl_cblas.h>
+    //#include <mkl_lapack.h>
+
 #endif
 
 #include "../Repulsor.hpp"
@@ -39,7 +43,7 @@ using SReal   = Real64;
 using ExtReal = Real64;
 
 
-int main(int argc, const char * argv[])
+int main(void)
 {
     print("");
     print("###############################################################");
@@ -47,32 +51,28 @@ int main(int argc, const char * argv[])
     print("###############################################################");
     print("");
     
-    
-    const char * homedir = getenv("HOME");
-
-    if( homedir == nullptr)
-    {
-        homedir = getpwuid(getuid())->pw_dir;
-    }
-    std::string home ( homedir );
-    
-    Profiler::Clear( home );
+    Profiler::Clear( getenv("HOME") );
 
     
     int thread_count = 8;
-
-    std::string path = home + "/github/BAEMM/Meshes/";
-    std::string name = "TorusMesh_00038400T.txt";
-//    std::string name = "Spot_00005856T.txt";
     
     
     using MeshBase_T = SimplicialMeshBase<Real,Int,LInt,SReal,ExtReal>;
     using Mesh_T     = SimplicialMesh<2,3,Real,Int,LInt,SReal,ExtReal>;
 
     SimplicialMesh_Factory<MeshBase_T,2,2,3,3> mesh_factory;
+
+
     
     tic("Initializing mesh");
-    std::unique_ptr<MeshBase_T> M_ptr = mesh_factory.Make_FromFile( path + name, thread_count );
+    
+    std::filesystem::path this_file { __FILE__ };
+    std::filesystem::path repo_dir  = this_file.parent_path().parent_path();
+    std::filesystem::path mesh_file = repo_dir / "Meshes" / "TorusMesh_00038400T.txt";
+    
+    std::unique_ptr<MeshBase_T> M_ptr = mesh_factory.Make_FromFile(
+        mesh_file.c_str(), thread_count
+    );
     
     auto & M = *M_ptr;
     
@@ -95,11 +95,11 @@ int main(int argc, const char * argv[])
 
     
     tic("Creating ClusterTree");
-    M.GetClusterTree();           // Not necessary. Will automatically called by all routines that require it.
+    M.GetClusterTree();
     toc("Creating ClusterTree");
 
     tic("Creating BlockClusterTree");
-    M.GetBlockClusterTree();      // Not necessary. Will automatically called by all routines that require it.
+    M.GetBlockClusterTree();
     toc("Creating BlockClusterTree");
 
     print("");
@@ -116,24 +116,17 @@ int main(int argc, const char * argv[])
     
     print("");
 
-    
-    
     constexpr Int NRHS = 3;
     
     Tensor2<ExtReal,Int> B  ( M.VertexCount(), NRHS );
     Tensor2<ExtReal,Int> X  ( M.VertexCount(), NRHS );
     Tensor2<ExtReal,Int> Y  ( M.VertexCount(), NRHS );
-    
-//    X.Read(B.data());
 
     X.SetZero();
     
     tic("tpe.Differential");
     tpe.Differential( M, B.data() );
     toc("tpe.Differential");
-    
-    
-    tpm.MultiplyMetric( M, 1., B.data(), 0, Y.data(), NRHS );
     
     print("");
     
