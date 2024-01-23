@@ -1,26 +1,29 @@
 #include <iostream>
 
-#include <sys/types.h>
-#include <pwd.h>
 
-
-
-//#define NDEBUG
-#define TOOLS_DEBUG
+//#define TOOLS_DEBUG
 
 #define TOOLS_ENABLE_PROFILER // enable profiler
 
-#define LAPACK_DISABLE_NAN_CHECK
-
-/// Use these while on a mac. Don't forget to issue the
-/// compiler flag `-framework Accelerate`.
-#define ACCELERATE_NEW_LAPACK
-#include <Accelerate/Accelerate.h>
-
-
+#ifdef __APPLE__
+/// Use these while on a mac. Don't forget to issue the compiler flag `-framework Accelerate`.
+///
+    #define ACCELERATE_NEW_LAPACK
+    #include <Accelerate/Accelerate.h>
+#else
 /// Use these instead of Accelerate under Windows or Linux, e.g. together with OpenBLAS, Intel oneMKL, AMD AOCL-BLAS. Of course, your path variables or compiler flags should hint the compiler to these files. And you also have to link the according libraries.
-//#include <cblas.h>
-//#include <lapack.h>
+
+/// This should work for OpenBLAS.
+
+    #include <cblas.h>
+    #include <lapack.h>
+
+/// Use this with Intel oneMKL. Check their documentation if you are unsure.
+
+    //#include <mkl_cblas.h>
+    //#include <mkl_lapack.h>
+
+#endif
 
 #include "../Repulsor.hpp"
 #include "../src/SpaceFillingCurve.hpp"
@@ -49,16 +52,7 @@ int main(int argc, const char * argv[])
     print("###############################################################");
     print("");
     
-    
-    const char * homedir = getenv("HOME");
-
-    if( homedir == nullptr)
-    {
-        homedir = getpwuid(getuid())->pw_dir;
-    }
-    std::string path ( homedir );
-    
-    Profiler::Clear( path );
+    Profiler::Clear( getenv("HOME") );
 
     
 //    int thread_count = 8;
