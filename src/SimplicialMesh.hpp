@@ -400,7 +400,7 @@ namespace Repulsor
             
             ExtReal t = max_time;
 
-            if( this->InCacheQ("Obstacle") )
+            if( this->InPersistentCacheQ("Obstacle") )
             {
                 GetObstacle().LoadUpdateVectors( static_cast<ExtReal *>(nullptr), max_time );
                 
