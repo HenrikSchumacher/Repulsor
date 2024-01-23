@@ -40,28 +40,33 @@ Pull changes from the remote repositories of any submodule by executing
 
 ## Within the _C++_ code
 
-_Repulsor_ is header-only, so do not have to precompile anything and thus you also find no makefile here. Just include
+_Repulsor_ is header-only, so you do not have to precompile anything and thus you also find no makefile here. Just include
 
     #include "Repulsor.hpp"
     
 and tell your compiler where to find it: either put the parent directory of this file onto the search path or submit it with the `-I` compiler command (_clang_ or _gcc_ ).
 
-However, you also need implementations of _CBLAS_ and _LAPACK_. There are various choices for this and they may have a heavy impact on the performance. That's why I did not hard-code any implementation into `Repulsor.hpp`. (Moreover, for lacking appropriate test systems, I cannot give any educated guesses for which implementation to use.) See the instructions below for details.
+However, you also need implementations of _CBLAS_ and _LAPACK_. There are various choices for these and they may have a heavy impact on the performance. That's why I did not hard-code any implementation into `Repulsor.hpp`. See the instructions below for details. I recommend to use Intel oneMKL for maximal performance on Intel machines and Apple Accelerate on Apple Silicon. I think _AMD AOCL-BLAS_ should be the best option on AMD hardware, but I have no experience to back that up. OpenBLAS seems to provide also a very good performance (at least on Apple Silicon). And it has the advantage of being the most portable implementation.
+
 
 ## CBLAS/LAPACK
 
-Most CBLAS and LAPACK implementations come with files `cblas.h` and `lapack.h`, e.g.,
-_OpenBLAS_ (which might be the most portable option), _Intel oneMKL_ (only recommended on Intel hardware), _AMD AOCL-BLAS_ (on AMD hardware). In that case, just put
+Most CBLAS and LAPACK implementations come with files `cblas.h` and `lapack.h`. In that case, just put
 
-    #define LAPACK_DISABLE_NAN_CHECK
     #include <cblas.h>
     #include <lapack.h>
 
 into your _C++_ code _before_ you include `Repulsor.hpp`. Of course, your path variables or compiler flags should hint the compiler to these files. And you also have to link the according libraries. But the actual library name and so the linker command may differ from implementation to implementation, so please refer to their documentations for details.
 
-Under macos you can (and IMHO should) use the _Accelerate_ framework. Make sure to use the most recent API by inserting this
+If you use Intel oneMKL, then you would rather have to use the following:
 
-    #define LAPACK_DISABLE_NAN_CHECK
+    #include <mkl_cblas.h>
+    #include <mkl_lapack.h>
+    
+If in doubt, then better consult the [Link Line Advisor](https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl-link-line-advisor.html).
+
+Under macos you can use the _Accelerate_ framework. Make sure to use the most recent API by inserting this
+
     #define ACCELERATE_NEW_LAPACK
     #include <Accelerate/Accelerate.h>
     
@@ -83,7 +88,7 @@ In particular, I have no experience with the Microsoft Visual C++ Compiler. So b
 
 _Repulsor_ uses several _C++ 20_ features, so make sure to use a compatible _C++_ implementation, e.g., by issueing the compiler option `-std=c++20`.
 
-Older versions of _Repulsor_ employd _OpenMP_ for parallelization. That turned out to be a maintenance hell because of various incompatible implementations (`libomp`, `libiomp5`, `libgomp`,...) Nowadays _Repulsor_ simply spawns a couple of `std::thread`s when needed. So make sure to use the `-pthread` option.
+Older versions of _Repulsor_ employd _OpenMP_ for parallelization. That turned out to be a maintenance hell because of various incompatible implementations (`libomp`, `libiomp5`, `libgomp`,...)  that might be used by the calling program. Nowadays _Repulsor_ simply spawns a couple of `std::thread`s when needed. So make sure to use the `-pthread` option.
 Btw., _Repulsor_ does not use any sophisticated thread pools like _OpenMP_ does, so I do not expect any problems with other parallelization frameworks. (Curiously, this did not come with _any_ performance penalty.)
 
 Optimization flags like `-O3` or even `-Ofast` are certainly a good idea. I also found that using `-flto` can make a measurable difference.
