@@ -1,24 +1,32 @@
+#include <filesystem>
 #include <iostream>
 
 #include <sys/types.h>
 #include <pwd.h>
 
-//#define NDEBUG
-#define TOOLS_DEBUG
+//#define TOOLS_DEBUG
 
 #define TOOLS_ENABLE_PROFILER // enable profiler
 
-#define LAPACK_DISABLE_NAN_CHECK
-
-/// Use these while on a mac. Don't forget to issue the
-/// compiler flag `-framework Accelerate`.
-#define ACCELERATE_NEW_LAPACK
-#include <Accelerate/Accelerate.h>
-
-
+#ifdef __APPLE__
+/// Use these while on a mac. Don't forget to issue the compiler flag `-framework Accelerate`.
+///
+    #define ACCELERATE_NEW_LAPACK
+    #include <Accelerate/Accelerate.h>
+#else
 /// Use these instead of Accelerate under Windows or Linux, e.g. together with OpenBLAS, Intel oneMKL, AMD AOCL-BLAS. Of course, your path variables or compiler flags should hint the compiler to these files. And you also have to link the according libraries.
-//#include <cblas.h>
-//#include <lapack.h>
+
+/// This should work for OpenBLAS.
+
+    #include <cblas.h>
+    #include <lapack.h>
+
+/// Use this with Intel oneMKL. Check their documentation if you are unsure.
+
+    //#include <mkl_cblas.h>
+    //#include <mkl_lapack.h>
+
+#endif
 
 #include "../Repulsor.hpp"
 
@@ -38,7 +46,7 @@ using SReal   = Real64;
 using ExtReal = Real64;
 
 
-int main(int argc, const char * argv[])
+int main(void)
 {
     print("");
     print("###############################################################");
@@ -46,25 +54,9 @@ int main(int argc, const char * argv[])
     print("###############################################################");
     print("");
     
+    Profiler::Clear( getenv("HOME") );
     
-    const char * homedir = getenv("HOME");
-
-    if( homedir == nullptr)
-    {
-        homedir = getpwuid(getuid())->pw_dir;
-    }
-    std::string home ( homedir );
-    
-    Profiler::Clear( home );
-
-    
-    int thread_count = 8;
-
-    std::string path = home + "/github/BAEMM/Meshes/";
-//    std::string name = "TorusMesh_00038400T.txt";
-//    std::string name = "Spot_00005856T.txt";
-    std::string name = "Spot_00093696T.txt";
-    
+    const int thread_count = 8;
     
     using MeshBase_T     = SimplicialMeshBase<Real,Int,LInt,SReal,ExtReal>;
     using Mesh_T         = SimplicialMesh<2,3,Real,Int,LInt,SReal,ExtReal>;
@@ -76,7 +68,14 @@ int main(int argc, const char * argv[])
     
     
     tic("Initializing mesh");
-    std::unique_ptr<MeshBase_T> M_ptr = mesh_factory.Make_FromFile( path + name, thread_count );
+    
+    std::filesystem::path this_file { __FILE__ };
+    std::filesystem::path repo_dir  = this_file.parent_path().parent_path();
+    std::filesystem::path mesh_file = repo_dir / "Meshes" / "Sphere_00040560T.txt";
+    
+    std::unique_ptr<MeshBase_T> M_ptr = mesh_factory.Make_FromFile(
+        mesh_file.c_str(), thread_count
+    );
     
     auto & M = *M_ptr;
 
@@ -116,7 +115,7 @@ int main(int argc, const char * argv[])
     print("");
     
     
-    //Apply collapse_split_iter rounds of edge collapse and edge split.
+    /// Apply `collapse_split_iter` rounds of edge collapse and edge split.
     tic("UnifyEdgeLengths");
     R->UnifyEdgeLengths( lower_bound, upper_bound, collapse_split_iter );
     toc("UnifyEdgeLengths");
@@ -127,7 +126,7 @@ int main(int argc, const char * argv[])
     
     print("");
     
-    //Apply flip_max_iter rounds of edge flips to improve triangle shapes.
+    /// Apply `flip_max_iter` rounds of edge flips to improve triangle shapes.
     tic("DelaunayFlip");
     R->DelaunayFlip( flip_iter );
     toc("DelaunayFlip");
@@ -136,7 +135,7 @@ int main(int argc, const char * argv[])
     
     print("");
     
-    // Apply smooth_iter iterations of tangential smoothening to further improve mesh regularity.
+    /// Apply `smooth_iter` iterations of tangential smoothening to further improve mesh regularity.
     tic("TangentialSmoothing");
     R->TangentialSmoothing( smooth_iter );
     toc("TangentialSmoothing");
