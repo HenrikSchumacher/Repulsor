@@ -10,7 +10,11 @@ namespace Repulsor
     template<int DOM_DIM, int AMB_DIM, typename Real_, typename Int_, typename ExtReal_, typename ExtInt_>
     class SimplicialRemesher;
 
-    template<int DOM_DIM, int AMB_DIM, typename Real_, typename Int_, typename LInt_, typename SReal_, typename ExtReal_>
+    template<
+        int DOM_DIM, int AMB_DIM,
+        typename Real_, typename Int_, typename LInt_,
+        typename SReal_ = Real_, typename ExtReal_ = Real_
+    >
     class SimplicialMesh : public SimplicialMeshBase<Real_,Int_,LInt_,SReal_,ExtReal_>
     {   
         static_assert(DOM_DIM >= 0       , "Domain dimension must be nonnegative.");
@@ -656,9 +660,9 @@ namespace Repulsor
             ptoc(className()+"::Assemble_ClusterTree_SimplexEnergies");
         }
 
-//##############################################################################################
+//#######################################################################################
 //      Obstacle
-//##############################################################################################
+//#######################################################################################
 
         virtual void LoadObstacle( std::unique_ptr<Obstacle_T> obstacle_ ) override
         {
@@ -680,9 +684,8 @@ namespace Repulsor
             {
                 obstacle = std::move(obstacle_);
             }
-
+            
             this->SetPersistentCache(tag, std::any( obstacle ) );
-
         }
         
         cref<Obstacle_T> GetObstacle() const override
@@ -745,9 +748,9 @@ namespace Repulsor
         }
 
         
-//##############################################################################################
+//#########################################################################################
 //      IO
-//##############################################################################################
+//#########################################################################################
      
     public:
         
@@ -795,9 +798,9 @@ namespace Repulsor
             ptoc(ClassName()+"::WriteToFile");
         }
         
-//##############################################################################################
+//#########################################################################################
 //      Remesher
-//##############################################################################################
+//#########################################################################################
         
     public:
         
@@ -828,9 +831,9 @@ namespace Repulsor
             }
         }
         
-//##############################################################################################
+//#########################################################################################
 //      Standard interface
-//##############################################################################################
+//#########################################################################################
         
     public:
         
