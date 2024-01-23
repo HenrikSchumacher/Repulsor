@@ -1,91 +1,84 @@
+#include <filesystem>
 #include <iostream>
 
-#include <sys/types.h>
-#include <pwd.h>
-
-// We have to toggle which domain dimensions and ambient dimensions shall be supported by runtime polymorphism before we load Repulsor.hpp
-// You can activate everything you want, but compile times might increase substatially.
-
-//#define NDEBUG
-#define TOOLS_DEBUG
-
-#define TOOLS_ENABLE_PROFILER // enable profiler
-
-#define LAPACK_DISABLE_NAN_CHECK
-
-/// Use these while on a mac. Don't forget to issue the
-/// compiler flag `-framework Accelerate`.
-#define ACCELERATE_NEW_LAPACK
-#include <Accelerate/Accelerate.h>
+/// This is a simple program meant to make you familiar with how to
+/// - generate a simplicial mesh from data _from file_;
+/// - compute the tangent-point energy (and derivative) of such a mesh;
+/// - perform matrix-vector operations with the tangent-point metric;
+/// - compute the gradient of the tangent-point energy w.r.t. that metric; and
+/// - find a collision-free step size for a displacement field along the manifold.
 
 
+/// Enable the shipped profiler.
+#define TOOLS_ENABLE_PROFILER
+
+#ifdef __APPLE__
+/// Use these while on a mac. Don't forget to issue the compiler flag `-framework Accelerate`.
+///
+    #define ACCELERATE_NEW_LAPACK
+    #include <Accelerate/Accelerate.h>
+#else
 /// Use these instead of Accelerate under Windows or Linux, e.g. together with OpenBLAS, Intel oneMKL, AMD AOCL-BLAS. Of course, your path variables or compiler flags should hint the compiler to these files. And you also have to link the according libraries.
-//#include <cblas.h>
-//#include <lapack.h>
+
+/// This should work for OpenBLAS.
+
+    #include <cblas.h>
+    #include <lapack.h>
+
+/// Use this with Intel oneMKL. Check their documentation if you are unsure.
+
+    //#include <mkl_cblas.h>
+    //#include <mkl_lapack.h>
+
+#endif
 
 #include "../Repulsor.hpp"
-#include "../submodules/Tensors/Sparse.hpp"
 
-
-using namespace Repulsor;
-using namespace Tensors;
 using namespace Tools;
 
-using Int     = Int64;
-using LInt    = Int64;
-using ExtInt  = Int64;
+using Int     = int;
+using LInt    = std::size_t;
 
-using Real    = Real64;
-using SReal   = Real64;
-using ExtReal = Real64;
+using Real    = double;
 
-
-int main(int argc, const char * argv[])
+int main(void)
 {
-    const char * homedir = getenv("HOME");
-
-    if( homedir == nullptr)
-    {
-        homedir = getpwuid(getuid())->pw_dir;
-    }
-    std::string home ( homedir );
+    /// Set up profiler to write to `~/Tools_Profile.tsv` and `~/Tools_Log.txt`
+    Profiler::Clear( getenv("HOME") );
     
-    Profiler::Clear( home );
+    using Mesh_T   = Repulsor::SimplicialMeshBase<Real,Int,LInt>;
+    using Energy_T = Repulsor::EnergyBase<Mesh_T>;
+    using Metric_T = Repulsor::MetricBase<Mesh_T>;
 
-    std::string path = home + "/github/BAEMM/Meshes/";
-    std::string name = "TorusMesh_00038400T.txt";
-//    std::string name = "Spot_00005856T.txt";
+    const Int thread_count = 8;
     
-    
-    using Mesh_T   = SimplicialMeshBase<Real,Int,LInt,SReal,ExtReal>;
-    using Energy_T = EnergyBase<Mesh_T>;
-    using Metric_T = MetricBase<Mesh_T>;
-
-    const Int thread_count = 1;
+    /// These turned out to be good choices for the parameters of the tangent-point energy for 2-dimensional surfaces.
     const Real q = 6;
     const Real p = 12;
     
-    SimplicialMesh_Factory<Mesh_T,2,2,3,3> mesh_factory;
-    TangentPointEnergy_Factory<Mesh_T,2,2,3,3> TPE_factory;
-//    TangentPointMetric_Factory<Mesh_T,2,2,3,3> TPM_factory;
+    Repulsor::SimplicialMesh_Factory<Mesh_T,2,2,3,3> mesh_factory;
+    Repulsor::TangentPointEnergy0_Factory<Mesh_T,2,2,3,3> TPE_factory;
+    Repulsor::TangentPointMetric0_Factory<Mesh_T,2,2,3,3> TPM_factory;
     
     std::unique_ptr<Energy_T> tpe_ptr = TPE_factory.Make(2,3,q,p);
+    std::unique_ptr<Metric_T> tpm_ptr = TPM_factory.Make(2,3,q,p);
+    
     const auto & tpe = *tpe_ptr;
-
-//    std::unique_ptr<Metric_T> tpm_ptr = TPM_factory.Make(2,3,q,p);
-//    const auto & tpm = *tpm_ptr;
+    const auto & tpm = *tpm_ptr;
     
     tic("Initializing mesh");
-    std::unique_ptr<Mesh_T> M_ptr = mesh_factory.Make_FromFile( path + name, thread_count );
+    
+    std::filesystem::path this_file { __FILE__ };
+    std::filesystem::path repo_dir  = this_file.parent_path().parent_path();
+    std::filesystem::path mesh_file = repo_dir / "Meshes" / "TorusMesh_00038400T.txt";
+    
+    std::unique_ptr<Mesh_T> M_ptr = mesh_factory.Make_FromFile(
+        mesh_file.c_str(), thread_count
+    );
     
     auto & M = *M_ptr;
-    
-    dump(M.ThreadCount());
 
     toc("Initializing mesh");
-    
-    dump( min_buffer( M.Simplices().data(), (M.DomDim()+1) * M.SimplexCount() ) );
-    dump( max_buffer( M.Simplices().data(), (M.DomDim()+1) * M.SimplexCount() ) );
     
     print("");
     
@@ -97,77 +90,79 @@ int main(int argc, const char * argv[])
     M.block_cluster_tree_settings.far_field_separation_parameter   =  0.25;
     M.adaptivity_settings.theta                                    = 10.0;
 
-    tic("GetClusterTree");
-    /// It is not necessary to call this separately.
-    /// It will automatically be called by all routines that require it.
-    M.GetClusterTree();
-    toc("GetClusterTree");
-
-    tic("GetBlockClusterTree");
-    /// It is not necessary to call this separately.
-    /// It will automatically be called by all routines that require it.
-    M.GetBlockClusterTree();
-    toc("GetBlockClusterTree");
-//
     
-    double en;
-    /// `Mesh_T::CotangentVector_T` is `Tensor2<REAL,INT>` in this case. It is a simple container class for heap-allocated matrices.
-    Mesh_T::CotangentVector_T diff;
-
-    tic("tpe.Energy(M)");
-    en = tpe.Value(M);
-    toc("tpe.Energy(M)");
+    Real en;
+    Mesh_T::CotangentVector_T diff ( M.VertexCount(), M.AmbDim() );
+    
+    tic("Compute tangent-point energy and derivative");
+//    en = tpe.Value(M);
+    en = tpe.Differential(M, diff.data());
+    toc("Compute tangent-point energy and derivative");
 
     dump(en);
 
-    tic("tpe.Differential(M)");
-    diff = tpe.Differential(M);
-    toc("tpe.Differential(M)");
-
+    
+    /// This is how you can get the gradient of the tangent-point energy:
+    const Int  max_iter  = 100;
+    const Real relative_tolerance = 0.00001;
+    
+    Mesh_T::TangentVector_T gradient ( M.VertexCount(), M.AmbDim() );
+    
+    tic("Solving for gradient");
+    /// We have to solve M.AmbDim() equations at once.
+    tpm.Solve(M, diff.data(), gradient.data(), M.AmbDim(), max_iter, relative_tolerance );
+    toc("Solving for gradient");
+    
+    dump(tpm.CG_IterationCount());
+    dump(tpm.CG_RelativeResiduals());
+    
+    
+    Mesh_T::TangentVector_T downward_gradient = gradient;
+    
+    downward_gradient*= -1.;
     
     print("");
     
+    /// Given a displacement field like `downward_gradient` along the manifold `M`, you can use `MaximumSafeStepSize` to compute an (almost) maximal collision-free step size in the interval [0,1].
     tic("MaximumSafeStepSize");
-    Tensor2<Real,Int> V ( M.VertexCount(), M.AmbDim() );
-    V.Random();
-    const Real t = M.MaximumSafeStepSize(V.data(), 1.);
+    const Real t = M.MaximumSafeStepSize(downward_gradient.data(), 1.);
+    
     toc("MaximumSafeStepSize");
-    dump(t);
+    
+    valprint("Collision-free step size",t);
     
     print("");
-    print("###############################################");
+    
+    
     print("");
+    
     tic("SemiStaticUpdate");
-    V *= t;
-    V += M.VertexCoordinates();
+    /// X = M.VertexCoordinates() + t * downward_gradient.
     
-    M.SemiStaticUpdate(V.data());
+    Mesh_T::TangentVector_T X = downward_gradient;
+    X *= t;
+    X += M.VertexCoordinates();
+
+    
+    /// Update mesh without rebuilding the bounding volume hierarchy.
+    /// Use this for line search!
+    M.SemiStaticUpdate( X.data() );
+    
     toc("SemiStaticUpdate");
+    
     print("");
     
+    /// Let's see whether the energy has decreased...
     
+    Real en_new;
+
+    tic("Compute tangent-point energy of updated mesh");
+    en_new = tpe.Value(M);
+    toc("Compute tangent-point energy of updated mesh");
+
+    dump(en_new);
     
-    tic("GetClusterTree");
-    /// It is not necessary to call this separately.
-    /// It will automatically be called by all routines that require it.
-    M.GetClusterTree();
-    toc("GetClusterTree");
-
-    tic("GetBlockClusterTree");
-    /// It is not necessary to call this separately.
-    /// It will automatically be called by all routines that require it.
-    M.GetBlockClusterTree();
-    toc("GetBlockClusterTree");
-    
-    tic("tpe.Energy(M)");
-    en = tpe.Value(M);
-    toc("tpe.Energy(M)");
-
-    dump(en);
-
-    tic("tpe.Differential(M)");
-    diff = tpe.Differential(M);
-    toc("tpe.Differential(M)");
+    dump(en_new < en);
     
 
     return 0;
