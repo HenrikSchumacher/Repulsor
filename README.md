@@ -1,6 +1,19 @@
 # Repulsor
 
-# Installation
+by Henrik Schumacher 
+
+This header-only _C++_ library allows you to work with the tangent-point energy of curves and surface in 2-, 3-, and 4-dimensional Euclidean space.
+
+The library provide:
+
+- A simple data structure for simplicial meshes.
+- An implementation of the naive (all-pairs) discrete tangent-point energy and its derivative.
+- An implementation of the multipole-accelerate discrete tangent-point energy and its derivative.
+- Facilities to compute the matrix-vector product with an (almost) Riemannian metric.
+- An interative solver for this Riemannian metric that can be used to compute a good Sobolev gradient for steepest descent.  
+
+
+# Download/installation
 
 Either clone with
 
@@ -13,15 +26,65 @@ or clone as usual and then run the following to connect all submodules to their 
 
 Pull changes from the remote repositories of any submodule by executing
 
-    git submodule foreach --recursive git checkout main
-    git submodule foreach --recursive git pull
-    
-    
-# Trouble shooting
+    git pull && git submodule foreach --recursive "git checkout main && git pull"
 
-If you accidentally modified one of the submodules you can run
-
-    git submodule foreach --recursive git reset --hard
     
-to repair this.
+# Usage
 
+## Within the _C++_ code
+
+_Repulsor_ is header-only, so do not have to precompile anything and thus you also find no makefile here. Just include
+
+    #include "Repulsor.hpp"
+    
+and tell your compiler where to find it: either put the parent directory of this file onto the search path or submit it with the `-I` compiler command (_clang_ or _gcc_ ).
+
+However, you also need implementations of _CBLAS_ and _LAPACK_. There are various choices for this and they may have a heavy impact on the performance. That's why I did not hard-code any implementation into `Repulsor.hpp`. (Moreover, for lacking appropriate test systems, I cannot give any educated guesses for which implementation to use.) See the instructions below for details.
+
+## CBLAS/LAPACK
+
+Most CBLAS and LAPACK implementations come with files `cblas.h` and `lapack.h`, e.g.,
+_OpenBLAS_ (which might be the most portable option), _Intel oneMKL_ (only recommended on Intel hardware), _AMD AOCL-BLAS_ (on AMD hardware). In that case, just put
+
+    #define LAPACK_DISABLE_NAN_CHECK
+    #include <cblas.h>
+    #include <lapack.h>
+
+into your _C++_ code _before_ you include `Repulsor.hpp`. Of course, your path variables or compiler flags should hint the compiler to these files. And you also have to link the according libraries. But the actual library name and so the linker command may differ from implementation to implementation, so please refer to their documentations for details.
+
+Under macos you can (and IMHO should) use the _Accelerate_ framework. Make sure to use the most recent API by inserting this
+
+    #define LAPACK_DISABLE_NAN_CHECK
+    #define ACCELERATE_NEW_LAPACK
+    #include <Accelerate/Accelerate.h>
+    
+into your code before you include `Repulsor.hpp`. Then you also have to issue the compile option `-framework Accelerate`.
+
+
+## Compiling and linking
+
+The code should be largely portable, but for a lack of test sytems, I tested it only in the following configurations:
+
+- under macos on Apple Silicon with _Apple clang_ as compiler and 
+- under Linux with x86 processors with _gcc_ as compiler. 
+
+This is why I give instructions only for _clang_ and _gcc_.
+In particular, I have no experience with the Microsoft Visual C++ Compiler. So beware that the options and flags there might come under different names. 
+
+
+### Compiler options
+
+_Repulsor_ uses several _C++ 20_ features, so make sure to use a compatible _C++_ implementation, e.g., by issueing the compiler option `-std=c++20`.
+
+Older versions of _Repulsor_ employd _OpenMP_ for parallelization. That turned out to be a maintenance hell because of various incompatible implementations (`libomp`, `libiomp5`, `libgomp`,...) Nowadays _Repulsor_ simply spawns a couple of `std::thread`s when needed. So make sure to use the `-pthread` option.
+Btw., _Repulsor_ does not use any sophisticated thread pools like _OpenMP_ does, so I do not expect any problems with other parallelization frameworks. (Curiously, this did not come with _any_ performance penalty.)
+
+Optimization flags like `-O3` or even `-Ofast` are certainly a good idea. I also found that using `-flto` can make a measurable difference.
+
+With _clang_ as compiler you also have to issue `-fenable-matrix` to enable the clang matrix extension.
+
+If you use _Accelerate_, then you also have to add the compiler option `-framework Accelerate`.
+
+### Linker flags
+
+Only the linker flags needed for CBLAS and LAPACK; nothing if you use _Accelerate_. 
