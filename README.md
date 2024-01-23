@@ -2,15 +2,21 @@
 
 by Henrik Schumacher 
 
-This header-only _C++_ library allows you to work with the tangent-point energy of curves and surface in 2-, 3-, and 4-dimensional Euclidean space.
+This header-only _C++_ library allows you to work with the so-called _generalized tangent-point energy_ of curves and surface in 2-, 3-, and 4-dimensional Euclidean space.
 
 The library provide:
 
-- A simple data structure for simplicial meshes.
-- An implementation of the naive (all-pairs) discrete tangent-point energy and its derivative.
-- An implementation of the multipole-accelerate discrete tangent-point energy and its derivative.
-- Facilities to compute the matrix-vector product with an (almost) Riemannian metric.
-- An interative solver for this Riemannian metric that can be used to compute a good Sobolev gradient for steepest descent.  
+- a simple data structure for simplicial meshes --> `SimplicialMesh`;
+- an implementation of the naive (all-pairs) discrete tangent-point energy and its derivative --> `TangentPointEnergy_AllPairs`;
+- an implementation of the multipole-accelerate discrete tangent-point energy and its derivative (it can also be used to compute Coulomb-like potentials when setting the exponent of the numerator to 0)  --> `TangentPointEnergy0`;
+- an implementation of the multipole-accelerate discrete tangent-point energy between a manifold and an obstacle manifold (of potentially different dimens)  --> `TangentPointObstacleEnergy`;
+- facilities to compute the matrix-vector product with an (almost) Riemannian metric --> `TangentPointMetric0`;
+- an interative solver for this Riemannian metric that can be used to compute a good Sobolev gradient for steepest descent --> `TangentPointMetric0::Solve`;  
+- a line search implementation for finding collision-free step sizes in the direction into a given displacement field along a curve or surface --> `SimplicialMesh::MaximumSafeStepSize`.
+
+Moreover, the library provides a simple remesher based in edge-splits and edge-contractions (see `SimplicialRemesher`).
+
+For code examples please see the directories `Example` and `Example2`.  
 
 
 # Download/installation
