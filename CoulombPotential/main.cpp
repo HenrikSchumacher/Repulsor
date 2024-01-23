@@ -1,24 +1,27 @@
+#include <filesystem>
 #include <iostream>
 
-#include <sys/types.h>
-#include <pwd.h>
+#define TOOLS_ENABLE_PROFILER
 
-//#define NDEBUG
-#define TOOLS_DEBUG
-
-#define TOOLS_ENABLE_PROFILER // enable profiler
-
-#define LAPACK_DISABLE_NAN_CHECK
-
-/// Use these while on a mac. Don't forget to issue the
-/// compiler flag `-framework Accelerate`.
-#define ACCELERATE_NEW_LAPACK
-#include <Accelerate/Accelerate.h>
-
-
+#ifdef __APPLE__
+/// Use these while on a mac. Don't forget to issue the compiler flag `-framework Accelerate`.
+///
+    #define ACCELERATE_NEW_LAPACK
+    #include <Accelerate/Accelerate.h>
+#else
 /// Use these instead of Accelerate under Windows or Linux, e.g. together with OpenBLAS, Intel oneMKL, AMD AOCL-BLAS. Of course, your path variables or compiler flags should hint the compiler to these files. And you also have to link the according libraries.
-//#include <cblas.h>
-//#include <lapack.h>
+
+/// This should work for OpenBLAS.
+
+    #include <cblas.h>
+    #include <lapack.h>
+
+/// Use this with Intel oneMKL. Check their documentation if you are unsure.
+
+    //#include <mkl_cblas.h>
+    //#include <mkl_lapack.h>
+
+#endif
 
 #include "../Repulsor.hpp"
 
@@ -36,21 +39,10 @@ using SReal   = Real64;
 using ExtReal = Real64;
 
 
-int main(int argc, const char * argv[])
+int main(void)
 {
-    const char * homedir = getenv("HOME");
-
-    if( homedir == nullptr)
-    {
-        homedir = getpwuid(getuid())->pw_dir;
-    }
-    std::string home ( homedir );
-    
-    Profiler::Clear( home );
-
-    std::string path = home + "/github/Repulsor/CoulombPotential/";
-    std::string name = "Sphere_Points.txt";
-    
+    /// Set up profiler to write to `~/Tools_Profile.tsv` and `~/Tools_Log.txt`
+    Profiler::Clear( getenv("HOME") );
     
     using Mesh_T      = SimplicialMesh<0,3,Real,Int,LInt,SReal,ExtReal>;
     using MeshBase_T  = SimplicialMeshBase<Real,Int,LInt,SReal,ExtReal>;
@@ -61,7 +53,13 @@ int main(int argc, const char * argv[])
 
     tic("Initializing mesh");
 
-    std::unique_ptr<MeshBase_T> M_ptr = mesh_factory.Make_FromFile( path + name, thread_count );
+    std::filesystem::path this_file { __FILE__ };
+    std::filesystem::path repo_dir  = this_file.parent_path().parent_path();
+    std::filesystem::path mesh_file = repo_dir / "Meshes" / "Sphere_Points.txt";
+    
+    std::unique_ptr<MeshBase_T> M_ptr = mesh_factory.Make_FromFile(
+        mesh_file.c_str(), thread_count
+    );
 
     Tensor1<Real,Int> vertex_charges ( M_ptr->VertexCount(), 1. );
 
@@ -96,23 +94,16 @@ int main(int argc, const char * argv[])
 
     const Real alpha = 1;
 
-//    CoulombEnergy<Mesh_T> E( alpha );
-
     TangentPointEnergy<Mesh_T> E( 0, alpha );
 
     ExtReal en;
-    // Mesh_T::CotangentVector_T is Tensor2<REAL,INT> in this case. It is a simple container class for heap-allocated matrices.
-    Mesh_T::CotangentVector_T diff;
-//
-    tic("tpe.Energy(M)");
-    en = E.Value(M);
-    toc("tpe.Energy(M)");
-
-    dump(en);
+    Mesh_T::CotangentVector_T diff ( M.VertexCount(), M.AmbDim() );
 
     tic("tpe.Differential(M)");
-    diff = E.Differential(M);
+    en = E.Differential(M, diff.data());
     toc("tpe.Differential(M)");
+
+    dump(en);
     
     return 0;
 }

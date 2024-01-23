@@ -17,7 +17,11 @@ namespace Repulsor
     
     template<typename Mesh_T,int DOM_DIM_T> class CLASS {};
     
-    template<int DOM_DIM_S, int DOM_DIM_T, int AMB_DIM,typename Real, typename Int, typename LInt, typename SReal, typename ExtReal>
+    template<
+        int DOM_DIM_S, int DOM_DIM_T, int AMB_DIM,
+        typename Real, typename Int, typename LInt,
+        typename SReal, typename ExtReal
+    >
     class CLASS<MESH, DOM_DIM_T> : public BASE
     {
     public:
@@ -28,7 +32,8 @@ namespace Repulsor
         using Root_T              = typename Base_T::Root_T;
         
         using ClusterTree_T       = typename Mesh_T::ClusterTree_T;
-        // We have to explicitly allow an unsymmetryc BCT.
+        
+        // We have to explicitly allow an unsymmetric BCT.
         using BlockClusterTree_T  = BlockClusterTree<AMB_DIM,Real,Int,LInt,SReal,ExtReal,false>;
         
         
@@ -41,8 +46,8 @@ namespace Repulsor
         
         CLASS( const Real q_, const Real p_ )
         :   Base_T ()
-        ,   q    ( static_cast<Real>(q_) )
-        ,   p    ( static_cast<Real>(p_) )
+        ,   q      ( static_cast<Real>(q_) )
+        ,   p      ( static_cast<Real>(p_) )
         {}
         
         virtual ~CLASS() = default;
@@ -56,7 +61,7 @@ namespace Repulsor
         
         virtual ExtReal value( const Mesh_T & M ) const override
         {
-            if( M.InCacheQ("Obstacle") )
+            if( M.InPersistentCacheQ("Obstacle") )
             {
                 TP_Traversor<DOM_DIM_S,DOM_DIM_T,BlockClusterTree_T,true,false,false>
                 traversor( M.GetObstacleBlockClusterTree(), this->metric_values, q, p );
@@ -71,7 +76,7 @@ namespace Repulsor
         
         virtual ExtReal differential( const Mesh_T & M ) const override
         {
-            if( M.InCacheQ("Obstacle") )
+            if( M.InPersistentCacheQ("Obstacle") )
             {
                 TP_Traversor<DOM_DIM_S,DOM_DIM_T,BlockClusterTree_T,true,true,false>
                 traversor( M.GetObstacleBlockClusterTree(), this->metric_values, q, p );

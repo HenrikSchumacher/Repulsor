@@ -39,6 +39,11 @@
 			<key>orderHint</key>
 			<integer>4</integer>
 		</dict>
+		<key>Test_Repulsor.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>6</integer>
+		</dict>
 		<key>Test_SpaceFillingCurve.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
@@ -47,6 +52,11 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
+		<key>AF2E85CA2B5F33CB0093AA00</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
 		<key>AF3DADB428ECF0470089476A</key>
 		<dict>
 			<key>primary</key>

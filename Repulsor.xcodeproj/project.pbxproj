@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AF2E85DA2B5F342C0093AA00 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AF2E85D92B5F342C0093AA00 /* main.cpp */; };
+		AF2E85DE2B5F34330093AA00 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AF83C2E8293B426000A23318 /* Accelerate.framework */; };
 		AF3DADB828ECF0470089476A /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AF3DADB728ECF0470089476A /* main.cpp */; };
 		AF68F6DE2A4FE96E00009C92 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AF68F6DD2A4FE96E00009C92 /* main.cpp */; };
 		AF68F6E22A4FE97D00009C92 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AF83C2E8293B426000A23318 /* Accelerate.framework */; };
@@ -21,6 +23,15 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		AF2E85D52B5F342C0093AA00 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 		AF3DADB328ECF0470089476A /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -78,12 +89,14 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		AF2E85C62B5F21D00093AA00 /* Meshes */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Meshes; sourceTree = "<group>"; };
+		AF2E85D72B5F342C0093AA00 /* Test_Repulsor */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Test_Repulsor; sourceTree = BUILT_PRODUCTS_DIR; };
+		AF2E85D92B5F342C0093AA00 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		AF3DADB028ECEFFC0089476A /* src */ = {isa = PBXFileReference; lastKnownFileType = folder; path = src; sourceTree = "<group>"; };
 		AF3DADB528ECF0470089476A /* Example */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Example; sourceTree = BUILT_PRODUCTS_DIR; };
 		AF3DADB728ECF0470089476A /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		AF68F6DB2A4FE96E00009C92 /* CoulombPotential */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = CoulombPotential; sourceTree = BUILT_PRODUCTS_DIR; };
 		AF68F6DD2A4FE96E00009C92 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		AF68F6E32A4FEBB200009C92 /* Sphere_Points.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Sphere_Points.txt; sourceTree = "<group>"; };
 		AF789CF62A4AC95800546B46 /* Example2 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Example2; sourceTree = BUILT_PRODUCTS_DIR; };
 		AF789CF82A4AC95800546B46 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		AF809C802AAD3767005895C7 /* Test_SpaceFillingCurve */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Test_SpaceFillingCurve; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -96,11 +109,18 @@
 		AF98B21F28EF0DDC00413977 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		AF9C9BCB2A5230B8008AB9E6 /* Test_Preconditioner */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Test_Preconditioner; sourceTree = BUILT_PRODUCTS_DIR; };
 		AF9C9BCD2A5230B8008AB9E6 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		AFA60FCE2906739700CF0C41 /* Meshes.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Meshes.hpp; sourceTree = "<group>"; };
 		AFBAFE592A8004CC00F734EE /* submodules */ = {isa = PBXFileReference; lastKnownFileType = folder; path = submodules; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		AF2E85D42B5F342C0093AA00 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AF2E85DE2B5F34330093AA00 /* Accelerate.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		AF3DADB228ECF0470089476A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -151,10 +171,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		AF2E85D82B5F342C0093AA00 /* Test_Repulsor */ = {
+			isa = PBXGroup;
+			children = (
+				AF2E85D92B5F342C0093AA00 /* main.cpp */,
+			);
+			path = Test_Repulsor;
+			sourceTree = "<group>";
+		};
 		AF3DADB628ECF0470089476A /* Example */ = {
 			isa = PBXGroup;
 			children = (
-				AFA60FCE2906739700CF0C41 /* Meshes.hpp */,
 				AF3DADB728ECF0470089476A /* main.cpp */,
 			);
 			path = Example;
@@ -163,6 +190,7 @@
 		AF47AFFA28ECEE8800A5FCEA = {
 			isa = PBXGroup;
 			children = (
+				AF2E85C62B5F21D00093AA00 /* Meshes */,
 				AF88400F28ECEEBA0040A2FC /* LICENSE */,
 				AFBAFE592A8004CC00F734EE /* submodules */,
 				AF3DADB028ECEFFC0089476A /* src */,
@@ -174,6 +202,7 @@
 				AF9C9BCC2A5230B8008AB9E6 /* Test_Preconditioner */,
 				AF8B89232A6D09F8009498F2 /* Test_Remesher */,
 				AF809C812AAD3767005895C7 /* Test_SpaceFillingCurve */,
+				AF2E85D82B5F342C0093AA00 /* Test_Repulsor */,
 				AF47B00428ECEE8800A5FCEA /* Products */,
 				AF83C2E7293B426000A23318 /* Frameworks */,
 			);
@@ -188,6 +217,7 @@
 				AF9C9BCB2A5230B8008AB9E6 /* Test_Preconditioner */,
 				AF8B89222A6D09F8009498F2 /* Test_Remesher */,
 				AF809C802AAD3767005895C7 /* Test_SpaceFillingCurve */,
+				AF2E85D72B5F342C0093AA00 /* Test_Repulsor */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -196,7 +226,6 @@
 			isa = PBXGroup;
 			children = (
 				AF68F6DD2A4FE96E00009C92 /* main.cpp */,
-				AF68F6E32A4FEBB200009C92 /* Sphere_Points.txt */,
 			);
 			path = CoulombPotential;
 			sourceTree = "<group>";
@@ -244,6 +273,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		AF2E85D62B5F342C0093AA00 /* Test_Repulsor */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AF2E85DB2B5F342C0093AA00 /* Build configuration list for PBXNativeTarget "Test_Repulsor" */;
+			buildPhases = (
+				AF2E85D32B5F342C0093AA00 /* Sources */,
+				AF2E85D42B5F342C0093AA00 /* Frameworks */,
+				AF2E85D52B5F342C0093AA00 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Test_Repulsor;
+			productName = Test_Repulsor;
+			productReference = AF2E85D72B5F342C0093AA00 /* Test_Repulsor */;
+			productType = "com.apple.product-type.tool";
+		};
 		AF3DADB428ECF0470089476A /* Example */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = AF3DADB928ECF0470089476A /* Build configuration list for PBXNativeTarget "Example" */;
@@ -353,8 +399,12 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1520;
 				LastUpgradeCheck = 1520;
 				TargetAttributes = {
+					AF2E85D62B5F342C0093AA00 = {
+						CreatedOnToolsVersion = 15.2;
+					};
 					AF3DADB428ECF0470089476A = {
 						CreatedOnToolsVersion = 14.0.1;
 					};
@@ -394,11 +444,20 @@
 				AF9C9BCA2A5230B8008AB9E6 /* Test_Preconditioner */,
 				AF8B89212A6D09F8009498F2 /* Test_Remesher */,
 				AF809C7F2AAD3767005895C7 /* Test_SpaceFillingCurve */,
+				AF2E85D62B5F342C0093AA00 /* Test_Repulsor */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
+		AF2E85D32B5F342C0093AA00 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AF2E85DA2B5F342C0093AA00 /* main.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		AF3DADB128ECF0470089476A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -450,10 +509,38 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		AF2E85DC2B5F342C0093AA00 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = Y6DQ749ZRT;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		AF2E85DD2B5F342C0093AA00 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = Y6DQ749ZRT;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		AF3DADBA28ECF0470089476A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = Y6DQ749ZRT;
@@ -464,7 +551,6 @@
 		AF3DADBB28ECF0470089476A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = Y6DQ749ZRT;
@@ -536,7 +622,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "";
 				LIBRARY_SEARCH_PATHS = /opt/homebrew/Cellar/openblas/0.3.25/lib;
-				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MACOSX_DEPLOYMENT_TARGET = 14.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -622,7 +708,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "";
 				LIBRARY_SEARCH_PATHS = /opt/homebrew/Cellar/openblas/0.3.25/lib;
-				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MACOSX_DEPLOYMENT_TARGET = 14.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -658,7 +744,6 @@
 				DEVELOPMENT_TEAM = Y6DQ749ZRT;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
-				MACOSX_DEPLOYMENT_TARGET = 13.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -672,7 +757,6 @@
 				DEVELOPMENT_TEAM = Y6DQ749ZRT;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
-				MACOSX_DEPLOYMENT_TARGET = 13.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -685,7 +769,6 @@
 				DEVELOPMENT_TEAM = Y6DQ749ZRT;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
-				MACOSX_DEPLOYMENT_TARGET = 13.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -699,7 +782,6 @@
 				DEVELOPMENT_TEAM = Y6DQ749ZRT;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
-				MACOSX_DEPLOYMENT_TARGET = 13.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -712,7 +794,6 @@
 				DEVELOPMENT_TEAM = Y6DQ749ZRT;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
-				MACOSX_DEPLOYMENT_TARGET = 13.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -726,7 +807,6 @@
 				DEVELOPMENT_TEAM = Y6DQ749ZRT;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
-				MACOSX_DEPLOYMENT_TARGET = 13.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -739,7 +819,6 @@
 				DEVELOPMENT_TEAM = Y6DQ749ZRT;
 				ENABLE_HARDENED_RUNTIME = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
-				MACOSX_DEPLOYMENT_TARGET = 13.3;
 				OTHER_LDFLAGS = (
 					"-ldl",
 					"-lm",
@@ -762,7 +841,6 @@
 				DEVELOPMENT_TEAM = Y6DQ749ZRT;
 				ENABLE_HARDENED_RUNTIME = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
-				MACOSX_DEPLOYMENT_TARGET = 13.3;
 				OTHER_LDFLAGS = (
 					"-ldl",
 					"-lm",
@@ -784,7 +862,6 @@
 				DEVELOPMENT_TEAM = Y6DQ749ZRT;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
-				MACOSX_DEPLOYMENT_TARGET = 13.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -798,7 +875,6 @@
 				DEVELOPMENT_TEAM = Y6DQ749ZRT;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
-				MACOSX_DEPLOYMENT_TARGET = 13.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -806,6 +882,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		AF2E85DB2B5F342C0093AA00 /* Build configuration list for PBXNativeTarget "Test_Repulsor" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AF2E85DC2B5F342C0093AA00 /* Debug */,
+				AF2E85DD2B5F342C0093AA00 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		AF3DADB928ECF0470089476A /* Build configuration list for PBXNativeTarget "Example" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

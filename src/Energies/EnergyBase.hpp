@@ -39,18 +39,18 @@ namespace Repulsor
         // Return the value of the energy; use caching.
         ExtReal Value( mref<MeshBase_T> M ) const
         {
-            ptic(ClassName()+"::Value");
+            std::string tag = ClassName()+"::Value";
             
-            if( !M.InCacheQ(ClassName()+"::Value"))
+            ptic(tag);
+            
+            if( !M.InCacheQ(tag) )
             {
-//                std::any energy = value(M);
-                
-                M.SetCache( ClassName()+"::Value", value(M) );
+                M.SetCache( tag, value(M) );
             }
             
-            ptoc(ClassName()+"::Value");
+            ptoc(tag);
             
-            return std::any_cast<ExtReal>( M.GetCache(ClassName()+"::Value") );
+            return std::any_cast<ExtReal>( M.GetCache(tag) );
         }
         
     protected:
@@ -63,12 +63,12 @@ namespace Repulsor
         // Return the differential of the energy; use caching.
         cref<CotangentVector_T> Differential( mref<MeshBase_T> M ) const
         {
-            ptic(ClassName()+"::Differential");
+            std::string tag = ClassName()+"::Differential";
+                
+            ptic(tag);
             
-            if( !M.InCacheQ(ClassName()+"::Differential"))
+            if( !M.InCacheQ(tag))
             {
-//                M.GetS().CleanseDerivativeBuffers();
-
                 const ExtReal en = differential(M);
                 
                 if( !M.InCacheQ(ClassName()+"::Value"))
@@ -80,14 +80,12 @@ namespace Repulsor
 
                 M.Assemble_ClusterTree_Derivatives( diff.data(), ExtReal(1), false );
                 
-                M.SetCache( ClassName()+"::Differential", std::move(diff) );
+                M.SetCache( tag, std::move(diff) );
             }
             
-            ptoc(ClassName()+"::Differential");
+            ptoc(tag);
             
-            return std::any_cast<CotangentVector_T &>(
-                M.GetCache(ClassName()+"::Differential")
-            );
+            return std::any_cast<CotangentVector_T &>( M.GetCache(tag) );
         }
         
         // Return the differential of the energy to a pointer; don't use any caching.
