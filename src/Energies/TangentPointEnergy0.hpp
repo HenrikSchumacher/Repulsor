@@ -32,6 +32,12 @@ namespace Repulsor
         using Base_T::Value;
         using Base_T::Differential;
         
+        CLASS( const Real p_ )
+        :   Base_T ()
+        ,   q ( p_ )
+        ,   p ( Scalar::Two<Real> * p_ )
+        {}
+        
         CLASS( const Real q_, const Real p_ )
         :   Base_T ()
         ,   q ( q_ )

@@ -24,6 +24,11 @@
 			<key>orderHint</key>
 			<integer>0</integer>
 		</dict>
+		<key>Example_Surface.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>7</integer>
+		</dict>
 		<key>Repulsor.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
@@ -52,6 +57,11 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
+		<key>AF26D85F2B696A4F00C13DAB</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
 		<key>AF2E85CA2B5F33CB0093AA00</key>
 		<dict>
 			<key>primary</key>

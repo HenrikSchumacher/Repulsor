@@ -12,7 +12,7 @@ namespace Repulsor
 
     template<
         int DOM_DIM, int AMB_DIM,
-        typename Real_, typename Int_, typename LInt_,
+        typename Real_, typename Int_ = int, typename LInt_ = Size_T,
         typename SReal_ = Real_, typename ExtReal_ = Real_
     >
     class SimplicialMesh : public SimplicialMeshBase<Real_,Int_,LInt_,SReal_,ExtReal_>
@@ -71,6 +71,39 @@ namespace Repulsor
         
         SimplicialMesh() = default;
 
+        SimplicialMesh(
+            cref<Tensor2<Real,Int>> V_coords_,
+            // vertex coordinates; assumed to be of size vertex_count_ x AMB_DIM
+            cref<Tensor2<Int, Int>> simplices_,
+            // simplices; assumed to be of size simplex_count_ x (DOM_DIM+1)
+            const Size_T thread_count_ = 1
+        )
+        :   SimplicialMesh(
+                  V_coords_.data(),
+                  V_coords_.Dimension(0),
+                  false,
+                  simplices_.data(),
+                  simplices_.Dimension(0),
+                  false,
+                  int_cast<Int>(thread_count_)
+            )
+        {
+            ptic(className()+"()");
+            if( V_coords_.Dimension(1) != AMB_DIM )
+            {
+                eprint(className()+" : V_coords.Dimension(1) != AMB_DIM");
+                ptoc(className()+"()");
+                return;
+            }
+            if( simplices_.Dimension(1) != DOM_DIM+1 )
+            {
+                eprint(className()+" : simplices_.Dimension(1) != DOM_DIM+1");
+                ptoc(className()+"()");
+                return;
+            }
+            ptoc(className()+"()");
+        }
+        
         SimplicialMesh(
             cref<Tensor2<Real,Int>> V_coords_,
             // vertex coordinates; assumed to be of size vertex_count_ x AMB_DIM

@@ -26,6 +26,14 @@ namespace Repulsor
         using Values_T                = typename ValueContainer_T::Values_T;
         using BASE::MetricValues;
         
+        CLASS( const Real p_ )
+        :   BASE       (                             )
+        ,   q          ( static_cast<Real>(p_)       )
+        ,   p          ( static_cast<Real>( 2 * p_)  )
+        ,   s          ( (p - Scalar::Two<Real>) / q )
+        ,   pseudo_lap ( Scalar::Two<Real> - s       )
+        {}
+        
         CLASS( const Real q_, const Real p_ )
         :   BASE       (                              )
         ,   q          ( static_cast<Real>(q_)        )
