@@ -57,18 +57,18 @@ int main(void)
     constexpr int n = 2;
     constexpr int m = 3;
     
+    double p = 6;
+
     using Mesh_T = Repulsor::SimplicialMesh<n,m,double,int>;
     using TPE_T  = Repulsor::TangentPointEnergy<Mesh_T>;
     
     Mesh_T mesh ( vertex_coords, vertex_count, triangles, triangle_count );
     
-    double p = 6;
-    
     TPE_T tpe ( p );
     
-    double value = tpe.Value( mesh );
+    double energy = tpe.Value( mesh );
     
-    std::cout << "tangent-point energy = " << value << "." << std::endl;
+    std::cout << "tangent-point energy = " << energy << "." << std::endl;
     
     return 0;
 }
