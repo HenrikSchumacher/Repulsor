@@ -1,14 +1,10 @@
 public:
 
-//#######################################################################################
-//####                                AxesToMorton                                  #####
-//#######################################################################################
-
-    Tensor1<Morton_T,Int> AxesToMorton( cref<Tensor1<Axes_T,Int>> A  )
+    Tensor1<MortonCode_T,Int> AxesToMorton( cref<Tensor1<Axes_T,Int>> A  )
     {
         ptic(ClassName()+"::AxesToMorton");
         
-        Tensor1<Morton_T,Int> M ( A.Dimension(0) );
+        Tensor1<MortonCode_T,Int> M ( A.Dimension(0) );
         
         ParallelDo(
             [&]( const Int thread )
@@ -30,7 +26,7 @@ public:
     }
 
     // The actual worker routine.
-    void constexpr AxesToMorton_Reference( cref<Axes_T> a, mref<Morton_T> m ) const
+    void constexpr AxesToMorton_Reference( cref<Axes_T> a, mref<MortonCode_T> m ) const
     {
     //        Not needed because we write all bits.
     //        zerofy_buffer(M, n);
@@ -51,7 +47,7 @@ public:
 
 
     // The actual worker routine.
-    void constexpr AxesToMorton( cref<Axes_T> a, mref<Morton_T> m ) const
+    void constexpr AxesToMorton( cref<Axes_T> a, mref<MortonCode_T> m ) const
     {
         constexpr Int shift = 8 * n;
         

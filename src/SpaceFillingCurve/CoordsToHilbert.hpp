@@ -1,14 +1,11 @@
-//#######################################################################################
-//####                                CoordToHilbert                                #####
-//#######################################################################################
 
-    Tensor1<Morton_T,Int> CoordToHilbert( cptr<Real> X, const Int point_count )
+    Tensor1<HilbertCode_T,Int> CoordsToHilbert( cptr<Real> X, const Int point_count )
     {
         ComputeBoundingBox( X, point_count );
         
-        ptic(ClassName()+"::CoordToHilbert");
+        ptic(ClassName()+"::CoordsToHilbert");
         
-        Tensor1<Morton_T,Int> M ( point_count );
+        Tensor1<MortonCode_T,Int> M ( point_count );
         
         ParallelDo(
             [&,this]( const Int thread )
@@ -20,7 +17,7 @@
                 
                 for( Int i = i_begin; i < i_end; ++ i )
                 {
-                    CoordToAxes( &X[n*i], a );
+                    CoordsToAxes( &X[n*i], a );
                     
                     AxesToHilbert( a, M[i] );
                 }
@@ -28,7 +25,7 @@
             thread_count
         );
         
-        ptoc(ClassName()+"::CoordToHilbert");
+        ptoc(ClassName()+"::CoordsToHilbert");
         
         return M;
     }

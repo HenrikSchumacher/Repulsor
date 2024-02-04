@@ -58,9 +58,9 @@ namespace Repulsor
         static constexpr Int total_byte_count = sizeof(UInt) * n;
         
 
-        using Morton_T = std::array<UInt,n>;
+        using MortonCode_T = std::array<UInt,n>;
         
-        using Hilbert_T = std::array<UInt,n>;
+        using HilbertCode_T = std::array<UInt,n>;
         
         using Axes_T   = std::array<UInt,n>;
         
@@ -95,7 +95,7 @@ namespace Repulsor
 //        UInt Y_buffer [n] = {};   // TransposedIndex
 //        UInt Z_buffer [n] = {};   // Index
 //        UInt H_buffer [n] = {};   // HilbertIndex
-        Morton_T M_buffer = {};   // MortonIndex
+        MortonCode_T M_buffer = {};   // MortonIndex
         
 //        UInt * restrict const Y_scratch = &Y_buffer[0];
 //        UInt * restrict const Z_scratch = &Z_buffer[0];
@@ -107,7 +107,7 @@ namespace Repulsor
         {
 //            dump(sizeof(BitField_T));
 //            dump(sizeof(Axes_T));
-//            dump(sizeof(Morton_T));
+//            dump(sizeof(MortonCode_T));
 
             ptic("Creating lookup table");
             for( Int k = 0; k < 256; ++k )
@@ -230,58 +230,18 @@ namespace Repulsor
             ptoc(ClassName()+"::ComputeBoundingBox");
         }
         
-//        template<typename BigInt>
-//        void FromScalar( const BigInt & s, Morton_T & M )
-//        {
-//            M = {};
-//
-//            for( Int i = 0; i < n; ++i )
-//            {
-//                const int mi = bit_count * i;
-//                
-//                for( Int j = 0; j < bit_count; ++j )
-//                {
-//                    set_bit( M[n-1-i], j, get_bit( s, mi + j ) );
-//                }
-//            }
-//        }
-//
-//        template<typename BigInt>
-//        void ToScalar( const Morton_T & M, BigInt & s )
-//        {
-//            s = 0;
-//
-//            for( Int i = 0; i < n; ++i )
-//            {
-//                const Int mi = bit_count * i;
-//                
-//                for( Int j = 0; j < bit_count; ++j )
-//                {
-//                    set_bit( s, mi + j, get_bit( M[n-1-i], j ) );
-//                }
-//            }
-//        }
-        
-//#include "SpaceFillingCurve/Hilbert.hpp"
-
-#include "SpaceFillingCurve/CoordToAxes.hpp"
+#include "SpaceFillingCurve/CoordsToAxes.hpp"
 #include "SpaceFillingCurve/AxesToMorton.hpp"
-//#include "SpaceFillingCurve/MortonToAxes.hpp"
-#include "SpaceFillingCurve/CoordToMorton.hpp"
+#include "SpaceFillingCurve/MortonToAxes.hpp"
+#include "SpaceFillingCurve/CoordsToMorton.hpp"
 #include "SpaceFillingCurve/MortonOrdering.hpp"
 //#include "SpaceFillingCurve/MortonOrdering_Radix.hpp"
 //#include "SpaceFillingCurve/MortonOrdering_QuickSort.hpp"
 
 
 #include "SpaceFillingCurve/AxesToHilbert.hpp"
-#include "SpaceFillingCurve/CoordToHilbert.hpp"
+#include "SpaceFillingCurve/CoordsToHilbert.hpp"
 #include "SpaceFillingCurve/HilbertOrdering.hpp"
-        
-//#if defined( LTEMPLATE_H)
-//
-//#include "SpaceFillingCurve/Mathematica.hpp"
-//
-//#endif
         
     public:
         

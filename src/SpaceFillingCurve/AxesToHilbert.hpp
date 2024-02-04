@@ -1,43 +1,14 @@
 public:
 
-//#######################################################################################
-//####                                AxesToHilbert                                 #####
-//#######################################################################################
-
-    Tensor1<Hilbert_T,Int> AxesToHilbert( cref<Tensor1<Axes_T,Int>> A  )
-    {
-        ptic(ClassName()+"::AxesToHilbert");
-        
-        Tensor1<Morton_T,Int> H ( A.Dimension(0) );
-        
-        ParallelDo(
-            [&]( const Int thread )
-            {
-                const Int k_begin = JobPointer( A.Dimension(0), thread_count, thread     );
-                const Int k_end   = JobPointer( A.Dimension(0), thread_count, thread + 1 );
-
-                for( Int k = k_begin; k < k_end; ++k )
-                {
-                    AxesToHilbert( A[k], H[k] );
-                }
-            },
-            thread_count
-        );
-        
-        ptoc(ClassName()+"::AxesToHilbert");
-        
-        return H;
-    }
-
 // Port of Paul Chernoch's code on https://stackoverflow.com/a/10384110/8248900.
 // See also this page for the whole project: https://github.com/paulchernoch/HilbertTransformation
 
 
-    void constexpr AxesToHilbert( cref<Axes_T> a, mref<Morton_T> h ) const
+    void constexpr AxesToHilbert( cref<Axes_T> a, mref<MortonCode_T> h ) const
     {
         Axes_T x = a;
 
-        //See David Moton's Java implementation SmallHilbertCurve.java in https://github.com/davidmoten/hilbert-curve.
+        //Code taken from David Moton's Java implementation SmallHilbertCurve.java in https://github.com/davidmoten/hilbert-curve.
         
         constexpr UInt q_max ( one << (bit_count - 1) );
 
@@ -86,4 +57,30 @@ public:
         // Untranspose
         
         AxesToMorton( y, h );
+    }
+
+
+    Tensor1<HilbertCode_T,Int> AxesToHilbert( cref<Tensor1<Axes_T,Int>> A  )
+    {
+        ptic(ClassName()+"::AxesToHilbert");
+        
+        Tensor1<HilbertCode_T,Int> H ( A.Dimension(0) );
+        
+        ParallelDo(
+            [&]( const Int thread )
+            {
+                const Int k_begin = JobPointer( A.Dimension(0), thread_count, thread     );
+                const Int k_end   = JobPointer( A.Dimension(0), thread_count, thread + 1 );
+
+                for( Int k = k_begin; k < k_end; ++k )
+                {
+                    AxesToHilbert( A[k], H[k] );
+                }
+            },
+            thread_count
+        );
+        
+        ptoc(ClassName()+"::AxesToHilbert");
+        
+        return H;
     }

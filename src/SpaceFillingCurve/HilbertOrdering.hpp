@@ -1,18 +1,11 @@
-
 public:
-
-
-//#######################################################################################
-//####                        HilbertOrdering (hybrid sort)                         #####
-//#######################################################################################
-
 
     template<typename Real, typename ExtInt>
     void HilbertOrdering( cptr<Real> X, mptr<ExtInt> perm, const Int point_count )
     {
         ptic(ClassName()+"::HilbertOrdering");
 
-        Tensor1<Hilbert_T,Int> M = CoordToHilbert( X, point_count );
+        Tensor1<HilbertCode_T,Int> M = CoordsToHilbert( X, point_count );
         
         ptic("Ordering");
         Ordering( M.data(), perm, point_count );
