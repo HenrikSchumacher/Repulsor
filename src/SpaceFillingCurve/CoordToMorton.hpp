@@ -15,8 +15,8 @@
             {
                 Axes_T a;
                 
-                const Int i_begin = JobPointer<Int>( point_count, thread_count, thread     );
-                const Int i_end   = JobPointer<Int>( point_count, thread_count, thread + 1 );
+                const Int i_begin = JobPointer( point_count, thread_count, thread     );
+                const Int i_end   = JobPointer( point_count, thread_count, thread + 1 );
                 
                 for( Int i = i_begin; i < i_end; ++ i )
                 {

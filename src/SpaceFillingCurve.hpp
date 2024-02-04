@@ -16,9 +16,11 @@ namespace Repulsor
     // TODO: Input of floating point types? Translation and scaling.
     
     template<int n_, typename Real_, int bit_count_ = 16, typename Int_ = long long>
-    // Pick bit_count_ so that 2^bit_count_ exceeds the largest value in any coordinate.
     class SpaceFillingCurve
     {
+        /// n is the ambient dimensions of space filling curve.
+        /// Pick bit_count_ so that 2^bit_count_ exceeds the largest value in any coordinate.
+        
         ASSERT_INT(Int_);
         ASSERT_FLOAT(Real_);
         
@@ -58,6 +60,8 @@ namespace Repulsor
 
         using Morton_T = std::array<UInt,n>;
         
+        using Hilbert_T = std::array<UInt,n>;
+        
         using Axes_T   = std::array<UInt,n>;
         
         using Vector_T = Tiny::Vector<n,Real,Int>;
@@ -76,7 +80,7 @@ namespace Repulsor
         
         const Int thread_count;
         
-        const UInt q_max;
+//        const UInt q_max;
         
         Vector_T lower;
         Vector_T upper;
@@ -101,9 +105,9 @@ namespace Repulsor
         
         void Init()
         {
-            dump(sizeof(BitField_T));
-            dump(sizeof(Axes_T));
-            dump(sizeof(Morton_T));
+//            dump(sizeof(BitField_T));
+//            dump(sizeof(Axes_T));
+//            dump(sizeof(Morton_T));
 
             ptic("Creating lookup table");
             for( Int k = 0; k < 256; ++k )
@@ -128,7 +132,7 @@ namespace Repulsor
         
         SpaceFillingCurve( const Int thread_count_ = 1 )
         :   thread_count( thread_count_ )
-        ,   q_max( one << (bit_count - 1) )
+//        ,   q_max( one << (bit_count - 1) )
         {
             Init();
         }
@@ -268,6 +272,10 @@ namespace Repulsor
 //#include "SpaceFillingCurve/MortonOrdering_Radix.hpp"
 //#include "SpaceFillingCurve/MortonOrdering_QuickSort.hpp"
 
+
+#include "SpaceFillingCurve/AxesToHilbert.hpp"
+#include "SpaceFillingCurve/CoordToHilbert.hpp"
+#include "SpaceFillingCurve/HilbertOrdering.hpp"
         
 //#if defined( LTEMPLATE_H)
 //

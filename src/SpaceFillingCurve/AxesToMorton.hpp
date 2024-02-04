@@ -13,8 +13,8 @@ public:
         ParallelDo(
             [&]( const Int thread )
             {
-                const Int k_begin = JobPointer<Int>( A.Dimension(0), thread_count, thread     );
-                const Int k_end   = JobPointer<Int>( A.Dimension(0), thread_count, thread + 1 );
+                const Int k_begin = JobPointer( A.Dimension(0), thread_count, thread     );
+                const Int k_end   = JobPointer( A.Dimension(0), thread_count, thread + 1 );
 
                 for( Int k = k_begin; k < k_end; ++k )
                 {   
