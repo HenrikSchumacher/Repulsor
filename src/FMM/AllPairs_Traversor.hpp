@@ -97,11 +97,10 @@ namespace Repulsor
                     const Int i_begin = job_ptr[thread  ];
                     const Int i_end   = job_ptr[thread+1];
 
-                    LOOP_UNROLL(4)
                     for( Int i = i_begin; i < i_end; ++i )
                     {
                         // These are the corresponding nonzero blocks in i-th row.
-                        const Int j_begin = COND( symmetricQ, i+1, 0 );
+                        const Int j_begin = ( symmetricQ ? i+1 : 0 );
                         const Int j_end   = n;
                         
                         // Clear the local vector chunk of the kernel.
@@ -109,7 +108,6 @@ namespace Repulsor
                         
                         const LInt offset = n*i;
                         
-                        LOOP_UNROLL(4)
                         for( Int j = j_begin; j < j_end; ++j )
                         {
                             ker.LoadT(j);

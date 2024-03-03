@@ -222,11 +222,11 @@ namespace Repulsor
                 if constexpr ( diff_flag )
                 {
                     // factor = q / |y-x|^p
-                    const Real factor = COND( q_flag == 0, zero, q * r_minus_p );
+                    const Real factor = ( q_flag == 0 ? zero : q * r_minus_p );
                     // K_xy = q * |P*(y-x)|^(q-2) / |y-x|^p
-                    const Real K_xy   = COND( q_flag == 0, zero, factor * rCosPhi_q_minus_2 );
+                    const Real K_xy   = ( q_flag == 0 ? zero : factor * rCosPhi_q_minus_2 );
                     // K_yx = q * |Q*(y-x)|^(q-2) / |y-x|^p
-                    const Real K_yx   = COND( q_flag == 0, zero, factor * rCosPsi_q_minus_2 );
+                    const Real K_yx   = ( q_flag == 0 ? zero : factor * rCosPsi_q_minus_2 );
                     // H    = p * ( |P*(y-x)|^q + |Q*(y-x)|^q) / |y-x|^(p+2)
                     const Real H = p * r_minus_p_minus_2 * Num;
                     
@@ -235,7 +235,7 @@ namespace Repulsor
                     
                     for( Int i = 0; i < AMB_DIM; ++i )
                     {
-                        dEdv[i] = COND( q_flag == 0, zero, K_xy * Pv[i] + K_yx * Qv[i]) - H * v[i];
+                        dEdv[i] = ( q_flag == 0 ? zero : K_xy * Pv[i] + K_yx * Qv[i]) - H * v[i];
                         dEdvx += dEdv[i] * x[i];
                         dEdvy += dEdv[i] * y[i];
                         

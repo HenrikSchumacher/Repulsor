@@ -84,28 +84,13 @@ protected:
             }
             else
             {
-                const Int C_offset = buffer_dim * C;
-                const Int L_offset = buffer_dim * L;
-                const Int R_offset = buffer_dim * R;
+                combine_buffers<Scalar::Flag::Plus,Scalar::Flag::Plus,BUFFER_DIM>(
+                    Scalar::One<Real>, &C_in[buffer_dim * L],
+                    Scalar::One<Real>, &C_in[buffer_dim * R],
+                                       &C_in[buffer_dim * C],
+                    buffer_dim
+                );
                 
-                if constexpr ( BUFFER_DIM > 0 )
-                {
-                    LOOP_UNROLL_FULL
-                    for( Int k = 0; k < BUFFER_DIM; ++k )
-                    {
-                        // Overwrite, not add-into. Thus cleansing is not required.
-                        C_in[C_offset + k] = C_in[L_offset + k] + C_in[R_offset + k];
-                    }
-                }
-                else
-                {
-                    LOOP_UNROLL(4)
-                    for( Int k = 0; k < buffer_dim; ++k )
-                    {
-                        // Overwrite, not add-into. Thus cleansing is not required.
-                        C_in[C_offset + k] = C_in[L_offset + k] + C_in[R_offset + k];
-                    }
-                }
                 visited[stack_ptr] = false;
                 --stack_ptr;  // pop
             }
@@ -178,33 +163,18 @@ protected:
             
             if( (d < max_depth) && (L >= null) && (R >= null) )
             {
-                const Int C_offset = buffer_dim * C;
-                const Int L_offset = buffer_dim * L;
-                const Int R_offset = buffer_dim * R;
-                
                 // If not a leaf, compute the values of the children first.
-                if constexpr ( BUFFER_DIM > 0 )
-                {
-                    LOOP_UNROLL_FULL
-                    for( Int k = 0; k < BUFFER_DIM; ++k )
-                    {
-                        const Real buffer = C_out[C_offset + k];
-                        
-                        C_out[L_offset + k] += buffer;
-                        C_out[R_offset + k] += buffer;
-                    }
-                }
-                else
-                {
-                    LOOP_UNROLL(4)
-                    for( Int k = 0; k < buffer_dim; ++k )
-                    {
-                        const Real buffer = C_out[C_offset + k];
-                        
-                        C_out[L_offset + k] += buffer;
-                        C_out[R_offset + k] += buffer;
-                    }
-                }
+                combine_buffers<Scalar::Flag::Plus,Scalar::Flag::Plus,BUFFER_DIM>(
+                    Scalar::One<Real>, &C_out[buffer_dim * C],
+                    Scalar::One<Real>, &C_out[buffer_dim * L],
+                    buffer_dim
+                );
+                
+                combine_buffers<Scalar::Flag::Plus,Scalar::Flag::Plus,BUFFER_DIM>(
+                    Scalar::One<Real>, &C_out[buffer_dim * C],
+                    Scalar::One<Real>, &C_out[buffer_dim * R],
+                    buffer_dim
+                );
                 
                 // push
                 ++stack_ptr;

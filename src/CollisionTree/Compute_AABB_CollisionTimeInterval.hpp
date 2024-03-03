@@ -65,7 +65,7 @@ namespace Repulsor
             if( initially_intersecting )
             {
                 a = zero;
-                b = (A>zero) ? A : ( (B<=zero) ? one : B );
+                b = (A > zero) ? A : ( (B <= zero) ? one : B );
             }
             else
             {

@@ -28,7 +28,7 @@ namespace Repulsor
         Tiny::Vector<SIZE,Int,Int>   simplex;
         Tiny::Vector<SIZE,Int,Int> s_simplex;
         
-        SortNet<SIZE,Int> sort;
+        SortNet<SIZE> sort;
         
         Tiny::Vector<AMB_DIM,Real,Int> center;
         
@@ -173,7 +173,6 @@ namespace Repulsor
             
             hull.Write( &near[1] );
             
-            LOOP_UNROLL_FULL
             for( Int k = 0; k < PROJ_DIM; ++k )
             {
                 near[1 + AMB_DIM * SIZE + k] = P[ tri_i<AMB_DIM>(k) ][ tri_j<AMB_DIM>(k) ];
@@ -186,7 +185,6 @@ namespace Repulsor
             
             center.Write( &far[1] );
             
-            LOOP_UNROLL_FULL
             for( Int k = 0; k < PROJ_DIM; ++k )
             {
                 far[1 + AMB_DIM + k] = P[ tri_i<AMB_DIM>(k) ][ tri_j<AMB_DIM>(k) ];

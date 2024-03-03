@@ -58,9 +58,9 @@ namespace Repulsor
                 return static_cast<Real> (0);
             }
 
-            cref<JobPointers<Int>> job_ptr = COND(
-                symmetricQ,
-                pattern.UpperTriangularJobPtr(),
+            cref<JobPointers<Int>> job_ptr = (
+                symmetricQ ?
+                pattern.UpperTriangularJobPtr() :
                 pattern.JobPtr()
             );
 
@@ -80,7 +80,7 @@ namespace Repulsor
 
                     Real local_sum (0);
                     
-                    cptr<LInt> diag = COND(symmetricQ, pattern.Diag().data(), nullptr);
+                    cptr<LInt> diag = (symmetricQ ? pattern.Diag().data() : nullptr);
                     cptr<LInt> rp   = pattern.Outer().data();
                     cptr<Int>  ci   = pattern.Inner().data();
                     
@@ -94,7 +94,7 @@ namespace Repulsor
                     for( Int i = i_begin; i < i_end; ++i )
                     {
                         // These are the corresponding nonzero blocks in i-th row.
-                        const LInt k_begin = COND( symmetricQ, diag[i], rp[i] );
+                        const LInt k_begin = ( symmetricQ ? diag[i] : rp[i] );
                         const LInt k_end   = rp[i+1];
                         
                         if( k_end > k_begin )

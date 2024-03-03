@@ -53,30 +53,12 @@ protected:
             percolateUp_Recursive<BUFFER_DIM>(R);
             
             // Aftwards, compute the sum of the two children.
-            
-            const Int C_offset = buffer_dim * C;
-            const Int L_offset = buffer_dim * L;
-            const Int R_offset = buffer_dim * R;
-            
-            if constexpr ( BUFFER_DIM > 0 )
-            {
-                LOOP_UNROLL_FULL
-                for( Int k = 0; k < BUFFER_DIM; ++k )
-                {
-                    // Overwrite, not add-into. Thus cleansing is not required.
-                    C_in[C_offset+k] = C_in[L_offset+k] + C_in[R_offset+k];
-                }
-            }
-            else
-            {
-                LOOP_UNROLL(4)
-                for( Int k = 0; k < buffer_dim; ++k )
-                {
-                    // Overwrite, not add-into. Thus cleansing is not required.
-                    C_in[C_offset + k] = C_in[L_offset + k] + C_in[R_offset + k];
-                }
-            }
-            
+            combine_buffers<Scalar::Flag::Plus,Scalar::Flag::Plus,BUFFER_DIM>(
+                Scalar::One<Real>, &C_in[buffer_dim * L],
+                Scalar::One<Real>, &C_in[buffer_dim * R],
+                                   &C_in[buffer_dim * C],
+                buffer_dim
+            );
         }
         
     }; // percolateUp_Recursive
@@ -133,33 +115,19 @@ protected:
         
         if( (L >= null) && (R >= null) )
         {
-            mptr<Real> c = C_out.data();
+            // If not a leaf, compute the values of the children first.
             
-            const Int C_offset = buffer_dim * C;
-            const Int L_offset = buffer_dim * L;
-            const Int R_offset = buffer_dim * R;
+            combine_buffers<Scalar::Flag::Plus,Scalar::Flag::Plus,BUFFER_DIM>(
+                Scalar::One<Real>, &C_out[buffer_dim * C],
+                Scalar::One<Real>, &C_out[buffer_dim * L],
+                buffer_dim
+            );
             
-            if constexpr ( BUFFER_DIM > 0 )
-            {
-                LOOP_UNROLL_FULL
-                for( Int k = 0; k < BUFFER_DIM; ++k )
-                {
-                    const Real buffer = c[C_offset+k];
-                    c[L_offset + k] += buffer;
-                    c[R_offset + k] += buffer;
-                }
-            }
-            else
-            {
-                LOOP_UNROLL(4)
-                for( Int k = 0; k < buffer_dim; ++k )
-                {
-                    const Real buffer = c[C_offset + k];
-                    c[L_offset + k] += buffer;
-                    c[R_offset + k] += buffer;
-                }
-            }
-            
+            combine_buffers<Scalar::Flag::Plus,Scalar::Flag::Plus,BUFFER_DIM>(
+                Scalar::One<Real>, &C_out[buffer_dim * C],
+                Scalar::One<Real>, &C_out[buffer_dim * R],
+                buffer_dim
+            );
             
             percolateDown_Recursive<BUFFER_DIM>(L);
             percolateDown_Recursive<BUFFER_DIM>(R);

@@ -112,7 +112,7 @@ private:
                 P_score_buffer.data(),                              // some scratch space for storing local scores
                 P_perm_buffer.data(),                               // scratch space for storing local permutations
                 P_inverse_ordering.data(),                          // abusing P_inverse_ordering as scratch space for storing inverses of local permutations
-                //                 COND( recursive, static_cast<Int>(1), ThreadCount() )
+                //                 ( recursive ? static_cast<Int>(1) : ThreadCount() )
                 thread_count
             );
             
