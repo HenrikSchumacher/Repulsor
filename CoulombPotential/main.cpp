@@ -6,21 +6,10 @@
 #ifdef __APPLE__
 /// Use these while on a mac. Don't forget to issue the compiler flag `-framework Accelerate`.
 ///
-    #define ACCELERATE_NEW_LAPACK
-    #include <Accelerate/Accelerate.h>
+    #include "../submodules/Tensors/Accelerate.hpp"
 #else
-/// Use these instead of Accelerate under Windows or Linux, e.g. together with OpenBLAS, Intel oneMKL, AMD AOCL-BLAS. Of course, your path variables or compiler flags should hint the compiler to these files. And you also have to link the according libraries.
-
 /// This should work for OpenBLAS.
-
-    #include <cblas.h>
-    #include <lapack.h>
-
-/// Use this with Intel oneMKL. Check their documentation if you are unsure.
-
-    //#include <mkl_cblas.h>
-    //#include <mkl_lapack.h>
-
+    #include "../submodules/Tensors/OpenBLAS.hpp"
 #endif
 
 #include "../Repulsor.hpp"
