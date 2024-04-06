@@ -4,7 +4,7 @@ by Henrik Schumacher
 
 This header-only _C++_ library allows you to work with the so-called _generalized tangent-point energy_ of curves and surface in 2-, 3-, and 4-dimensional Euclidean space.
 
-The library provide:
+The library provides:
 
 - a simple data structure for simplicial meshes --> `SimplicialMesh`;
 - an implementation of the multipole-accelerate discrete tangent-point energy and its derivative (it can also be used to compute Coulomb-like potentials when setting the exponent of the numerator to 0)  --> `TangentPointEnergy0`;
