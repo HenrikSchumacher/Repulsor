@@ -176,12 +176,12 @@ public:
             
             Forest_T forest ( std::move(top_tree_rows), C_next, ThreadCount() );
 
-            this->SetPersistentCache(tag, std::any( std::move(forest) ) );
+            this->SetPersistentCache(tag, std::move(forest) );
             
             ptoc( ClassName()+"::" + tag );
         }
         
-        return std::any_cast<const Forest_T&>(this->GetPersistentCache(tag));
+        return this->template GetPersistentCache<Forest_T>(tag);
     }
 
     void PercolateDown_Parallel() const override

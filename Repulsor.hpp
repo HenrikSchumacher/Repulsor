@@ -9,6 +9,8 @@
 
     #include "submodules/Tensors/Tensors.hpp"
     #include "submodules/Tensors/Sparse.hpp"
+//    #include "submodules/Tensors/src/Sparse/ApproximateMinimumDegree.hpp"
+//    #include "submodules/Tensors/src/Sparse/Metis.hpp"
     #include "submodules/Tensors/ConjugateGradient.hpp"
 
     namespace Repulsor {

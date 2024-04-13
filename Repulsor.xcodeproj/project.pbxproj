@@ -576,7 +576,6 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = Y6DQ749ZRT;
-				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -591,7 +590,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = Y6DQ749ZRT;
-				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -605,7 +603,6 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = Y6DQ749ZRT;
-				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -620,7 +617,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = Y6DQ749ZRT;
-				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -710,7 +706,10 @@
 				GCC_WARN_UNUSED_VALUE = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "";
-				LIBRARY_SEARCH_PATHS = /opt/homebrew/opt/openblas/lib;
+				LIBRARY_SEARCH_PATHS = (
+					/opt/homebrew/opt/openblas/lib,
+					/opt/homebrew/lib,
+				);
 				MACOSX_DEPLOYMENT_TARGET = 14.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -795,7 +794,10 @@
 				GCC_WARN_UNUSED_VALUE = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "";
-				LIBRARY_SEARCH_PATHS = /opt/homebrew/opt/openblas/lib;
+				LIBRARY_SEARCH_PATHS = (
+					/opt/homebrew/opt/openblas/lib,
+					/opt/homebrew/lib,
+				);
 				MACOSX_DEPLOYMENT_TARGET = 14.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -829,7 +831,6 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = Y6DQ749ZRT;
-				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -842,7 +843,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = Y6DQ749ZRT;
-				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -854,7 +854,6 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = Y6DQ749ZRT;
-				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -867,7 +866,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = Y6DQ749ZRT;
-				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -879,7 +877,6 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = Y6DQ749ZRT;
-				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -892,7 +889,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = Y6DQ749ZRT;
-				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -904,7 +900,6 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = Y6DQ749ZRT;
-				ENABLE_HARDENED_RUNTIME = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				OTHER_LDFLAGS = (
 					"-ldl",
@@ -926,7 +921,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = Y6DQ749ZRT;
-				ENABLE_HARDENED_RUNTIME = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				OTHER_LDFLAGS = (
 					"-ldl",
@@ -947,9 +941,23 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = Y6DQ749ZRT;
-				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
+				LIBRARY_SEARCH_PATHS = (
+					/opt/homebrew/opt/openblas/lib,
+					"/opt/homebrew/Cellar/suite-sparse/7.6.1/lib",
+					/opt/homebrew/lib,
+				);
+				OTHER_LDFLAGS = (
+					"-lamd",
+					"-lmetis",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					/usr/include,
+					/opt/homebrew/include,
+					/opt/homebrew/opt/openblas/include,
+					"/opt/homebrew/Cellar/suite-sparse/7.6.1/include/suitesparse",
+				);
 			};
 			name = Debug;
 		};
@@ -960,9 +968,23 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = Y6DQ749ZRT;
-				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
+				LIBRARY_SEARCH_PATHS = (
+					/opt/homebrew/opt/openblas/lib,
+					"/opt/homebrew/Cellar/suite-sparse/7.6.1/lib",
+					/opt/homebrew/lib,
+				);
+				OTHER_LDFLAGS = (
+					"-lamd",
+					"-lmetis",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					/usr/include,
+					/opt/homebrew/include,
+					/opt/homebrew/opt/openblas/include,
+					"/opt/homebrew/Cellar/suite-sparse/7.6.1/include/suitesparse",
+				);
 			};
 			name = Release;
 		};

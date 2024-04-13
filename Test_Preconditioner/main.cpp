@@ -20,7 +20,6 @@ using namespace Repulsor;
 using namespace Tensors;
 using namespace Tools;
 
-
 // We have to toggle which domain dimensions and ambient dimensions shall be supported by runtime polymorphism before we load Repulsor.hpp
 // You can activate everything you want, but compile times might increase substatially.
 using Int     = Int64;
@@ -107,9 +106,9 @@ int main(void)
 
     constexpr Int NRHS = 3;
     
-    Tensor2<ExtReal,Int> B  ( M.VertexCount(), NRHS );
-    Tensor2<ExtReal,Int> X  ( M.VertexCount(), NRHS );
-    Tensor2<ExtReal,Int> Y  ( M.VertexCount(), NRHS );
+    Tensor2<ExtReal,Int> B ( M.VertexCount(), NRHS );
+    Tensor2<ExtReal,Int> X ( M.VertexCount(), NRHS );
+    Tensor2<ExtReal,Int> Y ( M.VertexCount(), NRHS );
 
     X.SetZero();
     
@@ -123,7 +122,7 @@ int main(void)
     const Real tolerance = 0.00001;
     
     tic("Solving for gradient");
-    tpm.Solve(M, B.data(), X.data(), NRHS, max_iter, tolerance );
+    tpm.Solve( M, B.data(), X.data(), NRHS, max_iter, tolerance );
     toc("Solving for gradient");
     
     dump(tpm.CG_IterationCount());

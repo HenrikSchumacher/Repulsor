@@ -35,12 +35,9 @@ namespace Repulsor
             {
                 M.SetCache( tag, compute_metric(M) );
             }
-            
-            mref<ValueContainer_T> result = std::any_cast<ValueContainer_T &>( M.GetCache(tag) );
-            
             ptoc(tag);
             
-            return result;
+            return M.template GetCache<ValueContainer_T>(tag);
         }
         
         mref<ValueContainer_T> MetricValues( cref<Mesh_T> M ) const
@@ -53,11 +50,9 @@ namespace Repulsor
                 M.SetCache( tag, compute_metric(M) );
             }
             
-            mref<ValueContainer_T> result = std::any_cast<ValueContainer_T &>( M.GetCache(tag) );
-            
             ptoc(tag);
             
-            return result;
+            return M.template GetCache<ValueContainer_T>(tag);
         }
         
     

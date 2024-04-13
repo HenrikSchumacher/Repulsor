@@ -129,7 +129,7 @@ namespace Repulsor
         
         virtual cref<SparseMatrix_T> MassMatrix() const = 0;
         
-        virtual cref<Tensor1<Int,Int>> NestedDissectionOrdering( const Int local_thread_count = 1 ) const = 0;
+        virtual cref<Permutation<Int>> NestedDissectionOrdering( const Int local_thread_count = 1 ) const = 0;
         
 //        virtual void H1Solve( cptr<ExtReal> X, mptr<ExtReal> Y, const Int nrhs ) const = 0;
         

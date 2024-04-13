@@ -264,12 +264,12 @@ namespace Repulsor
             
             this->SetCache(
                 std::string("PrimitiveToCluster"),
-                std::any( std::move( P_to_C ) )
+                std::move( P_to_C )
             );
             
             this->SetCache(
                 std::string("ClusterToPrimitiveMatrix"),
-                std::any( std::move( C_to_P ) )
+                std::move( C_to_P )
             );
             
             ptoc(className()+"::ComputePrimitiveToCluster");
@@ -292,7 +292,7 @@ namespace Repulsor
                 ComputePrimitiveToClusterMatrix();
             }
             
-            return std::any_cast<cref<SparseBinaryMatrix_T>>( this->GetCache(tag) );
+            return this->template GetCache<SparseBinaryMatrix_T>(tag);
         }
         
         cref<SparseBinaryMatrix_T> PrimitiveToClusterMatrix() const
@@ -304,7 +304,7 @@ namespace Repulsor
                 ComputePrimitiveToClusterMatrix();
             }
             
-            return std::any_cast<cref<SparseBinaryMatrix_T>>( this->GetCache(tag) );
+            return this->template GetCache<SparseBinaryMatrix_T>(tag);
         }
       
         

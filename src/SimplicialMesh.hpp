@@ -573,7 +573,7 @@ namespace Repulsor
                 ptoc(className()+"::GetClusterTree");
             }
 
-            return std::any_cast<ClusterTree_T &>( this->GetPersistentCache(tag) );
+            return this->template GetPersistentCache<ClusterTree_T>(tag);
         }
 
         virtual cref<BlockClusterTree_T> GetBlockClusterTree() const override
@@ -600,7 +600,7 @@ namespace Repulsor
                 ptoc(className()+"::GetBlockClusterTree");
             }
             
-            return std::any_cast<BlockClusterTree_T &>( this->GetPersistentCache(tag) );
+            return this->template GetPersistentCache<BlockClusterTree_T>(tag);
         }
         
         virtual cref<CollisionTree_T> GetCollisionTree() const override
@@ -618,7 +618,7 @@ namespace Repulsor
                 ptoc(className()+"::GetCollisionTree");
             }
             
-            return std::any_cast<CollisionTree_T &>( this->GetCache(tag) );
+            return this->template GetCache<CollisionTree_T>(tag);
         }
         
         cref<SparseBinaryMatrix_T> DerivativeAssembler() const override
@@ -640,12 +640,12 @@ namespace Repulsor
                 A.Outer().iota();
                 A.Inner().Read(simplices.data());
                 
-                this->SetPersistentCache( tag, std::any( std::move(A.Transpose()) ) );
+                this->SetPersistentCache( tag, std::move(A.Transpose()) );
                 
                 ptoc(className()+"::DerivativeAssembler");
             }
             
-            return std::any_cast<SparseBinaryMatrix_T &>( this->GetPersistentCache(tag) );
+            return this->template GetPersistentCache<SparseBinaryMatrix_T>(tag);
             
         } // DerivativeAssembler
         
@@ -718,7 +718,7 @@ namespace Repulsor
                 obstacle = std::move(obstacle_);
             }
             
-            this->SetPersistentCache(tag, std::any( obstacle ) );
+            this->SetPersistentCache(tag, obstacle );
         }
         
         cref<Obstacle_T> GetObstacle() const override
@@ -730,10 +730,10 @@ namespace Repulsor
                 wprint( ClassName()+"::GetObstacle: Obstacle not initialized.");
                 
                 // We have to construct an empty SimplicialMesh because Obstacle_T is abstract.
-                this->SetPersistentCache(tag, std::any(std::make_shared<SimplicialMesh>()) );
+                this->SetPersistentCache(tag, std::make_shared<SimplicialMesh>() );
             }
             
-            return *std::any_cast<std::shared_ptr<Obstacle_T>>( this->GetPersistentCache(tag) );
+            return *(this->template GetPersistentCache<std::shared_ptr<Obstacle_T>>(tag) );
         }
         
         virtual cref<ClusterTree_T> GetObstacleClusterTree() const override
@@ -759,7 +759,7 @@ namespace Repulsor
 
             }
             
-            return std::any_cast<ObstacleBlockClusterTree_T &>( this->GetPersistentCache(tag) );
+            return this->template GetPersistentCache<ObstacleBlockClusterTree_T>(tag);
         }
         
         virtual cref<ObstacleCollisionTree_T> GetObstacleCollisionTree() const override
@@ -777,7 +777,7 @@ namespace Repulsor
                 ptoc(className()+"::GetObstacleCollisionTree");
             }
             
-            return std::any_cast<ObstacleCollisionTree_T &>( this->GetPersistentCache(tag) );
+            return this->template GetPersistentCache<ObstacleCollisionTree_T>(tag);
         }
 
         

@@ -85,7 +85,11 @@ namespace Repulsor
         {
             // TODO: Once the solver works better, make these calls Parallel.
             M.H1Solver().template Solve<Sequential>( X, Y, rhs_count );
-            pseudo_lap.MultiplyMetric( M, Scalar::One<Real>, Y, Scalar::Zero<Real>, Y, rhs_count );
+            
+            pseudo_lap.MultiplyMetric( 
+                M, Scalar::One<Real>, Y, Scalar::Zero<Real>, Y, rhs_count
+            );
+            
             M.H1Solver().template Solve<Sequential>( Y, Y, rhs_count );
         }
         

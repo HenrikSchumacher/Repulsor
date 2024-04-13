@@ -1,6 +1,6 @@
 public:
 
-    virtual cref<Tensor1<Int,Int>> NestedDissectionOrdering( const Int local_thread_count = 1 ) const override
+    virtual cref<Permutation<Int>> NestedDissectionOrdering( const Int local_thread_count = 1 ) const override
     {
         std::string tag ("NestedDissectionOrdering");
         
@@ -200,10 +200,14 @@ public:
                 ++level;
             }
             
-            this->SetPersistentCache( tag, std::any( std::move(perm_0) ) );
+            Permutation<Int> perm (
+                perm_0.data(), VertexCount(), Inverse::False, ThreadCount()
+            );
+            
+            this->SetPersistentCache( tag, std::move(perm) );
             
             ptoc(ClassName()+"::"+tag);
         }
         
-        return std::any_cast<Tensor1<Int,Int> &>( this->GetPersistentCache(tag) );
+        return this->template GetPersistentCache<Permutation<Int>>(tag);
     }

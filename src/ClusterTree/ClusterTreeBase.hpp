@@ -527,16 +527,16 @@ namespace Repulsor
 
                 ptoc(ClassName()+"::" + tag );
                 
-                this->SetPersistentCache(tag, std::any( std::move(P_adjacency_matrix) ) );
+                this->SetPersistentCache(tag, std::move(P_adjacency_matrix) );
             }
             
-            return std::any_cast<const SparseBinaryMatrix_T & >(this->GetPersistentCache(tag));
+            return this->template GetPersistentCache<SparseBinaryMatrix_T>(tag);
         }
         
         
-//##################################################################################################
+//##########################################################################################
 //##        Derivatives
-//##################################################################################################
+//##########################################################################################
         
     public:
         

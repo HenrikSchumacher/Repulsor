@@ -50,7 +50,7 @@ namespace Repulsor
             
             ptoc(tag);
             
-            return std::any_cast<ExtReal>( M.GetCache(tag) );
+            return M.template GetCache<ExtReal>(tag);
         }
         
     protected:
@@ -85,7 +85,7 @@ namespace Repulsor
             
             ptoc(tag);
             
-            return std::any_cast<CotangentVector_T &>( M.GetCache(tag) );
+            return M.template GetCache<CotangentVector_T>(tag);
         }
         
         // Return the differential of the energy to a pointer; don't use any caching.

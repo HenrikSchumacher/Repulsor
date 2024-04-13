@@ -1126,7 +1126,7 @@ namespace Repulsor
         
         std::string ClassName() const
         {
-            return std::string("GJK")+"<"+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Real>+">";
+            return std::string("GJK")+"<"+ToString(AMB_DIM) + "," + TypeName<Real> + "," + TypeName<Real>+">";
         }
         
     }; // GJK

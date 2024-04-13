@@ -36,8 +36,10 @@ protected:
                     
                     Tiny::Matrix<SIZE,SIZE,Real,Int> mass;
                     
-                    const Real m_factor = Frac<Real>( c_0 ,
-                        StandardSimplexVolume<Real>(DOM_DIM) * Factorial<Real>(DOM_DIM + 2) );
+                    const Real m_factor = Frac<Real>( 
+                        c_0,
+                        StandardSimplexVolume<Real>(DOM_DIM) * Factorial<Real>(DOM_DIM + 2)
+                    );
                     
                     for( Int i = 0; i < SIZE; ++i )
                     {
@@ -49,8 +51,8 @@ protected:
                     
                     Tiny::SelfAdjointMatrix<DOM_DIM,Real,Int> g;
                     
-                    Tiny::Matrix<SIZE,SIZE, Int,Int> idx;
-                    Tiny::Matrix<SIZE,SIZE, Int,Int> jdx;
+                    Tiny::Matrix<SIZE,SIZE,Int,Int> idx;
+                    Tiny::Matrix<SIZE,SIZE,Int,Int> jdx;
                     
                     for( Int k = k_begin; k < k_end; ++k )
                     {
@@ -147,31 +149,29 @@ public:
             
             auto & A = H1Metric();
             
-            Permutation<Int> perm (
-                NestedDissectionOrdering().data(), VertexCount(), Inverse::False, ThreadCount()
-            );
+            Permutation<Int> perm = NestedDissectionOrdering();
+            
+//            Permutation<Int> perm = Sparse::ApproximateMinimumDegree<Int>()(
+//                A.Outer().data(), A.Inner().data(), A.RowCount(), ThreadCount()
+//            );
+//            
+//            Permutation<Int> perm = Sparse::Metis<Int>()(
+//                A.Outer().data(), A.Inner().data(), A.RowCount(), ThreadCount()
+//            );
             
             std::shared_ptr<Solver_T> S = std::make_shared<Solver_T>(
-                A.Outer().data(), A.Inner().data(), NestedDissectionOrdering().data(),
-                A.RowCount(), A.ThreadCount()
+                A.Outer().data(), A.Inner().data(), std::move(perm)
             );
             
             S->NumericFactorization( A.Values().data(), Scalar::Zero<Real> );
             
-            this->SetCache( tag, std::any( std::move( S ) ) );
+            this->SetCache( tag, S );
             
             ptoc(ClassName()+"::"+tag);
         }
         
-        return *std::any_cast<std::shared_ptr<Solver_T>>( this->GetCache(tag) );
+        return *(this->template GetCache<std::shared_ptr<Solver_T>>(tag) );
     }
-
-//    virtual void H1Solve( cptr<ExtReal> X, mptr<ExtReal> Y, const Int nrhs ) const override
-//    {
-//        H1Solver().template Solve<Parallel>( X, Y, nrhs );
-//    }
-
-
 
     virtual cref<SparseMatrix_T> H1Metric() const override
     {
@@ -180,14 +180,12 @@ public:
         {
             ptic(ClassName()+"::"+tag);
             
-            this->SetCache( tag,
-               std::any( std::move( Create_H1Metric(H1_c_1,H1_c_0) ) )
-            );
+            this->SetCache( tag, Create_H1Metric(H1_c_1,H1_c_0) );
             
             ptoc(ClassName()+"::"+tag);
         }
         
-        return std::any_cast<SparseMatrix_T &>( this->GetCache(tag) );
+        return this->template GetCache<SparseMatrix_T>(tag);
     }
 
     
@@ -198,14 +196,12 @@ public:
         {
             ptic(ClassName()+"::"+tag);
             
-            this->SetCache( tag,
-               std::any(std::move(Create_H1Metric(1,0)))
-            );
+            this->SetCache( tag, Create_H1Metric(1,0) );
             
             ptoc(ClassName()+"::"+tag);
         }
         
-        return std::any_cast<SparseMatrix_T &>( this->GetCache(tag) );
+        return this->template GetCache<SparseMatrix_T>(tag);
     }
 
     
@@ -216,12 +212,10 @@ public:
         {
             ptic(ClassName()+"::"+tag);
             
-            this->SetCache( tag,
-                std::any(std::move(Create_H1Metric(0,1)))
-            );
+            this->SetCache( tag, Create_H1Metric(0,1) );
             
             ptoc(ClassName()+"::"+tag);
         }
         
-        return std::any_cast<SparseMatrix_T &>( this->GetCache(tag) );
+        return this->template GetCache<SparseMatrix_T>(tag);
     }
