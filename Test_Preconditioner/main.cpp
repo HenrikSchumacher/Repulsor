@@ -119,7 +119,7 @@ int main(void)
     print("");
     
     const Int  max_iter  = 100;
-    const Real tolerance = 0.00001;
+    const Real tolerance = 0.0001;
     
     tic("Solving for gradient");
     tpm.Solve( M, B.data(), X.data(), NRHS, max_iter, tolerance );
