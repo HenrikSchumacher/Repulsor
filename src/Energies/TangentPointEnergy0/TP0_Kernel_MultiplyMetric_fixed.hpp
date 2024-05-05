@@ -16,7 +16,7 @@ namespace Repulsor
         typename Real_, typename Real_in_, typename Real_out_, typename Int_, typename LInt_,
         Scalar::Flag alpha_flag, Scalar::Flag beta_flag
     >
-    class TP0_Kernel_MultiplyMetric : public BASE
+    class TP0_Kernel_MultiplyMetric_fixed : public BASE
     
     {
     private:
@@ -57,13 +57,13 @@ namespace Repulsor
         
     public:
         
-        TP0_Kernel_MultiplyMetric() = delete;
+        TP0_Kernel_MultiplyMetric_fixed() = delete;
         
-        explicit TP0_Kernel_MultiplyMetric( mptr<Real> A_ )
+        explicit TP0_Kernel_MultiplyMetric_fixed( mptr<Real> A_ )
         :   Base_T( A_ )
         {}
         
-        TP0_Kernel_MultiplyMetric(
+        TP0_Kernel_MultiplyMetric_fixed(
             cptr<Real>     A_,
             cref<Real_out> alpha_,  cptr<Real_in> X_,
             cref<Real_out> beta_,   mptr<Real>    Y_,
@@ -73,9 +73,9 @@ namespace Repulsor
         {}
         
         // Copy constructor
-        TP0_Kernel_MultiplyMetric( cref<TP0_Kernel_MultiplyMetric> other ) : Base_T(other) {}
+        TP0_Kernel_MultiplyMetric_fixed( cref<TP0_Kernel_MultiplyMetric_fixed> other ) : Base_T(other) {}
         
-        ~TP0_Kernel_MultiplyMetric() = default;
+        ~TP0_Kernel_MultiplyMetric_fixed() = default;
         
     public:
         
@@ -111,50 +111,50 @@ namespace Repulsor
 */
 
             
-            if constexpr ( vecQ )
-            {
-                std::array<vec_T<MAX_RHS_COUNT,Real>,COLS> x_vec;
-                std::array<vec_T<MAX_RHS_COUNT,Real>,ROWS> y_vec;
-
-                // This explicity copying is somewhat insane but will probably optimized a bit by the compiler.
-                for( Int j = 0; j < COLS; ++j )
-                {
-                    for( Int k = 0; k < MAX_RHS_COUNT; ++k )
-                    {
-                        x_vec[j][k] = get_x(j,k);
-                    }
-                }
-
-                // This explicity copying is somewhat insane but will probably optimized a bit by the compiler.
-                for( Int j = 0; j < ROWS; ++j )
-                {
-                    for( Int k = 0; k < MAX_RHS_COUNT; ++k )
-                    {
-                        y_vec[j][k] = get_y(j,k);
-                    }
-                }
-
-                const Real a_0 ( a[0] );
-
-                y_vec[0] += a_0 * x_vec[0];
-
-                const Real a_1 ( a[1] );
-
-                for( Int j = 1; j < COLS; ++j )
-                {
-                    y_vec[j] += a_1 * x_vec[j];
-                }
-
-                // This explicity copying is somewhat insane but will probably optimized a bit by the compiler.
-                for( Int j = 0; j < ROWS; ++j )
-                {
-                    for( Int k = 0; k < MAX_RHS_COUNT; ++k )
-                    {
-                        get_y(j,k) = y_vec[j][k];
-                    }
-                }
-            }
-            else
+//            if constexpr ( vecQ )
+//            {
+//                std::array<vec_T<MAX_RHS_COUNT,Real>,COLS> x_vec;
+//                std::array<vec_T<MAX_RHS_COUNT,Real>,ROWS> y_vec;
+//
+//                // This explicity copying is somewhat insane but will probably optimized a bit by the compiler.
+//                for( Int j = 0; j < COLS; ++j )
+//                {
+//                    for( Int k = 0; k < MAX_RHS_COUNT; ++k )
+//                    {
+//                        x_vec[j][k] = get_x(j,k);
+//                    }
+//                }
+//
+//                // This explicity copying is somewhat insane but will probably optimized a bit by the compiler.
+//                for( Int j = 0; j < ROWS; ++j )
+//                {
+//                    for( Int k = 0; k < MAX_RHS_COUNT; ++k )
+//                    {
+//                        y_vec[j][k] = get_y(j,k);
+//                    }
+//                }
+//
+//                const Real a_0 ( a[0] );
+//
+//                y_vec[0] += a_0 * x_vec[0];
+//
+//                const Real a_1 ( a[1] );
+//
+//                for( Int j = 1; j < COLS; ++j )
+//                {
+//                    y_vec[j] += a_1 * x_vec[j];
+//                }
+//
+//                // This explicity copying is somewhat insane but will probably optimized a bit by the compiler.
+//                for( Int j = 0; j < ROWS; ++j )
+//                {
+//                    for( Int k = 0; k < MAX_RHS_COUNT; ++k )
+//                    {
+//                        get_y(j,k) = y_vec[j][k];
+//                    }
+//                }
+//            }
+//            else
             {
                 
                 const Real a_0 ( a[0] );
@@ -180,7 +180,7 @@ namespace Repulsor
         
         std::string ClassName() const
         {
-            return "TP0_Kernel_MultiplyMetric<"
+            return "TP0_Kernel_MultiplyMetric_fixed<"
                 +ToString(AMB_DIM)
             +","+ToString(MAX_RHS_COUNT)
             +","+TypeName<Real>+","+TypeName<Real_in>+","+TypeName<Real_out>
@@ -190,7 +190,7 @@ namespace Repulsor
             +">";
         }
 
-    }; // class TP0_Kernel_MultiplyMetric
+    }; // class TP0_Kernel_MultiplyMetric_fixed
     
 } // namespace Repulsor
 

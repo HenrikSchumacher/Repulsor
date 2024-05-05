@@ -5,6 +5,7 @@ protected:
     mutable Real H1_c_0 = 1;
     mutable Real H1_c_1 = 1;
 
+
     SparseMatrix_T Create_H1Metric( const Real c_1, const Real c_0 ) const
     {
         if constexpr ( DOM_DIM <= 0 )
@@ -140,24 +141,90 @@ protected:
     
 public:
 
+
+    virtual Int H1SolverID() const override
+    {
+        std::string tag ("H1SolverID");
+        
+        if( !this->InCacheQ( tag ) )
+        {
+            this->SetCache( tag, Int(0) );
+        }
+        
+        return this->template GetCache<Int>( tag );
+    }
+
+    virtual void SetH1SolverID( const Int ID ) const override
+    {
+        const Int current_ID = H1SolverID();
+        
+        std::string tag ("H1SolverID");
+        
+        if( ID != current_ID )
+        {
+            this->ClearCache( tag );
+            
+            this->ClearCache( "H1Solver" );
+            
+            this->SetCache( tag, ID );
+        }
+    }
+
     virtual mref<Solver_T> H1Solver() const override
     {
         std::string tag ("H1Solver");
+        
         if( !this->InCacheQ(tag))
         {
             ptic(ClassName()+"::"+tag);
             
             auto & A = H1Metric();
             
-            Permutation<Int> perm = NestedDissectionOrdering();
+            Permutation<Int> perm;
             
-//            Permutation<Int> perm = Sparse::ApproximateMinimumDegree<Int>()(
-//                A.Outer().data(), A.Inner().data(), A.RowCount(), ThreadCount()
-//            );
-//            
-//            Permutation<Int> perm = Sparse::Metis<Int>()(
-//                A.Outer().data(), A.Inner().data(), A.RowCount(), ThreadCount()
-//            );
+            const Int ID = H1SolverID();
+            
+            switch( ID )
+            {
+                case 0:
+                {
+                    perm = NestedDissectionOrdering();
+                    break;
+                }
+                case 1:
+                {
+#ifdef TENSORS_HAS_AMD
+                    perm = Sparse::ApproximateMinimumDegree<Int>()(
+                        A.Outer().data(), A.Inner().data(), A.RowCount(), ThreadCount()
+                    );
+#else
+                    wprint(ClassName()+"::H1Solver: Sparse::ApproximateMinimumDegree not available. Using default NestedDissectionOrdering.");
+                    
+                    perm = NestedDissectionOrdering();
+#endif
+                    break;
+                }
+                case 2:
+                {
+#ifdef TENSORS_HAS_METIS
+                    perm = Sparse::Metis<Int>()(
+                        A.Outer().data(), A.Inner().data(), A.RowCount(), ThreadCount()
+                    );
+#else
+                    wprint(ClassName()+"::H1Solver: Sparse::Metis not available. Using default NestedDissectionOrdering.");
+                    
+                    perm = NestedDissectionOrdering();
+#endif
+                    break;
+                }
+                default:
+                {
+                    wprint(ClassName()+"::H1Solver: Unknown H1SolverID "+ToString(ID)+". Using default NestedDissectionOrdering.");
+                    
+                    break;
+                }
+                    
+            }
             
             std::shared_ptr<Solver_T> S = std::make_shared<Solver_T>(
                 A.Outer().data(), A.Inner().data(), std::move(perm)
@@ -192,6 +259,7 @@ public:
     virtual cref<SparseMatrix_T> StiffnessMatrix() const override
     {
         std::string tag ("StiffnessMatrix");
+        
         if( !this->InCacheQ(tag))
         {
             ptic(ClassName()+"::"+tag);
@@ -208,6 +276,7 @@ public:
     virtual cref<SparseMatrix_T> MassMatrix() const override
     {
         std::string tag ("MassMatrix");
+        
         if( !this->InCacheQ(tag))
         {
             ptic(ClassName()+"::"+tag);

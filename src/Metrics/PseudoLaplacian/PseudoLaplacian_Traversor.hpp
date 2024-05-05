@@ -39,7 +39,7 @@ namespace Repulsor
         using TangentVector_T   = Tensor2<ExtReal,Int>;
         using CotangentVector_T = Tensor2<ExtReal,Int>;
 
-        using Kernel_Block_MulAdd_T = ScalarBlockKernel_fixed<
+        using Kernel_Block_MulAdd_T = ScalarBlockKernel_Tiny<
             high_order ? AMB_DIM : 1, high_order ? AMB_DIM : 1, AMB_DIM,
             Real, Real, Real, Int, LInt,
             Scalar::Flag::Plus, Scalar::Flag::Plus,
@@ -47,7 +47,7 @@ namespace Repulsor
             true
         >;
         
-        using Kernel_Block_Mul_T = ScalarBlockKernel_fixed<
+        using Kernel_Block_Mul_T = ScalarBlockKernel_Tiny<
             high_order ? AMB_DIM : 1, high_order ? AMB_DIM : 1, AMB_DIM,
             Real, Real, Real, Int, LInt,
             Scalar::Flag::Plus, Scalar::Flag::Zero,
@@ -55,7 +55,7 @@ namespace Repulsor
             true
         >;
         
-        using Kernel_Diag_MulAdd_T = ScalarBlockKernel_fixed<
+        using Kernel_Diag_MulAdd_T = ScalarBlockKernel_Tiny<
             high_order ? AMB_DIM : 1, high_order ? AMB_DIM : 1, AMB_DIM,
             Real, Real, Real, Int, LInt,
             Scalar::Flag::Plus, Scalar::Flag::Plus,

@@ -4,6 +4,8 @@
 //#define TOOLS_DEBUG
 
 #define TOOLS_ENABLE_PROFILER
+#define REPULSOR_USE_AMD
+//#define REPULSOR_USE_METIS
 
 #ifdef __APPLE__
 /// Use these while on a mac. Don't forget to issue the compiler flag `-framework Accelerate`.
@@ -70,6 +72,7 @@ int main(void)
     M.block_cluster_tree_settings.far_field_separation_parameter   =  0.25;
     M.adaptivity_settings.theta                                    = 10.0;
     
+    M.SetH1SolverID( 1 ); // Try to use AMD reordering if available.
 
     dump(M.ThreadCount());
 

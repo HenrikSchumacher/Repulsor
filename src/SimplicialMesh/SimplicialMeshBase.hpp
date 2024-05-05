@@ -135,6 +135,10 @@ namespace Repulsor
         
         virtual mref<Sparse::CholeskyDecomposition<Real,Int,LInt>> H1Solver() const = 0;
         
+        virtual Int H1SolverID() const = 0;
+
+        virtual void SetH1SolverID( const Int ID ) const =0;
+        
 //#######################################################################################
 //      Obstacle
 //#######################################################################################

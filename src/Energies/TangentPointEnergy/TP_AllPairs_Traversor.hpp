@@ -37,7 +37,7 @@ namespace Repulsor
         using CotangentVector_T = Tensor2<ExtReal,Int>;
         
         
-        using Kernel_Block_MulAdd_T = ArrowheadBlockKernel_fixed<
+        using Kernel_Block_MulAdd_T = ArrowheadBlockKernel_Tiny<
             AMB_DIM+1, AMB_DIM+1, AMB_DIM,
             Real, Real, Real, Int, LInt,
             Scalar::Flag::Plus, Scalar::Flag::Plus, // CAUTION: We use add-in instead of overwrite!
@@ -46,7 +46,7 @@ namespace Repulsor
             true
         >;
         
-        using Kernel_Block_Mul_T = ArrowheadBlockKernel_fixed<
+        using Kernel_Block_Mul_T = ArrowheadBlockKernel_Tiny<
             AMB_DIM+1, AMB_DIM+1, AMB_DIM,
             Real, Real, Real, Int, LInt,
             Scalar::Flag::Plus, Scalar::Flag::Zero,
@@ -55,7 +55,7 @@ namespace Repulsor
             true
         >;
   
-        using Kernel_Diag_MulAdd_T = DenseBlockKernel_fixed<
+        using Kernel_Diag_MulAdd_T = DenseBlockKernel_Tiny<
             AMB_DIM+1, AMB_DIM+1, AMB_DIM,
             Real, Real, Real, Int, LInt,
             Scalar::Flag::Plus, Scalar::Flag::Plus,
@@ -249,9 +249,9 @@ namespace Repulsor
         
 
         
-//##############################################################################################
+//####################################################################################
 //      Compute subroutines
-//##############################################################################################
+//####################################################################################
     
     protected:
         
@@ -291,9 +291,9 @@ namespace Repulsor
             ptoc(ClassName()+"::NF_Compute");
         }
         
-//##############################################################################################
+//####################################################################################
 //      Multiply metric
-//##############################################################################################
+//####################################################################################
         
     public:
         
@@ -316,9 +316,9 @@ namespace Repulsor
             }
         }
         
-//##############################################################################################
+//####################################################################################
 //      Multiply metric subroutines
-//##############################################################################################
+//####################################################################################
         
     protected:
 

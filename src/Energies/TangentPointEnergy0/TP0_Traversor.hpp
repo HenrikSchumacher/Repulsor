@@ -3,7 +3,9 @@
 #include "TP0_Kernel_FF.hpp"
 #include "TP0_Kernel_NF.hpp"
 #include "TP0_Kernel_VF.hpp"
-#include "TP0_Kernel_MultiplyMetric.hpp"
+
+//#include "TP0_Kernel_MultiplyMetric_fixed.hpp"
+#include "TP0_Kernel_MultiplyMetric_Tiny.hpp"
 
 namespace Repulsor
 {
@@ -40,24 +42,23 @@ namespace Repulsor
         using CotangentVector_T = Tensor2<ExtReal,Int>;
         
         
+    protected:
+        
+        static constexpr Scalar::Flag Plus  = Scalar::Flag::Plus;
+        static constexpr Scalar::Flag Zero  = Scalar::Flag::Zero;
+        
+    public:
 
-        using Kernel_Block_MulAdd_T = TP0_Kernel_MultiplyMetric<
-            AMB_DIM,AMB_DIM,
-            Real, Real, Real, Int, LInt,
-            Scalar::Flag::Plus, Scalar::Flag::Plus // <-- this 1 means add-in
+        using Kernel_Block_MulAdd_T = TP0_Kernel_MultiplyMetric_Tiny<
+            AMB_DIM,AMB_DIM, Real, Real, Real, Int, LInt, Plus, Plus // <-- add-in
         >;
         
-        using Kernel_Block_Mul_T = TP0_Kernel_MultiplyMetric<
-            AMB_DIM,AMB_DIM,
-            Real, Real, Real, Int, LInt,
-            Scalar::Flag::Plus, Scalar::Flag::Zero // <-- this 0 means overwrite
+        using Kernel_Block_Mul_T = TP0_Kernel_MultiplyMetric_Tiny<
+            AMB_DIM,AMB_DIM, Real, Real, Real, Int, LInt, Plus, Zero // <-- overwrite
         >;
-
         
-        using Kernel_Diag_MulAdd_T = TP0_Kernel_MultiplyMetric<
-            AMB_DIM,AMB_DIM,
-            Real, Real, Real, Int, LInt,
-            Scalar::Flag::Plus, Scalar::Flag::Plus // <-- this 1 means add-in
+        using Kernel_Diag_MulAdd_T = TP0_Kernel_MultiplyMetric_Tiny<
+            AMB_DIM,AMB_DIM, Real, Real, Real, Int, LInt, Plus, Plus // <-- add-in
         >;
     
         static constexpr Int VF_blk_size = Kernel_Block_MulAdd_T::ROWS * Kernel_Block_MulAdd_T::COLS;
@@ -121,9 +122,9 @@ namespace Repulsor
     public:
         
 
-//##############################################################################################
+//####################################################################################
 //      Compute
-//##############################################################################################
+//####################################################################################
         
         Real Compute()
         {
@@ -277,9 +278,9 @@ namespace Repulsor
         
 
         
-//##############################################################################################
+//####################################################################################
 //      Compute subroutines
-//##############################################################################################
+//####################################################################################
     
     protected:
         
@@ -403,9 +404,9 @@ namespace Repulsor
             ptoc(ClassName()+"::FF_Compute");
         }
         
-//##############################################################################################
+//####################################################################################
 //      Multiply metric
-//##############################################################################################
+//####################################################################################
         
     public:
         
@@ -445,9 +446,9 @@ namespace Repulsor
             }
         }
         
-//##############################################################################################
+//####################################################################################
 //      Multiply metric subroutines
-//##############################################################################################
+//####################################################################################
         
     protected:
 

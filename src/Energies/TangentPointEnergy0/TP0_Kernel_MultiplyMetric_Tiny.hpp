@@ -1,10 +1,10 @@
 #pragma once
 
-#define BASE BlockKernel_fixed_2<                                     \
+#define BASE BlockKernel_Tiny<                                        \
         AMB_DIM_+1,AMB_DIM_+1,NRHS,                                   \
         Scal_, Scal_in_, Scal_out_, Int_, LInt_,                      \
         alpha_flag, beta_flag,                                        \
-        true, true,                                                   \
+        true, false,                                                  \
         true                                                          \
     >
 
@@ -15,7 +15,7 @@ namespace Repulsor
         typename Scal_, typename Scal_in_, typename Scal_out_, typename Int_, typename LInt_,
         Scalar::Flag alpha_flag, Scalar::Flag beta_flag
     >
-    class TP0_Kernel_MultiplyMetric : public BASE
+    class TP0_Kernel_MultiplyMetric_Tiny : public BASE
     
     {
     private:
@@ -52,13 +52,13 @@ namespace Repulsor
         
     public:
         
-        TP0_Kernel_MultiplyMetric() = delete;
+        TP0_Kernel_MultiplyMetric_Tiny() = delete;
         
-        explicit TP0_Kernel_MultiplyMetric( mptr<Scal> A_ )
+        explicit TP0_Kernel_MultiplyMetric_Tiny( mptr<Scal> A_ )
         :   Base_T( A_ )
         {}
         
-        TP0_Kernel_MultiplyMetric(
+        TP0_Kernel_MultiplyMetric_Tiny(
             cptr<Scal>     A_,
             cref<Scal_out> alpha_,  cptr<Scal_in> X_,
             cref<Scal_out> beta_,   mptr<Scal>    Y_,
@@ -68,9 +68,9 @@ namespace Repulsor
         {}
         
         // Copy constructor
-        TP0_Kernel_MultiplyMetric( cref<TP0_Kernel_MultiplyMetric> other ) : Base_T(other) {}
+        TP0_Kernel_MultiplyMetric_Tiny( cref<TP0_Kernel_MultiplyMetric_Tiny> other ) : Base_T(other) {}
         
-        ~TP0_Kernel_MultiplyMetric() = default;
+        ~TP0_Kernel_MultiplyMetric_Tiny() = default;
         
     public:
         
@@ -113,8 +113,9 @@ namespace Repulsor
                 y[0][k] += a_0 * x[0][k];
             }
             
+//            // For some weird reason this is slower than the above loop.
 //            combine_buffers<Scalar::Flag::Generic,Scalar::Flag::Plus,NRHS>(
-//                a_0, &x[0][0], Scalar::One<Scal>, &y[0][0]
+//               a[0], &x[0][0], Scalar::One<Scal>, &y[0][0]
 //            );
             
 
@@ -128,9 +129,9 @@ namespace Repulsor
                 }
             }
             
-//            // For some reason this is slower than the above loop.
+//            // For some weird reason this is slower than the above loop.
 //            combine_buffers<Scalar::Flag::Generic,Scalar::Flag::Plus,(COLS-1)*NRHS>(
-//                a_1, &x[1][0], Scalar::One<Scal>, &y[1][0]
+//                a[1], &x[1][0], Scalar::One<Scal>, &y[1][0]
 //            );
         }
         
@@ -138,7 +139,7 @@ namespace Repulsor
         
         std::string ClassName() const
         {
-            return "TP0_Kernel_MultiplyMetric<"
+            return "TP0_Kernel_MultiplyMetric_Tiny<"
                 +ToString(AMB_DIM)
             +","+ToString(NRHS)
             +","+TypeName<Scal>+","+TypeName<Scal_in>+","+TypeName<Scal_out>
@@ -148,7 +149,7 @@ namespace Repulsor
             +">";
         }
 
-    }; // class TP0_Kernel_MultiplyMetric
+    }; // class TP0_Kernel_MultiplyMetric_Tiny
     
 } // namespace Repulsor
 

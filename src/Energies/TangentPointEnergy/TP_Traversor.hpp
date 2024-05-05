@@ -39,33 +39,66 @@ namespace Repulsor
         using CotangentVector_T = Tensor2<ExtReal,Int>;
         
         
+    protected:
+        
+        static constexpr Scalar::Flag Plus  = Scalar::Flag::Plus;
+        static constexpr Scalar::Flag Zero  = Scalar::Flag::Zero;
+        
+    public:
 
-        using Kernel_Block_MulAdd_T = ArrowheadBlockKernel_fixed<
+        using Kernel_Block_MulAdd_T = ArrowheadBlockKernel_Tiny<
             AMB_DIM+1, AMB_DIM+1, AMB_DIM,
             Real, Real, Real, Int, LInt,
-            Scalar::Flag::Plus, Scalar::Flag::Plus, // CAUTION: We use add-in instead of overwrite!
+            Plus, Plus, // CAUTION: We use add-in instead of overwrite!
             true,
             true, false,
             true
         >;
         
-        using Kernel_Block_Mul_T = ArrowheadBlockKernel_fixed<
+        using Kernel_Block_Mul_T = ArrowheadBlockKernel_Tiny<
             AMB_DIM+1, AMB_DIM+1, AMB_DIM,
             Real, Real, Real, Int, LInt,
-            Scalar::Flag::Plus, Scalar::Flag::Zero,
+            Plus, Zero, // <-- overwrite
             true,
             true, false,
             true
         >;
   
-        using Kernel_Diag_MulAdd_T = DenseBlockKernel_fixed<
+        using Kernel_Diag_MulAdd_T = DenseBlockKernel_Tiny<
             AMB_DIM+1, AMB_DIM+1, AMB_DIM,
             Real, Real, Real, Int, LInt,
-            Scalar::Flag::Plus, Scalar::Flag::Plus,
+            Plus, Plus, // <-- add-in
             true, false, true,
             true, true,
             true
         >;
+        
+//        using Kernel_Block_MulAdd_T = ArrowheadBlockKernel_Tiny<
+//            AMB_DIM+1, AMB_DIM+1, AMB_DIM,
+//            Real, Real, Real, Int, LInt,
+//            Plus, Plus, // CAUTION: We use add-in instead of overwrite!
+//            true,
+//            true, false,
+//            true
+//        >;
+//        
+//        using Kernel_Block_Mul_T = ArrowheadBlockKernel_Tiny<
+//            AMB_DIM+1, AMB_DIM+1, AMB_DIM,
+//            Real, Real, Real, Int, LInt,
+//            Plus, Zero,
+//            true,
+//            true, false,
+//            true
+//        >;
+//  
+//        using Kernel_Diag_MulAdd_T = DenseBlockKernel_Tiny<
+//            AMB_DIM+1, AMB_DIM+1, AMB_DIM,
+//            Real, Real, Real, Int, LInt,
+//            Plus, Plus,
+//            true, false, true,
+//            true, true,
+//            true
+//        >;
         
 //        using Kernel_Diag_MulAdd_T = DenseBlockKernel_fixed<
 //            AMB_DIM+1, AMB_DIM+1, AMB_DIM, true,

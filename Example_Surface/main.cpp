@@ -8,7 +8,6 @@
 /// - compute the gradient of the tangent-point energy w.r.t. that metric; and
 /// - find a collision-free step size for a displacement field along the manifold.
 
-
 #ifdef __APPLE__
 /// Use these while on a mac. Don't forget to issue the compiler flag `-framework Accelerate`.
 ///
@@ -17,8 +16,6 @@
 /// This should work for OpenBLAS.
     #include "../submodules/Tensors/OpenBLAS.hpp"
 #endif
-
-#include "../Repulsor.hpp"
 
 #include "../Repulsor.hpp"
 
