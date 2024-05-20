@@ -65,9 +65,9 @@ namespace Repulsor
     template<int AMB_DIM, typename Real_, typename Int_>
     class alignas(ObjectAlignment) GJK
     {
-        ASSERT_FLOAT(Real_);
-        ASSERT_INT  (Int_ );
-
+        static_assert(FloatQ<Real_>,"");
+        static_assert(IntQ<Int_>,"");
+        
     public:
         
         using Int  = Int_;

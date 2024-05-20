@@ -1,6 +1,6 @@
 public:
 
-    using BASE::serialized_data;
+    using Base_T::serialized_data;
 
 
 public:

@@ -11,12 +11,12 @@ namespace Repulsor
     >
     class SimplicialMeshBase : public CachedObject
     {
+        static_assert(IntQ< Int_>,"");
+        static_assert(IntQ<LInt_>,"");
         
-        ASSERT_FLOAT(Real_);
-        ASSERT_INT(Int_);
-        ASSERT_INT(LInt_);
-        ASSERT_FLOAT(SReal_);
-        ASSERT_FLOAT(ExtReal_);
+        static_assert(FloatQ<Real_>,"");
+        static_assert(FloatQ<SReal_>,"");
+        static_assert(FloatQ<ExtReal_>,"");
         
     public:
         

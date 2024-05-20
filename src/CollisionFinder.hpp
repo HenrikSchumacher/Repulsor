@@ -6,9 +6,10 @@ namespace Repulsor
     template <int AMB_DIM, typename Real, typename Int, typename SReal>
     class CollisionFinder
     {
-        ASSERT_FLOAT(Real   );
-        ASSERT_INT  (Int    );
-        ASSERT_FLOAT(SReal  );
+        static_assert(FloatQ<Real>,"");
+        static_assert(FloatQ<SReal>,"");
+        
+        static_assert(IntQ<Int>,"");
         
     public:
         

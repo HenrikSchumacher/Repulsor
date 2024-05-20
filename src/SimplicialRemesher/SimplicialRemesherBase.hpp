@@ -7,11 +7,11 @@ namespace Repulsor
     template<typename Real_, typename Int_, typename ExtReal_, typename ExtInt_>
     class SimplicialRemesherBase
     {
+        static_assert(FloatQ<Real_>,"");
+        static_assert(FloatQ<ExtReal_>,"");
         
-        ASSERT_REAL(Real_);
-        ASSERT_INT(Int_);
-        ASSERT_REAL(ExtReal_);
-        ASSERT_INT(ExtInt_);
+        static_assert(IntQ<Int_>,"");
+        static_assert(IntQ<ExtInt_>,"");
         
     public:
         

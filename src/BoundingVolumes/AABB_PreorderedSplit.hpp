@@ -1,8 +1,5 @@
 #pragma once
 
-#define BASE  AABB<AMB_DIM,Real,Int,SReal>
-#define CLASS AABB_PreorderedSplit
-
 namespace Repulsor
 {
     // serialized_data is assumed to be an array of size SIZE. Will never be allocated by class! Instead, it is meant to be mapped onto an array of type SReal by calling the member SetPointer.
@@ -13,48 +10,58 @@ namespace Repulsor
     // serialized_data[AMB_DIM + 1],...,serialized_data[AMB_DIM + AMB_DIM] = half the edge lengths.
     
     template<int AMB_DIM, typename Real, typename Int, typename SReal>
-    class CLASS : public BASE
+    class AABB_PreorderedSplit : public AABB<AMB_DIM,Real,Int,SReal>
     {
     public:
         
-        CLASS() : BASE() {}
+        using Base_T = AABB<AMB_DIM,Real,Int,SReal>;
+        
+        AABB_PreorderedSplit() : Base_T() {}
 
         // Copy constructor
-        CLASS( const CLASS & other ) : BASE( other ) {}
+        AABB_PreorderedSplit( const AABB_PreorderedSplit & other ) : Base_T( other ) {}
         
         // Move constructor
-        CLASS( CLASS && other ) noexcept : BASE( other ) {}
+        AABB_PreorderedSplit( AABB_PreorderedSplit && other ) noexcept : Base_T( other ) {}
         
         // Copy assignment
-        const CLASS & operator=( const CLASS & rhs)
+        const AABB_PreorderedSplit & operator=( const AABB_PreorderedSplit & rhs)
         {
-            return CLASS ( rhs );
+            return AABB_PreorderedSplit ( rhs );
         }
         
         // Move assignment
-        const CLASS & operator=( CLASS && rhs)
+        const AABB_PreorderedSplit & operator=( AABB_PreorderedSplit && rhs)
         {
-            return CLASS ( std::move(rhs) );
+            return AABB_PreorderedSplit ( std::move(rhs) );
         }
         
-        virtual ~CLASS() override = default;
+        virtual ~AABB_PreorderedSplit() override = default;
         
     protected:
         
-        using BASE::serialized_data;
-//        using BASE::self_buffer;
+        using Base_T::serialized_data;
+//        using Base_T::self_buffer;
         
     public:
         
-        using BASE::Size;
-        using BASE::SetPointer;
-        using BASE::FromPrimitives;
+        using Base_T::Size;
+        using Base_T::SetPointer;
+        using Base_T::FromPrimitives;
         
     public:
         
-//#include "../Primitives/Primitive_Common.hpp"
+        [[nodiscard]] std::shared_ptr<AABB_PreorderedSplit> Clone () const
+        {
+            return std::shared_ptr<AABB_PreorderedSplit>(CloneImplementation());
+        }
+                                                                                    
+    private:
         
-        __ADD_CLONE_CODE__(CLASS)
+        [[nodiscard]] virtual AABB_PreorderedSplit * CloneImplementation() const override
+        {
+            return new AABB_PreorderedSplit(*this);
+        }
         
     public:
         
@@ -137,14 +144,10 @@ namespace Repulsor
         
         virtual std::string ClassName() const override
         {
-            return TO_STD_STRING(CLASS)+"<"+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+">";
+            return std::string("AABB_PreorderedSplit")+"<"+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+">";
         }
         
         
-    }; // CLASS
+    }; // AABB_PreorderedSplit
 
 } // namespace Repulsor
-
-#undef CLASS
-#undef BASE
-

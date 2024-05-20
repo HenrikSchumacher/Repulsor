@@ -1,31 +1,38 @@
 #pragma once
 
-#define CLASS BoundingVolumeBase
-#define BASE  PrimitiveSerialized<AMB_DIM,Real,Int,SReal>
-
 namespace Repulsor
 {
-    
     // Class that adds bounding volume features to a basic serializable primitive, like computing the bounding volume from a set of points.
     template<int AMB_DIM, typename Real, typename Int, typename SReal>
-    class CLASS : public BASE
+    class BoundingVolumeBase : public PrimitiveSerialized<AMB_DIM,Real,Int,SReal>
     {
     public:
         
-        CLASS() : BASE()
+        using Base_T = PrimitiveSerialized<AMB_DIM,Real,Int,SReal>;
+        
+        BoundingVolumeBase() : Base_T()
         {}
         
         // Copy constructor
-        CLASS( const CLASS & other ) : BASE(other)
+        BoundingVolumeBase( const BoundingVolumeBase & other ) : Base_T(other)
         {}
         
         // Move constructor
-        CLASS( CLASS && other ) noexcept : BASE(other)
+        BoundingVolumeBase( BoundingVolumeBase && other ) noexcept : Base_T(other)
         {}
         
-        virtual ~CLASS() override = default;
+        virtual ~BoundingVolumeBase() override = default;
         
-        __ADD_CLONE_CODE_FOR_ABSTRACT_CLASS__(CLASS)
+    public:
+        
+        [[nodiscard]] std::shared_ptr<BoundingVolumeBase> Clone () const
+        {
+            return std::shared_ptr<BoundingVolumeBase>(CloneImplementation());
+        }
+        
+    private:
+        
+        [[nodiscard]] virtual BoundingVolumeBase * CloneImplementation() const override = 0;
         
     public:
         
@@ -68,13 +75,9 @@ namespace Repulsor
 
         virtual std::string ClassName() const override
         {
-            return TO_STD_STRING(CLASS)+"<"+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+">";
+            return std::string("BoundingVolumeBase")+"<"+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+">";
         }
         
-    }; // PrimitiveBase
+    }; // BoundingVolumeBase
 
-    
 } // namespace Repulsor
-
-#undef BASE
-#undef CLASS

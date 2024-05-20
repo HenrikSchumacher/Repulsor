@@ -1,11 +1,7 @@
 #pragma once
 
-#define CLASS PrimitiveSerialized
-#define BASE  PrimitiveBase<AMB_DIM,Real,Int>
-
 namespace Repulsor
 {
-    
     // Adds some I/O routines to PrimitiveBase.
 
     // Real  -  data type that will be handed to GJK; GJK typically needs doubles.
@@ -13,11 +9,16 @@ namespace Repulsor
     // Int   -  integer type for return values and loops.
     
     template<int AMB_DIM, typename Real, typename Int, typename SReal >
-    class CLASS : public BASE
+    class PrimitiveSerialized : public PrimitiveBase<AMB_DIM,Real,Int>
     {
-        ASSERT_FLOAT(Real );
-        ASSERT_INT  (Int  );
-        ASSERT_FLOAT(SReal);
+    public:
+        
+        using Base_T  = PrimitiveBase<AMB_DIM,Real,Int>;
+        
+        static_assert(FloatQ<Real>,"");
+        static_assert(FloatQ<SReal>,"");
+        
+        static_assert(IntQ<Int>,"");
 
     protected:
         
@@ -36,24 +37,33 @@ namespace Repulsor
         
     public:
         
-        CLASS() = default;
+        PrimitiveSerialized() = default;
         
         
         // Copy constructor
-        CLASS( const CLASS & other )
+        PrimitiveSerialized( const PrimitiveSerialized & other )
         {
             this->serialized_data = other.serialized_data;
         }
 
         // Move constructor
-        CLASS( PrimitiveSerialized && other ) noexcept 
+        PrimitiveSerialized( PrimitiveSerialized && other ) noexcept 
         {
             this->serialized_data = std::move(other.serialized_data);
         }
         
-        virtual ~CLASS() override = default;
+        virtual ~PrimitiveSerialized() override = default;
         
-        __ADD_CLONE_CODE_FOR_ABSTRACT_CLASS__(CLASS)
+    public:
+            
+        [[nodiscard]] std::shared_ptr<PrimitiveSerialized> Clone () const
+        {
+            return std::shared_ptr<PrimitiveSerialized>(CloneImplementation());
+        }
+        
+    private:
+            
+        [[nodiscard]] virtual PrimitiveSerialized * CloneImplementation() const override = 0;
         
     public:
         
@@ -136,13 +146,10 @@ namespace Repulsor
 
         virtual std::string ClassName() const override
         {
-            return TO_STD_STRING(CLASS)+"<"+TypeName<Real>+","+ToString(AMB_DIM)+">";
+            return std::string("PrimitiveSerialized")+"<"+TypeName<Real>+","+ToString(AMB_DIM)+">";
         }
         
-    }; // PrimitiveBase
+    };
 
     
 } // namespace Repulsor
-
-#undef BASE
-#undef CLASS

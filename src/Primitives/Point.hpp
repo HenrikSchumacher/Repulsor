@@ -1,18 +1,18 @@
 #pragma once
 
-
-#define CLASS Point
-#define BASE  PrimitiveSerialized<AMB_DIM,Real,Int,SReal>
-
 namespace Repulsor
 {
-    
     template<int AMB_DIM,typename Real,typename Int,typename SReal,
                 typename ExtReal = SReal,typename ExtInt = Int>
-    class CLASS : public BASE
+    class Point : public PrimitiveSerialized<AMB_DIM,Real,Int,SReal>
     {
-        ASSERT_FLOAT (ExtReal );
-        ASSERT_INT   (ExtInt  );
+    public:
+        
+        static_assert(FloatQ<ExtReal>,"");
+        
+        static_assert(IntQ<ExtInt>,"");
+        
+        using Base_T = PrimitiveSerialized<AMB_DIM,Real,Int,SReal>;
         
     protected:
         
@@ -24,15 +24,15 @@ namespace Repulsor
         
     public:
         
-        CLASS() : BASE() {}
+        Point() : Base_T() {}
         
         // Copy constructor
-        CLASS( const CLASS & other ) : BASE( other ) {}
+        Point( const Point & other ) : Base_T( other ) {}
 
         // Move constructor
-        CLASS( CLASS && other ) noexcept : BASE( other ) {}
+        Point( Point && other ) noexcept : Base_T( other ) {}
 
-        virtual ~CLASS() override = default;
+        virtual ~Point() override = default;
         
         static constexpr Int SIZE = 1 + AMB_DIM;
         
@@ -47,7 +47,19 @@ namespace Repulsor
         
 #include "Primitive_Common.hpp"
         
-        __ADD_CLONE_CODE__(CLASS)
+    public:
+        
+        [[nodiscard]] std::shared_ptr<Point> Clone () const
+        {
+            return std::shared_ptr<Point>(CloneImplementation());
+        }
+                                                                                    
+    private:
+        
+        [[nodiscard]] virtual Point * CloneImplementation() const override
+        {
+            return new Point(*this);
+        }
         
     public:
         
@@ -93,12 +105,9 @@ namespace Repulsor
         
         virtual std::string ClassName() const override
         {
-            return TO_STD_STRING(CLASS)+"<"+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+","+TypeName<ExtReal>+","+TypeName<ExtInt>+">";
+            return std::string("Point")+"<"+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+","+TypeName<ExtReal>+","+TypeName<ExtInt>+">";
         }
 
     }; // Point
     
 } // namespace Repulsor
-
-#undef CLASS
-#undef BASE

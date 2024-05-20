@@ -1,37 +1,35 @@
 #pragma once
 
-#define CLASS   SpaceTimePrism
-#define BASE    PrimitiveBase<AMB_DIM,Real,Int>
-#define PROTO_T PrimitiveSerialized<AMB_DIM+1,Real,Int,SReal>
-
 namespace Repulsor
 {
-    
     // Adds some common I/O interface for all Polytope types to PrimitiveSerialized.
 
     template<int AMB_DIM,typename Real,typename Int,typename SReal>
-    class CLASS : public BASE
+    class SpaceTimePrism : public PrimitiveBase<AMB_DIM,Real,Int>
     {
+    public:
+        
+        using Base_T  = PrimitiveBase<AMB_DIM,Real,Int>;
+        using Proto_T = PrimitiveSerialized<AMB_DIM+1,Real,Int,SReal>;
+        
     protected:
-    
-
-        std::shared_ptr<PROTO_T> proto_0;
-        std::shared_ptr<PROTO_T> proto_1;
+        std::shared_ptr<Proto_T> proto_0;
+        std::shared_ptr<Proto_T> proto_1;
         
         SReal t_0 = 0;
         SReal t_1 = 1;
     public:
         
-        CLASS() {}
+        SpaceTimePrism() {}
         
-        explicit CLASS( const PROTO_T & proto )
+        explicit SpaceTimePrism( const Proto_T & proto )
         :   proto_0(proto->Clone())
         ,   proto_1(proto->Clone())
         {}
         
         // Copy constructor
-        CLASS( const CLASS & other )
-        :   BASE()
+        SpaceTimePrism( const SpaceTimePrism & other )
+        :   Base_T()
         ,   proto_0(other.proto_0->Clone())
         ,   proto_1(other.proto_1->Clone())
         ,   t_0(other.t_0)
@@ -39,17 +37,27 @@ namespace Repulsor
         {}
 
         // Move constructor
-        CLASS( CLASS && other ) noexcept 
-        :   BASE()
+        SpaceTimePrism( SpaceTimePrism && other ) noexcept 
+        :   Base_T()
         ,   proto_0(std::move(other.proto_0->Clone()))
         ,   proto_1(std::move(other.proto_1->Clone()))
         ,   t_0(other.t_0)
         ,   t_1(other.t_1)
         {}
         
-        virtual ~CLASS() override = default;
+        virtual ~SpaceTimePrism() override = default;
         
-        __ADD_CLONE_CODE_FOR_ABSTRACT_CLASS__(CLASS)
+
+    public:
+            
+        [[nodiscard]] std::shared_ptr<SpaceTimePrism> Clone () const
+        {
+            return std::shared_ptr<SpaceTimePrism>(CloneImplementation());
+        }
+        
+    private:
+            
+        [[nodiscard]] virtual SpaceTimePrism * CloneImplementation() const override = 0;
         
     public:
         
@@ -196,14 +204,9 @@ namespace Repulsor
         
         virtual std::string ClassName() const override
         {
-            return TO_STD_STRING(CLASS)+"<"+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+">";
+            return std::string("SpaceTimePrism")+"<"+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+">";
         }
         
     };
-
     
 } // namespace Repulsor
-
-#undef PROTO_T
-#undef CLASS
-#undef BASE

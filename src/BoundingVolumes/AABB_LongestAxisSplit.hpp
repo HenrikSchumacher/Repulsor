@@ -1,11 +1,7 @@
 #pragma once
 
-#define BASE  AABB<AMB_DIM,Real,Int,SReal>
-#define CLASS AABB_LongestAxisSplit
-
 namespace Repulsor
 {
-
     // serialized_data is assumed to be an array of size SIZE. Will never be allocated by class! Instead, it is meant to be mapped onto an array of type SReal by calling the member SetPointer.
     
     // DATA LAYOUT
@@ -14,45 +10,60 @@ namespace Repulsor
     // serialized_data[AMB_DIM + 1],...,serialized_data[AMB_DIM + AMB_DIM] = half the edge lengths.
     
     template<int AMB_DIM, typename Real, typename Int, typename SReal>
-    class CLASS : public BASE
+    class AABB_LongestAxisSplit : public AABB<AMB_DIM,Real,Int,SReal>
     {
     public:
         
-        CLASS() : BASE() {}
+        using Base_T = AABB<AMB_DIM,Real,Int,SReal>;
+        
+        AABB_LongestAxisSplit() : Base_T() {}
 
         // Copy constructor
-        CLASS( const CLASS & other ) : BASE( other ) {}
+        AABB_LongestAxisSplit( const AABB_LongestAxisSplit & other ) : Base_T( other ) {}
         
         // Move constructor
-        CLASS( CLASS && other ) noexcept : BASE( other ) {}
+        AABB_LongestAxisSplit( AABB_LongestAxisSplit && other ) noexcept : Base_T( other ) {}
         
         // Copy assignment
-        const CLASS & operator=( const CLASS & rhs)
+        const AABB_LongestAxisSplit & operator=( const AABB_LongestAxisSplit & rhs)
         {
-            return CLASS ( rhs );
+            return AABB_LongestAxisSplit ( rhs );
         }
         
         // Move assignment
-        const CLASS & operator=( CLASS && rhs)
+        const AABB_LongestAxisSplit & operator=( AABB_LongestAxisSplit && rhs)
         {
-            return CLASS ( std::move(rhs) );
+            return AABB_LongestAxisSplit ( std::move(rhs) );
         }
         
-        virtual ~CLASS() override = default;
+        virtual ~AABB_LongestAxisSplit() override = default;
         
     protected:
         
-        using BASE::serialized_data;
+        using Base_T::serialized_data;
         
     public:
         
-        using BASE::Size;
-        using BASE::SetPointer;
-        using BASE::FromPrimitives;
+        using Base_T::Size;
+        using Base_T::SetPointer;
+        using Base_T::FromPrimitives;
         
     public:
         
-        __ADD_CLONE_CODE__(CLASS)
+
+    public:
+        
+        [[nodiscard]] std::shared_ptr<AABB_LongestAxisSplit> Clone () const
+        {
+            return std::shared_ptr<AABB_LongestAxisSplit>(CloneImplementation());
+        }
+                                                                                    
+    private:
+        
+        [[nodiscard]] virtual AABB_LongestAxisSplit * CloneImplementation() const override
+        {
+            return new AABB_LongestAxisSplit(*this);
+        }
     
     public:
         
@@ -231,14 +242,9 @@ namespace Repulsor
         
         virtual std::string ClassName() const override
         {
-            return TO_STD_STRING(CLASS)+"<"+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+">";
+            return std::string("AABB_LongestAxisSplit")+"<"+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+">";
         }
-        
-        
-    }; // CLASS
+          
+    }; // AABB_LongestAxisSplit
 
 } // namespace Repulsor
-
-#undef CLASS
-#undef BASE
-

@@ -1,18 +1,15 @@
 #pragma once
 
-#define CLASS PolytopeExt
-#define BASE  PolytopeBase<AMB_DIM,Real,Int,SReal>
-
 namespace Repulsor
 {
-    
     // Pure interface class
 
     template<int AMB_DIM, typename Real, typename Int,typename SReal, typename ExtReal, typename ExtInt>
-    class CLASS : public BASE
-    {        
-        ASSERT_FLOAT (ExtReal);
-        ASSERT_INT   (ExtInt );
+    class PolytopeExt : public PolytopeBase<AMB_DIM,Real,Int,SReal>
+    {
+        static_assert(FloatQ<ExtReal>,"");
+        
+        static_assert(IntQ<ExtInt>,"");
         
     protected:
         
@@ -25,19 +22,30 @@ namespace Repulsor
         
     public:
         
-        CLASS() : BASE () {}
+        using Base_T = PolytopeBase<AMB_DIM,Real,Int,SReal>;
+        
+        PolytopeExt() : Base_T () {}
         
         // Copy constructor
-        CLASS( const CLASS & other ) : BASE( other)
+        PolytopeExt( const PolytopeExt & other ) : Base_T( other)
         {}
 
         // Move constructor
-        CLASS( CLASS && other ) noexcept : BASE( other)
+        PolytopeExt( PolytopeExt && other ) noexcept : Base_T( other)
         {}
         
-        virtual ~CLASS() override = default;
+        virtual ~PolytopeExt() override = default;
         
-        __ADD_CLONE_CODE_FOR_ABSTRACT_CLASS__(CLASS)
+    public:
+        
+        [[nodiscard]] std::shared_ptr<PolytopeExt> Clone () const
+        {
+            return std::shared_ptr<PolytopeExt>(CloneImplementation());
+        }
+        
+    private:
+        
+        [[nodiscard]] virtual PolytopeExt * CloneImplementation() const override = 0;
         
     public:
         
@@ -47,13 +55,9 @@ namespace Repulsor
         
         virtual std::string ClassName() const override
         {
-            return TO_STD_STRING(CLASS)+"<"+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+","+TypeName<ExtReal>+">";
+            return std::string("PolytopeExt")+"<"+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+","+TypeName<ExtReal>+">";
         }
         
-    }; // PrimitiveBase
+    };
 
-    
 } // namespace Repulsor
-
-#undef CLASS
-#undef BASE

@@ -21,8 +21,9 @@ namespace Repulsor
         /// n is the ambient dimensions of space filling curve.
         /// Pick bit_count_ so that 2^bit_count_ exceeds the largest value in any coordinate.
         
-        ASSERT_INT(Int_);
-        ASSERT_FLOAT(Real_);
+        static_assert(FloatQ<Real_>,"");
+        
+        static_assert(IntQ<Int_>,"");
         
         static_assert( bit_count_ <= 64, "Maximally 64 bits are supported."  );
         

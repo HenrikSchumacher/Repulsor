@@ -5,10 +5,11 @@ namespace Repulsor
     template<typename Real, typename Int, typename SReal, typename ExtReal>
     class CollisionTreeBase
     {
-        ASSERT_FLOAT(Real   );
-        ASSERT_INT  (Int    );
-        ASSERT_FLOAT(SReal  );
-        ASSERT_FLOAT(ExtReal);        
+        static_assert(FloatQ<Real_>,"");
+        static_assert(FloatQ<SReal_>,"");
+        static_assert(FloatQ<ExtReal_>,"");
+        
+        static_assert(IntQ< Int>,"");
         
     public:
         

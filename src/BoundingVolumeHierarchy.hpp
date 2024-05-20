@@ -47,7 +47,7 @@ namespace Repulsor
         template<typename Int>
         struct Cluster // slim POD container to hold only the data relevant for the construction phase in the tree, before it is serialized
         {
-            ASSERT_SIGNED_INT(Int);
+            static_assert(SignedIntQ<Int>,"");
             
         public:
             

@@ -1,39 +1,49 @@
 #pragma once
 
-#define CLASS MovingPolytopeExt
-#define BASE  MovingPolytopeBase<AMB_DIM,Real,Int,SReal>
-
 namespace Repulsor
 {
     
     template<int AMB_DIM, typename Real,typename Int, typename SReal, typename ExtReal, typename ExtInt>
-    class CLASS : public BASE
+    class MovingPolytopeExt : public MovingPolytopeBase<AMB_DIM,Real,Int,SReal>
     {
-        ASSERT_FLOAT(ExtReal);
+    public:
+        
+        static_assert(FloatQ<ExtReal>,"");
+        
+        using Base_T = MovingPolytopeBase<AMB_DIM,Real,Int,SReal>;
         
     protected:
 
-        using BASE::a;
-        using BASE::b;
-        using BASE::T;
+        using Base_T::a;
+        using Base_T::b;
+        using Base_T::T;
         
     public:
         
-        CLASS() {}
+        MovingPolytopeExt() {}
         
         // Copy constructor
-        CLASS( const CLASS & other )
-        :   BASE(other)
+        MovingPolytopeExt( const MovingPolytopeExt & other )
+        :   Base_T(other)
         {}
 
         // Move constructor
-        CLASS( CLASS && other ) noexcept 
-        :   BASE(other)
+        MovingPolytopeExt( MovingPolytopeExt && other ) noexcept 
+        :   Base_T(other)
         {}
         
-        virtual ~CLASS() override = default;
+        virtual ~MovingPolytopeExt() override = default;
         
-        __ADD_CLONE_CODE_FOR_ABSTRACT_CLASS__(CLASS)
+    public:
+        
+        [[nodiscard]] std::shared_ptr<MovingPolytopeExt> Clone () const
+        {
+            return std::shared_ptr<MovingPolytopeExt>(CloneImplementation());
+        }
+        
+    private:
+        
+        [[nodiscard]] virtual MovingPolytopeExt * CloneImplementation() const override = 0;
         
     public:
         
@@ -46,12 +56,9 @@ namespace Repulsor
         
         virtual std::string ClassName() const override
         {
-            return TO_STD_STRING(CLASS)+"<"+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+","+TypeName<ExtReal>+">";
+            return std::string("MovingPolytopeExt")+"<"+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+","+TypeName<ExtReal>+">";
         }
         
-    };
+    }; //
 
 } // namespace Repulsor
-
-#undef CLASS
-#undef BASE

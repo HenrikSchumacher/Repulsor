@@ -16,10 +16,11 @@ namespace Repulsor
         static_assert( MinDomDim_ <= MaxDomDim_, "MinDomDim_ <= MaxDomDim_ required." );
         static_assert( MinAmbDim_ <= MaxAmbDim_, "MinAmbDim_ <= MaxAmbDim_ required." );
         
-        ASSERT_FLOAT(Real_);
-        ASSERT_INT(Int_);
-        ASSERT_FLOAT(ExtReal_);
-        ASSERT_INT(ExtInt_);
+        static_assert(FloatQ<Real_>,"");
+        static_assert(FloatQ<ExtReal_>,"");
+        
+        static_assert(IntQ<Int_>,"");
+        static_assert(IntQ<ExtInt_>,"");
         
     public:
         

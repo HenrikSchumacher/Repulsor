@@ -1,15 +1,15 @@
 #pragma once
 
-#define CLASS MovingPolytopeBase
-#define BASE  PrimitiveBase<AMB_DIM+1,Real,Int>
-
 namespace Repulsor
 {
-
     template<int AMB_DIM, typename Real, typename Int, typename SReal>
-    class CLASS : public BASE
+    class MovingPolytopeBase : public PrimitiveBase<AMB_DIM+1,Real,Int>
     {
-        ASSERT_FLOAT(SReal);
+    public:
+        
+        static_assert(FloatQ<SReal>,"");
+        
+        using Base_T = PrimitiveBase<AMB_DIM+1,Real,Int>;
         
     protected:
     
@@ -20,27 +20,36 @@ namespace Repulsor
         
     public:
         
-        CLASS() {}
+        MovingPolytopeBase() {}
         
         // Copy constructor
-        CLASS( const CLASS & other )
-        :   BASE()
+        MovingPolytopeBase( const MovingPolytopeBase & other )
+        :   Base_T()
         ,   a(other.a)
         ,   b(other.b)
         ,   T(other.T)
         {}
 
         // Move constructor
-        CLASS( CLASS && other ) noexcept 
-        :   BASE()
+        MovingPolytopeBase( MovingPolytopeBase && other ) noexcept 
+        :   Base_T()
         ,   a(other.a)
         ,   b(other.b)
         ,   T(other.T)
         {}
         
-        virtual ~CLASS() override = default;
+        virtual ~MovingPolytopeBase() override = default;
         
-        __ADD_CLONE_CODE_FOR_ABSTRACT_CLASS__(CLASS)
+    public:
+        
+        [[nodiscard]] std::shared_ptr<MovingPolytopeBase> Clone () const
+        {
+            return std::shared_ptr<MovingPolytopeBase>(CloneImplementation());
+        }
+        
+    private:
+        
+        [[nodiscard]] virtual MovingPolytopeBase * CloneImplementation() const override = 0;
         
     public:
         
@@ -82,13 +91,10 @@ namespace Repulsor
         
         virtual std::string ClassName() const override
         {
-            return TO_STD_STRING(CLASS)+"<"+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+">";
+            return std::string("MovingPolytopeBase")+"<"+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+">";
         }
         
-    };
+    }; // MovingPolytopeBase
 
     
 } // namespace Repulsor
-
-#undef CLASS
-#undef BASE

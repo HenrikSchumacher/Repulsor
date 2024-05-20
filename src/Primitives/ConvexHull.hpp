@@ -1,27 +1,26 @@
 #pragma once
 
-#define CLASS ConvexHull
-#define BASE  PrimitiveBase<AMB_DIM,Real,Int>
-
-
 //TODO: Test this thoroughly!
 
 namespace Repulsor
 {
-    
     template<int HULL_COUNT, int AMB_DIM, typename Real, typename Int>
-    class CLASS : public BASE
+    class ConvexHull : public PrimitiveBase<AMB_DIM,Real,Int>
     {
+    public:
+        
+        using Base_T = PrimitiveBase<AMB_DIM,Real,Int>;
+        
     protected:
         
-        const BASE * primitive [HULL_COUNT];
+        const Base_T * primitive [HULL_COUNT];
         
         mutable Real buffer [AMB_DIM * (AMB_DIM+1)];
         mutable Real squared_radius = - Scalar::One<Real>;
         
     public:
         
-        CLASS() : BASE()
+        ConvexHull() : Base_T()
         {
             for( Int i = 0; i < HULL_COUNT; ++i )
             {
@@ -29,9 +28,9 @@ namespace Repulsor
             }
         }
         
-        virtual ~CLASS() override = default;
+        virtual ~ConvexHull() override = default;
 
-        void Set( const Int i, const BASE * const  P )
+        void Set( const Int i, const Base_T * const  P )
         {
             if( 0 <= i < HULL_COUNT )
             {
@@ -181,12 +180,9 @@ namespace Repulsor
         
         virtual std::string ClassName() const override
         {
-            return TO_STD_STRING(CLASS)+"<"+ToString(HULL_COUNT)+","+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+">";
+            return std::string("ConvexHull")+"<"+ToString(HULL_COUNT)+","+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+">";
         }
         
     }; // ConvexHull
     
 } // namespace Repulsor
-
-#undef CLASS
-#undef BASE

@@ -1,18 +1,14 @@
 #pragma once
 
-
-#define CLASS Polytope
-#define BASE  PolytopeExt<AMB_DIM_,Real,Int,SReal,ExtReal,Int>
-
 namespace Repulsor
 {
-    
     template<int POINT_COUNT, int AMB_DIM_, typename Real ,typename Int, typename SReal,
                 typename ExtReal = SReal,typename ExtInt = Int>
-    class CLASS : public BASE
+    class Polytope : public PolytopeExt<AMB_DIM_,Real,Int,SReal,ExtReal,Int>
     {
-        ASSERT_FLOAT (ExtReal );
-        ASSERT_INT   (ExtInt  );
+        static_assert(FloatQ<ExtReal>,"");
+        
+        static_assert(IntQ<ExtInt>,"");
         
     protected:
         
@@ -25,17 +21,19 @@ namespace Repulsor
         
     public:
         
+        using Base_T = PolytopeExt<AMB_DIM_,Real,Int,SReal,ExtReal,Int>;
+        
         static constexpr Int AMB_DIM = AMB_DIM_;
         
-        CLASS() : BASE() {}
+        Polytope() : Base_T() {}
         
         // Copy constructor
-        CLASS( const CLASS & other ) : BASE( other ) {}
+        Polytope( const Polytope & other ) : Base_T( other ) {}
 
         // Move constructor
-        CLASS( CLASS && other ) noexcept : BASE( other ) {}
+        Polytope( Polytope && other ) noexcept : Base_T( other ) {}
 
-        virtual ~CLASS() override = default;
+        virtual ~Polytope() override = default;
         
         static constexpr Int SIZE = 1 + AMB_DIM + POINT_COUNT * AMB_DIM;
         
@@ -51,7 +49,19 @@ namespace Repulsor
         
 #include "Primitive_Common.hpp"
         
-        __ADD_CLONE_CODE__(CLASS)
+    public:
+        
+        [[nodiscard]] std::shared_ptr<Polytope> Clone () const
+        {
+            return std::shared_ptr<Polytope>(CloneImplementation());
+        }
+                                                                                    
+    private:
+        
+        [[nodiscard]] virtual Polytope * CloneImplementation() const override
+        {
+            return new Polytope(*this);
+        }
         
     public:
         
@@ -253,16 +263,19 @@ namespace Repulsor
         
         virtual std::string ClassName() const override
         {
-            return TO_STD_STRING(CLASS)+"<"+ToString(POINT_COUNT)+","+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+","+TypeName<ExtReal>+","+TypeName<ExtInt>+">";
+            return std::string("Polytope")+"<"+ToString(POINT_COUNT)+","+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+","+TypeName<ExtReal>+","+TypeName<ExtInt>+">";
         }
 
     }; // Polytope
     
     template <int AMB_DIM_, typename Real, typename Int, typename SReal,
         typename ExtReal = SReal, typename ExtInt = Int>
-    [[nodiscard]] std::shared_ptr<BASE> MakePolytope( const Int P_size )
+    [[nodiscard]] 
+    std::shared_ptr<PolytopeExt<AMB_DIM_,Real,Int,SReal,ExtReal,Int>>
+    MakePolytope( const Int P_size )
     {
-        BASE * r;
+        using Base_T = PolytopeExt<AMB_DIM_,Real,Int,SReal,ExtReal,Int>;
+        Base_T * r;
         switch(  P_size  )
         {
             case 1:
@@ -372,11 +385,8 @@ namespace Repulsor
             }
         }
         
-        return std::shared_ptr<BASE>(r);
+        return std::shared_ptr<Base_T>(r);
         
     } // MakePolytope
     
 } // namespace Repulsor
-
-#undef CLASS
-#undef BASE

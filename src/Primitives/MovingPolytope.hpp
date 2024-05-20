@@ -1,24 +1,24 @@
 #pragma once
 
-#define CLASS MovingPolytope
-#define BASE  MovingPolytopeExt<AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>
-
 namespace Repulsor
 {
-    
     template<int POINT_COUNT, int AMB_DIM, typename Real, typename Int, typename SReal,
         typename ExtReal, typename ExtInt>
-    class alignas(ObjectAlignment) CLASS : public BASE
+    class alignas(ObjectAlignment) MovingPolytope : public MovingPolytopeExt<AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>
     {
+    public:
+        
+        static_assert(FloatQ<ExtReal>,"");
 
-        ASSERT_FLOAT(ExtReal);
-        ASSERT_INT  (ExtInt );
+        static_assert(IntQ<ExtInt>,"");
+        
+        using Base_T = MovingPolytopeExt<AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>;
         
     protected:
         
-        using BASE::a;
-        using BASE::b;
-        using BASE::T;
+        using Base_T::a;
+        using Base_T::b;
+        using Base_T::T;
         
         mutable SReal r = 0;      // radius positions  as measured from av_position
         mutable SReal w = 0;      // radius velocities as measured from av_velocity
@@ -32,25 +32,37 @@ namespace Repulsor
         
     public:
         
-        CLASS() : BASE() {}
+        MovingPolytope() : Base_T() {}
         
         // Copy constructor
-        CLASS( const CLASS & other )
-        :   BASE(other)
+        MovingPolytope( const MovingPolytope & other )
+        :   Base_T(other)
         {}
 
         // Move constructor
-        CLASS( CLASS && other ) noexcept : BASE(other) {}
+        MovingPolytope( MovingPolytope && other ) noexcept : Base_T(other) {}
         
-        virtual ~CLASS() override = default;
-        
-        __ADD_CLONE_CODE__(CLASS)
+        virtual ~MovingPolytope() override = default;
         
         
         static constexpr Int COORD_SIZE = 1 + (1 + POINT_COUNT ) * AMB_DIM;
         static constexpr Int VELOC_SIZE = 1 + (1 + POINT_COUNT ) * AMB_DIM + 1;
         static constexpr Int SIZE       = COORD_SIZE + VELOC_SIZE;
 
+    public:
+        
+        [[nodiscard]] std::shared_ptr<MovingPolytope> Clone () const
+        {
+            return std::shared_ptr<MovingPolytope>(CloneImplementation());
+        }
+                                                                                    
+    private:
+        
+        [[nodiscard]] virtual MovingPolytope * CloneImplementation() const override
+        {
+            return new MovingPolytope(*this);
+        }
+        
     public:
         
         virtual Int PointCount() const override
@@ -640,7 +652,7 @@ namespace Repulsor
 
         virtual std::string ClassName() const override
         {
-            return TO_STD_STRING(CLASS)+"<"+ToString(POINT_COUNT)+","+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+","+TypeName<ExtReal>+","+TypeName<ExtInt>+">";
+            return std::string("MovingPolytope")+"<"+ToString(POINT_COUNT)+","+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+","+TypeName<ExtReal>+","+TypeName<ExtInt>+">";
         }
         
     };
@@ -648,89 +660,89 @@ namespace Repulsor
     
 //    template <int AMB_DIM, typename Real, typename Int, typename SReal,
 //        typename ExtReal = SReal, typename ExtInt = Int>
-//    [[nodiscard]] std::shared_ptr<BASE> MakeMovingPolytope( const Int P_size )
+//    [[nodiscard]] std::shared_ptr<Base_T> MakeMovingPolytope( const Int P_size )
 //    {
 //        switch( P_size )
 //        {
 //            case 1:
 //            {
-//                return std::shared_ptr<BASE>(MovingPolytope<1,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>());
+//                return std::shared_ptr<Base_T>(MovingPolytope<1,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>());
 //            }
 //            case 2:
 //            {
-//                return std::shared_ptr<BASE>(MovingPolytope<2,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>());
+//                return std::shared_ptr<Base_T>(MovingPolytope<2,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>());
 //            }
 //            case 3:
 //            {
-//                return std::shared_ptr<BASE>(MovingPolytope<3,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>());
+//                return std::shared_ptr<Base_T>(MovingPolytope<3,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>());
 //            }
 //            case 4:
 //            {
-//                return std::shared_ptr<BASE>(MovingPolytope<4,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>());
+//                return std::shared_ptr<Base_T>(MovingPolytope<4,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>());
 //            }
 //            case 5:
 //            {
-//                return std::shared_ptr<BASE>(MovingPolytope<5,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>());
+//                return std::shared_ptr<Base_T>(MovingPolytope<5,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>());
 //            }
 //            case 6:
 //            {
-//                return std::shared_ptr<BASE>(MovingPolytope<6,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>());
+//                return std::shared_ptr<Base_T>(MovingPolytope<6,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>());
 //            }
 //            case 7:
 //            {
-//                return std::shared_ptr<BASE>(MovingPolytope<7,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>());
+//                return std::shared_ptr<Base_T>(MovingPolytope<7,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>());
 //            }
 //            case 8:
 //            {
-//                return std::shared_ptr<BASE>(MovingPolytope<8,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>());
+//                return std::shared_ptr<Base_T>(MovingPolytope<8,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>());
 //            }
 //            case 9:
 //            {
-//                return std::shared_ptr<BASE>(MovingPolytope<9,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>());
+//                return std::shared_ptr<Base_T>(MovingPolytope<9,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>());
 //            }
 //            case 10:
 //            {
-//                return std::shared_ptr<BASE>(MovingPolytope<10,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>());
+//                return std::shared_ptr<Base_T>(MovingPolytope<10,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>());
 //            }
 //            case 11:
 //            {
-//                return std::shared_ptr<BASE>(MovingPolytope<11,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>());
+//                return std::shared_ptr<Base_T>(MovingPolytope<11,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>());
 //            }
 //            case 12:
 //            {
-//                return std::shared_ptr<BASE>(MovingPolytope<12,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>());
+//                return std::shared_ptr<Base_T>(MovingPolytope<12,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>());
 //            }
 //            case 13:
 //            {
-//                return std::shared_ptr<BASE>(MovingPolytope<13,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>());
+//                return std::shared_ptr<Base_T>(MovingPolytope<13,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>());
 //            }
 //            case 14:
 //            {
-//                return std::shared_ptr<BASE>(MovingPolytope<14,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>());
+//                return std::shared_ptr<Base_T>(MovingPolytope<14,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>());
 //            }
 //            case 15:
 //            {
-//                return std::shared_ptr<BASE>(MovingPolytope<15,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>());
+//                return std::shared_ptr<Base_T>(MovingPolytope<15,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>());
 //            }
 //            case 16:
 //            {
-//                return std::shared_ptr<BASE>(MovingPolytope<16,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>());
+//                return std::shared_ptr<Base_T>(MovingPolytope<16,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>());
 //            }
 //            case 17:
 //            {
-//                return std::shared_ptr<BASE>(MovingPolytope<17,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>());
+//                return std::shared_ptr<Base_T>(MovingPolytope<17,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>());
 //            }
 //            case 18:
 //            {
-//                return std::shared_ptr<BASE>(MovingPolytope<18,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>());
+//                return std::shared_ptr<Base_T>(MovingPolytope<18,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>());
 //            }
 //            case 19:
 //            {
-//                return std::shared_ptr<BASE>(MovingPolytope<19,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>());
+//                return std::shared_ptr<Base_T>(MovingPolytope<19,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>());
 //            }
 //            case 20:
 //            {
-//                return std::shared_ptr<BASE>(MovingPolytope<20,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>());
+//                return std::shared_ptr<Base_T>(MovingPolytope<20,AMB_DIM,Real,Int,SReal,ExtReal,ExtInt>());
 //            }
 //            default:
 //            {
@@ -742,6 +754,3 @@ namespace Repulsor
 //    } // MakeMovingPolytope
     
 } // namespace Repulsor
-
-#undef CLASS
-#undef BASE

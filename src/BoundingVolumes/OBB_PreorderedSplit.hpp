@@ -1,11 +1,7 @@
 #pragma once
 
-#define BASE  OBB<AMB_DIM,Real,Int,SReal>
-#define CLASS OBB_PreorderedSplit
-
 namespace Repulsor
 {
-    
     // The OBB is the image of Cuboid[ {-L[0],...,-L[AMB_DIM-1]}, {L[0],...,L[AMB_DIM-1]} ] under the ORTHOGONAL mapping x \mapsto rotation * x + center.
     
     
@@ -18,21 +14,21 @@ namespace Repulsor
     // serialized_data[1+AMB_DIM+AMB_DIM],...,serialized_data[AMB_DIM + AMB_DIM + AMB_DIM x AMB_DIM] = rotation^T. BEWARE THE TRANSPOSITION!!!!!!!!!!!!!
     
     template<int AMB_DIM, typename Real, typename Int, typename SReal>
-    class CLASS : public BASE
+    class OBB_PreorderedSplit : public OBB<AMB_DIM,Real,Int,SReal>
     {
     public:
         
-        CLASS() : BASE() {}
+        using Base_T = OBB<AMB_DIM,Real,Int,SReal>;
+        
+        OBB_PreorderedSplit() : Base_T() {}
 
         // Copy constructor
-        CLASS( const CLASS & other ) : BASE( other ) {}
+        OBB_PreorderedSplit( const OBB_PreorderedSplit & other ) : Base_T( other ) {}
         
         // Move constructor
-        CLASS( CLASS && other ) noexcept : BASE( other ) {}
+        OBB_PreorderedSplit( OBB_PreorderedSplit && other ) noexcept : Base_T( other ) {}
         
-        __ADD_CLONE_CODE__(CLASS)
-        
-        virtual ~CLASS() override = default;
+        virtual ~OBB_PreorderedSplit() override = default;
         
         static constexpr Int SIZE = 1 + AMB_DIM + AMB_DIM + AMB_DIM * AMB_DIM;
         
@@ -41,9 +37,19 @@ namespace Repulsor
             return SIZE;
         }
         
-//protected:
-//        
-//        using BASE::self_buffer;
+    public:
+        
+        [[nodiscard]] std::shared_ptr<OBB_PreorderedSplit> Clone () const
+        {
+            return std::shared_ptr<OBB_PreorderedSplit>(CloneImplementation());
+        }
+                                                                                    
+    private:
+        
+        [[nodiscard]] virtual OBB_PreorderedSplit * CloneImplementation() const override
+        {
+            return new OBB_PreorderedSplit(*this);
+        }
  
 public:
 
@@ -420,13 +426,9 @@ public:
         
         virtual std::string ClassName() const override
         {
-            return TO_STD_STRING(CLASS)+"<"+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+">";
+            return std::string("OBB_PreorderedSplit")+"<"+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+">";
         }
         
-    }; // CLASS
+    }; // OBB_PreorderedSplit
     
 } // namespace Repulsor
-
-
-#undef CLASS
-#undef BASE

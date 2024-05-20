@@ -2,28 +2,35 @@
 
 namespace Repulsor
 {
-    
-#define CLASS PrimitiveBase
-    
     // Real  -  data type that will be handed to GJK; GJK typically needs doubles.
     // Int   -  integer type for return values and loops.
     
     template<int AMB_DIM, typename Real_, typename Int_>
-    class alignas(ObjectAlignment) CLASS // Use this broad alignment to prevent false sharing.
+    class alignas(ObjectAlignment) PrimitiveBase // Use this broad alignment to prevent false sharing.
     {
-        ASSERT_FLOAT(Real_);
-        ASSERT_INT  (Int_ );
+        static_assert(FloatQ<Real_>,"");
+        
+        static_assert(IntQ<Int_>,"");
 
     public:
         
         using Real = Real_;
         using Int  = Int_;
         
-        CLASS() = default;
+        PrimitiveBase() = default;
         
-        virtual ~CLASS() = default;
+        virtual ~PrimitiveBase() = default;
+                                 
+    public:
         
-        __ADD_CLONE_CODE_FOR_BASE_CLASS__(CLASS)
+        [[nodiscard]] std::shared_ptr<PrimitiveBase> Clone () const
+        {
+            return std::shared_ptr<PrimitiveBase>(CloneImplementation());
+        }
+        
+    private:
+        
+        [[nodiscard]] virtual PrimitiveBase * CloneImplementation() const = 0;
         
     public:
         
@@ -56,9 +63,7 @@ namespace Repulsor
             return std::string("PrimitiveBase<")+TypeName<Real>+","+ToString(AMB_DIM)+">";
         }
         
-    }; // PrimitiveBase
-
-#undef CLASS
+    };
     
 } // namespace Repulsor
 

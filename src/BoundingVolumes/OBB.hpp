@@ -1,8 +1,5 @@
 #pragma once
 
-#define BASE BoundingVolumeBase<AMB_DIM,Real,Int,SReal>
-#define CLASS OBB
-
 namespace Repulsor
 {
     // The OBB is the image of Cuboid[ {-L[0],...,-L[AMB_DIM-1]}, {L[0],...,L[AMB_DIM-1]} ] under the ORTHOGONAL mapping x \mapsto rotation * x + center.
@@ -14,24 +11,25 @@ namespace Repulsor
     // serialized_data[0] = squared radius
     // serialized_data[1],...,serialized_data[AMB_DIM] = center
     // serialized_data[1+AMB_DIM],...,serialized_data[AMB_DIM+AMB_DIM] = L (vector of half the edge lengths)
-    // serialized_data[1+AMB_DIM+AMB_DIM],...,serialized_data[AMB_DIM + AMB_DIM + AMB_DIM x AMB_DIM] = rotation^T. BEWARE THE TRANSPOSITION!!!!!!!!!!!!!
+    // serialized_data[1+AMB_DIM+AMB_DIM],...,serialized_data[AMB_DIM + AMB_DIM + AMB_DIM x AMB_DIM] = rotation^T. BEWARE THE TRANSPOSITION!!!
     
     template<int AMB_DIM, typename Real, typename Int, typename SReal>
-    class CLASS : public BASE
+    class OBB : public BoundingVolumeBase<AMB_DIM,Real,Int,SReal>
     {
     public:
         
-        CLASS() : BASE() {}
+        using Base_T = BoundingVolumeBase<AMB_DIM,Real,Int,SReal>;
+        
+        OBB() : Base_T() {}
 
         // Copy constructor
-        CLASS( const CLASS & other ) : BASE( other ) {}
+        OBB( const OBB & other ) : Base_T( other ) {}
         
         // Move constructor
-        CLASS( CLASS && other ) noexcept : BASE( other ) {}
+        OBB( OBB && other ) noexcept : Base_T( other ) {}
         
-        __ADD_CLONE_CODE_FOR_ABSTRACT_CLASS__(CLASS)
         
-        virtual ~CLASS() override = default;
+        virtual ~OBB() override = default;
         
         static constexpr Int SIZE = 1 + AMB_DIM + AMB_DIM + AMB_DIM * AMB_DIM;
         
@@ -39,6 +37,17 @@ namespace Repulsor
         {
             return SIZE;
         }
+        
+    public:
+        
+        [[nodiscard]] std::shared_ptr<OBB> Clone () const
+        {
+            return std::shared_ptr<OBB>(CloneImplementation());
+        }
+        
+    private:
+        
+        [[nodiscard]] virtual OBB * CloneImplementation() const override = 0;
         
 //protected:
 //
@@ -473,7 +482,7 @@ public:
         
         virtual std::string ClassName() const override
         {
-            return TO_STD_STRING(CLASS)+"<"+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+">";
+            return std::string("OBB")+"<"+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+">";
         }
     
     protected:
@@ -488,9 +497,6 @@ public:
             return LAPACKE_ssyev( LAPACK_COL_MAJOR, 'V', 'L', AMB_DIM, matrix, AMB_DIM, eigenvalues );
         }
         
-    }; // CLASS
+    }; // OBB
     
 } // namespace Repulsor
-
-#undef CLASS
-#undef BASE

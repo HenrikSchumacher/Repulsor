@@ -1,8 +1,5 @@
 #pragma once
 
-#define CLASS AABB
-#define BASE  BoundingVolumeBase<AMB_DIM,Real,Int,SReal>
-
 namespace Repulsor
 {
     // serialized_data is assumed to be an array of size SIZE. Will never be allocated by class! Instead, it is meant to be mapped onto an array of type SReal by calling the member SetPointer.
@@ -13,8 +10,12 @@ namespace Repulsor
     // serialized_data[AMB_DIM + 1],...,serialized_data[AMB_DIM + AMB_DIM] = half the edge lengths.
     
     template<int AMB_DIM, typename Real, typename Int, typename SReal>
-    class CLASS : public BASE
+    class AABB : public BoundingVolumeBase<AMB_DIM,Real,Int,SReal>
     {
+    public:
+        
+        using Base_T = BoundingVolumeBase<AMB_DIM,Real,Int,SReal>;
+        
     protected:
         
         Real id_matrix[AMB_DIM][AMB_DIM];
@@ -38,24 +39,24 @@ namespace Repulsor
     
     public:
         
-        CLASS() : BASE()
+        AABB() : Base_T()
         {
             Initialize();
         }
 
         // Copy constructor
-        CLASS( const CLASS & other ) : BASE( other )
+        AABB( const AABB & other ) : Base_T( other )
         {
             Initialize();
         }
         
         // Move constructor
-        CLASS( CLASS && other ) noexcept : BASE( other )
+        AABB( AABB && other ) noexcept : Base_T( other )
         {
             Initialize();
         }
         
-        virtual ~CLASS() override = default;
+        virtual ~AABB() override = default;
         
         
         static constexpr Int SIZE = 1 + AMB_DIM + AMB_DIM;
@@ -73,7 +74,16 @@ namespace Repulsor
         
 #include "../Primitives/Primitive_Common.hpp"
         
-        __ADD_CLONE_CODE_FOR_ABSTRACT_CLASS__(CLASS)
+    public:
+        
+        [[nodiscard]] std::shared_ptr<AABB> Clone () const
+        {
+            return std::shared_ptr<AABB>(CloneImplementation());
+        }
+        
+    private:
+        
+        [[nodiscard]] virtual AABB * CloneImplementation() const override = 0;
         
         
     public:
@@ -374,11 +384,11 @@ namespace Repulsor
         
         virtual std::string ClassName() const override
         {
-            return TO_STD_STRING(CLASS)+"<"+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+">";
+            return std::string("AABB")+"<"+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+">";
         }
         
         
-        inline friend Real AABB_SquaredDistance( cref<CLASS> P, cref<CLASS> Q )
+        inline friend Real AABB_SquaredDistance( cref<AABB> P, cref<AABB> Q )
         {
             cptr<SReal> P_x = P.serialized_data+1;              // center of box P
             cptr<SReal> P_L = P.serialized_data+1+AMB_DIM;      // edge half-lengths of box P
@@ -432,12 +442,6 @@ namespace Repulsor
             }
         }
         
-    }; // CLASS
+    };
 
 } // namespace Repulsor
-
-#undef CLASS
-#undef BASE
-    
-
-

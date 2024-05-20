@@ -33,8 +33,8 @@ namespace Repulsor
         ,   n       ( n_      )
         ,   kernel  ( kernel_ )
         {
-            ASSERT_INT(I0);
-            ASSERT_INT(I1);
+            static_assert(IntQ<I0>,"");
+            static_assert(IntQ<I1>,"");
         }
         
         // Copy constructor

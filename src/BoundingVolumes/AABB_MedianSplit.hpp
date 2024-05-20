@@ -1,12 +1,7 @@
 #pragma once
 
-#define BASE  AABB<AMB_DIM,Real,Int,SReal>
-#define CLASS AABB_MedianSplit
-
 namespace Repulsor
 {
-    
-    
     // serialized_data is assumed to be an array of size SIZE. Will never be allocated by class! Instead, it is meant to be mapped onto an array of type SReal by calling the member SetPointer.
     
     // DATA LAYOUT
@@ -15,46 +10,58 @@ namespace Repulsor
     // serialized_data[AMB_DIM + 1],...,serialized_data[AMB_DIM + AMB_DIM] = half the edge lengths.
     
     template<int AMB_DIM, typename Real, typename Int, typename SReal>
-    class CLASS : public BASE
+    class AABB_MedianSplit : public AABB<AMB_DIM,Real,Int,SReal>
     {
     public:
         
-        CLASS() : BASE() {}
+        using Base_T = AABB<AMB_DIM,Real,Int,SReal>;
+        
+        AABB_MedianSplit() : Base_T() {}
 
         // Copy constructor
-        CLASS( const CLASS & other ) : BASE( other ) {}
+        AABB_MedianSplit( const AABB_MedianSplit & other ) : Base_T( other ) {}
         
         // Move constructor
-        CLASS( CLASS && other ) noexcept : BASE( other ) {}
+        AABB_MedianSplit( AABB_MedianSplit && other ) noexcept : Base_T( other ) {}
         
         // Copy assignment
-        const CLASS & operator=( const CLASS & rhs)
+        const AABB_MedianSplit & operator=( const AABB_MedianSplit & rhs)
         {
-            return CLASS ( rhs );
+            return AABB_MedianSplit ( rhs );
         }
         
         // Move assignment
-        const CLASS & operator=( CLASS && rhs)
+        const AABB_MedianSplit & operator=( AABB_MedianSplit && rhs)
         {
-            return CLASS ( std::move(rhs) );
+            return AABB_MedianSplit ( std::move(rhs) );
         }
         
-        virtual ~CLASS() override = default;
+        virtual ~AABB_MedianSplit() override = default;
         
     protected:
         
-        using BASE::serialized_data;
-//        using BASE::self_buffer;
+        using Base_T::serialized_data;
+//        using Base_T::self_buffer;
         
     public:
         
-        using BASE::Size;
-        using BASE::SetPointer;
-        using BASE::FromPrimitives;
+        using Base_T::Size;
+        using Base_T::SetPointer;
+        using Base_T::FromPrimitives;
         
     public:
         
-        __ADD_CLONE_CODE__(CLASS)
+        [[nodiscard]] std::shared_ptr<AABB_MedianSplit> Clone () const
+        {
+            return std::shared_ptr<AABB_MedianSplit>(CloneImplementation());
+        }
+                                                                                    
+    private:
+        
+        [[nodiscard]] virtual AABB_MedianSplit * CloneImplementation() const override
+        {
+            return new AABB_MedianSplit(*this);
+        }
         
     public:
         
@@ -210,13 +217,9 @@ namespace Repulsor
         
         virtual std::string ClassName() const override
         {
-            return TO_STD_STRING(CLASS)+"<"+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+">";
+            return std::string("AABB_MedianSplit")+"<"+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+">";
         }
         
-    }; // CLASS
+    }; // AABB_MedianSplit
 
 } // namespace Repulsor
-
-#undef CLASS
-#undef BASE
-
