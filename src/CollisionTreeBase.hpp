@@ -2,7 +2,7 @@
 
 namespace Repulsor
 {
-    template<typename Real, typename Int, typename SReal, typename ExtReal>
+    template<typename Real, typename Int, typename SReal, typename ExtReal, typename ExtInt>
     class CollisionTreeBase
     {
         static_assert(FloatQ<Real_>,"");
@@ -13,7 +13,7 @@ namespace Repulsor
         
     public:
         
-        using ClusterTreeBase_T = ClusterTreeBase<Real,Int,SReal,ExtReal>;
+        using ClusterTreeBase_T = ClusterTreeBase<Real,Int,SReal,ExtReal,ExtInt>;
         
         using CollisionMatrix_T = SparseMatrixCSR<SReal,Int,Int>;
         

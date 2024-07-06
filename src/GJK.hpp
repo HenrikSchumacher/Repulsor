@@ -828,6 +828,16 @@ namespace Repulsor
             return AABB_SquaredDistance(P,Q);
         }
         
+        // Faster overload for AABBs and Points.
+        template<typename SReal>
+        Real SquaredDistance(
+            cref<AABB <AMB_DIM,Real,Int,SReal>> P,
+            cref<Point<AMB_DIM,Real,Int,SReal>> Q
+        )
+        {
+            return AABB_Point_SquaredDistance(P,Q);
+        }
+        
 /// ##########################################################################
 /// ##                               Witnesses                              ##
 /// ##########################################################################

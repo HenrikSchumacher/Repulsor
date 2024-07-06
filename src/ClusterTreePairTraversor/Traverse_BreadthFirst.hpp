@@ -31,8 +31,8 @@ public:
                 const Int left_i = S_C_left[i];
                 const Int left_j = T_C_left[j];
 
-                // Warning: This assumes that either both children are defined or empty.
-                if( left_i >= null || left_j >= null )
+                // Using that children are either both interiors or both leaves.
+                if( (left_i >= null) /*|| (left_j >= null)*/ )
                 {
                     const Int right_i = S_C_right[i];
                     const Int right_j = T_C_right[j];

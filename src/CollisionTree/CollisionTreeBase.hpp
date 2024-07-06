@@ -2,11 +2,14 @@
 
 namespace Repulsor
 {
-    template<typename Real_, typename Int_, typename LInt_, typename SReal_, typename ExtReal_, bool symmetricQetric>
+    template<
+        typename Real_, typename Int_, typename LInt_, typename SReal_,
+        typename ExtReal_, bool symmetricQetric
+    >
     class CollisionTreeBase
     {
-        static_assert(IntQ< Int_>,"");
-        static_assert(IntQ<LInt_>,"");
+        static_assert(IntQ<   Int_>,"");
+        static_assert(IntQ<  LInt_>,"");
         
         static_assert(FloatQ<Real_>,"");
         static_assert(FloatQ<SReal_>,"");

@@ -8,14 +8,16 @@ public:
         
         mref<Kernel_T> K = kernels[thread];
         
-        Int i_stack[max_depth] = {};
-        Int j_stack[max_depth] = {};
+        const Int stack_size = 4 * max_depth;
+        
+        Int i_stack[stack_size] = {};
+        Int j_stack[stack_size] = {};
 
         Int stack_ptr = null;
         i_stack[0] = i0;
         j_stack[0] = j0;
         
-        while( (null <= stack_ptr) && (stack_ptr < max_depth) )
+        while( (null <= stack_ptr) && (stack_ptr < stack_size-4) )
         {
             const Int i = i_stack[stack_ptr];
             const Int j = j_stack[stack_ptr];
@@ -24,16 +26,16 @@ public:
             K.LoadClusterS(i);
             K.LoadClusterT(j);
             
-            const Int left_i = S_C_left[i];
-            const Int left_j = T_C_left[j];
-            
             const bool admissableQ = (!( symmetricQ && (i == j) )) && K.AdmissableQ();
             
             if( !admissableQ )
             {
-                // Warning: This assumes that either both children are defined or empty.
-                if( left_i >= null || left_j >= null )
+                const Int left_i = S_C_left[i];
+                
+                // Using that children are either both interiors or both leaves.
+                if( (left_i >= null) /*|| (left_j >= null)*/ )
                 {
+                    const Int left_j = T_C_left[j];
                     const Int right_i = S_C_right[i];
                     const Int right_j = T_C_right[j];
                     
@@ -130,7 +132,7 @@ public:
                         }
                     }
                 }
-                else // left_i < null && left_j < null
+                else // (left_i < null) && (left_j < null)
                 {
                     // We know that i and j are leaf clusters and that they belong either to the near field, the very near field or contain intersecting primitives.
                     
@@ -250,7 +252,7 @@ public:
             else // admissableQ
             {
                 if constexpr ( symmetricQ )
-                {                    
+                {
                     if( i <= j )
                     {
                         K.ComputeAdmissable();
@@ -266,6 +268,12 @@ public:
                     K.ComputeAdmissable();
                 }
             }
+            
+        } // while
+        
+        if( stack_ptr >= stack_size-4 )
+        {
+            eprint( ClassName() + "::Traverse_DepthFirst: Stack overflow." );
         }
         
         debug_print(className()+"::Traverse_DepthFirst("+ToString(thread)+") done.");

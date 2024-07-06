@@ -46,7 +46,8 @@ protected:
         const Int L = C_left [C];
         const Int R = C_right[C];
         
-        if( (L >= null) && (R >= null) )
+        // Using that children are either both interiors or both leaves.
+        if( (L >= null) /*&& (R >= null)*/ )
         {
             // If not a leaf, compute the values of the children first.
             percolateUp_Recursive<BUFFER_DIM>(L);
@@ -113,7 +114,8 @@ protected:
         const Int L = C_left [C];
         const Int R = C_right[C];
         
-        if( (L >= null) && (R >= null) )
+        // Using that children are either both interiors or both leaves.
+        if( (L >= null) /*&& (R >= null)*/ )
         {
             // If not a leaf, compute the values of the children first.
             

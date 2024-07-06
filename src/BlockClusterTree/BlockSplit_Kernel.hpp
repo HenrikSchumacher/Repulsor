@@ -183,8 +183,8 @@ namespace Repulsor
             const bool neighbor_found = A.NonzeroPositionQ(P_i,P_j);
             
             const bool admissableQ = neighbor_found || G.MultipoleAcceptanceCriterion(
-                *S_P_proto, *T_P_proto, near_theta2
-            );
+                    *S_P_proto, *T_P_proto, near_theta2
+                );
             
             if( admissableQ )
             {

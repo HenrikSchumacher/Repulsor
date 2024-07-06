@@ -14,7 +14,7 @@ namespace Repulsor
     {
     public:
         
-        using Base_T = BoundingVolumeBase<AMB_DIM,Real,Int,SReal>;
+        using Base_T  = BoundingVolumeBase<AMB_DIM,Real,Int,SReal>;
         
     protected:
         
@@ -413,13 +413,37 @@ namespace Repulsor
             return d2;
         }
         
+        template<typename ExtReal>
+        inline friend Real AABB_Point_SquaredDistance(
+            cref<AABB> P, cref<Point<AMB_DIM,Real,Int,SReal,ExtReal>> Q
+        )
+        {
+            cptr<SReal> P_x = P.serialized_data+1;              // center of box P
+            cptr<SReal> P_L = P.serialized_data+1+AMB_DIM;      // edge half-lengths of box P
+            
+            Real d2 = Scalar::Zero<Real>;
+            
+            for( Int k = 0; k < AMB_DIM; ++k )
+            {
+                Real x = static_cast<Real>(
+                    Max(
+                        Scalar::Zero<SReal>,
+                        Max( P_x[k]-P_L[k], Q[k] )
+                        -
+                        Min( P_x[k]+P_L[k], Q[k] )
+                    )
+                );
+                d2 += x * x;
+            }
+            return d2;
+        }
+        
         void Merge( mptr<SReal> C_Serialized, const Int i = 0 ) const
         {
             mptr<SReal> p = C_Serialized + SIZE * i;
             
             if( serialized_data != p )
             {
-                
                 mptr<SReal> x1 = serialized_data + 1;
                 mptr<SReal> L1 = serialized_data + 1 + AMB_DIM;
                 

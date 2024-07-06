@@ -153,6 +153,7 @@ public:
                 
                 top_tree_rows[d].push_back(C);
                 
+                // Using that children are either both interiors or both leaves.
                 if( L >= null )
                 {
                     if( d < max_depth  )
@@ -280,6 +281,7 @@ protected:
     {
         const Int L = C_left [C];
         
+        // Using that children are either both interiors or both leaves.
         if( L >= 0 )
         {
             const Int R = C_right[C];

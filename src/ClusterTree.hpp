@@ -16,7 +16,7 @@ namespace Repulsor
         using ExtReal = ExtReal_;
         using LInt    = LInt_;
         
-        using Base_T               = ClusterTreeBase<Real,Int,LInt,SReal,ExtReal>;
+        using Base_T = ClusterTreeBase<Real,Int,LInt,SReal,ExtReal>;
         
         using SparseMatrix_T       = typename Base_T::SparseMatrix_T;
         using SparseBinaryMatrix_T = typename Base_T::SparseBinaryMatrix_T;
@@ -232,6 +232,8 @@ namespace Repulsor
 #include "ClusterTree/Percolate_Parallel.hpp"
 #include "ClusterTree/Percolate_Recursive.hpp"
 #include "ClusterTree/ComputeClusterData_Thread.hpp"
+        
+#include "ClusterTree/DistanceQueries.hpp"
 
         
     private:
@@ -1118,9 +1120,9 @@ namespace Repulsor
             
             ptic(className()+"::TakeUpdateVectors - Upward pass for AABBs.");
             {
-                Int stack_array[128];
+                Int stack [128];
                 Int stack_ptr = 0;
-                stack_array[stack_ptr] = 0;
+                stack[stack_ptr] = 0;
 
                 Tensor1<bool,Int> visited( ClusterCount(), false );
 
@@ -1128,10 +1130,11 @@ namespace Repulsor
 
                 while( (0 <= stack_ptr) && (stack_ptr < 126) )
                 {
-                    const Int C = stack_array[stack_ptr];
+                    const Int C = stack[stack_ptr];
                     const Int L = C_left [C];
                     const Int R = C_right[C];
 
+                    // Using that children are either both interiors or both leaves.
                     if( (L >= 0) /*&& (R >= 0)*/ )
                     {
                         if( visited[C] )
@@ -1143,8 +1146,8 @@ namespace Repulsor
                         }
                         else
                         {
-                            stack_array[++stack_ptr] = R;
-                            stack_array[++stack_ptr] = L;
+                            stack[++stack_ptr] = R;
+                            stack[++stack_ptr] = L;
                             visited[C] = true;
                         }
                     }
@@ -1152,6 +1155,12 @@ namespace Repulsor
                     {
                         --stack_ptr;
                     }
+                    
+                } // while
+                
+                if( stack_ptr >= 126 )
+                {
+                    eprint( ClassName() + "::TakeUpdateVectors: Stack overflow." );
                 }
             }
             ptoc(className()+"::TakeUpdateVectors - Upward pass for AABBs.");

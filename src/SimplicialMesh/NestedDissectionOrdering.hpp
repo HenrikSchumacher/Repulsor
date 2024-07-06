@@ -76,6 +76,7 @@ public:
                         const Int L = C_left [C];
                         const Int R = C_right[C];
                         
+                        // Using that children are either both interiors or both leaves.
                         if( L >= 0 )
                         {
                             
@@ -132,6 +133,7 @@ public:
                         const Int L = C_left [C];
                         const Int R = C_right[C];
 
+                        // Using that children are either both interiors or both leaves.
                         if( L >= 0 )
                         {
                             const Int i_begin = V_begin[C];

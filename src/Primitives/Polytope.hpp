@@ -2,8 +2,9 @@
 
 namespace Repulsor
 {
-    template<int POINT_COUNT, int AMB_DIM_, typename Real ,typename Int, typename SReal,
-                typename ExtReal = SReal,typename ExtInt = Int>
+    template<
+        int POINT_COUNT, int AMB_DIM_, typename Real ,typename Int, typename SReal,
+        typename ExtReal = SReal,typename ExtInt = Int>
     class Polytope : public PolytopeExt<AMB_DIM_,Real,Int,SReal,ExtReal,Int>
     {
         static_assert(FloatQ<ExtReal>,"");

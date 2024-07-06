@@ -13,11 +13,11 @@ namespace Repulsor
         
     public:
         
+        using GJK_T = GJK<AMB_DIM+1,GJK_Real,Int>;
+        
         using       Primitive_T =       PolytopeBase<AMB_DIM,GJK_Real,Int,SReal>;
         using MovingPrimitive_T = MovingPolytopeBase<AMB_DIM,GJK_Real,Int,SReal>;
 
-        using GJK_T = GJK<AMB_DIM+1,GJK_Real,Int>;
-        
         CollisionFinder() {};
 
         CollisionFinder(
@@ -45,8 +45,9 @@ namespace Repulsor
         
         const SReal eps = static_cast<SReal>(0.0625);
         
-        mutable Int max_iter = 128;
-        mutable SReal b_stack[128] = {};
+        static constexpr Int max_iter = 126;
+        
+        mutable SReal b_stack[max_iter+2] = {};
 
     public:
  
@@ -133,6 +134,12 @@ namespace Repulsor
                     P->SetSecondTime(b);
                     Q->SetSecondTime(b);
                 }
+            }
+
+            if( stack_ptr >= max_iter )
+            {
+                eprint(ClassName()+"::FindMaximumSafeStepSize: Stack overflow.");
+                return static_cast<SReal>(a);
             }
             
             if( iter >= max_iter )

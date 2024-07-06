@@ -2,15 +2,15 @@
 
 namespace Repulsor
 {
-    template<int AMB_DIM,typename Real,typename Int,typename SReal,
-                typename ExtReal = SReal,typename ExtInt = Int>
+    template<
+        int AMB_DIM,typename Real,typename Int,typename SReal,
+        typename ExtReal = SReal
+    >
     class Point : public PrimitiveSerialized<AMB_DIM,Real,Int,SReal>
     {
     public:
         
         static_assert(FloatQ<ExtReal>,"");
-        
-        static_assert(IntQ<ExtInt>,"");
         
         using Base_T = PrimitiveSerialized<AMB_DIM,Real,Int,SReal>;
         
@@ -67,7 +67,7 @@ namespace Repulsor
         {
             serialized_data[0] = Scalar::Zero<SReal>;
             
-            copy_buffer<AMB_DIM>( coords, &serialized_data[1] );
+            copy_buffer<AMB_DIM>( &coords[AMB_DIM *i], &serialized_data[1] );
         }
         
         
@@ -76,7 +76,7 @@ namespace Repulsor
         {
             copy_buffer<AMB_DIM>( &serialized_data[1], supp );
             
-            return dot_buffer<AMB_DIM>( dir, supp );
+            return dot_buffers<AMB_DIM>( dir, supp );
         }
         
         //Computes support vector supp of dir.
@@ -88,7 +88,7 @@ namespace Repulsor
         // Computes only the values of min/max support function. Usefull to compute bounding boxes.
         virtual void MinMaxSupportValue( cptr<Real> dir, mref<Real> min_val, mref<Real> max_val ) const override
         {
-            min_val = dot_buffer<AMB_DIM>( &serialized_data[1], dir );
+            min_val = dot_buffers<AMB_DIM>( &serialized_data[1], dir );
             max_val = min_val;
         }
         
@@ -103,9 +103,17 @@ namespace Repulsor
         }
         
         
+        
+        SReal operator[]( Int i ) const
+        {
+            return serialized_data[1+i];
+        }
+        
+        
+        
         virtual std::string ClassName() const override
         {
-            return std::string("Point")+"<"+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+","+TypeName<ExtReal>+","+TypeName<ExtInt>+">";
+            return std::string("Point")+"<"+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<SReal>+","+TypeName<ExtReal>+">";
         }
 
     }; // Point

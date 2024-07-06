@@ -43,6 +43,12 @@ protected:
     template<Int BUFFER_DIM>
     void percolateUp_DFS( const Int C_root, const Int max_depth ) const
     {
+        // The tree is a binary tree. 
+        // Each node needs an identifier of type std::size_t.
+        // With contemporary systems, std::size_t is 64 bit in size.
+        // There is no way that such a tree can have 128 levels.
+        // So it is relatively save here to use a stack of fixed size.
+        
         Int stack   [128] = {};
         Int visited [128] = {false};
         Int depths  [128] = {};
@@ -96,9 +102,9 @@ protected:
             }
         }
         
-        if( stack_ptr >= 128 )
+        if( stack_ptr >= 126 )
         {
-            eprint(ClassName()+"::percolateUp_DFS: stack overflow detected.");
+            eprint(ClassName()+"::percolateUp_DFS: Stack overflow.");
         }
 
     } // percolateUp_DFS
@@ -146,6 +152,12 @@ protected:
     template<Int BUFFER_DIM>
     void percolateDown_DFS( const Int C_root, const Int max_depth ) const
     {
+        // The tree is a binary tree.
+        // Each node needs an identifier of type std::size_t.
+        // With contemporary systems, std::size_t is 64 bit in size.
+        // There is no way that such a tree can have 128 levels.
+        // So it is relatively save here to use a stack of fixed size.
+        
         Int stack  [128] = {};
         Int depths [128] = {};
 
@@ -188,8 +200,8 @@ protected:
             }
         }
         
-        if( stack_ptr >= 128 )
+        if( stack_ptr >= 126 )
         {
-            eprint(ClassName()+"::PercolateDown_DFS: stack overflow detected.");
+            eprint(ClassName()+"::PercolateDown_DFS: Stack overflow.");
         }
     }; // PercolateDown_DFS
