@@ -594,13 +594,13 @@ namespace Repulsor
         } // CollectDerivatives
         
         
-        void CollectPrimitiveEnergies() const
+        void CollectPrimitiveDensities() const
         {
-            ptic(ClassName()+"::CollectPrimitiveEnergies");
+            ptic(ClassName()+"::CollectPrimitiveDensities");
             
             // Collect energies from primitives and clusters and store them in P_out.
             
-            // Partially using the pipeline for derivatives. Not really efficient, but also not performance critical.
+            // Partially using the pipeline for derivatives. Not fully optimized, but also not performance critical.
             
             const Int far_dim         =  FarDim();
             const Int near_dim        = NearDim();
@@ -612,9 +612,9 @@ namespace Repulsor
             
             this->CleanseBuffers();
             
-            // Collect first entry of thread_C_D_far into C_out.
+            // Collect entries of thread_C_D_far into C_out.
             for( Int thread = 0; thread < thread_count; ++thread )
-            {
+            {   
                 cptr<Real> from = thread_C_D_far.data(thread);
                 mptr<Real> to   = C_out.data();
                 
@@ -628,33 +628,12 @@ namespace Repulsor
                 );
             }
             
-            //Before percolating the energies down we have to transform them to densities.
-            ParallelDo(
-                [=,this]( const Int i )
-                {
-                    C_out[i] /= C_far[i][0];
-                },
-                cluster_count,
-                ThreadCount()
-            );
-            
             PercolateDown();
             
             this->ClustersToPrimitives( false );
             
             // Now the simplex far field densities are stored in P_out.
-            // We have to convert them back to energies before we add the energies from thread_P_D_near.
-            
-            ParallelDo(
-                [=,this]( const Int i )
-                {
-                    P_out[i] *= P_near[i][0];
-                },
-                primitive_count,
-                thread_count
-            );
-            
-            // Add first entries of thread_P_D_near into P_out.
+            // Add entries of thread_P_D_near into P_out.
             for( Int thread = 0; thread < thread_count; ++thread )
             {
                 cptr<Real> from = thread_P_D_near.data(thread);
@@ -670,20 +649,20 @@ namespace Repulsor
                 );
             }
                         
-            ptoc(ClassName()+"::CollectPrimitiveEnergies");
+            ptoc(ClassName()+"::CollectPrimitiveDensities");
             
-        } // CollectPrimitiveEnergies
+        } // CollectPrimitiveDensities
         
-        void CollectPrimitiveEnergies( mptr<ExtReal> output, const ExtReal weight, bool addTo = false ) const
+        void CollectPrimitiveDensities( mptr<ExtReal> output, const ExtReal weight, bool addTo = false ) const
         {
-            ptic(ClassName()+"::CollectPrimitiveEnergies");
+            ptic(ClassName()+"::CollectPrimitiveDensities");
             
             //Collect the energies into P_out.
-            CollectPrimitiveEnergies();
+            CollectPrimitiveDensities();
             
             const Int primitive_count = PrimitiveCount();
             
-            // Copy the values to output. We must not forget reorder!
+            // Copy the values to output. We also have to reorder.
             ParallelDo(
                 [=,this]( const Int i )
                 {
@@ -694,18 +673,20 @@ namespace Repulsor
                 ThreadCount()
             );
             
-            ptoc(ClassName()+"::CollectPrimitiveEnergies");
+            ptoc(ClassName()+"::CollectPrimitiveDensities");
        
-        } // CollectPrimitiveEnergies
+        } // CollectPrimitiveDensities
             
-        void CollectDensity( mptr<ExtReal> output, const ExtReal weight, bool addTo = false ) const
+        void CollectVertexDensities( mptr<ExtReal> output, const ExtReal weight, bool addTo = false ) const
         {
-            ptic(ClassName()+"::CollectDensity");
+            ptic(ClassName()+"::CollectVertexDensities");
             
-            // Partially using the pipeline for derivatives. Not really efficient, but also not performance critical.
+            // Partially using the pipeline for derivatives. Not optimized efficient, but also not performance critical.
             this->RequireBuffers( static_cast<Int>(1) );
             
             // Compute dual volume vectors.
+            // It's actually not the dual volumes because we do not divide by AMB_DIM+1.
+            // But this way we also do not have to divide by AMB_DIM+1 when we average from primitives to simplices.
             fill_buffer( &P_in[0], Scalar::One<Real>, PrimitiveCount() );
 
             Tensor1<ExtReal,Int> dual_volumes ( lo_post.RowCount() );
@@ -717,17 +698,7 @@ namespace Repulsor
             );
         
             //Collect the energies into P_out.
-            CollectPrimitiveEnergies();
-            
-            // Divide by primitive volumes to get densities.
-            ParallelDo(
-                [=,this]( const Int j )
-                {
-                    P_out[j] /= P_near[j][0];
-                },
-                PrimitiveCount(),
-                ThreadCount()
-            );
+            CollectPrimitiveDensities();
             
             // Distribute the energy densities to energies per vertex. (Note that lo_post also multiplies by the primitives' volumes!)
             lo_post.template Dot<1>(
@@ -746,9 +717,9 @@ namespace Repulsor
                 ThreadCount()
             );
             
-            ptoc(ClassName()+"::CollectDensity");
+            ptoc(ClassName()+"::CollectVertexDensities");
             
-        } // CollectDensity
+        } // CollectVertexDensities
 
 //#################################################################################
 //##        Updates

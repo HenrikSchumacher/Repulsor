@@ -7,13 +7,19 @@ namespace Repulsor
         int S_DOM_DIM_, int T_DOM_DIM_,
         typename ClusterTree_T_,
         bool symmetricQ_,
-        bool energy_flag_, bool diff_flag_, bool metric_flag_
+        bool energy_flag_, bool diff_flag_, bool metric_flag_, bool density_flag_
     >
-    class FMM_Kernel_VF : public FMM_Kernel<ClusterTree_T_,symmetricQ_,energy_flag_,diff_flag_,metric_flag_>
+    class FMM_Kernel_VF : public FMM_Kernel<
+            ClusterTree_T_,symmetricQ_,
+            energy_flag_,diff_flag_,metric_flag_,density_flag_
+    >
     {
     private:
         
-        using Base_T = FMM_Kernel<ClusterTree_T_,symmetricQ_,energy_flag_,diff_flag_,metric_flag_>;
+        using Base_T = FMM_Kernel<
+            ClusterTree_T_,symmetricQ_,
+            energy_flag_,diff_flag_,metric_flag_,density_flag_
+        >;
 
     public:
         
@@ -36,6 +42,7 @@ namespace Repulsor
         using Base_T::energy_flag;
         using Base_T::diff_flag;
         using Base_T::metric_flag;
+        using Base_T::density_flag;
         using Base_T::GetS;
         using Base_T::GetT;
         
@@ -219,7 +226,7 @@ namespace Repulsor
             
             prefetch_buffer<T_Tree_T::SIZE,0,0>( &T_ser[T_Tree_T::SIZE * j] );
             
-            if constexpr ( diff_flag )
+            if constexpr (diff_flag || density_flag)
             {
                 prefetch_buffer<T_DATA_DIM,1,0>( &T_D_data[T_DATA_DIM * j] );
             }
@@ -242,7 +249,7 @@ namespace Repulsor
             x_buffer = &X[1];
             P        = &X[1+T_COORD_DIM];
 #endif
-            if constexpr ( diff_flag )
+            if constexpr ( diff_flag || density_flag )
             {
                 DX.SetZero();
             }
@@ -263,7 +270,7 @@ namespace Repulsor
             y_buffer = &Y[1];
             Q        = &Y[1+T_COORD_DIM];
 #endif
-            if constexpr ( diff_flag )
+            if constexpr ( diff_flag || density_flag )
             {
                 DY.SetZero();
             }
@@ -272,7 +279,7 @@ namespace Repulsor
         
         force_inline void writeS( const Int i_global )
         {
-            if constexpr (diff_flag)
+            if constexpr ( diff_flag || density_flag )
             {
                 combine_buffers<Scalar::Flag::Generic,Scalar::Flag::Plus,S_DATA_DIM>(
                     symmetry_factor, DX.data(), Scalar::One<Real>, &S_D_data[S_DATA_DIM * i_global]
@@ -282,7 +289,7 @@ namespace Repulsor
         
         force_inline void writeT( const Int j_global )
         {
-            if constexpr (diff_flag)
+            if constexpr ( diff_flag || density_flag )
             {
                 combine_buffers<Scalar::Flag::Generic,Scalar::Flag::Plus,T_DATA_DIM>(
                     symmetry_factor, DY.data(), Scalar::One<Real>, &T_D_data[T_DATA_DIM * j_global]
@@ -373,7 +380,8 @@ namespace Repulsor
             + "...,"
             + ToString(energy_flag) + ","
             + ToString(diff_flag) + ","
-            + ToString(metric_flag) + ","
+            + ToString(metric_flag) +  ","
+            + ToString(density_flag) +
             ">";
         }
 

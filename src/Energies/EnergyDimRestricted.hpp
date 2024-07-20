@@ -68,6 +68,28 @@ namespace Repulsor
         
         // Actual implementation to be specified by descendants.
         virtual ExtReal differential( const Mesh_T & M ) const = 0;
+        
+        // Do a down cast and delegate implementation further to descendant class.
+        ExtReal density( const MeshBase_T & M ) const override
+        {
+            const Mesh_T * Q = dynamic_cast<const Mesh_T *>(&M);
+                    
+            if( Q != nullptr )
+            {
+                ExtReal en = density(*Q);
+                
+                return en;
+                
+            }
+            else
+            {
+                eprint(ClassName()+"::density: Input could not be downcast to compatible type. Doing nothing.");
+                return 0;
+            }
+        }
+        
+        // Actual implementation to be specified by descendants.
+        virtual ExtReal density( const Mesh_T & M ) const = 0;
 
     public:
         

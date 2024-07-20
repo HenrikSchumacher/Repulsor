@@ -8,7 +8,7 @@ namespace Repulsor
         int S_DOM_DIM_, int T_DOM_DIM_,
         typename ClusterTree_T_,
         bool symmetricQ_,
-        bool energy_flag, bool diff_flag, bool metric_flag
+        bool energy_flag, bool diff_flag, bool metric_flag, bool density_flag
     >
     class TP_AllPairs_Traversor
     {
@@ -137,9 +137,9 @@ namespace Repulsor
     public:
         
 
-//##############################################################################################
+//#####################################################################################
 //      Compute
-//##############################################################################################
+//#####################################################################################
         
         Real Compute()
         {
@@ -149,7 +149,7 @@ namespace Repulsor
             
             DummyAllocators();
 
-            if constexpr ( diff_flag )
+            if constexpr ( diff_flag || density_flag )
             {
                 S.CleanseDerivativeBuffers();
                 
@@ -264,7 +264,7 @@ namespace Repulsor
                 S_DOM_DIM, T_DOM_DIM,
                 ClusterTree_T, T1, T2, q_flag,
                 symmetricQ,
-                energy_flag, diff_flag, metric_flag
+                energy_flag, diff_flag, metric_flag, density_flag
             >;
             
             Kernel_T ker ( conf, 0, q_half_, p_half_ );
@@ -360,7 +360,8 @@ namespace Repulsor
                 + S.ClassName()       + ","
                 + ToString(energy_flag) + ","
                 + ToString(diff_flag)   + ","
-                + ToString(metric_flag) +
+                + ToString(metric_flag) + ","
+                + ToString(density_flag) +
                 + ">";
         }
         

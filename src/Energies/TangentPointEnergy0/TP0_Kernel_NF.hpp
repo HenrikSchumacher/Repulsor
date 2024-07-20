@@ -1,10 +1,5 @@
 #pragma once
 
-#define BASE FMM_Kernel_NF<                                                 \
-        S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,symmetricQ_,                   \
-        energy_flag_,diff_flag_,metric_flag_                                \
-    >
-
 namespace Repulsor
 {
     template<
@@ -12,15 +7,22 @@ namespace Repulsor
         typename ClusterTree_T_,
         typename T1, typename T2, int q_flag,
         bool symmetricQ_,
-        bool energy_flag_, bool diff_flag_, bool metric_flag_
+        bool energy_flag_, bool diff_flag_, bool metric_flag_, bool density_flag_
     >
-    class TP0_Kernel_NF : public BASE
+    class TP0_Kernel_NF : public FMM_Kernel_NF<
+        S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,symmetricQ_,
+        energy_flag_,diff_flag_,metric_flag_,density_flag_
+    >
     {
     private:
         
-        using Base_T = BASE;
+        using Base_T = FMM_Kernel_NF<
+            S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,symmetricQ_,
+            energy_flag_,diff_flag_,metric_flag_,density_flag_
+        >;
         
     public:
+        
         using ClusterTree_T      = ClusterTree_T_;
         
         using Real               = typename Base_T::Real;
@@ -44,6 +46,7 @@ namespace Repulsor
         using Base_T::energy_flag;
         using Base_T::diff_flag;
         using Base_T::metric_flag;
+        using Base_T::density_flag;
         
         static constexpr Int ROWS      = 1 + AMB_DIM;
         static constexpr Int COLS      = 1 + AMB_DIM;
@@ -170,7 +173,7 @@ namespace Repulsor
             
             Real result = 0;
             
-            if constexpr ( energy_flag || diff_flag )
+            if constexpr ( energy_flag || density_flag || diff_flag )
             {
                 
                 // r^{-p-2}
@@ -217,6 +220,12 @@ namespace Repulsor
                 if constexpr ( energy_flag )
                 {
                     result = this->symmetry_factor * a * E * b;
+                }
+                
+                if constexpr ( density_flag )
+                {
+                    DX[0] += b * rCosPhi_q * r_minus_p;
+                    DY[0] += a * rCosPsi_q * r_minus_p;
                 }
                 
                 if constexpr ( diff_flag )
@@ -385,11 +394,10 @@ namespace Repulsor
             + TypeName<T2> + ","
             + ToString(energy_flag) + ","
             + ToString(diff_flag) + ","
-            + ToString(metric_flag) + ","
+            + ToString(metric_flag) +  ","
+            + ToString(density_flag) +
             ">";
         }
     };
 
 } // namespace Repulsor
-
-#undef BASE

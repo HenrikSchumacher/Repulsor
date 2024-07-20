@@ -8,11 +8,11 @@ namespace Repulsor
         bool symmetricQ_,
         bool high_order_
     >
-    class PseudoLaplacian_Kernel_FF : public FMM_Kernel_FF<ClusterTree_T_,symmetricQ_,false,false,true>
+    class PseudoLaplacian_Kernel_FF : public FMM_Kernel_FF<ClusterTree_T_,symmetricQ_,false,false,true,false>
     {
     private:
         
-        using Base_T = FMM_Kernel_FF<ClusterTree_T_,symmetricQ_,false,false,true>;
+        using Base_T = FMM_Kernel_FF<ClusterTree_T_,symmetricQ_,false,false,true,false>;
         
     public:
         

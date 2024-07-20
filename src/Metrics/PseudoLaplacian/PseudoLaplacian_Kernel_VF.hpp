@@ -1,10 +1,5 @@
 #pragma once
 
-#define BASE  FMM_Kernel_VF<                                                \
-        S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,symmetricQ_,                   \
-        false,false,true                                                    \
-    >
-
 namespace Repulsor
 {
     template<
@@ -13,11 +8,17 @@ namespace Repulsor
         bool symmetricQ_,
         bool high_order_
     >
-    class PseudoLaplacian_Kernel_VF : public BASE
+    class PseudoLaplacian_Kernel_VF : public FMM_Kernel_VF<
+        S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,symmetricQ_,
+        false,false,true,false
+    >
     {
     private:
         
-        using Base_T = BASE;
+        using Base_T = FMM_Kernel_VF<
+            S_DOM_DIM_,T_DOM_DIM_,ClusterTree_T_,symmetricQ_,
+            false,false,true,false
+        >;
         
     public:
         

@@ -1,20 +1,24 @@
 #pragma once
 
-#define BASE FMM_Kernel_FF<ClusterTree_T_,symmetricQ_,energy_flag_,diff_flag_,metric_flag_>
-
 namespace Repulsor
 {
     template<
         typename ClusterTree_T_,
         typename T1, typename T2, int q_flag,
         bool symmetricQ_,
-        bool energy_flag_, bool diff_flag_, bool metric_flag_
+        bool energy_flag_, bool diff_flag_, bool metric_flag_, bool density_flag_
     >
-    class TP_Kernel_FF : public BASE
+    class TP_Kernel_FF : public FMM_Kernel_FF<
+        ClusterTree_T_,symmetricQ_,
+        energy_flag_,diff_flag_,metric_flag_, density_flag_
+    >
     {
     private:
         
-        using Base_T = BASE;
+        using Base_T = FMM_Kernel_FF<
+            ClusterTree_T_,symmetricQ_,
+            energy_flag_,diff_flag_,metric_flag_, density_flag_
+        >;
         
     public:
         
@@ -49,6 +53,7 @@ namespace Repulsor
         using Base_T::energy_flag;
         using Base_T::diff_flag;
         using Base_T::metric_flag;
+        using Base_T::density_flag;
         
     public:
         
@@ -189,6 +194,12 @@ namespace Repulsor
             // E = ( |P*(y-x)|^q + |Q*(y-x)|^q) / |y-x|^p
             const Real E = Num * r_minus_p;
 
+            if constexpr ( density_flag )
+            {
+                DX[0] += b * rCosPhi_q * r_minus_p;
+                DY[0] += a * rCosPsi_q * r_minus_p;
+            }
+            
             if constexpr ( diff_flag || metric_flag )
             {
                 // factor = q / |y-x|^p
@@ -388,11 +399,10 @@ namespace Repulsor
             + TypeName<T2> + ","
             + ToString(energy_flag) + ","
             + ToString(diff_flag) + ","
-            + ToString(metric_flag) + ","
+            + ToString(metric_flag) +  ","
+            + ToString(density_flag) +
             ">" + this->ThreadString();
         }
     };
 
 } // namespace Repulsor
-
-#undef BASE

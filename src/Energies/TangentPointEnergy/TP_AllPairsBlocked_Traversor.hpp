@@ -8,7 +8,7 @@ namespace Repulsor
         int S_DOM_DIM_, int T_DOM_DIM_,
         typename ClusterTree_T_,
         bool symmetricQ_,
-        bool energy_flag, bool diff_flag, bool metric_flag,
+        bool energy_flag, bool diff_flag, bool metric_flag, density_flag
         int ROW_BLK, int COL_BLK
     >
     class TP_AllPairsBlocked_Traversor
@@ -143,7 +143,7 @@ namespace Repulsor
             
             DummyAllocators();
             
-            if constexpr ( diff_flag )
+            if constexpr ( diff_flag || density_flag )
             {
                 S.CleanseDerivativeBuffers();
                 
@@ -330,7 +330,8 @@ namespace Repulsor
                 + S.ClassName()       + ","
                 + ToString(energy_flag) + ","
                 + ToString(diff_flag)   + ","
-                + ToString(metric_flag) +
+                + ToString(metric_flag) + ","
+                + ToString(density_flag) +
                 + ">";
         }
         

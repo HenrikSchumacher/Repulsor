@@ -106,6 +106,42 @@ namespace Repulsor
         
         // Actual implementation to be specified by descendants.
         virtual ExtReal differential( const MeshBase_T & M ) const = 0;
+        
+        
+    public:
+        
+        // Return the densities of the energy to a pointer; don't use any caching.
+        ExtReal SimplexDensities( mref<MeshBase_T> M, mptr<ExtReal> density_ptr ) const
+        {
+            ptic(ClassName()+"::SimplexDensities (pointer)");
+            
+            const ExtReal en = density(M);
+            
+            M.Assemble_ClusterTree_SimplexDensities( density_ptr, ExtReal(1), false );
+            
+            ptoc(ClassName()+"::SimplexDensities (pointer)");
+            
+            return en;
+        }
+        
+        // Return the densities of the energy to a pointer; don't use any caching.
+        ExtReal VertexDensities( mref<MeshBase_T> M, mptr<ExtReal> density_ptr ) const
+        {
+            ptic(ClassName()+"::VertexDensities (pointer)");
+            
+            const ExtReal en = density(M);
+            
+            M.Assemble_ClusterTree_VertexDensities( density_ptr, ExtReal(1), false );
+            
+            ptoc(ClassName()+"::VertexDensities (pointer)");
+            
+            return en;
+        }
+        
+    protected:
+        
+        // Actual implementation to be specified by descendants.
+        virtual ExtReal density( const MeshBase_T & M ) const = 0;
 
     public:
 

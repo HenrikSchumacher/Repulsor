@@ -58,8 +58,11 @@ namespace Repulsor
         {
             ValueContainer_T metric_values;
          
-            TP0_Traversor<DOM_DIM,DOM_DIM,BlockClusterTree_T,false,false,true>
-                traversor( M.GetBlockClusterTree(), metric_values, q, p );
+            TP0_Traversor<
+                DOM_DIM,DOM_DIM,BlockClusterTree_T,
+                false,false,true,false
+            >
+            traversor( M.GetBlockClusterTree(), metric_values, q, p );
          
             (void)traversor.Compute();
          
@@ -71,8 +74,11 @@ namespace Repulsor
             const bool VF_flag, const bool NF_flag, const bool FF_flag
         ) const override
         {
-            TP0_Traversor<DOM_DIM,DOM_DIM,BlockClusterTree_T,false,false,true>
-                traversor( M.GetBlockClusterTree(), MetricValues(M), q, p );
+            TP0_Traversor<
+                DOM_DIM,DOM_DIM,BlockClusterTree_T,
+                false,false,true,false
+            >
+            traversor( M.GetBlockClusterTree(), MetricValues(M), q, p );
             
             (void)traversor.MultiplyMetric(VF_flag,NF_flag,FF_flag);
         }

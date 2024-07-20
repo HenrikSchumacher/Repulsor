@@ -55,16 +55,32 @@ namespace Repulsor
         
         virtual ExtReal value( const Mesh_T & M ) const override
         {
-            TP0_Traversor<DOM_DIM,DOM_DIM,BlockClusterTree_T,true,false,false>
-                traversor( M.GetBlockClusterTree(), this->metric_values, q, p );
+            TP0_Traversor<
+                DOM_DIM,DOM_DIM,BlockClusterTree_T,
+                true,false,false,false
+            >
+            traversor( M.GetBlockClusterTree(), this->metric_values, q, p );
             
             return traversor.Compute();
         }
         
         virtual ExtReal differential( const Mesh_T & M ) const override
         {
-            TP0_Traversor<DOM_DIM,DOM_DIM,BlockClusterTree_T,true,true,false>
-                traversor( M.GetBlockClusterTree(), this->metric_values, q, p );
+            TP0_Traversor<
+                DOM_DIM,DOM_DIM,BlockClusterTree_T,true,true,false,false
+            >
+            traversor( M.GetBlockClusterTree(), this->metric_values, q, p );
+            
+            return traversor.Compute();
+        }
+        
+        virtual ExtReal density( const Mesh_T & M ) const override
+        {
+            TP0_Traversor<
+                DOM_DIM,DOM_DIM,BlockClusterTree_T,
+                true,false,false,true
+            >
+            traversor( M.GetBlockClusterTree(), this->metric_values, q, p );
             
             return traversor.Compute();
         }

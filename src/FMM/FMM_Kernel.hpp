@@ -5,11 +5,13 @@ namespace Repulsor
     template<
         typename ClusterTree_T_,
         bool symmetricQ_,
-        bool energy_flag_, bool diff_flag_, bool metric_flag_
+        bool energy_flag_, bool diff_flag_, bool metric_flag_, bool density_flag_
     >
     class alignas(ObjectAlignment) FMM_Kernel
     {
     public:
+        
+        static_assert( !diff_flag_ || !density_flag_, "diff_flag and density_flag must not be active at the same time because they use the same ressources." );
         
         using ClusterTree_T      = ClusterTree_T_;
         
@@ -27,6 +29,7 @@ namespace Repulsor
         static constexpr bool energy_flag  = energy_flag_;
         static constexpr bool diff_flag    = diff_flag_;
         static constexpr bool metric_flag  = metric_flag_;
+        static constexpr bool density_flag = density_flag_;
         
         static constexpr Int AMB_DIM   = ClusterTree_T::AMB_DIM;
         static constexpr Int PROJ_DIM  = (AMB_DIM*(AMB_DIM+1))/2;

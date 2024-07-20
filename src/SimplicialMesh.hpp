@@ -676,27 +676,27 @@ namespace Repulsor
             ptoc(className()+"::Assemble_ClusterTree_Derivatives");
         }
         
-        void Assemble_ClusterTree_Density( mptr<ExtReal> output, const ExtReal weight, bool addTo = false ) const override
+        void Assemble_ClusterTree_VertexDensities( mptr<ExtReal> output, const ExtReal weight, bool addTo = false ) const override
         {
-            ptic(className()+"::Assemble_ClusterTree_Density");
+            ptic(className()+"::Assemble_ClusterTree_VertexDensities");
             
-            GetClusterTree().CollectDensity( output, weight, addTo );
+            GetClusterTree().CollectVertexDensities( output, weight, addTo );
             
-            ptoc(className()+"::Assemble_ClusterTree_Density");
+            ptoc(className()+"::Assemble_ClusterTree_VertexDensities");
         }
         
-        void Assemble_ClusterTree_SimplexEnergies( mptr<ExtReal> output, const ExtReal weight, bool addTo = false ) const override
+        void Assemble_ClusterTree_SimplexDensities( mptr<ExtReal> output, const ExtReal weight, bool addTo = false ) const override
         {
-            ptic(className()+"::Assemble_ClusterTree_SimplexEnergies");
+            ptic(className()+"::Assemble_ClusterTree_SimplexDensities");
             
-            GetClusterTree().CollectPrimitiveEnergies( output, weight, addTo );
+            GetClusterTree().CollectPrimitiveDensities( output, weight, addTo );
             
-            ptoc(className()+"::Assemble_ClusterTree_SimplexEnergies");
+            ptoc(className()+"::Assemble_ClusterTree_SimplexDensities");
         }
 
-//#######################################################################################
+//#####################################################################################
 //      Obstacle
-//#######################################################################################
+//#####################################################################################
 
         virtual void LoadObstacle( std::unique_ptr<Obstacle_T> obstacle_ ) override
         {
@@ -782,9 +782,9 @@ namespace Repulsor
         }
 
         
-//#########################################################################################
+//#####################################################################################
 //      IO
-//#########################################################################################
+//#####################################################################################
      
     public:
         
@@ -832,9 +832,9 @@ namespace Repulsor
             ptoc(ClassName()+"::WriteToFile");
         }
         
-//#########################################################################################
+//#####################################################################################
 //      Remesher
-//#########################################################################################
+//#####################################################################################
         
     public:
         
@@ -865,9 +865,9 @@ namespace Repulsor
             }
         }
         
-//#########################################################################################
+//#####################################################################################
 //      Standard interface
-//#########################################################################################
+//#####################################################################################
         
     public:
         

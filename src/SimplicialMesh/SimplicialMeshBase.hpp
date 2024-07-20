@@ -101,13 +101,13 @@ namespace Repulsor
             bool addTo = false
         ) const = 0;
 
-        virtual void Assemble_ClusterTree_SimplexEnergies(
+        virtual void Assemble_ClusterTree_SimplexDensities(
             mptr<ExtReal> output,
             const ExtReal weight,
             bool addTo = false
         ) const = 0;
         
-        virtual void Assemble_ClusterTree_Density(
+        virtual void Assemble_ClusterTree_VertexDensities(
             mptr<ExtReal> output,
             const ExtReal weight,
             bool addTo = false

@@ -11,7 +11,7 @@ namespace Repulsor
     template<
         int S_DOM_DIM_, int T_DOM_DIM_,
         typename BlockClusterTree_T_,
-        bool energy_flag, bool diff_flag, bool metric_flag
+        bool energy_flag, bool diff_flag, bool metric_flag, bool density_flag
     >
     class TP_Traversor
     {
@@ -184,7 +184,7 @@ namespace Repulsor
             
             DummyAllocators();
 
-            if constexpr ( diff_flag )
+            if constexpr ( diff_flag  || density_flag )
             {
                 bct.GetS().CleanseDerivativeBuffers();
                 
@@ -329,7 +329,7 @@ namespace Repulsor
             using Kernel_T = TP_Kernel_VF<
                 S_DOM_DIM, T_DOM_DIM,
                 ClusterTree_T, T1, T2, q_flag, BlockClusterTree_T::symmetricQ,
-                energy_flag, diff_flag, metric_flag
+                energy_flag, diff_flag, metric_flag, density_flag
             >;
 
             Kernel_T ker ( conf, 0, bct.NearFieldSeparationParameter(), int_cast<Int>(bct.Settings().max_refinement), q_half_, p_half_ );
@@ -369,7 +369,7 @@ namespace Repulsor
                 S_DOM_DIM, T_DOM_DIM,
                 ClusterTree_T, T1, T2, q_flag,
                 BlockClusterTree_T::SymmetricQ(),
-                energy_flag, diff_flag, metric_flag
+                energy_flag, diff_flag, metric_flag, density_flag
             >;
             
             Kernel_T ker ( conf, 0, q_half_, p_half_ );
@@ -408,7 +408,7 @@ namespace Repulsor
             using Kernel_T = TP_Kernel_FF<
                 ClusterTree_T, T1, T2, q_flag,
                 BlockClusterTree_T::SymmetricQ(),
-                energy_flag, diff_flag, metric_flag
+                energy_flag, diff_flag, metric_flag, density_flag
             >;
             
             Kernel_T ker ( conf, 0, q_half_, p_half_ );
@@ -434,9 +434,9 @@ namespace Repulsor
             ptoc(ClassName()+"::FF_Compute");
         }
         
-//##############################################################################################
+//#####################################################################################
 //      Multiply metric
-//##############################################################################################
+//#####################################################################################
         
     public:
         
@@ -476,9 +476,9 @@ namespace Repulsor
             }
         }
         
-//##############################################################################################
+//#####################################################################################
 //      Multiply metric subroutines
-//##############################################################################################
+//#####################################################################################
         
     protected:
 
@@ -580,7 +580,8 @@ namespace Repulsor
                 + "...,"
                 + ToString(energy_flag) + ","
                 + ToString(diff_flag)   + ","
-                + ToString(metric_flag) +
+                + ToString(metric_flag) + ","
+                + ToString(density_flag)
                 + ">";
         }
 

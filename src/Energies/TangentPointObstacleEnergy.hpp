@@ -63,7 +63,10 @@ namespace Repulsor
         {
             if( M.InPersistentCacheQ("Obstacle") )
             {
-                TP_Traversor<DOM_DIM_S,DOM_DIM_T,BlockClusterTree_T,true,false,false>
+                TP_Traversor<
+                    DOM_DIM_S,DOM_DIM_T,BlockClusterTree_T,
+                    true,false,false,false
+                >
                 traversor( M.GetObstacleBlockClusterTree(), this->metric_values, q, p );
                 
                 return traversor.Compute();
@@ -78,7 +81,28 @@ namespace Repulsor
         {
             if( M.InPersistentCacheQ("Obstacle") )
             {
-                TP_Traversor<DOM_DIM_S,DOM_DIM_T,BlockClusterTree_T,true,true,false>
+                TP_Traversor<
+                    DOM_DIM_S,DOM_DIM_T,BlockClusterTree_T,
+                    true,true,false,false
+                >
+                traversor( M.GetObstacleBlockClusterTree(), this->metric_values, q, p );
+                
+                return traversor.Compute();
+            }
+            else
+            {
+                return Scalar::Zero<ExtReal>;
+            }
+        }
+        
+        virtual ExtReal density( const Mesh_T & M ) const override
+        {
+            if( M.InPersistentCacheQ("Obstacle") )
+            {
+                TP_Traversor<
+                    DOM_DIM_S,DOM_DIM_T,BlockClusterTree_T,
+                    true,false,false,true
+                >
                 traversor( M.GetObstacleBlockClusterTree(), this->metric_values, q, p );
                 
                 return traversor.Compute();
