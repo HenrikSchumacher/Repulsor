@@ -171,6 +171,8 @@ namespace Repulsor
             {
                 eprint("Make_FromFile: File "+file_name+" could not be opened.");
                 
+                ptoc(ClassName()+"Make_FromFile");
+                
                 return nullptr;
             }
             
@@ -181,20 +183,20 @@ namespace Repulsor
             Int simplex_count;
             s >> str;
             s >> dom_dim;
-            valprint("dom_dim",dom_dim);
+            dump(dom_dim);
             s >> str;
             s >> amb_dim;
-            valprint("amb_dim",amb_dim);
+            dump(amb_dim);
             s >> str;
             s >> vertex_count;
-            valprint("vertex_count",vertex_count);
+            dump(vertex_count);
             s >> str;
             s >> simplex_count;
-            valprint("simplex_count",simplex_count);
+            dump(simplex_count);
             
             const Int simplex_size = dom_dim+1;
             
-            valprint("simplex_size",simplex_size);
+            dump(simplex_size);
             
             Tensor2<ExtReal,Int> coords    (vertex_count, amb_dim);
             Tensor2<Int,Int>     simplices (simplex_count,simplex_size);
