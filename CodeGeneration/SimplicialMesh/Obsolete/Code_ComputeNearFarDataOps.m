@@ -61,19 +61,19 @@ StringJoin[
 		ParallelDo(
 			[&]( const Int thread )
 			{
-				mut<LInt> AvOp_outer = AvOp.Outer().data();
-				mut< Int> AvOp_inner = AvOp.Inner().data();
+				mptr<LInt> AvOp_outer = AvOp.Outer().data();
+				mptr< Int> AvOp_inner = AvOp.Inner().data();
 				AvOp.Value().Fill(static_cast<Real>(1));
 	
-				mut<LInt> DiffOp_outer = DiffOp.Outer().data();
-				mut< Int> DiffOp_inner = DiffOp.Inner().data();
+				mptr<LInt> DiffOp_outer = DiffOp.Outer().data();
+				mptr< Int> DiffOp_inner = DiffOp.Inner().data();
 				DiffOp.Value().SetZero();
 	
-				ptr<Real> V_coords__      = V_coords.data();
+				cptr<Real> V_coords__      = V_coords.data();
 				
-				ptr<Int>  simplices__     = simplices.data();
-				mut<Real> P_hull_coords__ = P_hull_coords.data();
-			    mut<Real> P_coords__      = P_coords.data();
+				cptr<Int>  simplices__     = simplices.data();
+				mptr<Real> P_hull_coords__ = P_hull_coords.data();
+			    mptr<Real> P_coords__      = P_coords.data();
 	
 				Int simplex        [",s[n+1],"];
 				Int sorted_simplex [",s[n+1],"];
@@ -84,8 +84,8 @@ StringJoin[
 	            for( Int i = i_begin; i < i_end; ++i )
 	            {
 	
-					mut<Real> near = P_near.data(i);                    
-					mut<Real> far  = P_far.data(i);
+					mptr<Real> near = P_near.data(i);                    
+					mptr<Real> far  = P_far.data(i);
 
 ",
 Table[line[5,"simplex[",s[j],"] = sorted_simplex[",s[j],"] = simplices__[",s[n+1],"*i +",s[j],"]"],{j,0,n+1-1}],
@@ -159,19 +159,19 @@ StringJoin[
 		ParallelDo(
 			[&]( const Int thread )
 			{
-				mut<LInt> AvOp_outer = AvOp.Outer().data();
-				mut< Int> AvOp_inner = AvOp.Inner().data();
-				mut<Real> AvOp_value = AvOp.Values().data();
+				mptr<LInt> AvOp_outer = AvOp.Outer().data();
+				mptr< Int> AvOp_inner = AvOp.Inner().data();
+				mptr<Real> AvOp_value = AvOp.Values().data();
 	
-				mut<LInt> DiffOp_outer = DiffOp.Outer().data();
-				mut< Int> DiffOp_inner = DiffOp.Inner().data();
-				mut<Real> DiffOp_value = DiffOp.Value().data();
+				mptr<LInt> DiffOp_outer = DiffOp.Outer().data();
+				mptr< Int> DiffOp_inner = DiffOp.Inner().data();
+				mptr<Real> DiffOp_value = DiffOp.Value().data();
 	
-				ptr<Real> V_coords__      = V_coords.data();
+				cptr<Real> V_coords__      = V_coords.data();
 				
-				ptr<Int>  simplices__     = simplices.data();
-			    mut<Real> P_hull_coords__ = P_hull_coords.data();
-				mut<Real> P_coords__      = P_coords.data();
+				cptr<Int>  simplices__     = simplices.data();
+			    mptr<Real> P_hull_coords__ = P_hull_coords.data();
+				mptr<Real> P_coords__      = P_coords.data();
 	
 				Real df       [",AmbDim,"][",DomDim,"];
 				Real dfdagger [",DomDim,"][",AmbDim,"];
@@ -187,8 +187,8 @@ StringJoin[
 	            for( Int i = i_begin; i < i_end; ++i )
 	            {
 	
-					mut<Real> near = P_near.data(i);                    
-					mut<Real> far  = P_far.data(i);
+					mptr<Real> near = P_near.data(i);                    
+					mptr<Real> far  = P_far.data(i);
 
 ",
 Table[line[5,"simplex[",s[j],"] = sorted_simplex[",s[j],"] = simplices__[",s[n+1],"*i +",s[j],"]"],{j,0,n+1-1}],
@@ -283,19 +283,19 @@ StringJoin[
 		ParallelDo(
 			[&]( const Int thread )
 			{
-				mut<LInt> AvOp_outer = AvOp.Outer().data();
-				mut< Int> AvOp_inner = AvOp.Inner().data();
-				mut<Real> AvOp_value = AvOp.Values().data();
+				mptr<LInt> AvOp_outer = AvOp.Outer().data();
+				mptr< Int> AvOp_inner = AvOp.Inner().data();
+				mptr<Real> AvOp_value = AvOp.Values().data();
 	
-				mut<LInt> DiffOp_outer = DiffOp.Outer().data();
-				mut< Int> DiffOp_inner = DiffOp.Inner().data();
-				mut<Real> DiffOp_value = DiffOp.Values().data();
+				mptr<LInt> DiffOp_outer = DiffOp.Outer().data();
+				mptr< Int> DiffOp_inner = DiffOp.Inner().data();
+				mptr<Real> DiffOp_value = DiffOp.Values().data();
 	
-				ptr<Real> V_coords__      = V_coords.data();
+				cptr<Real> V_coords__      = V_coords.data();
 				
-				ptr< Int> simplices__     = simplices.data();
-			    mut<Real> P_hull_coords__ = P_hull_coords.data();
-				mut<Real> P_coords__      = P_coords.data();
+				cptr< Int> simplices__     = simplices.data();
+			    mptr<Real> P_hull_coords__ = P_hull_coords.data();
+				mptr<Real> P_coords__      = P_coords.data();
 	
 				Real df       [",AmbDim,"][",DomDim,"];
 				Real dfdagger [",DomDim,"][",AmbDim,"];
@@ -311,8 +311,8 @@ StringJoin[
 	            for( Int i = i_begin; i < i_end; ++i )
 	            {
 	
-					mut<Real> near = P_near.data(i);                    
-					mut<Real> far  = P_far.data(i);
+					mptr<Real> near = P_near.data(i);                    
+					mptr<Real> far  = P_far.data(i);
 
 ",
 Table[line[5,"simplex[",s[j],"] = sorted_simplex[",s[j],"] = simplices__[",s[n+1],"*i +",s[j],"]"],{j,0,n+1-1}],
@@ -358,7 +358,7 @@ Module[{c=m},
 "
 	                // derivative operator  ("<>AmbDim<>" x "<>s[n+1]<>" matrix)
 	
-	                mut<Real> Df = &DiffOp_value[ ",s[m(n+1)]," * i ];
+	                mptr<Real> Df = &DiffOp_value[ ",s[m(n+1)]," * i ];
 
 ",
 StringJoin[

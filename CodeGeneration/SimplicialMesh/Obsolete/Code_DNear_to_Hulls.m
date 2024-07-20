@@ -97,10 +97,10 @@ StringJoin["
             eprint(\"in "<>name<>": P_D_near.Dimension(1) != "<>NearDim<>". Aborting\");
         }
 
-		//ptr<Real> V_coords__  = V_coords.data();
-		//ptr<Int>  simplices__ = simplices.data();
-		ptr<Real> P_D_near__  = P_D_near.data();
-		mut<Real> buffer__    = buffer.data();
+		//cptr<Real> V_coords__  = V_coords.data();
+		//cptr<Int>  simplices__ = simplices.data();
+		cptr<Real> P_D_near__  = P_D_near.data();
+		mptr<Real> buffer__    = buffer.data();
         
         if constexpr ( addtoQ == AddTo )
 		{
@@ -215,10 +215,10 @@ StringJoin["
             eprint(\"in "<>name<>": P_D_near.Dimension(1) != "<>NearDim<>". Aborting\");
         }
 
-		ptr<Real> V_coords__  = V_coords.data();
-		ptr<Int>  simplices__ = simplices.data();
-		ptr<Real> P_D_near__  = P_D_near.data();
-		mut<Real> buffer__    = buffer.data();
+		cptr<Real> V_coords__  = V_coords.data();
+		cptr<Int>  simplices__ = simplices.data();
+		cptr<Real> P_D_near__  = P_D_near.data();
+		mptr<Real> buffer__    = buffer.data();
         
         if constexpr ( addtoQ == AddTo )
 		{
@@ -347,10 +347,10 @@ StringJoin["
             eprint(\"in "<>name<>": P_D_near.Dimension(1) != "<>NearDim<>". Aborting\");
         }
         
-		ptr<Real> V_coords__  = V_coords.data();
-        ptr<Int>  simplices__ = simplices.data();
-		ptr<Real> P_D_near__  = P_D_near.data();
-        mut<Real> buffer__    = buffer.data();
+		cptr<Real> V_coords__  = V_coords.data();
+        cptr<Int>  simplices__ = simplices.data();
+		cptr<Real> P_D_near__  = P_D_near.data();
+        mptr<Real> buffer__    = buffer.data();
 
 		if constexpr ( addtoQ == AddTo )
 		{

@@ -98,10 +98,10 @@ StringJoin["
             eprint(\"in "<>name<>": P_D_far.Dimension(1) != "<>FarDim<>". Aborting\");
         }
 
-		//ptr<Real> V_coords__  = V_coords.data();
-		//ptr<Int>  simplices__ = simplices.data();
-		ptr<Real> P_D_far__   = P_D_far.data();
-		mut<Real> buffer__    = buffer.data();
+		//cptr<Real> V_coords__  = V_coords.data();
+		//cptr<Int>  simplices__ = simplices.data();
+		cptr<Real> P_D_far__   = P_D_far.data();
+		mptr<Real> buffer__    = buffer.data();
         
         if constexpr ( addtoQ == AddTo )
 		{
@@ -215,10 +215,10 @@ StringJoin["
             eprint(\"in "<>name<>": P_D_far.Dimension(1) != "<>FarDim<>". Aborting\");
         }
 
-		ptr<Real> V_coords__  = V_coords.data();
-		ptr<Int>  simplices__ = simplices.data();
-		ptr<Real> P_D_far__   = P_D_far.data();
-		mut<Real> buffer__    = buffer.data();
+		cptr<Real> V_coords__  = V_coords.data();
+		cptr<Int>  simplices__ = simplices.data();
+		cptr<Real> P_D_far__   = P_D_far.data();
+		mptr<Real> buffer__    = buffer.data();
         
         if constexpr ( addtoQ == AddTo )
 		{
@@ -357,10 +357,10 @@ StringJoin["
             eprint(\"in "<>name<>": P_D_far.Dimension(1) != "<>FarDim<>". Aborting\");
         }
         
-		ptr<Real> V_coords__  = V_coords.data();
-        ptr<Int>  simplices__ = simplices.data();
-		ptr<Real> P_D_far__   = P_D_far.data();
-        mut<Real> buffer__    = buffer.data();
+		cptr<Real> V_coords__  = V_coords.data();
+        cptr<Int>  simplices__ = simplices.data();
+		cptr<Real> P_D_far__   = P_D_far.data();
+        mptr<Real> buffer__    = buffer.data();
 
 		if constexpr ( addtoQ == AddTo )
 		{

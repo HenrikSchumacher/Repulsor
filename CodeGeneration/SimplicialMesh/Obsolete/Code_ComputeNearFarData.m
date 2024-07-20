@@ -54,8 +54,8 @@ StringJoin[
 		ParallelDo(
 			[&]( const Int thread )
 			{
-				ptr<Real> V_coords__      = V_coords.data();	
-				ptr<Int>  simplices__     = simplices.data();
+				cptr<Real> V_coords__      = V_coords.data();	
+				cptr<Int>  simplices__     = simplices.data();
 	
 				Real hull    [",s[n+1],"][",AmbDim,"];
 	
@@ -66,8 +66,8 @@ StringJoin[
 	
 	            for( Int i = i_begin; i < i_end; ++i )
 	            {
-					mut<Real> near = P_near.data(i);                    
-					mut<Real> far  = P_far.data(i);   
+					mptr<Real> near = P_near.data(i);                    
+					mptr<Real> far  = P_far.data(i);   
             
 ",
 Table[line[5,"simplex[",s[j],"] = simplices__[",s[n+1],"*i +",s[j],"]"],{j,0,n+1-1}],
@@ -125,8 +125,8 @@ StringJoin[
 		ParallelDo(
 			[&]( const Int thread )
 			{
-				ptr<Real> V_coords__      = V_coords.data();	
-				ptr<Int > simplices__     = simplices.data();
+				cptr<Real> V_coords__      = V_coords.data();	
+				cptr<Int > simplices__     = simplices.data();
 	
 				Real hull    [",s[n+1],"][",AmbDim,"];
 				Real df      [",AmbDim,"][",DomDim,"];
@@ -141,8 +141,8 @@ StringJoin[
 	
 	            for( Int i = i_begin; i < i_end; ++i )
 	            {
-					mut<Real> near = P_near.data(i);                    
-					mut<Real> far  = P_far.data(i);   
+					mptr<Real> near = P_near.data(i);                    
+					mptr<Real> far  = P_far.data(i);   
             
 ",
 Table[line[5,"simplex[",s[j],"] = simplices__[",s[n+1],"*i +",s[j],"]"],{j,0,n+1-1}],
@@ -210,8 +210,8 @@ StringJoin[
 		ParallelDo(
 			[&]( const Int thread )
 			{
-				ptr<Real> V_coords__      = V_coords.data();	
-				ptr<Int > simplices__     = simplices.data();
+				cptr<Real> V_coords__      = V_coords.data();	
+				cptr<Int > simplices__     = simplices.data();
 	
 				Real hull    [",s[n+1],"][",AmbDim,"];
 				Real df      [",AmbDim,"][",DomDim,"];
@@ -226,8 +226,8 @@ StringJoin[
 	
 	            for( Int i = i_begin; i < i_end; ++i )
 	            {
-					mut<Real> near = P_near.data(i);                    
-					mut<Real> far  = P_far.data(i);   
+					mptr<Real> near = P_near.data(i);                    
+					mptr<Real> far  = P_far.data(i);   
             
 ",
 Table[line[5,"simplex[",s[j],"] = simplices__[",s[n+1],"*i +",s[j],"]"],{j,0,n+1-1}],

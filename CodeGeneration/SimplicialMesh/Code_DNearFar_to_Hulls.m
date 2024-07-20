@@ -60,11 +60,11 @@ code0=Part[Experimental`OptimizeExpression[A,"OptimizationLevel"->2,
 "OptimizationSymbol"->$
 ]/.CompoundExpression->List/.Set-> CAssign,
 -1]/.Thread[
-	Flatten[PP]->Flatten[Table["V_coords__["<>AmbDim<>"*simplices__["<>s[n+1]<>"*i+"<>s[j]<>"]+"<>s[k]<>"]",{j,0,n},{k,0,m-1}]]
+	Flatten[PP]->Flatten[Table["X["<>AmbDim<>"*S["<>s[n+1]<>"*i+"<>s[j]<>"]+"<>s[k]<>"]",{j,0,n},{k,0,m-1}]]
 ]/.Thread[
-	Flatten[dXXnear]->Flatten[Table["P_D_near__["<>NearDim<>"*i+"<>s[j]<>"]",{j,0,neardim-1}]]
+	Flatten[dXXnear]->Flatten[Table["N["<>NearDim<>"*i+"<>s[j]<>"]",{j,0,neardim-1}]]
 ]/.Thread[
-	Flatten[dXXfar]->Flatten[Table["P_D_far__["<>FarDim<>"*i+"<>s[j]<>"]",{j,0,fardim-1}]]
+	Flatten[dXXfar]->Flatten[Table["F["<>FarDim<>"*i+"<>s[j]<>"]",{j,0,fardim-1}]]
 ]/.Power[x_,2]:>HoldForm[x x];
 
 scratchsymbols=Cases[code0,CAssign[symbol_,rhs_]:>symbol,\[Infinity]];
@@ -73,9 +73,9 @@ scratchrules=MapIndexed[#1->"s"<>ToString[#2[[1]]-1]&,scratchsymbols];
 
 code1=code0/.scratchrules/.CAssign[symbol_,rhs_]:>CDeclareAssign["const Real",symbol,myCForm[rhs]];
 
-code1=Flatten@MapIndexed[CAssign["buffer__["<>HullSize<>"*i+"<>s[m (#2[[1]]-1)+(#2[[2]]-1)]<>"]",myCForm[#1]]&,Partition[code1,m],{2}];
+code1=Flatten@MapIndexed[CAssign["B["<>HullSize<>"*i+"<>s[m (#2[[1]]-1)+(#2[[2]]-1)]<>"]",myCForm[#1]]&,Partition[code1,m],{2}];
 
-codestringAssign=StringCases[StringReplace[GenerateCode[CBlock[code1],Indent->5],"Sqrt("->"std::sqrt("],Longest["{\n"~~x___~~"\n}"]:>x][[1]];
+codestringAssign=StringCases[StringReplace[GenerateCode[CBlock[code1],Indent->4],"Sqrt("->"std::sqrt("],Longest["{\n"~~x___~~"\n}"]:>x][[1]];
 
 StringJoin["
 	void ",name,"( 
@@ -95,11 +95,11 @@ StringJoin["
             eprint(\"in "<>name<>": P_D_near.Dimension(1) != "<>NearDim<>". Aborting\");
         }
 
-		//cptr<Real> V_coords__  = V_coords.data();
-		//cptr<Int>  simplices__ = simplices.data();
-		cptr<Real> P_D_near__    = P_D_near.data();
-		cptr<Real> P_D_far__     = P_D_far.data();
-		mptr<Real> buffer__      = buffer.data();
+		//cptr<Real> X = V_coords.data();
+		//cptr<Int>  S = simplices.data();
+		cptr<Real> N = P_D_near.data();
+		cptr<Real> F = P_D_far.data();
+		mptr<Real> B = buffer.data();
         
 		ParallelDo(
 			[=]( const Int i )
@@ -156,11 +156,11 @@ code0=Part[Experimental`OptimizeExpression[A,"OptimizationLevel"->2,
 "OptimizationSymbol"->$
 ]/.CompoundExpression->List/.Set-> CAssign,
 -1,-1]/.Thread[
-	Flatten[PP]->Flatten[Table["V_coords__["<>AmbDim<>"*simplices__["<>s[n+1]<>"*i+"<>s[j]<>"]+"<>s[k]<>"]",{j,0,n},{k,0,m-1}]]
+	Flatten[PP]->Flatten[Table["X["<>AmbDim<>"*S["<>s[n+1]<>"*i+"<>s[j]<>"]+"<>s[k]<>"]",{j,0,n},{k,0,m-1}]]
 ]/.Thread[
-	Flatten[dXXnear]->Flatten[Table["P_D_near__["<>NearDim<>"*i+"<>s[j]<>"]",{j,0,neardim-1}]]
+	Flatten[dXXnear]->Flatten[Table["N["<>NearDim<>"*i+"<>s[j]<>"]",{j,0,neardim-1}]]
 ]/.Thread[
-	Flatten[dXXfar]->Flatten[Table["P_D_far__["<>FarDim<>"*i+"<>s[j]<>"]",{j,0,fardim-1}]]
+	Flatten[dXXfar]->Flatten[Table["F["<>FarDim<>"*i+"<>s[j]<>"]",{j,0,fardim-1}]]
 ]/.Power[x_,2]:>HoldForm[x x];
 
 scratchsymbols=Cases[code0,CAssign[symbol_,rhs_]:>symbol,\[Infinity]];
@@ -169,9 +169,9 @@ scratchrules=MapIndexed[#1->"s"<>ToString[#2[[1]]-1]&,scratchsymbols];
 
 code1=code0/.scratchrules/.CAssign[symbol_,rhs_]:>CDeclareAssign["const Real",symbol,myCForm[rhs]];
 
-code1[[-1]]=Flatten@MapIndexed[CAssign["buffer__["<>HullSize<>"*i+"<>s[m (#2[[1]]-1)+(#2[[2]]-1)]<>"]",myCForm[#1]]&,Partition[code1[[-1]],m],{2}];
+code1[[-1]]=Flatten@MapIndexed[CAssign["B["<>HullSize<>"*i+"<>s[m (#2[[1]]-1)+(#2[[2]]-1)]<>"]",myCForm[#1]]&,Partition[code1[[-1]],m],{2}];
 
-codestringAssign=StringCases[StringReplace[GenerateCode[CBlock[code1],Indent->5],"Sqrt("->"std::sqrt("],Longest["{\n"~~x___~~"\n}"]:>x][[1]];
+codestringAssign=StringCases[StringReplace[GenerateCode[CBlock[code1],Indent->4],"Sqrt("->"std::sqrt("],Longest["{\n"~~x___~~"\n}"]:>x][[1]];
 
 StringJoin["
 	void ",name,"( 
@@ -191,11 +191,11 @@ StringJoin["
             eprint(\"in "<>name<>": P_D_near.Dimension(1) != "<>NearDim<>". Aborting\");
         }
 
-		cptr<Real> V_coords__  = V_coords.data();
-		cptr<Int>  simplices__ = simplices.data();
-		cptr<Real> P_D_near__  = P_D_near.data();
-		cptr<Real> P_D_far__   = P_D_far.data();
-		mptr<Real> buffer__    = buffer.data();
+		cptr<Real> X = V_coords.data();
+		cptr<Int>  S = simplices.data();
+		cptr<Real> N = P_D_near.data();
+		cptr<Real> F = P_D_far.data();
+		mptr<Real> B = buffer.data();
         
 		ParallelDo(
 			[=]( const Int i )
@@ -265,11 +265,11 @@ Experimental`OptimizeExpression[A,
 ]/.CompoundExpression->List/.Set-> CAssign,
 -1,-1]/.Thread[
 Flatten[PP]->
-Flatten[Table["V_coords__["<>AmbDim<>"*simplices__["<>s[n+1]<>"*i+"<>s[j]<>"]+"<>s[k]<>"]", {j,0,n},{k,0,m-1}]]
+Flatten[Table["X["<>AmbDim<>"*S["<>s[n+1]<>"*i+"<>s[j]<>"]+"<>s[k]<>"]", {j,0,n},{k,0,m-1}]]
 ]/.Thread[
-	Flatten[dXXnear]->Flatten[Table["P_D_near__["<>NearDim<>"*i+"<>s[j]<>"]",{j,0,neardim-1}]]
+	Flatten[dXXnear]->Flatten[Table["N["<>NearDim<>"*i+"<>s[j]<>"]",{j,0,neardim-1}]]
 ]/.Thread[
-	Flatten[dXXfar]->Flatten[Table["P_D_far__["<>FarDim<>"*i+"<>s[j]<>"]",{j,0,fardim-1}]]
+	Flatten[dXXfar]->Flatten[Table["F["<>FarDim<>"*i+"<>s[j]<>"]",{j,0,fardim-1}]]
 ]/.Power[x_,2]:>HoldForm[x x];
 
 scratchsymbols=Cases[code0,CAssign[symbol_,rhs_]:>symbol,\[Infinity]];
@@ -277,9 +277,9 @@ scratchrules=MapIndexed[#1->"s"<>ToString[#2[[1]]-1]&,scratchsymbols];
 
 code1=code0/.scratchrules/.CAssign[symbol_,rhs_]:>CDeclareAssign["const Real",symbol,myCForm[rhs]];
 
-code1[[-1]]=Flatten@MapIndexed[CAssign["buffer__["<>HullSize<>"*i+"<>s[m (#2[[1]]-1)+(#2[[2]]-1)]<>"]",myCForm[#1]]&,Partition[code1[[-1]],m],{2}];
+code1[[-1]]=Flatten@MapIndexed[CAssign["B["<>HullSize<>"*i+"<>s[m (#2[[1]]-1)+(#2[[2]]-1)]<>"]",myCForm[#1]]&,Partition[code1[[-1]],m],{2}];
 
-codestringAssign=StringCases[StringReplace[GenerateCode[CBlock[code1],Indent->5],"Sqrt("->"std::sqrt("],Longest["{\n"~~x___~~"\n}"]:>x][[1]];
+codestringAssign=StringCases[StringReplace[GenerateCode[CBlock[code1],Indent->4],"Sqrt("->"std::sqrt("],Longest["{\n"~~x___~~"\n}"]:>x][[1]];
 
 StringJoin["
     void ",name,"( 
@@ -299,11 +299,11 @@ StringJoin["
             eprint(\"in "<>name<>": P_D_near.Dimension(1) != "<>NearDim<>". Aborting\");
         }
         
-		cptr<Real> V_coords__  = V_coords.data();
-        cptr<Int>  simplices__ = simplices.data();
-		cptr<Real> P_D_near__  = P_D_near.data();
-		cptr<Real> P_D_far__   = P_D_far.data();
-        mptr<Real> buffer__    = buffer.data();
+		cptr<Real> X = V_coords.data();
+        cptr<Int>  S = simplices.data();
+		cptr<Real> N = P_D_near.data();
+		cptr<Real> F = P_D_far.data();
+        mptr<Real> B = buffer.data();
 
 		ParallelDo(
 			[=]( const Int i )
