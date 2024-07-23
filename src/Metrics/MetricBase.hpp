@@ -14,6 +14,7 @@ namespace Repulsor
         using TangentVector_T        = typename MeshBase_T::TangentVector_T;
         using CotangentVector_T      = typename MeshBase_T::CotangentVector_T;
         using ValueContainer_T       = MetricValueContainer<Real,LInt>;
+        using CG_T                   = ConjugateGradient<VarSize,Real,Int>;
         
         MetricBase() = default;
 
@@ -22,7 +23,7 @@ namespace Repulsor
     protected:
         
         mutable Int iter = 0;
-        mutable ConjugateGradient<VarSize,Real,Int>::RealVector_T rel_residuals;
+        mutable CG_T::RealVector_T rel_residuals;
         
     public:
         
@@ -75,7 +76,7 @@ namespace Repulsor
             return iter;
         }
         
-        ConjugateGradient<VarSize,Real,Int>::RealVector_T CG_RelativeResiduals() const
+        CG_T::RealVector_T CG_RelativeResiduals() const
         {
             return rel_residuals;
         }

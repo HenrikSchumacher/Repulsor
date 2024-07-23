@@ -17,10 +17,10 @@ namespace Repulsor
         using Base_T     = MetricBase<MeshBase_T>;
         using Root_T     = MetricBase<MeshBase_T>;
     
-
         using TangentVector_T    = typename Base_T::TangentVector_T;
         using CotangentVector_T  = typename Base_T::CotangentVector_T;
         using ValueContainer_T   = typename Base_T::ValueContainer_T;
+        using CG_T               = typename Base_T::CG_T;
         
         MetricDimRestricted() = default;
 
@@ -45,6 +45,7 @@ namespace Repulsor
             std::string tag ( ClassName()+"::MetricValues" );
 
             ptic(tag);
+            
             if( !M.InCacheQ(tag))
             {
                 M.SetCache( tag, compute_metric(M) );
@@ -222,7 +223,7 @@ namespace Repulsor
             
             if( rhs_count == AMB_DIM )
             {
-                ConjugateGradient<AMB_DIM,ExtReal,Int> CG ( M.VertexCount(), max_iter, rhs_count, M.ThreadCount() );
+                CG_T CG ( M.VertexCount(), max_iter, rhs_count, M.ThreadCount() );
                 
                 CG( A, P, B, rhs_count, X, rhs_count, tolerance );
                 
@@ -231,7 +232,8 @@ namespace Repulsor
             }
             else
             {
-                ConjugateGradient<VarSize,ExtReal,Int> CG ( M.VertexCount(), max_iter, rhs_count, M.ThreadCount() );
+                CG_T CG ( M.VertexCount(), max_iter, rhs_count, M.ThreadCount() );
+                
                 CG( A, P, B, rhs_count, X, rhs_count, tolerance );
                 
                 iter          = CG.IterationCount();
