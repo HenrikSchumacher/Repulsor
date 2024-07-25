@@ -668,7 +668,9 @@ namespace Repulsor
             
         } // DerivativeAssembler
         
-        void Assemble_ClusterTree_Derivatives( mptr<ExtReal> output, const ExtReal weight, bool addTo = false ) const override
+        void Assemble_ClusterTree_Derivatives(
+            const ExtReal alpha, const ExtReal beta , mptr<ExtReal> Y, const Int ldY
+        ) const override
         {
             ptic(className()+"::Assemble_ClusterTree_Derivatives");
             
@@ -686,15 +688,19 @@ namespace Repulsor
             );
             
             DerivativeAssembler().template Dot<AMB_DIM>(
-                static_cast<Real>(weight),   buffer.data(),
-                static_cast<ExtReal>(addTo), output,
+                alpha, buffer.data(), AMB_DIM,
+                beta , Y            , ldY,
                 AMB_DIM
             );
 
             ptoc(className()+"::Assemble_ClusterTree_Derivatives");
         }
         
-        void Assemble_ClusterTree_VertexDensities( mptr<ExtReal> output, const ExtReal weight, bool addTo = false ) const override
+        void Assemble_ClusterTree_VertexDensities( 
+            mptr<ExtReal> output,
+            const ExtReal weight,
+            bool addTo = false
+        ) const override
         {
             ptic(className()+"::Assemble_ClusterTree_VertexDensities");
             

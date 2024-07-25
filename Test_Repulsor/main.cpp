@@ -173,7 +173,7 @@ int main( void )
     
     /// Alternatively, you can write into any pointer-array like `diff.data()`.
     tic("tpe.Differential(M)");
-    tpe.Differential(M,diff.data());
+    tpe.Differential(M, diff.data() );
     toc("tpe.Differential(M)");
 
     print("");

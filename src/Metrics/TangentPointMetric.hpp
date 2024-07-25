@@ -85,43 +85,81 @@ namespace Repulsor
         
         using BASE::MultiplyMetric;
         
-        void multiply_preconditioner(
-            cref<Mesh_T> M, 
-            const ExtReal alpha, cptr<ExtReal> X, const Int ldX,
-            const ExtReal beta,  mptr<ExtReal> Y, const Int ldY,
-            const Int rhs_count
+        virtual void multiply_preconditioner(
+            cref<Mesh_T> M,
+            cref<ExtReal> alpha, cptr<ExtReal> X, const Int ldX,
+            cref<ExtReal> beta,  mptr<ExtReal> Y, const Int ldY,
+            const Int nrhs
         ) const override
         {
-            mref<Tensor2<Real,Int>> Z_buf = M.XBuffer( rhs_count );
-            
-            const Int ldZ = rhs_count;
+            mref<Tensor2<Real,Int>> Z_buf = M.XBuffer( nrhs );
             
             mptr<Real> Z = Z_buf.data();
+
+            // TODO: Once the solver works better, make these calls Parallel.
+            constexpr Parallel_T parQ = Sequential;
+
+            const Real alpha_ = static_cast<Real>(alpha);
+
+            if ( nrhs == AMB_DIM )
+            {
+                M.H1Solver().template Solve<AMB_DIM,parQ>(
+                    alpha_,             X, ldX,
+                    Scalar::Zero<Real>, Z, nrhs,
+                    nrhs
+                );
+            }
+            else if( nrhs == 1 )
+            {
+                M.H1Solver().template Solve<1,parQ>(
+                    alpha_,             X, ldX,
+                    Scalar::Zero<Real>, Z, nrhs,
+                    nrhs
+                );
+            }
+            else
+            {
+                M.H1Solver().template Solve<VarSize,parQ>(
+                   alpha_,              X, ldX,
+                    Scalar::Zero<Real>, Z, nrhs,
+                    nrhs
+                );
+            }
             
-            // Z = alpha * Laplace^{-1}.X
+            if( Abs(alpha_) > Scalar::Zero<Real> )
+            {
+                pseudo_lap.MultiplyMetric( M,
+                    Scalar::One<Real>,  Z, nrhs,
+                    Scalar::Zero<Real>, Z, nrhs,
+                    nrhs
+                );
+            }
+
             
-            // TODO: Once the Cholesky solver works better, make these calls Parallel.
-            M.H1Solver().template Solve<Sequential>(
-                scalar_cast<Real>(alpha), X, ldX,
-                Scalar::Zero<Real>      , Z, ldZ,
-                rhs_count
-            );
-            
-            // Z = alpha * Laplace^{2-s} . Laplace^{-1} . X
-            pseudo_lap.MultiplyMetric(
-                M,
-                Scalar::One <Real>, Z, ldZ,
-                Scalar::Zero<Real>, Z, ldZ,
-                rhs_count
-            );
-            
-            // Y = alpha * Laplace^{-1} . Laplace^{2-s} . Laplace^{-1} . X + beta * Y
-            // TODO: Once the Cholesky solver works better, make these calls Parallel.
-            M.H1Solver().template Solve<Sequential>(
-                Scalar::One <ExtReal>, Z, ldZ,
-                beta,                  Y, ldY,
-                rhs_count
-            );
+            if( nrhs == AMB_DIM )
+            {
+                M.H1Solver().template Solve<AMB_DIM,parQ>(
+                    Scalar::One<ExtReal>, Z, nrhs,
+                    beta,                 Y, ldY,
+                    nrhs
+                );
+            }
+            else if( nrhs == 1 )
+            {
+                M.H1Solver().template Solve<1,parQ>(
+                    Scalar::One<ExtReal>, Z, nrhs,
+                    beta,                 Y, ldY,
+                    nrhs
+                );
+            }
+            else
+            {
+                M.H1Solver().template Solve<VarSize,parQ>(
+                    Scalar::One<ExtReal>, Z, nrhs,
+                    beta,                 Y, ldY,
+                    nrhs
+                );
+            }
         }
         
     public:
