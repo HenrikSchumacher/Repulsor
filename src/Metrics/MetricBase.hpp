@@ -30,8 +30,8 @@ namespace Repulsor
 
         virtual void MultiplyMetric(
             cref<MeshBase_T> M,
-            cref<ExtReal> alpha, cptr<ExtReal> X,
-            cref<ExtReal> beta,  mptr<ExtReal> Y,
+            cref<ExtReal> alpha, cptr<ExtReal> X, const Int ldX,
+            cref<ExtReal> beta,  mptr<ExtReal> Y, const Int ldY,
             const Int  rhs_count,
             const bool VF_flag = true,
             const bool NF_flag = true,
@@ -47,11 +47,18 @@ namespace Repulsor
             const bool FF_flag = true
         ) const
         {
-            this->MultiplyMetric( M, alpha, X.data(), beta, Y.data(), X.Dimension(1), VF_flag, NF_flag, FF_flag );
+            this->MultiplyMetric( M, 
+                alpha, X.data(), X.Dimension(1),
+                beta,  Y.data(), Y.Dimension(1),
+                X.Dimension(1), VF_flag, NF_flag, FF_flag
+            );
         }
         
         virtual void MultiplyPreconditioner(
-            cref<MeshBase_T> M, cptr<ExtReal> X, mptr<ExtReal> Y, const Int rhs_count
+            cref<MeshBase_T> M, 
+            cref<ExtReal> alpha, cptr<ExtReal> X, const Int ldX,
+            cref<ExtReal> beta,  mptr<ExtReal> Y, const Int ldY,
+            const Int rhs_count
         ) const = 0;
 
         virtual void Solve(
@@ -61,13 +68,31 @@ namespace Repulsor
         ) const = 0;
         
     
-        ExtReal FrobeniusNorm( cref<MeshBase_T> M, cptr<ExtReal> X, const Int rhs_count ) const
+        ExtReal FrobeniusNorm( cref<MeshBase_T> M,
+            cptr<ExtReal> X, const Int ldX,
+            const Int rhs_count
+        ) const
         {
-            Tensor2<ExtReal,Int> Y ( M.VertexCount(), rhs_count );
+            mref<Tensor2<Real,Int>> X_buf = M.XBuffer();
+            mref<Tensor2<Real,Int>> Y_buf = M.YBuffer();
             
-            MultiplyMetric(M, Scalar::One<ExtReal>, X, Scalar::Zero<ExtReal>, Y.data(), rhs_count );
+            X_buf.RequireSize( M.VertexCount(), rhs_count );
+            Y_buf.RequireSize( M.VertexCount(), rhs_count );
             
-            return Sqrt( dot_buffers( X, Y.data(), M.VertexCount() * rhs_count, M.ThreadCount() ) );
+            X_buf.Read( X, ldX );
+            
+            cptr<Real> X_ = X_buf.data();
+            mptr<Real> Y_ = Y_buf.data();
+            
+            MultiplyMetric(M,
+                Scalar::One <ExtReal>, X_, rhs_count,
+                Scalar::Zero<ExtReal>, Y_, rhs_count,
+                rhs_count
+            );
+            
+            return Sqrt(
+                dot_buffers( X_, Y_, M.VertexCount() * rhs_count, M.ThreadCount())
+            );
         }
         
         Int CG_IterationCount() const

@@ -86,21 +86,45 @@ namespace Repulsor
         using BASE::MultiplyMetric;
         
         void multiply_preconditioner(
-            cref<Mesh_T> M, cptr<ExtReal> X, mptr<ExtReal> Y, const Int rhs_count
+            cref<Mesh_T> M, 
+            const ExtReal alpha, cptr<ExtReal> X, const Int ldX,
+            const ExtReal beta,  mptr<ExtReal> Y, const Int ldY,
+            const Int rhs_count
         ) const override
         {
-            // TODO: Once the solver works better, make these calls Parallel.
-            M.H1Solver().template Solve<Sequential>( X, Y, rhs_count );
+            mref<Tensor2<Real,Int>> Z_buf = M.SolverBuffer();
             
-//            M.H1Solver().template Solve<Parallel>( X, Y, rhs_count );
+            const Int ldZ = rhs_count;
             
-            pseudo_lap.MultiplyMetric( 
-                M, Scalar::One<Real>, Y, Scalar::Zero<Real>, Y, rhs_count
+            Z_buf.RequireSize(M.VertexCount(),ldZ);
+            
+            mptr<Real> Z = Z_buf.data();
+            
+            
+            // Z = alpha * Laplace^{-1}.X
+            
+            // TODO: Once the Cholesky solver works better, make these calls Parallel.
+            M.H1Solver().template Solve<Sequential>(
+                scalar_cast<Real>(alpha), X, ldX,
+                Scalar::Zero<Real>      , Z, ldZ,
+                rhs_count
             );
             
-            M.H1Solver().template Solve<Sequential>( Y, Y, rhs_count );
+            // Z = alpha * Laplace^{2-s} . Laplace^{-1} . X
+            pseudo_lap.MultiplyMetric(
+                M,
+                Scalar::One <Real>, Z, ldZ,
+                Scalar::Zero<Real>, Z, ldZ,
+                rhs_count
+            );
             
-//            M.H1Solver().template Solve<Parallel>( Y, Y, rhs_count );
+            // Y = alpha * Laplace^{-1} . Laplace^{2-s} . Laplace^{-1} . X
+            // TODO: Once the Cholesky solver works better, make these calls Parallel.
+            M.H1Solver().template Solve<Sequential>(
+                Scalar::One <ExtReal>, Y, ldY,
+                beta,                  Y, ldY,
+                rhs_count
+            );
         }
         
     public:

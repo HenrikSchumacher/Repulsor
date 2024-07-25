@@ -34,5 +34,21 @@
             landmarkType = "0">
          </BreakpointContent>
       </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "0E8476F8-3F37-4EB0-B7EC-B2FB84886247"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "src/Metrics/MetricDimRestricted.hpp"
+            startingColumnNumber = "75"
+            endingColumnNumber = "75"
+            startingLineNumber = "233"
+            endingLineNumber = "233"
+            landmarkName = "Solve(M, alpha, B, ldB, beta, X, ldX, rhs_count, max_iter, tolerance)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
    </Breakpoints>
 </Bucket>
