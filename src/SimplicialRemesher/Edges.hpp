@@ -17,8 +17,8 @@ protected:
 #endif
             max_edge_count *= two;
             
-            edges.Resize( max_edge_count, 2 );
-            E_active.Resize( max_edge_count );
+            edges   .template Resize<true>( max_edge_count, 2 );
+            E_active.template Resize<true>( max_edge_count );
         }
     
         edge_lookup.insert( {p,e} );

@@ -74,11 +74,11 @@ int main(void)
     M.adaptivity_settings.theta                                    = 10.0;
 
     tic("GetClusterTree");
-    M.GetClusterTree();           // Not necessary. Will automatically called by all routines that require it.
+    M.GetClusterTree();           // Not necessary. Will automatically be called by all routines that require it.
     toc("GetClusterTree");
 
     tic("GetBlockClusterTree");
-    M.GetBlockClusterTree();      // Not necessary. Will automatically called by all routines that require it.
+    M.GetBlockClusterTree();      // Not necessary. Will automatically be called by all routines that require it.
     toc("GetBlockClusterTree");
 
     const Real alpha = 1;

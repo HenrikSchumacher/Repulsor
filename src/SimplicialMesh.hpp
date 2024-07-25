@@ -336,14 +336,14 @@ namespace Repulsor
         
         mref<Tensor2<Real,Int>> XBuffer( const Int rhs_count ) const
         {
-            X_buf.RequireSize( VertexCount(), rhs_count );
+            X_buf.template RequireSize<false>( VertexCount(), rhs_count );
             
             return X_buf;
         }
         
         mref<Tensor2<Real,Int>> YBuffer( const Int rhs_count ) const
         {
-            Y_buf.RequireSize( VertexCount(), rhs_count );
+            Y_buf.RequireSize<false>( VertexCount(), rhs_count );
             
             return Y_buf;
         }

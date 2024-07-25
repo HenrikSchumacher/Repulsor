@@ -202,7 +202,11 @@ int main(void)
     
     tic("Solving for gradient");
     /// We have to solve M.AmbDim() equations at once.
-    tpm.Solve(M, diff.data(), gradient.data(), M.AmbDim(), max_iter, relative_tolerance );
+    tpm.Solve(M, 
+        Real(1), diff.data(),     M.AmbDim(),
+        Real(0), gradient.data(), M.AmbDim(),
+        M.AmbDim(), max_iter, relative_tolerance
+    );
     toc("Solving for gradient");
     
     dump(tpm.CG_IterationCount());
