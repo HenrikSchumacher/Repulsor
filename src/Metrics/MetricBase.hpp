@@ -28,6 +28,7 @@ namespace Repulsor
         
         virtual mref<ValueContainer_T> MetricValues( cref<MeshBase_T> M ) const = 0;
 
+        // Computes Y = alpha * A.X + beta * Y
         virtual void MultiplyMetric(
             cref<MeshBase_T> M,
             cref<ExtReal> alpha, cptr<ExtReal> X, const Int ldX,
@@ -38,6 +39,7 @@ namespace Repulsor
             const bool FF_flag = true
         ) const = 0;
         
+        // Computes Y = alpha * A.X + beta * Y
         void MultiplyMetric(
             cref<MeshBase_T> M,
             cref<ExtReal> alpha,  cref<TangentVector_T>   X,
@@ -54,6 +56,7 @@ namespace Repulsor
             );
         }
         
+        // Computes Y = alpha * P.X + beta * Y
         virtual void MultiplyPreconditioner(
             cref<MeshBase_T> M, 
             cref<ExtReal> alpha, cptr<ExtReal> X, const Int ldX,
@@ -61,8 +64,13 @@ namespace Repulsor
             const Int rhs_count
         ) const = 0;
 
+        
+        // Computes X = alpha * A^{-1}.B + beta * X
         virtual void Solve(
-            cref<MeshBase_T> M, cptr<ExtReal> B, mptr<ExtReal> X, const Int  rhs_count,
+            cref<MeshBase_T> M, 
+            cref<ExtReal> alpha, cptr<ExtReal> B, const Int ldB,
+            cref<ExtReal> beta,  mptr<ExtReal> X, const Int ldX,
+            const Int  rhs_count,
             const Int  max_iter,
             const Real tolerance
         ) const = 0;
@@ -73,11 +81,8 @@ namespace Repulsor
             const Int rhs_count
         ) const
         {
-            mref<Tensor2<Real,Int>> X_buf = M.XBuffer();
-            mref<Tensor2<Real,Int>> Y_buf = M.YBuffer();
-            
-            X_buf.RequireSize( M.VertexCount(), rhs_count );
-            Y_buf.RequireSize( M.VertexCount(), rhs_count );
+            mref<Tensor2<Real,Int>> X_buf = M.XBuffer( rhs_count );
+            mref<Tensor2<Real,Int>> Y_buf = M.YBuffer( rhs_count );
             
             X_buf.Read( X, ldX );
             

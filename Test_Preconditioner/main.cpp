@@ -120,18 +120,38 @@ int main(void)
     toc("tpe.Differential");
     
     print("");
-    
+
+    // Computing X = alpha * A^{-1} . B + beta * X using CG method.
     const Int  max_iter  = 100;
     const Real tolerance = 0.0001;
-    
+    const Real alpha = 1;
+    const Real beta  = 0;
+    const Int ldB = B.Dimension(1);
+    const Int ldX = X.Dimension(1);
+    const Int ldY = Y.Dimension(1);
+
     tic("Solving for gradient");
-    tpm.Solve( M, B.data(), X.data(), NRHS, max_iter, tolerance );
+    tpm.Solve( M, 
+        alpha, B.data(), ldB,
+        beta,  X.data(), ldX,
+        NRHS, max_iter, tolerance
+    );
     toc("Solving for gradient");
+    
+    dump( B.CountNaNs() );
+    dump( X.CountNaNs() );
     
     dump(tpm.CG_IterationCount());
     dump(tpm.CG_RelativeResiduals());
     
-    tpm.MultiplyMetric( M, 1., X.data(), 0, Y.data(), NRHS );
+    const Real alpha_inv = Real(1) / alpha;
+    const Real zero      = 0;
+    
+    tpm.MultiplyMetric( M,
+        alpha_inv, X.data(), ldX,
+        zero,      Y.data(), ldY,
+        NRHS
+    );
 
     
     dump(B.MaxNorm());

@@ -133,7 +133,7 @@ namespace Repulsor
             
             multiply_metric( M, VF_flag, NF_flag, FF_flag );
 
-            S.Post( Y, ldY, alpha, beta, op_type );
+            S.Post( alpha, beta, Y, ldY, op_type );
             
             ptoc(ClassName()+"::MultiplyMetric");
         }

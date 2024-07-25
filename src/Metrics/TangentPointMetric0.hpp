@@ -86,15 +86,26 @@ namespace Repulsor
         using BASE::MultiplyMetric;
         
         virtual void multiply_preconditioner(
-            cref<Mesh_T> M, cptr<ExtReal> X, mptr<ExtReal> Y, const Int  rhs_count
+            cref<Mesh_T> M, 
+            cref<ExtReal> alpha, cptr<ExtReal> X, const Int ldX,
+            cref<ExtReal> beta,  mptr<ExtReal> Y, const Int ldY,
+            const Int rhs_count
         ) const override
         {
+            mref<Tensor2<Real,Int>> Z_buf = M.XBuffer( rhs_count );
+            
+            mptr<Real> Z = Z_buf.data();
+            
             // TODO: Once the solver works better, make these calls Parallel.
-            M.H1Solver().template Solve<Sequential>( X, Y, rhs_count );
+            M.H1Solver().template Solve<Sequential>( X, Z, rhs_count );
             
 //            M.H1Solver().template Solve<Parallel>( X, Y, rhs_count );
             
-            pseudo_lap.MultiplyMetric( M, Scalar::One<Real>, Y, Scalar::Zero<Real>, Y, rhs_count );
+            pseudo_lap.MultiplyMetric( M,
+                Scalar::One<Real>,  Z, rhs_count,
+                Scalar::Zero<Real>, Z, rhs_count,
+                rhs_count
+            );
             
             M.H1Solver().template Solve<Sequential>( Y, Y, rhs_count );
             

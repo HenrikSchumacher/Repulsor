@@ -294,15 +294,15 @@ namespace Repulsor
         
         void NF_MultiplyMetric( const Int rhs_count ) const
         {
-            // TODO: DenseKernelMatrix
-            //            SparseKernelMatrixCSR<Kernel_Block_Mul_T> matrix ( bct.Near() );
-            //
-            //            matrix.Dot(
-            //                metric_values.NF.data(),
-            //                one,  T.PrimitiveInputBuffer().data(),
-            //                zero, S.PrimitiveOutputBuffer().data(),
-            //                rhs_count
-            //            );
+// TODO: DenseKernelMatrix
+//            SparseKernelMatrixCSR<Kernel_Block_Mul_T> matrix ( bct.Near() );
+//
+//            matrix.Dot(
+//                metric_values.NF.data(),
+//                one,  T.PrimitiveInputBuffer().data(),
+//                zero, S.PrimitiveOutputBuffer().data(),
+//                rhs_count
+//            );
             
             if constexpr ( symmetricQ )
             {

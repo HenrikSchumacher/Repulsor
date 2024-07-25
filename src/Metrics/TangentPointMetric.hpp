@@ -92,14 +92,11 @@ namespace Repulsor
             const Int rhs_count
         ) const override
         {
-            mref<Tensor2<Real,Int>> Z_buf = M.SolverBuffer();
+            mref<Tensor2<Real,Int>> Z_buf = M.XBuffer( rhs_count );
             
             const Int ldZ = rhs_count;
             
-            Z_buf.RequireSize(M.VertexCount(),ldZ);
-            
             mptr<Real> Z = Z_buf.data();
-            
             
             // Z = alpha * Laplace^{-1}.X
             
@@ -118,10 +115,10 @@ namespace Repulsor
                 rhs_count
             );
             
-            // Y = alpha * Laplace^{-1} . Laplace^{2-s} . Laplace^{-1} . X
+            // Y = alpha * Laplace^{-1} . Laplace^{2-s} . Laplace^{-1} . X + beta * Y
             // TODO: Once the Cholesky solver works better, make these calls Parallel.
             M.H1Solver().template Solve<Sequential>(
-                Scalar::One <ExtReal>, Y, ldY,
+                Scalar::One <ExtReal>, Z, ldZ,
                 beta,                  Y, ldY,
                 rhs_count
             );

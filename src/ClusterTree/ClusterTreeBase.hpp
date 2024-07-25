@@ -491,10 +491,19 @@ namespace Repulsor
         virtual void PercolateDown_Parallel() const = 0;
 
     public:
+
+        // Reads P_in = X[:,0..ldX],
+        // where P_in is the input buffer of the tree.
+        virtual void Pre(
+            const ExtReal * X, const Int ldX,
+        const Int nrsh, const OperatorType op_type ) const = 0;
         
-        virtual void Pre( const ExtReal * input, const Int nrsh, const OperatorType op_type ) const = 0;
-        
-        virtual void Post( ExtReal * output, const ExtReal alpha, const ExtReal beta, const OperatorType op_type ) const = 0;
+        // Writes Y[:,0..ldY] = alpha * P_out + beta * Y[:,0..ldY],
+        // where P_out is the output buffer of the tree.
+        virtual void Post(
+            const ExtReal alpha, const ExtReal beta, ExtReal * Y, const Int ldY,
+            const OperatorType op_type
+        ) const = 0;
         
         virtual void ClustersToPrimitives( bool add_to = false ) const = 0;
         
