@@ -89,7 +89,7 @@ namespace Repulsor
             cref<MeshBase_T> M,
             cref<ExtReal> alpha, cptr<ExtReal> X, const Int ldX,
             cref<ExtReal> beta,  mptr<ExtReal> Y, const Int ldY,
-            const Int  nrhs,
+            const Int nrhs,
             const bool VF_flag = true,
             const bool NF_flag = true,
             const bool FF_flag = true
@@ -100,7 +100,7 @@ namespace Repulsor
                         
             if( Q != nullptr )
             {
-                MultiplyMetric(*Q, 
+                MultiplyMetric(*Q,
                     alpha, X, ldX,
                     beta,  Y, ldY,
                     nrhs, VF_flag, NF_flag, FF_flag
@@ -122,7 +122,18 @@ namespace Repulsor
             const bool FF_flag = true
         ) const
         {
-            ptic(ClassName()+"::MultiplyMetric");
+            std::string tag = ClassName()+"::MultiplyMetric";
+            
+            ptic(tag);
+            
+            if( nrhs != AMB_DIM )
+            {
+                NrhsError( tag, nrhs );
+                
+                ptoc(tag);
+                
+                return;
+            }
             
             const auto & restrict S = M.GetBlockClusterTree().GetS();
             const auto & restrict T = M.GetBlockClusterTree().GetT();
@@ -135,7 +146,7 @@ namespace Repulsor
 
             S.Post( alpha, beta, Y, ldY, op_type );
             
-            ptoc(ClassName()+"::MultiplyMetric");
+            ptoc(tag);
         }
     
         
@@ -177,15 +188,26 @@ namespace Repulsor
             const Int nrhs
         ) const
         {
-            ptic(ClassName()+"::MultiplyPreconditioner");
+            std::string tag = ClassName()+"::MultiplyPreconditioner";
+            
+            ptic(tag);
 
+            if( nrhs != AMB_DIM )
+            {
+                NrhsError( tag, nrhs );
+                
+                ptoc(tag);
+                
+                return;
+            }
+            
             multiply_preconditioner(M,
                 alpha, X, ldX,
                 beta,  Y, ldY,
                 nrhs
             );
             
-            ptoc(ClassName()+"::MultiplyPreconditioner");
+            ptoc(tag);
         }
         
         
@@ -227,15 +249,28 @@ namespace Repulsor
             cref<Mesh_T> M, 
             cref<ExtReal> alpha, cptr<ExtReal> B, const Int ldB,
             cref<ExtReal> beta,  mptr<ExtReal> X, const Int ldX,
-            const Int nrhs,
+            const Int  nrhs,
             const Int  max_iter,
             const Real tolerance
         ) const
         {
-            // TODO: alpha and beta are currently ignored.
+            std::string tag = ClassName()+"::Solve";
             
-            ptic(ClassName()+"::Solve");
-            // The operator for the metric.
+            ptic(tag);
+
+
+            if( nrhs != AMB_DIM )
+            {
+                NrhsError( tag, nrhs );
+                
+                ptoc(tag);
+                
+                return;
+            }
+            
+            // TODO: alpha and beta are currently ignored.
+            wprint( tag + ": Arguments alpha and beta are currently ignored. alpha = 1 and beta = 0  is assumed.");
+            
             auto A = [&M,nrhs,this]( cptr<Real> X_, mptr<Real> Y_ )
             {
                 // Forward operator.
@@ -256,42 +291,26 @@ namespace Repulsor
                 );
             };
             
-            if( nrhs == AMB_DIM )
-            {
-                ConjugateGradient<AMB_DIM,Real,Int> CG (
-                    M.VertexCount(), max_iter, nrhs, M.ThreadCount()
-                );
-                
-                CG( A, P, B, ldB, X, ldX, tolerance );
-                
-                iter          = CG.IterationCount();
-                rel_residuals = CG.RelativeResiduals();
-            }
-            else if( nrhs == 1 )
-            {
-                ConjugateGradient<1,Real,Int> CG (
-                    M.VertexCount(), max_iter, nrhs, M.ThreadCount()
-                );
-                
-                CG( A, P, B, ldB, X, ldX, tolerance );
-                
-                iter          = CG.IterationCount();
-                rel_residuals = CG.RelativeResiduals();
-            }
-            else
-            {
-                ConjugateGradient<VarSize,Real,Int> CG (
-                    M.VertexCount(), max_iter, nrhs, M.ThreadCount()
-                );
-                
-                CG( A, P, B, ldB, X, ldX, tolerance );
-                
-                iter          = CG.IterationCount();
-                rel_residuals = CG.RelativeResiduals();
-            }
+            ConjugateGradient<AMB_DIM,Real,Int> CG (
+                M.VertexCount(), max_iter, nrhs, M.ThreadCount()
+            );
             
-            ptoc(ClassName()+"::Solve");
+            CG( A, P, B, ldB, X, ldX, tolerance );
+            
+            iter          = CG.IterationCount();
+            rel_residuals = CG.RelativeResiduals();
+            
+            ptoc(tag);
         }
+        
+        
+    private:
+        
+        void NrhsError( const std::string & tag, Int nrhs ) const
+        {
+            eprint( tag + ": nrhs = " + ToString(nrhs)+ " != " + ToString(AMB_DIM) + " = AMB_DIM. The current implementation only accepts nrhs = AMB_DIM. (After all, this is a metric on the space of infinitesimal displacement in " + ToString(AMB_DIM) + "-dimensional Euclidean space.) Doing nothing. The argument nrhs is there only for compatibility reasons. Please set nrhs = " + ToString(AMB_DIM) + ".");
+        }
+
         
     public:
         

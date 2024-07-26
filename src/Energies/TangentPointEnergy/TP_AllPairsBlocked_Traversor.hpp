@@ -131,9 +131,9 @@ namespace Repulsor
     public:
         
         
-//##############################################################################################
+//######################################################################################
 //      Compute
-//##############################################################################################
+//######################################################################################
         
         Real Compute()
         {
@@ -261,9 +261,9 @@ namespace Repulsor
             ptoc(ClassName()+"::NF_Compute");
         }
         
-        //##############################################################################################
-        //      Multiply metric
-        //##############################################################################################
+//######################################################################################
+//      Multiply metric
+//######################################################################################
         
     public:
         
@@ -294,29 +294,29 @@ namespace Repulsor
         
         void NF_MultiplyMetric( const Int nrhs ) const
         {
-// TODO: DenseKernelMatrix
-//            SparseKernelMatrixCSR<Kernel_Block_Mul_T> matrix ( bct.Near() );
-//
-//            matrix.Dot(
-//                metric_values.NF.data(),
-//                one,  T.PrimitiveInputBuffer().data(),
-//                zero, S.PrimitiveOutputBuffer().data(),
-//                nrhs
-//            );
+            // TODO: DenseKernelMatrix
+            //            SparseKernelMatrixCSR<Kernel_Block_Mul_T> matrix ( bct.Near() );
+            //
+            //            matrix.Dot(
+            //                metric_values.NF.data(),
+            //                one,  T.PrimitiveInputBuffer().data(),
+            //                zero, S.PrimitiveOutputBuffer().data(),
+            //                nrhs
+            //            );
             
             if constexpr ( symmetricQ )
             {
                 DiagonalKernelMatrix<Kernel_Diag_MulAdd_T> diag (
-                                                                 S.PrimitiveCount(),
-                                                                 S.ThreadCount()
-                                                                 );
+                    S.PrimitiveCount(),
+                    S.ThreadCount()
+                );
                 
                 diag.Dot(
-                         metric_values.NF_diag..data(),
-                         one, T.PrimitiveInputBuffer().data(),
-                         one, S.PrimitiveOutputBuffer().data(),
-                         nrhs
-                         );
+                    metric_values.NF_diag.data(),
+                    one, T.PrimitiveInputBuffer().data(),  nrhs,
+                    one, S.PrimitiveOutputBuffer().data(), nrhs,
+                    nrhs
+                );
             }
         }
         

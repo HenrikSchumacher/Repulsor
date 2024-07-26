@@ -95,36 +95,19 @@ namespace Repulsor
             mref<Tensor2<Real,Int>> Z_buf = M.XBuffer( nrhs );
             
             mptr<Real> Z = Z_buf.data();
-
-            // TODO: Once the solver works better, make these calls Parallel.
+            
             constexpr Parallel_T parQ = Sequential;
 
             const Real alpha_ = static_cast<Real>(alpha);
 
-            if ( nrhs == AMB_DIM )
-            {
-                M.H1Solver().template Solve<AMB_DIM,parQ>(
-                    alpha_,             X, ldX,
-                    Scalar::Zero<Real>, Z, nrhs,
-                    nrhs
-                );
-            }
-            else if( nrhs == 1 )
-            {
-                M.H1Solver().template Solve<1,parQ>(
-                    alpha_,             X, ldX,
-                    Scalar::Zero<Real>, Z, nrhs,
-                    nrhs
-                );
-            }
-            else
-            {
-                M.H1Solver().template Solve<VarSize,parQ>(
-                   alpha_,              X, ldX,
-                    Scalar::Zero<Real>, Z, nrhs,
-                    nrhs
-                );
-            }
+            // TODO: Once the solver works better, make these calls Parallel.
+
+            // Actually, only nrhs = AMB_DIM should be allowed at this point.
+            M.H1Solver().template Solve<AMB_DIM,parQ>(
+                alpha_,             X, ldX,
+                Scalar::Zero<Real>, Z, nrhs,
+                nrhs
+            );
             
             if( Abs(alpha_) > Scalar::Zero<Real> )
             {
@@ -135,31 +118,12 @@ namespace Repulsor
                 );
             }
 
-            
-            if( nrhs == AMB_DIM )
-            {
-                M.H1Solver().template Solve<AMB_DIM,parQ>(
-                    Scalar::One<ExtReal>, Z, nrhs,
-                    beta,                 Y, ldY,
-                    nrhs
-                );
-            }
-            else if( nrhs == 1 )
-            {
-                M.H1Solver().template Solve<1,parQ>(
-                    Scalar::One<ExtReal>, Z, nrhs,
-                    beta,                 Y, ldY,
-                    nrhs
-                );
-            }
-            else
-            {
-                M.H1Solver().template Solve<VarSize,parQ>(
-                    Scalar::One<ExtReal>, Z, nrhs,
-                    beta,                 Y, ldY,
-                    nrhs
-                );
-            }
+            // Actually, only nrhs = AMB_DIM should be allowed at this point.
+            M.H1Solver().template Solve<AMB_DIM,parQ>(
+                Scalar::One<ExtReal>, Z, nrhs,
+                beta,                 Y, ldY,
+                nrhs
+            );
         }
         
     public:

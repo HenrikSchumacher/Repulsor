@@ -174,18 +174,18 @@ int main(void)
     print("");
     
     
-//    X.SetZero();
-//    
-//    tpm.MultiplyMetric( M,
-//        Real(1), &B[0][0], ldB,
-//        Real(0), &X[0][0], ldX,
-//        6
-//    );
-//    
-//    dump( ArrayToString(X.data(), {4,6}) );
-//    
-//    dump( X.MaxNorm() );
-//    print("");
+    X.SetZero();
+    
+    tpm.MultiplyMetric( M,
+        Real(1), &B[0][0], ldB,
+        Real(0), &X[0][0], ldX,
+        6
+    );
+    
+    dump( ArrayToString(X.data(), {4,6}) );
+    
+    dump( X.MaxNorm() );
+    print("");
     
     // Computing X = alpha * A^{-1} . B + beta * X using CG method.
     const Int  max_iter  = 100;

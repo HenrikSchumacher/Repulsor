@@ -89,7 +89,7 @@ namespace Repulsor
                 beta,  Y, ldY,
                 M.VertexCount(), nrhs, M.ThreadCount()
             );
-            
+
             return;
         }
         

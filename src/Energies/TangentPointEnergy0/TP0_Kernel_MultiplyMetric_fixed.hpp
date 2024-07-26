@@ -1,7 +1,7 @@
 #pragma once
 
 #define BASE BlockKernel_fixed<                                       \
-        AMB_DIM_+1,AMB_DIM_+1,MAX_NRHS_, true,                   \
+        AMB_DIM_+1,AMB_DIM_+1,MAX_NRHS_, true,                        \
         Real_, Real_in_, Real_out_, Int_, LInt_,                      \
         alpha_flag, beta_flag,                                        \
         true, true, false, true,                                      \
