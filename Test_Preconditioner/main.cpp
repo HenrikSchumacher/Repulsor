@@ -190,8 +190,6 @@ int main(void)
     dump(tpm.CG_IterationCount());
     dump(tpm.CG_RelativeResiduals());
     
-    print("");
-    
     // Checking the result.
     
     const Real alpha_inv = Real(1) / alpha;
