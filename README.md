@@ -29,11 +29,6 @@ Either clone with
 or clone as usual and then run the following to connect all submodules to their repos.
 
     git submodule update --init --recursive
-    
-
-Pull changes from the remote repositories of any submodule by executing
-
-    git pull && git submodule foreach --recursive "git checkout main && git pull"
 
     
 # Usage
