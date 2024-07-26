@@ -87,8 +87,8 @@ namespace Repulsor
         
         void MultiplyMetric(
             cref<MeshBase_T> M,
-            cref<ExtReal> alpha, cptr<ExtReal> X, const Int ldX,
-            cref<ExtReal> beta,  mptr<ExtReal> Y, const Int ldY,
+            const ExtReal alpha, cptr<ExtReal> X, const Int ldX,
+            const ExtReal beta,  mptr<ExtReal> Y, const Int ldY,
             const Int nrhs,
             const bool VF_flag = true,
             const bool NF_flag = true,
@@ -114,8 +114,8 @@ namespace Repulsor
         
         void MultiplyMetric(
             cref<Mesh_T> M,
-            cref<ExtReal> alpha, cptr<ExtReal> X, const Int ldX,
-            cref<ExtReal> beta,  mptr<ExtReal> Y, const Int ldY,
+            const ExtReal alpha, cptr<ExtReal> X, const Int ldX,
+            const ExtReal beta,  mptr<ExtReal> Y, const Int ldY,
             const Int  nrhs,
             const bool VF_flag = true,
             const bool NF_flag = true,
@@ -162,8 +162,8 @@ namespace Repulsor
         
         virtual void MultiplyPreconditioner(
             cref<MeshBase_T> M, 
-            cref<ExtReal> alpha, cptr<ExtReal> X, const Int ldX,
-            cref<ExtReal> beta,  mptr<ExtReal> Y, const Int ldY,
+            const ExtReal alpha, cptr<ExtReal> X, const Int ldX,
+            const ExtReal beta,  mptr<ExtReal> Y, const Int ldY,
             const Int nrhs
         ) const override
         {
@@ -183,8 +183,8 @@ namespace Repulsor
         
         void MultiplyPreconditioner(
             cref<Mesh_T> M,
-            cref<ExtReal> alpha, cptr<ExtReal> X, const Int ldX,
-            cref<ExtReal> beta,  mptr<ExtReal> Y, const Int ldY,
+            const ExtReal alpha, cptr<ExtReal> X, const Int ldX,
+            const ExtReal beta,  mptr<ExtReal> Y, const Int ldY,
             const Int nrhs
         ) const
         {
@@ -213,16 +213,16 @@ namespace Repulsor
         
         virtual void multiply_preconditioner(
             cref<Mesh_T> M, 
-            cref<ExtReal> alpha, cptr<ExtReal> X, const Int ldX,
-            cref<ExtReal> beta,  mptr<ExtReal> Y, const Int ldY,
+            const ExtReal alpha, cptr<ExtReal> X, const Int ldX,
+            const ExtReal beta,  mptr<ExtReal> Y, const Int ldY,
             const Int nrhs
         ) const = 0;
         
         
         virtual void Solve(
             cref<MeshBase_T> M, 
-            cref<ExtReal> alpha, cptr<ExtReal> B, const Int ldB,
-            cref<ExtReal> beta,  mptr<ExtReal> X, const Int ldX,
+            const ExtReal alpha, cptr<ExtReal> B, const Int ldB,
+            const ExtReal beta,  mptr<ExtReal> X, const Int ldX,
             const Int  nrhs,
             const Int  max_iter,
             const Real tolerance
@@ -247,8 +247,8 @@ namespace Repulsor
         
         void Solve(
             cref<Mesh_T> M, 
-            cref<ExtReal> alpha, cptr<ExtReal> B, const Int ldB,
-            cref<ExtReal> beta,  mptr<ExtReal> X, const Int ldX,
+            const ExtReal alpha, cptr<ExtReal> B, const Int ldB,
+            const ExtReal beta,  mptr<ExtReal> X, const Int ldX,
             const Int  nrhs,
             const Int  max_iter,
             const Real tolerance

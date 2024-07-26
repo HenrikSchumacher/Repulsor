@@ -74,8 +74,8 @@ namespace Repulsor
         
         virtual void multiply_preconditioner(
             cref<Mesh_T> M, 
-            cref<ExtReal> alpha, cptr<ExtReal> X, const Int ldX,
-            cref<ExtReal> beta,  mptr<ExtReal> Y, const Int ldY,
+            const ExtReal alpha, cptr<ExtReal> X, const Int ldX,
+            const ExtReal beta,  mptr<ExtReal> Y, const Int ldY,
             const Int nrhs
         ) const override
         {

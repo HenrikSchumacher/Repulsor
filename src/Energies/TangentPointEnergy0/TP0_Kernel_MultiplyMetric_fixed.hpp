@@ -65,8 +65,8 @@ namespace Repulsor
         
         TP0_Kernel_MultiplyMetric_fixed(
             cptr<Real>     A_,
-            cref<Real_out> alpha_,  cptr<Real_in> X_,
-            cref<Real_out> beta_,   mptr<Real>    Y_,
+            cref<Real_out> alpha_, cptr<Real_in> X_,
+            cref<Real_out> beta_,  mptr<Real>    Y_,
             const Int      nrhs_
         )
         :   Base_T( A_, alpha_, X_, beta_, Y_, nrhs_ )
