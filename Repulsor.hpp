@@ -19,6 +19,7 @@
 #endif
 
     #include "submodules/Tensors/ConjugateGradient.hpp"
+    #include "submodules/Tensors/GMRES.hpp"
 
     namespace Repulsor {
         

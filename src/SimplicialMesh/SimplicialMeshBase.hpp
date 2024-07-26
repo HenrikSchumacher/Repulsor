@@ -85,6 +85,10 @@ namespace Repulsor
             return thread_count;
         }
         
+        virtual mref<Tensor2<Real,Int>> XBuffer( const Int nrhs ) const = 0;
+        
+        virtual mref<Tensor2<Real,Int>> YBuffer( const Int nrhs ) const = 0;
+        
         virtual void SemiStaticUpdate( cptr<ExtReal> V_coords_, const bool transp_ = false ) const = 0;
         
         virtual cref<ClusterTreeBase_T> GetClusterTree() const = 0;

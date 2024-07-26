@@ -334,16 +334,16 @@ namespace Repulsor
             return V_coords.data();
         }
         
-        mref<Tensor2<Real,Int>> XBuffer( const Int nrhs ) const
+        virtual mref<Tensor2<Real,Int>> XBuffer( const Int nrhs ) const override
         {
             X_buf.template RequireSize<false>( VertexCount(), nrhs );
             
             return X_buf;
         }
         
-        mref<Tensor2<Real,Int>> YBuffer( const Int nrhs ) const
+        virtual mref<Tensor2<Real,Int>> YBuffer( const Int nrhs ) const override
         {
-            Y_buf.RequireSize<false>( VertexCount(), nrhs );
+            Y_buf.template RequireSize<false>( VertexCount(), nrhs );
             
             return Y_buf;
         }

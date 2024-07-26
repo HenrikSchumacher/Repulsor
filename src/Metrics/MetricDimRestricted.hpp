@@ -258,7 +258,6 @@ namespace Repulsor
             
             ptic(tag);
 
-
             if( nrhs != AMB_DIM )
             {
                 NrhsError( tag, nrhs );
@@ -267,9 +266,6 @@ namespace Repulsor
                 
                 return;
             }
-            
-            // TODO: alpha and beta are currently ignored.
-            wprint( tag + ": Arguments alpha and beta are currently ignored. alpha = 1 and beta = 0  is assumed.");
             
             auto A = [&M,nrhs,this]( cptr<Real> X_, mptr<Real> Y_ )
             {
@@ -291,14 +287,21 @@ namespace Repulsor
                 );
             };
             
-            ConjugateGradient<AMB_DIM,Real,Int> CG (
+            ConjugateGradient<AMB_DIM,Real,Int,false,false> solver (
                 M.VertexCount(), max_iter, nrhs, M.ThreadCount()
             );
             
-            CG( A, P, B, ldB, X, ldX, tolerance );
+            solver( A, P, alpha, B, ldB, beta, X, ldX, tolerance );
             
-            iter          = CG.IterationCount();
-            rel_residuals = CG.RelativeResiduals();
+
+//            GMRES<AMB_DIM,Real,Int,Side::Left,false,false> solver (
+//                M.VertexCount(), max_iter, nrhs, M.ThreadCount()
+//            );
+//            
+//            solver( A, P, alpha, B, ldB, beta, X, ldX, tolerance, 3 );
+            
+            iter          = solver.IterationCount();
+            rel_residuals = solver.RelativeResiduals();
             
             ptoc(tag);
         }

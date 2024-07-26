@@ -77,11 +77,11 @@ namespace Repulsor
         ) const = 0;
         
     
-        ExtReal FrobeniusNorm( cref<MeshBase_T> M,
-            cptr<ExtReal> X, const Int ldX,
-            const Int nrhs
+        ExtReal MetricNorm( cref<MeshBase_T> M,
+            cptr<ExtReal> X, const Int ldX, const Int nrhs
         ) const
         {
+            // Not optimized; only meant for test purposes.
             mref<Tensor2<Real,Int>> X_buf = M.XBuffer( nrhs );
             mref<Tensor2<Real,Int>> Y_buf = M.YBuffer( nrhs );
             
@@ -91,6 +91,29 @@ namespace Repulsor
             mptr<Real> Y_ = Y_buf.data();
             
             MultiplyMetric(M,
+                Scalar::One <ExtReal>, X_, nrhs,
+                Scalar::Zero<ExtReal>, Y_, nrhs,
+                nrhs
+            );
+            
+            return Sqrt( dot_buffers( X_, Y_, M.VertexCount() * nrhs, M.ThreadCount()) );
+        }
+        
+        ExtReal PreconditionerNorm( cref<MeshBase_T> M,
+            cptr<ExtReal> X, const Int ldX, const Int nrhs
+        ) const
+        {
+            // Not optimized; only meant for test purposes.
+            
+            mref<Tensor2<Real,Int>> X_buf = M.XBuffer( nrhs );
+            mref<Tensor2<Real,Int>> Y_buf = M.YBuffer( nrhs );
+            
+            X_buf.Read( X, ldX );
+            
+            cptr<Real> X_ = X_buf.data();
+            mptr<Real> Y_ = Y_buf.data();
+            
+            MultiplyPreconditioner(M,
                 Scalar::One <ExtReal>, X_, nrhs,
                 Scalar::Zero<ExtReal>, Y_, nrhs,
                 nrhs

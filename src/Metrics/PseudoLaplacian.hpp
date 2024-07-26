@@ -82,7 +82,8 @@ namespace Repulsor
             wprint(ClassName()+"::multiply_preconditioner: No preconditioner available. Using identity transformation.");
             
             combine_matrices<
-                Scalar::Flag::Generic,Scalar::Flag::Generic,VarSize,Parallel
+                Scalar::Flag::Generic,Scalar::Flag::Generic,
+                VarSize,AMB_DIM,Parallel
             >
             (
                 alpha, X, ldX,

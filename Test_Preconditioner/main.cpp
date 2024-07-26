@@ -58,8 +58,8 @@ int main(void)
     
     std::filesystem::path this_file { __FILE__ };
     std::filesystem::path repo_dir  = this_file.parent_path().parent_path();
-    std::filesystem::path mesh_file = repo_dir / "Meshes" / "TorusMesh_00002400T.txt";
-//    std::filesystem::path mesh_file = repo_dir / "Meshes" / "TorusMesh_00038400T.txt";
+//    std::filesystem::path mesh_file = repo_dir / "Meshes" / "TorusMesh_00002400T.txt";
+    std::filesystem::path mesh_file = repo_dir / "Meshes" / "TorusMesh_00038400T.txt";
     
     std::unique_ptr<MeshBase_T> M_ptr = mesh_factory.Make_FromFile(
         mesh_file.c_str(), thread_count
@@ -108,9 +108,7 @@ int main(void)
     
     print("");
 
-    constexpr Int NRHS = 3;
-    
-    
+//    constexpr Int NRHS = 3;
     const Int print_rows = 4;
     const Int ld   = 6;
     const Int nrhs = 3;
@@ -118,163 +116,191 @@ int main(void)
     const Int ldB = ld;
     const Int ldX = ld;
     const Int ldY = ld;
+    const Int ldZ = ld;
     
-    Tensor2<ExtReal,Int> B ( M.VertexCount(), ldB );
-    Tensor2<ExtReal,Int> X ( M.VertexCount(), ldX );
-    Tensor2<ExtReal,Int> Y ( M.VertexCount(), ldY );
+    Tensor2<ExtReal,Int> B  ( M.VertexCount(), ldB );
+    Tensor2<ExtReal,Int> X  ( M.VertexCount(), ldX );
+    Tensor2<ExtReal,Int> Y  ( M.VertexCount(), ldY );
+    Tensor2<ExtReal,Int> Z  ( M.VertexCount(), ldZ );
     
     B.SetZero();
     X.SetZero();
+    Y.SetZero();
     
     dump( B.Dimension(0) );
     dump( B.Dimension(1) );
     
     print("");
-    print("tpe.Differential( M, Real(1), Real(0), &B[0][0], ldB );");
+    print("Experiment 1: Solve A.X = B for X and check the perconditioner norm of B - A.X ");
+    print("");
+//    print("tpe.Differential( M, Real(1), Real(0), &B[0][0], ldB );");
     
     tic("tpe.Differential");
     tpe.Differential( M, Real(1), Real(0), &B[0][0], ldB );
     toc("tpe.Differential");
     
-    
-    dump( ArrayToString(B.data(), {print_rows,ld}) );
+//    dump( ArrayToString( B.data(), {print_rows,ld}, 8 ) );
     
     
     print("");
-    print("tpe.Differential( M, Real(2), Real(0), &B[0][nrhs], ldB );");
+//    print("tpe.Differential( M, Real(0.5), Real(0), &B[0][nrhs], ldB );");
 
     tic("tpe.Differential");
-    tpe.Differential( M, Real(2), Real(0), &B[0][nrhs], ldB );
+    tpe.Differential( M, Real(0.5), Real(0), &B[0][nrhs], ldB );
     toc("tpe.Differential");
     
-    dump( ArrayToString(B.data(), {print_rows,ld}) );
+//    dump( ArrayToString( B.data(), {print_rows,ld}, 8 ) );
     print("");
     
+
+    // Computing X = alpha * A^{-1} . B + beta * X using CG method.
+    const Int  max_iter  = 100;
+    const Real tolerance = 0.0001;
+    const Real alpha = 1;
+    const Real beta  = 0;
     
-    X.SetZero();
-    
-    
-//    print("");
-//    print("tpm.MultiplyPreconditioner( M, Real(1), &B[0][0], ldB, Real(1), &X[0][0], ldX, 3 );");
-//    
-//    tpm.MultiplyPreconditioner( M,
-//        Real(1), &B[0][0], ldB,
-//        Real(1), &X[0][0], ldX,
-//        3
-//    );
-//    
-//    dump( ArrayToString(X.data(), {print_rows,ld}) );
-//
-//    dump( X.MaxNorm() );
-    
-    
-    print("");
-    print("tpm.MultiplyPreconditioner( M, Real(1), &B[0][3], ldB, Real(1), &X[0][3], ldX, 3 );");
-    
-    tpm.MultiplyPreconditioner( M,
-        Real(1), &B[0][nrhs], ldB,
-        Real(1), &X[0][nrhs], ldX,
-        nrhs
+
+    tic("Solving for gradient");
+    tpm.Solve( M, 
+        alpha, &B[0][0   ], ldB,
+        beta,  &X[0][0   ], ldX,
+        nrhs, max_iter, tolerance
     );
+    toc("Solving for gradient");
     
-    dump( ArrayToString(X.data(), {print_rows,ld}) );
+    dump( B.CountNaNs() );
+    dump( X.CountNaNs() );
     
-    dump( X.MaxNorm() );
-    
-    
-    X.SetZero();
-    
-    
-//    print("");
-//    print("tpm.MultiplyMetric( M, Real(1), &B[0][0], ldB, Real(1), &X[0][0], ldX, 3 );");
-//    
-//    tpm.MultiplyMetric( M,
-//        Real(1), &B[0][0], ldB,
-//        Real(1), &X[0][0], ldX,
-//        nrhs
-//    );
-//    
-//    dump( ArrayToString(X.data(), {print_rows,ld}) );
-//
-//    dump( X.MaxNorm() );
-    
+    dump(tpm.CG_IterationCount());
+    dump(tpm.CG_RelativeResiduals());
     
     print("");
     
-    print("tpm.MultiplyMetric( M, Real(1), &B[0][3], ldB, Real(1), &X[0][3], ldX, 3 );");
+    tic("Solving for gradient");
+    tpm.Solve( M,
+        alpha, &B[0][nrhs], ldB,
+        beta,  &X[0][nrhs], ldX,
+        nrhs, max_iter, tolerance
+    );
+    toc("Solving for gradient");
     
+    dump( B.CountNaNs() );
+    dump( X.CountNaNs() );
+    
+    dump(tpm.CG_IterationCount());
+    dump(tpm.CG_RelativeResiduals());
+    
+    print("");
+    
+    // Checking the result.
+    
+    const Real alpha_inv = Real(1) / alpha;
+
+    Y = B;
+
     tpm.MultiplyMetric( M,
-        Real(1), &B[0][nrhs], ldB,
-        Real(1), &X[0][nrhs], ldX,
+        alpha_inv, &X[0][0   ], ldX,
+        Real(-1),  &Y[0][0   ], ldY,
+        nrhs
+    );
+    tpm.MultiplyMetric( M,
+        alpha_inv, &X[0][nrhs], ldX,
+        Real(-1),  &Y[0][nrhs], ldY,
         nrhs
     );
     
-    dump( ArrayToString(X.data(), {print_rows,ld}) );
+    Tiny::Vector<2,Real,Int> B_prec_norms = {
+        tpm.PreconditionerNorm( M, &B[0][0   ], ldB, nrhs ),
+        tpm.PreconditionerNorm( M, &B[0][nrhs], ldB, nrhs )
+    };
+    Tiny::Vector<2,Real,Int> abs_prec_errors = {
+        tpm.PreconditionerNorm( M, &Y[0][0   ], ldB, nrhs ),
+        tpm.PreconditionerNorm( M, &Y[0][nrhs], ldB, nrhs )
+    };
     
-    dump( X.MaxNorm() );
+    Tiny::Vector<2,Real,Int> rel_prec_errors = {
+        abs_prec_errors[0] / B_prec_norms[0],
+        abs_prec_errors[1] / B_prec_norms[1]
+    };
+    
+//    dump(B_prec_norms);
+//    dump(abs_prec_errors);
+    dump(rel_prec_errors);
+    
+    print("");
+    print("Experiment 1: Done.");
     print("");
     
     
-//
-//    // Computing X = alpha * A^{-1} . B + beta * X using CG method.
-//    const Int  max_iter  = 100;
-//    const Real tolerance = 0.0001;
-//    const Real alpha = 1;
-//    const Real beta  = 0;
-//
-//    tic("Solving for gradient");
-//    tpm.Solve( M, 
-//        alpha, &B[0][0], ldB,
-//        beta,  &X[0][0], ldX,
-//        3, max_iter, tolerance
-//    );
-//    toc("Solving for gradient");
-//    
-//    dump( B.CountNaNs() );
-//    dump( X.CountNaNs() );
-//    
-//    dump(tpm.CG_IterationCount());
-//    dump(tpm.CG_RelativeResiduals());
-//    
-//    print("");
-//    
-//    tic("Solving for gradient");
-//    tpm.Solve( M,
-//        alpha, &B[0][3], ldB,
-//        beta,  &X[0][3], ldX,
-//        3, max_iter, tolerance
-//    );
-//    toc("Solving for gradient");
-//    
-//    dump( B.CountNaNs() );
-//    dump( X.CountNaNs() );
-//    
-//    dump(tpm.CG_IterationCount());
-//    dump(tpm.CG_RelativeResiduals());
-//    
-//    print("");
-//    
-//    const Real alpha_inv = Real(1) / alpha;
-//    const Real zero      = 0;
-//    
-//    tpm.MultiplyMetric( M,
-//        alpha_inv, &X[0][0], ldX,
-//        zero,      &Y[0][0], ldY,
-//        3
-//    );
-//    
-//    tpm.MultiplyMetric( M,
-//        alpha_inv, &X[0][3], ldX,
-//        zero,      &Y[0][3], ldY,
-//        3
-//    );
-//
-//    
-//    dump(B.MaxNorm());
-//    
-//    Y-=B;
-//    
-//    dump(Y.MaxNorm());
-//    
+    print("");
+    print("Experiment 2: Compute B = A.Z, then solve A.X = B for X and check the metric norm of Z - X");
+    print("");
+    
+    M.VertexCoordinates().Write( &X[0][0   ], ldX );
+    M.VertexCoordinates().Write( &X[0][nrhs], ldX );
+    
+//    dump( ArrayToString( X.data(), {print_rows,ld}, 8 ) );
+    
+    Tiny::Vector<2,Real,Int> X_true_metric_norms = {
+        tpm.MetricNorm( M, &X[0][0   ], ldX, nrhs ),
+        tpm.MetricNorm( M, &X[0][nrhs], ldX, nrhs )
+    };
+    
+    // B = (1/alpha) * A.X
+    tpm.MultiplyMetric( M,
+        alpha_inv, &X[0][0   ], ldX,
+        Real(0),   &B[0][0   ], ldB,
+        nrhs
+    );
+    tpm.MultiplyMetric( M,
+        alpha_inv, &X[0][nrhs], ldX,
+        Real(0),   &B[0][nrhs], ldB,
+        nrhs
+    );
+    
+//    dump( ArrayToString( B.data(), {print_rows,ld}, 8 ) );
+//    dump( ArrayToString( X.data(), {print_rows,ld}, 8 ) );
+    
+    tic("Computing X = alpha * A^{-1}.B - X_true.");
+    tpm.Solve( M,
+        alpha,    &B[0][0   ], ldB,
+        Real(-1), &X[0][0   ], ldX,
+        nrhs, max_iter, tolerance
+    );
+    toc("Computing X = alpha * A^{-1}.B - X_true.");
+    
+    dump(tpm.CG_IterationCount());
+    dump(tpm.CG_RelativeResiduals());
+    
+    tic("Computing X = alpha * A^{-1}.B - X_true.");
+    tpm.Solve( M,
+        alpha,    &B[0][nrhs], ldB,
+        Real(-1), &X[0][nrhs], ldX,
+        nrhs, max_iter, tolerance
+    );
+    toc("Computing X = alpha * A^{-1}.B - X_true.");
+    
+//    dump( ArrayToString( X.data(), {print_rows,ld}, 8 ) );
+    
+    dump(tpm.CG_IterationCount());
+    dump(tpm.CG_RelativeResiduals());
+    
+    Tiny::Vector<2,Real,Int> abs_metric_errors = {
+        tpm.MetricNorm( M, &X[0][0   ], ldX, nrhs ),
+        tpm.MetricNorm( M, &X[0][nrhs], ldX, nrhs )
+    };
+    Tiny::Vector<2,Real,Int> rel_metric_errors = {
+        abs_metric_errors[0] / X_true_metric_norms[0],
+        abs_metric_errors[1] / X_true_metric_norms[1]
+    };
+    
+//    dump(X_true_metric_norms);
+//    dump(abs_metric_errors);
+    dump(rel_metric_errors);
+
+    print("");
+    print("Experiment 2: Done.");
+    print("");
+    
     return 0;
 }
