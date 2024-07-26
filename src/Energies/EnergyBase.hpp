@@ -78,7 +78,9 @@ namespace Repulsor
                 
                 CotangentVector_T diff ( M.VertexCount(), M.AmbDim() );
 
-                M.Assemble_ClusterTree_Derivatives( diff.data(), ExtReal(1), false );
+                M.Assemble_ClusterTree_Derivatives( 
+                    ExtReal(1), ExtReal(0), diff.data(), M.AmbDim()
+                );
                 
                 M.SetCache( tag, std::move(diff) );
             }
@@ -89,13 +91,42 @@ namespace Repulsor
         }
         
         // Return the differential of the energy to a pointer; don't use any caching.
-        ExtReal Differential( mref<MeshBase_T> M, mptr<ExtReal> diff ) const
+        ExtReal Differential( 
+            mref<MeshBase_T> M,
+            const ExtReal alpha, const ExtReal beta, mptr<ExtReal> Y, const Int ldY
+        ) const
         {
             ptic(ClassName()+"::Differential (pointer)");
             
             const ExtReal en = differential(M);
             
-            M.Assemble_ClusterTree_Derivatives( diff, ExtReal(1), false );
+            dump(alpha);
+            dump(beta);
+            dump(Y);
+            dump(ldY);
+            
+            M.Assemble_ClusterTree_Derivatives(
+                alpha, beta, Y, ldY
+            );
+            
+            ptoc(ClassName()+"::Differential (pointer)");
+            
+            return en;
+        }
+        
+        // Return the differential of the energy to a pointer; don't use any caching.
+        ExtReal Differential( 
+            mref<MeshBase_T> M,
+            mptr<ExtReal> Y, bool addto = false
+        ) const
+        {
+            ptic(ClassName()+"::Differential (pointer)");
+            
+            const ExtReal en = differential(M);
+            
+            M.Assemble_ClusterTree_Derivatives(
+                ExtReal(1), ExtReal(addto), Y, M.AmbDim()
+            );
             
             ptoc(ClassName()+"::Differential (pointer)");
             

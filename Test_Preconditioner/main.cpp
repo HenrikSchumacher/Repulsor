@@ -44,7 +44,7 @@ int main(void)
     Profiler::Clear( getenv("HOME") );
 
     
-    int thread_count = 8;
+    int thread_count = 1;
     
     
     using MeshBase_T = SimplicialMeshBase<Real,Int,LInt,SReal,ExtReal>;
@@ -107,31 +107,138 @@ int main(void)
     
     print("");
 
-    constexpr Int NRHS = 3;
+    constexpr Int NRHS = 6;
     
-    Tensor2<ExtReal,Int> B ( M.VertexCount(), NRHS );
-    Tensor2<ExtReal,Int> X ( M.VertexCount(), NRHS );
-    Tensor2<ExtReal,Int> Y ( M.VertexCount(), NRHS );
-
+    const Int ldB = NRHS;
+    const Int ldX = NRHS;
+    const Int ldY = NRHS;
+    
+    Tensor2<ExtReal,Int> B ( M.VertexCount(), ldB );
+    Tensor2<ExtReal,Int> X ( M.VertexCount(), ldX );
+    Tensor2<ExtReal,Int> Y ( M.VertexCount(), ldY );
+    
+    B.SetZero();
     X.SetZero();
     
+    dump( B.Dimension(0) );
+    dump( B.Dimension(1) );
+    
     tic("tpe.Differential");
-    tpe.Differential( M, B.data() );
+    tpe.Differential( M, Real(1), Real(0), &B[0][0], ldB );
     toc("tpe.Differential");
     
+    
+    dump( ArrayToString(B.data(), {4,6}) );
     print("");
     
+    dump(&B[0][3]);
+    dump(&B[M.VertexCount()-1][6]);
+    dump(&(B.data()[M.VertexCount() * 6]));
+    
+    dump(B[M.VertexCount()-1][5]);
+    
+    
+    
+    dump(ldB);
+    
+    tic("tpe.Differential");
+    tpe.Differential( M, Real(2), Real(0), &B[0][3], ldB );
+    toc("tpe.Differential");
+    
+    dump( ArrayToString(B.data(), {4,6}) );
+    print("");
+    
+    
+    
+    
+//    tpm.MultiplyPreconditioner( M,
+//        Real(1), &B[0][0], ldB,
+//        Real(0), &X[0][0], ldX,
+//        3
+//    );
+//    
+//    dump( ArrayToString(X.data(), {4,6}) );
+//    
+//    dump( X.MaxNorm() );
+//    print("");
+    
+    tpm.MultiplyPreconditioner( M,
+        Real(1), &B[0][3], ldB,
+        Real(0), &X[0][3], ldX,
+        3
+    );
+    
+    dump( ArrayToString(X.data(), {4,6}) );
+    
+    dump( X.MaxNorm() );
+    print("");
+    
+    
+//    X.SetZero();
+//    
+//    tpm.MultiplyMetric( M,
+//        Real(1), &B[0][0], ldB,
+//        Real(0), &X[0][0], ldX,
+//        6
+//    );
+//    
+//    dump( ArrayToString(X.data(), {4,6}) );
+//    
+//    dump( X.MaxNorm() );
+//    print("");
+    
+    // Computing X = alpha * A^{-1} . B + beta * X using CG method.
     const Int  max_iter  = 100;
     const Real tolerance = 0.0001;
-    
+    const Real alpha = 1;
+    const Real beta  = 0;
+
     tic("Solving for gradient");
-    tpm.Solve( M, B.data(), X.data(), NRHS, max_iter, tolerance );
+    tpm.Solve( M, 
+        alpha, &B[0][0], ldB,
+        beta,  &X[0][0], ldX,
+        3, max_iter, tolerance
+    );
     toc("Solving for gradient");
+    
+    dump( B.CountNaNs() );
+    dump( X.CountNaNs() );
     
     dump(tpm.CG_IterationCount());
     dump(tpm.CG_RelativeResiduals());
     
-    tpm.MultiplyMetric( M, 1., X.data(), 0, Y.data(), NRHS );
+    print("");
+    
+    tic("Solving for gradient");
+    tpm.Solve( M,
+        alpha, &B[0][3], ldB,
+        beta,  &X[0][3], ldX,
+        3, max_iter, tolerance
+    );
+    toc("Solving for gradient");
+    
+    dump( B.CountNaNs() );
+    dump( X.CountNaNs() );
+    
+    dump(tpm.CG_IterationCount());
+    dump(tpm.CG_RelativeResiduals());
+    
+    print("");
+    
+    const Real alpha_inv = Real(1) / alpha;
+    const Real zero      = 0;
+    
+    tpm.MultiplyMetric( M,
+        alpha_inv, &X[0][0], ldX,
+        zero,      &Y[0][0], ldY,
+        3
+    );
+    
+    tpm.MultiplyMetric( M,
+        alpha_inv, &X[0][3], ldX,
+        zero,      &Y[0][3], ldY,
+        3
+    );
 
     
     dump(B.MaxNorm());

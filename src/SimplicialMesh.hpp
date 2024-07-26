@@ -261,6 +261,10 @@ namespace Repulsor
         mutable Tensor1<Int,Int> simplex_column_indices;
         
         SimplicialMeshDetails<DOM_DIM,AMB_DIM,Real,Int,LInt> details;
+        
+        // Two buffers that are supposed to help with solves.
+        mutable Tensor2<Real,Int> X_buf;
+        mutable Tensor2<Real,Int> Y_buf;
 
 #include "SimplicialMesh/ComputeNearFarDataOps.hpp"
 #include "SimplicialMesh/ComputeNearFarData.hpp"
@@ -328,6 +332,20 @@ namespace Repulsor
         virtual cptr<Real> Dofs() const override
         {
             return V_coords.data();
+        }
+        
+        mref<Tensor2<Real,Int>> XBuffer( const Int nrhs ) const
+        {
+            X_buf.template RequireSize<false>( VertexCount(), nrhs );
+            
+            return X_buf;
+        }
+        
+        mref<Tensor2<Real,Int>> YBuffer( const Int nrhs ) const
+        {
+            Y_buf.RequireSize<false>( VertexCount(), nrhs );
+            
+            return Y_buf;
         }
         
         virtual void SemiStaticUpdate( cptr<ExtReal> V_coords_, const bool transp_ = false ) const override
@@ -650,7 +668,9 @@ namespace Repulsor
             
         } // DerivativeAssembler
         
-        void Assemble_ClusterTree_Derivatives( mptr<ExtReal> output, const ExtReal weight, bool addTo = false ) const override
+        void Assemble_ClusterTree_Derivatives(
+            const ExtReal alpha, const ExtReal beta, mptr<ExtReal> Y, const Int ldY
+        ) const override
         {
             ptic(className()+"::Assemble_ClusterTree_Derivatives");
             
@@ -667,16 +687,25 @@ namespace Repulsor
                 buffer
             );
             
+            dump(alpha);
+            dump(beta);
+            dump(Y);
+            dump(ldY);
+            
             DerivativeAssembler().template Dot<AMB_DIM>(
-                static_cast<Real>(weight),   buffer.data(),
-                static_cast<ExtReal>(addTo), output,
+                alpha, buffer.data(), AMB_DIM,
+                beta , Y            , ldY,
                 AMB_DIM
             );
 
             ptoc(className()+"::Assemble_ClusterTree_Derivatives");
         }
         
-        void Assemble_ClusterTree_VertexDensities( mptr<ExtReal> output, const ExtReal weight, bool addTo = false ) const override
+        void Assemble_ClusterTree_VertexDensities( 
+            mptr<ExtReal> output,
+            const ExtReal weight,
+            bool addTo = false
+        ) const override
         {
             ptic(className()+"::Assemble_ClusterTree_VertexDensities");
             

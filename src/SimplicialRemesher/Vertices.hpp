@@ -15,14 +15,14 @@ protected:
 #endif
             max_vertex_count *= two;
             
-            V_coords.Resize( max_vertex_count, AMB_DIM );
-            V_charges.Resize( max_vertex_count );
-            V_active.Resize( max_vertex_count );
-            V_modified.Resize( max_vertex_count );
+            V_coords  .template Resize<true>( max_vertex_count, AMB_DIM );
+            V_charges .template Resize<true>( max_vertex_count );
+            V_active  .template Resize<true>( max_vertex_count );
+            V_modified.template Resize<true>( max_vertex_count );
             
             if( with_data )
             {
-                V_data.Resize( max_vertex_count, V_data.Dimension(1) );
+                V_data.template Resize<true>( max_vertex_count, V_data.Dimension(1) );
             }
         }
         

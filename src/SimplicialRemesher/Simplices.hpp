@@ -37,8 +37,8 @@ protected:
 #endif
             max_simplex_count *= 2;
             
-            simplices.Resize(max_simplex_count,DOM_DIM+1);
-            S_active.Resize(max_simplex_count);
+            simplices.template Resize<true>(max_simplex_count,DOM_DIM+1);
+            S_active .template Resize<true>(max_simplex_count);
         }
         
         S_active[s] = true;

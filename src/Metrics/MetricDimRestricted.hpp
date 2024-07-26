@@ -20,7 +20,6 @@ namespace Repulsor
         using TangentVector_T    = typename Base_T::TangentVector_T;
         using CotangentVector_T  = typename Base_T::CotangentVector_T;
         using ValueContainer_T   = typename Base_T::ValueContainer_T;
-        using CG_T               = typename Base_T::CG_T;
         
         MetricDimRestricted() = default;
 
@@ -88,9 +87,9 @@ namespace Repulsor
         
         void MultiplyMetric(
             cref<MeshBase_T> M,
-            cref<ExtReal> alpha, cptr<ExtReal> X,
-            cref<ExtReal> beta,  mptr<ExtReal> Y,
-            const Int  rhs_count,
+            cref<ExtReal> alpha, cptr<ExtReal> X, const Int ldX,
+            cref<ExtReal> beta,  mptr<ExtReal> Y, const Int ldY,
+            const Int  nrhs,
             const bool VF_flag = true,
             const bool NF_flag = true,
             const bool FF_flag = true
@@ -101,7 +100,11 @@ namespace Repulsor
                         
             if( Q != nullptr )
             {
-                MultiplyMetric(*Q, alpha, X, beta, Y, rhs_count, VF_flag, NF_flag, FF_flag );
+                MultiplyMetric(*Q, 
+                    alpha, X, ldX,
+                    beta,  Y, ldY,
+                    nrhs, VF_flag, NF_flag, FF_flag
+                );
             }
             else
             {
@@ -111,9 +114,9 @@ namespace Repulsor
         
         void MultiplyMetric(
             cref<Mesh_T> M,
-            cref<ExtReal> alpha, cptr<ExtReal> X,
-            cref<ExtReal> beta,  mptr<ExtReal> Y,
-            const Int  rhs_count,
+            cref<ExtReal> alpha, cptr<ExtReal> X, const Int ldX,
+            cref<ExtReal> beta,  mptr<ExtReal> Y, const Int ldY,
+            const Int  nrhs,
             const bool VF_flag = true,
             const bool NF_flag = true,
             const bool FF_flag = true
@@ -124,13 +127,13 @@ namespace Repulsor
             const auto & restrict S = M.GetBlockClusterTree().GetS();
             const auto & restrict T = M.GetBlockClusterTree().GetT();
 
-            T.Pre( X, rhs_count, op_type );
+            T.Pre( X, ldX, nrhs, op_type );
             
             S.RequireBuffers( T.BufferDimension() ); // Tell the S-side what it has to expect.
             
             multiply_metric( M, VF_flag, NF_flag, FF_flag );
 
-            S.Post( Y, alpha, beta, op_type );
+            S.Post( alpha, beta, Y, ldY, op_type );
             
             ptoc(ClassName()+"::MultiplyMetric");
         }
@@ -147,7 +150,10 @@ namespace Repulsor
     public:
         
         virtual void MultiplyPreconditioner(
-            cref<MeshBase_T> M, cptr<ExtReal> X, mptr<ExtReal> Y, const Int rhs_count
+            cref<MeshBase_T> M, 
+            cref<ExtReal> alpha, cptr<ExtReal> X, const Int ldX,
+            cref<ExtReal> beta,  mptr<ExtReal> Y, const Int ldY,
+            const Int nrhs
         ) const override
         {
             // Do a down cast and delegate implementation further to descendant class.
@@ -155,7 +161,7 @@ namespace Repulsor
                         
             if( Q != nullptr )
             {
-                MultiplyPreconditioner(*Q, X, Y, rhs_count );
+                MultiplyPreconditioner(*Q, alpha, X, ldX, beta, Y, ldY, nrhs );
             }
             else
             {
@@ -165,24 +171,37 @@ namespace Repulsor
 
         
         void MultiplyPreconditioner(
-            cref<Mesh_T> M, cptr<ExtReal> X, mptr<ExtReal> Y, const Int rhs_count
+            cref<Mesh_T> M,
+            cref<ExtReal> alpha, cptr<ExtReal> X, const Int ldX,
+            cref<ExtReal> beta,  mptr<ExtReal> Y, const Int ldY,
+            const Int nrhs
         ) const
         {
             ptic(ClassName()+"::MultiplyPreconditioner");
 
-            multiply_preconditioner(M, X, Y, rhs_count );
+            multiply_preconditioner(M,
+                alpha, X, ldX,
+                beta,  Y, ldY,
+                nrhs
+            );
             
             ptoc(ClassName()+"::MultiplyPreconditioner");
         }
         
         
         virtual void multiply_preconditioner(
-            cref<Mesh_T> M, cptr<ExtReal> X, mptr<ExtReal> Y, const Int rhs_count
+            cref<Mesh_T> M, 
+            cref<ExtReal> alpha, cptr<ExtReal> X, const Int ldX,
+            cref<ExtReal> beta,  mptr<ExtReal> Y, const Int ldY,
+            const Int nrhs
         ) const = 0;
         
         
         virtual void Solve(
-            cref<MeshBase_T> M, cptr<ExtReal> B, mptr<ExtReal> X, const Int  rhs_count,
+            cref<MeshBase_T> M, 
+            cref<ExtReal> alpha, cptr<ExtReal> B, const Int ldB,
+            cref<ExtReal> beta,  mptr<ExtReal> X, const Int ldX,
+            const Int  nrhs,
             const Int  max_iter,
             const Real tolerance
         ) const override
@@ -192,7 +211,11 @@ namespace Repulsor
                         
             if( Q != nullptr )
             {
-                Solve(*Q, B, X, rhs_count, max_iter, tolerance );
+                Solve(*Q, 
+                    alpha, B, ldB,
+                    beta,  X, ldX,
+                    nrhs, max_iter, tolerance
+                );
             }
             else
             {
@@ -201,40 +224,67 @@ namespace Repulsor
         }
         
         void Solve(
-            cref<Mesh_T> M, cptr<ExtReal> B, mptr<ExtReal> X, const Int rhs_count,
+            cref<Mesh_T> M, 
+            cref<ExtReal> alpha, cptr<ExtReal> B, const Int ldB,
+            cref<ExtReal> beta,  mptr<ExtReal> X, const Int ldX,
+            const Int nrhs,
             const Int  max_iter,
             const Real tolerance
         ) const
         {
+            // TODO: alpha and beta are currently ignored.
+            
             ptic(ClassName()+"::Solve");
             // The operator for the metric.
-            auto A = [&M,rhs_count,this]( cptr<ExtReal> X_, mptr<ExtReal> Y_ )
+            auto A = [&M,nrhs,this]( cptr<Real> X_, mptr<Real> Y_ )
             {
                 // Forward operator.
-                MultiplyMetric( M, Scalar::One<ExtReal>, X_, Scalar::Zero<ExtReal>, Y_, rhs_count );
+                MultiplyMetric( M, 
+                    Scalar::One <Real>, X_, nrhs,
+                    Scalar::Zero<Real>, Y_, nrhs,
+                    nrhs
+                );
             };
 
             // The operator for the preconditioner.
-            auto P = [&M,rhs_count,this]( cptr<ExtReal> X_, mptr<ExtReal> Y_ )
+            auto P = [&M,nrhs,this]( cptr<Real> X_, mptr<Real> Y_ )
             {
-                MultiplyPreconditioner( M, X_, Y_, rhs_count );
+                MultiplyPreconditioner( M, 
+                   Scalar::One <Real>, X_, nrhs,
+                   Scalar::Zero<Real>, Y_, nrhs,
+                   nrhs
+                );
             };
             
-            
-            if( rhs_count == AMB_DIM )
+            if( nrhs == AMB_DIM )
             {
-                CG_T CG ( M.VertexCount(), max_iter, rhs_count, M.ThreadCount() );
+                ConjugateGradient<AMB_DIM,Real,Int> CG (
+                    M.VertexCount(), max_iter, nrhs, M.ThreadCount()
+                );
                 
-                CG( A, P, B, rhs_count, X, rhs_count, tolerance );
+                CG( A, P, B, ldB, X, ldX, tolerance );
+                
+                iter          = CG.IterationCount();
+                rel_residuals = CG.RelativeResiduals();
+            }
+            else if( nrhs == 1 )
+            {
+                ConjugateGradient<1,Real,Int> CG (
+                    M.VertexCount(), max_iter, nrhs, M.ThreadCount()
+                );
+                
+                CG( A, P, B, ldB, X, ldX, tolerance );
                 
                 iter          = CG.IterationCount();
                 rel_residuals = CG.RelativeResiduals();
             }
             else
             {
-                CG_T CG ( M.VertexCount(), max_iter, rhs_count, M.ThreadCount() );
+                ConjugateGradient<VarSize,Real,Int> CG (
+                    M.VertexCount(), max_iter, nrhs, M.ThreadCount()
+                );
                 
-                CG( A, P, B, rhs_count, X, rhs_count, tolerance );
+                CG( A, P, B, ldB, X, ldX, tolerance );
                 
                 iter          = CG.IterationCount();
                 rel_residuals = CG.RelativeResiduals();

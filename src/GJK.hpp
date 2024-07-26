@@ -860,6 +860,7 @@ namespace Repulsor
                 y[k] = best_lambda[0] * Q_supp[0][k];
             }
             
+            
             switch( simplex_size )
             {
                 case 1:
@@ -868,52 +869,72 @@ namespace Repulsor
                 }
                 case 2:
                 {
-                    for( Int k = 0; k < AMB_DIM; ++k )
+                    // This if constexpr is to silence some compiler warnings.
+                    if constexpr ( AMB_DIM >= 1 )
                     {
-                        y[k] += best_lambda[1] * Q_supp[1][k];
+                        for( Int k = 0; k < AMB_DIM; ++k )
+                        {
+                            y[k] += best_lambda[1] * Q_supp[1][k];
+                        }
                     }
                     break;
                 }
                 case 3:
                 {
-                    for( Int j = 1; j < 3; ++j )
+                    // This if constexpr is to silence some compiler warnings.
+                    if constexpr ( AMB_DIM >= 2 )
                     {
-                        for( Int k = 0; k < AMB_DIM; ++k )
+                        for( Int j = 1; j < 3; ++j )
                         {
-                            y[k] += best_lambda[j] * Q_supp[j][k];
+                            for( Int k = 0; k < AMB_DIM; ++k )
+                            {
+                                y[k] += best_lambda[j] * Q_supp[j][k];
+                            }
                         }
                     }
                     break;
                 }
                 case 4:
                 {
-                    for( Int j = 1; j < 4; ++j )
+                    // This if constexpr is to silence some compiler warnings.
+                    if constexpr ( AMB_DIM >= 3 )
                     {
-                        for( Int k = 0; k < AMB_DIM; ++k )
+                        for( Int j = 1; j < 4; ++j )
                         {
-                            y[k] += best_lambda[j] * Q_supp[j][k];
+                            for( Int k = 0; k < AMB_DIM; ++k )
+                            {
+                                y[k] += best_lambda[j] * Q_supp[j][k];
+                            }
                         }
                     }
                     break;
                 }
                 case 5:
                 {
-                    for( Int j = 1; j < 5; ++j )
+                    // This if constexpr is to silence some compiler warnings.
+                    if constexpr ( AMB_DIM >= 4 )
                     {
-                        for( Int k = 0; k < AMB_DIM; ++k )
+                        for( Int j = 1; j < 5; ++j )
                         {
-                            y[k] += best_lambda[j] * Q_supp[j][k];
+                            for( Int k = 0; k < AMB_DIM; ++k )
+                            {
+                                y[k] += best_lambda[j] * Q_supp[j][k];
+                            }
                         }
                     }
                     break;
                 }
                 default:
                 {
-                    for( Int j = 1; j < simplex_size; ++j )
+                    // Only needed in high-dimensional settings.
+                    if constexpr ( AMB_DIM >= 5 )
                     {
-                        for( Int k = 0; k < AMB_DIM; ++k )
+                        for( Int j = 1; j < simplex_size; ++j )
                         {
-                            y[k] += best_lambda[j] * Q_supp[j][k];
+                            for( Int k = 0; k < AMB_DIM; ++k )
+                            {
+                                y[k] += best_lambda[j] * Q_supp[j][k];
+                            }
                         }
                     }
                 }
@@ -1023,52 +1044,72 @@ namespace Repulsor
                 }
                 case 2:
                 {
-                    for( Int k = 0; k < AMB_DIM; ++k )
+                    // This if constexpr is to silence some compiler warnings.
+                    if constexpr ( AMB_DIM >= 1 )
                     {
-                        y[k] += best_lambda[1] * Q_supp[1][k];
+                        for( Int k = 0; k < AMB_DIM; ++k )
+                        {
+                            y[k] += best_lambda[1] * Q_supp[1][k];
+                        }
                     }
                     break;
                 }
                 case 3:
                 {
-                    for( Int j = 1; j < 3; ++j )
+                    // This if constexpr is to silence some compiler warnings.
+                    if constexpr ( AMB_DIM >= 2 )
                     {
-                        for( Int k = 0; k < AMB_DIM; ++k )
+                        for( Int j = 1; j < 3; ++j )
                         {
-                            y[k] += best_lambda[j] * Q_supp[j][k];
+                            for( Int k = 0; k < AMB_DIM; ++k )
+                            {
+                                y[k] += best_lambda[j] * Q_supp[j][k];
+                            }
                         }
                     }
                     break;
                 }
                 case 4:
                 {
-                    for( Int j = 1; j < 4; ++j )
+                    // This if constexpr is to silence some compiler warnings.
+                    if constexpr ( AMB_DIM >= 3 )
                     {
-                        for( Int k = 0; k < AMB_DIM; ++k )
+                        for( Int j = 1; j < 4; ++j )
                         {
-                            y[k] += best_lambda[j] * Q_supp[j][k];
+                            for( Int k = 0; k < AMB_DIM; ++k )
+                            {
+                                y[k] += best_lambda[j] * Q_supp[j][k];
+                            }
                         }
                     }
                     break;
                 }
                 case 5:
                 {
-                    for( Int j = 1; j < 5; ++j )
+                    // This if constexpr is to silence some compiler warnings.
+                    if constexpr ( AMB_DIM >= 4 )
                     {
-                        for( Int k = 0; k < AMB_DIM; ++k )
+                        for( Int j = 1; j < 5; ++j )
                         {
-                            y[k] += best_lambda[j] * Q_supp[j][k];
+                            for( Int k = 0; k < AMB_DIM; ++k )
+                            {
+                                y[k] += best_lambda[j] * Q_supp[j][k];
+                            }
                         }
                     }
                     break;
                 }
                 default:
                 {
-                    for( Int j = 1; j < simplex_size; ++j )
+                    // Only needed in high-dimensional settings.
+                    if constexpr ( AMB_DIM >= 4 )
                     {
-                        for( Int k = 0; k < AMB_DIM; ++k )
+                        for( Int j = 1; j < simplex_size; ++j )
                         {
-                            y[k] += best_lambda[j] * Q_supp[j][k];
+                            for( Int k = 0; k < AMB_DIM; ++k )
+                            {
+                                y[k] += best_lambda[j] * Q_supp[j][k];
+                            }
                         }
                     }
                 }

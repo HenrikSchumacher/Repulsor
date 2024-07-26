@@ -239,7 +239,7 @@ protected:
         
         cref<Forest_T> forest = Forest();
         
-        logprint("Breadth-first scan to for the top levels of the tree.");
+        logprint("Breadth-first scan for the top levels of the tree.");
         for( Int level = 0; level < forest.TopLevels(); ++level )
         {
             for( Int C : forest.Row(level) )
@@ -374,7 +374,7 @@ protected:
         );
         
         
-        logprint("Breadth-first scan to for the top levels of the tree.");
+        logprint("Breadth-first scan for the top levels of the tree.");
         for( Int level = forest.TopLevels(); level --> 0 ; )
         {
             for( Int C : forest.Row(level) )

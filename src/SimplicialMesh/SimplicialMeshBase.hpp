@@ -96,9 +96,7 @@ namespace Repulsor
         virtual cref<SparseBinaryMatrix_T> DerivativeAssembler() const = 0;
         
         virtual void Assemble_ClusterTree_Derivatives(
-            mptr<ExtReal> output,
-            const ExtReal weight,
-            bool addTo = false
+            const ExtReal alpha, const ExtReal beta, mptr<ExtReal> Y, const Int ldY
         ) const = 0;
 
         virtual void Assemble_ClusterTree_SimplexDensities(
@@ -113,7 +111,9 @@ namespace Repulsor
             bool addTo = false
         ) const = 0;
         
-        virtual void LoadUpdateVectors( cptr<ExtReal> vecs, const ExtReal max_time, const bool transp_ = false ) const = 0;
+        virtual void LoadUpdateVectors( 
+            cptr<ExtReal> vecs, const ExtReal max_time, const bool transp_ = false
+        ) const = 0;
 
         virtual ExtReal MaximumSafeStepSize(
             cptr<ExtReal> vecs,
@@ -129,9 +129,9 @@ namespace Repulsor
         
         virtual cref<SparseMatrix_T> MassMatrix() const = 0;
         
-        virtual cref<Permutation<Int>> NestedDissectionOrdering( const Int local_thread_count = 1 ) const = 0;
-        
-//        virtual void H1Solve( cptr<ExtReal> X, mptr<ExtReal> Y, const Int nrhs ) const = 0;
+        virtual cref<Permutation<Int>> NestedDissectionOrdering( 
+            const Int local_thread_count = 1
+        ) const = 0;
         
         virtual mref<Sparse::CholeskyDecomposition<Real,Int,LInt>> H1Solver() const = 0;
         

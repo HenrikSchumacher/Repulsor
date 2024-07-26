@@ -29,16 +29,18 @@ namespace Repulsor
         
         virtual mref<ValueContainer_T> MetricValues( cref<MeshBase_T> M ) const = 0;
 
+        // Computes Y = alpha * A.X + beta * Y
         virtual void MultiplyMetric(
             cref<MeshBase_T> M,
-            cref<ExtReal> alpha, cptr<ExtReal> X,
-            cref<ExtReal> beta,  mptr<ExtReal> Y,
-            const Int  rhs_count,
+            cref<ExtReal> alpha, cptr<ExtReal> X, const Int ldX,
+            cref<ExtReal> beta,  mptr<ExtReal> Y, const Int ldY,
+            const Int  nrhs,
             const bool VF_flag = true,
             const bool NF_flag = true,
             const bool FF_flag = true
         ) const = 0;
         
+        // Computes Y = alpha * A.X + beta * Y
         void MultiplyMetric(
             cref<MeshBase_T> M,
             cref<ExtReal> alpha,  cref<TangentVector_T>   X,
@@ -48,27 +50,53 @@ namespace Repulsor
             const bool FF_flag = true
         ) const
         {
-            this->MultiplyMetric( M, alpha, X.data(), beta, Y.data(), X.Dimension(1), VF_flag, NF_flag, FF_flag );
+            this->MultiplyMetric( M, 
+                alpha, X.data(), X.Dimension(1),
+                beta,  Y.data(), Y.Dimension(1),
+                X.Dimension(1), VF_flag, NF_flag, FF_flag
+            );
         }
         
+        // Computes Y = alpha * P.X + beta * Y
         virtual void MultiplyPreconditioner(
-            cref<MeshBase_T> M, cptr<ExtReal> X, mptr<ExtReal> Y, const Int rhs_count
+            cref<MeshBase_T> M, 
+            cref<ExtReal> alpha, cptr<ExtReal> X, const Int ldX,
+            cref<ExtReal> beta,  mptr<ExtReal> Y, const Int ldY,
+            const Int nrhs
         ) const = 0;
 
+        
+        // Computes X = alpha * A^{-1}.B + beta * X
         virtual void Solve(
-            cref<MeshBase_T> M, cptr<ExtReal> B, mptr<ExtReal> X, const Int  rhs_count,
+            cref<MeshBase_T> M, 
+            cref<ExtReal> alpha, cptr<ExtReal> B, const Int ldB,
+            cref<ExtReal> beta,  mptr<ExtReal> X, const Int ldX,
+            const Int  nrhs,
             const Int  max_iter,
             const Real tolerance
         ) const = 0;
         
     
-        ExtReal FrobeniusNorm( cref<MeshBase_T> M, cptr<ExtReal> X, const Int rhs_count ) const
+        ExtReal FrobeniusNorm( cref<MeshBase_T> M,
+            cptr<ExtReal> X, const Int ldX,
+            const Int nrhs
+        ) const
         {
-            Tensor2<ExtReal,Int> Y ( M.VertexCount(), rhs_count );
+            mref<Tensor2<Real,Int>> X_buf = M.XBuffer( nrhs );
+            mref<Tensor2<Real,Int>> Y_buf = M.YBuffer( nrhs );
             
-            MultiplyMetric(M, Scalar::One<ExtReal>, X, Scalar::Zero<ExtReal>, Y.data(), rhs_count );
+            X_buf.Read( X, ldX );
             
-            return Sqrt( dot_buffers( X, Y.data(), M.VertexCount() * rhs_count, M.ThreadCount() ) );
+            cptr<Real> X_ = X_buf.data();
+            mptr<Real> Y_ = Y_buf.data();
+            
+            MultiplyMetric(M,
+                Scalar::One <ExtReal>, X_, nrhs,
+                Scalar::Zero<ExtReal>, Y_, nrhs,
+                nrhs
+            );
+            
+            return Sqrt( dot_buffers( X_, Y_, M.VertexCount() * nrhs, M.ThreadCount()) );
         }
         
         Int CG_IterationCount() const

@@ -86,19 +86,81 @@ namespace Repulsor
         using BASE::MultiplyMetric;
         
         virtual void multiply_preconditioner(
-            cref<Mesh_T> M, cptr<ExtReal> X, mptr<ExtReal> Y, const Int  rhs_count
+            cref<Mesh_T> M, 
+            cref<ExtReal> alpha, cptr<ExtReal> X, const Int ldX,
+            cref<ExtReal> beta,  mptr<ExtReal> Y, const Int ldY,
+            const Int nrhs
         ) const override
         {
+            mref<Tensor2<Real,Int>> Z_buf = M.XBuffer( nrhs );
+            
+            mptr<Real> Z = Z_buf.data();
+
             // TODO: Once the solver works better, make these calls Parallel.
-            M.H1Solver().template Solve<Sequential>( X, Y, rhs_count );
+            constexpr Parallel_T parQ = Sequential;
+
+            const Real alpha_ = static_cast<Real>(alpha);
             
-//            M.H1Solver().template Solve<Parallel>( X, Y, rhs_count );
+            if ( nrhs == AMB_DIM )
+            {
+                M.H1Solver().template Solve<AMB_DIM,parQ>(
+                    alpha_,             X, ldX,
+                    Scalar::Zero<Real>, Z, nrhs,
+                    nrhs
+                );
+            }
+            else if( nrhs == 1 )
+            {
+                M.H1Solver().template Solve<1,parQ>(
+                    alpha_,             X, ldX,
+                    Scalar::Zero<Real>, Z, nrhs,
+                    nrhs
+                );
+            }
+            else
+            {
+                M.H1Solver().template Solve<VarSize,parQ>(
+                    alpha_,              X, ldX,
+                    Scalar::Zero<Real>, Z, nrhs,
+                    nrhs
+                );
+            }
             
-            pseudo_lap.MultiplyMetric( M, Scalar::One<Real>, Y, Scalar::Zero<Real>, Y, rhs_count );
             
-            M.H1Solver().template Solve<Sequential>( Y, Y, rhs_count );
+            if( Abs(alpha_) > Scalar::Zero<Real> )
+            {
+                pseudo_lap.MultiplyMetric( M,
+                    Scalar::One<Real>,  Z, nrhs,
+                    Scalar::Zero<Real>, Z, nrhs,
+                    nrhs
+                );
+            }
+
             
-//            M.H1Solver().template Solve<Parallel>( Y, Y, rhs_count );
+            if( nrhs == AMB_DIM )
+            {
+                M.H1Solver().template Solve<AMB_DIM,parQ>(
+                    Scalar::One<ExtReal>, Z, nrhs,
+                    beta,                 Y, ldY,
+                    nrhs
+                );
+            }
+            else if( nrhs == 1 )
+            {
+                M.H1Solver().template Solve<1,parQ>(
+                    Scalar::One<ExtReal>, Z, nrhs,
+                    beta,                 Y, ldY,
+                    nrhs
+                );
+            }
+            else
+            {
+                M.H1Solver().template Solve<VarSize,parQ>(
+                    Scalar::One<ExtReal>, Z, nrhs,
+                    beta,                 Y, ldY,
+                    nrhs
+                );
+            }
         }
         
     public:

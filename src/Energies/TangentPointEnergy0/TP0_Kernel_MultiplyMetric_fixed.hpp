@@ -1,7 +1,7 @@
 #pragma once
 
 #define BASE BlockKernel_fixed<                                       \
-        AMB_DIM_+1,AMB_DIM_+1,MAX_RHS_COUNT_, true,                   \
+        AMB_DIM_+1,AMB_DIM_+1,MAX_NRHS_, true,                   \
         Real_, Real_in_, Real_out_, Int_, LInt_,                      \
         alpha_flag, beta_flag,                                        \
         true, true, false, true,                                      \
@@ -12,7 +12,7 @@
 namespace Repulsor
 {
     template<
-        int AMB_DIM_, int MAX_RHS_COUNT_,
+        int AMB_DIM_, int MAX_NRHS_,
         typename Real_, typename Real_in_, typename Real_out_, typename Int_, typename LInt_,
         Scalar::Flag alpha_flag, Scalar::Flag beta_flag
     >
@@ -35,7 +35,7 @@ namespace Repulsor
         
         using Base_T::ROWS;
         using Base_T::COLS;
-        using Base_T::MAX_RHS_COUNT;
+        using Base_T::MAX_NRHS;
         
         static constexpr LInt BLOCK_NNZ = 2;
         static constexpr LInt DIAG_NNZ  = 2;
@@ -67,9 +67,9 @@ namespace Repulsor
             cptr<Real>     A_,
             cref<Real_out> alpha_,  cptr<Real_in> X_,
             cref<Real_out> beta_,   mptr<Real>    Y_,
-            const Int      rhs_count_
+            const Int      nrhs_
         )
-        :   Base_T( A_, alpha_, X_, beta_, Y_, rhs_count_ )
+        :   Base_T( A_, alpha_, X_, beta_, Y_, nrhs_ )
         {}
         
         // Copy constructor
@@ -113,13 +113,13 @@ namespace Repulsor
             
 //            if constexpr ( vecQ )
 //            {
-//                std::array<vec_T<MAX_RHS_COUNT,Real>,COLS> x_vec;
-//                std::array<vec_T<MAX_RHS_COUNT,Real>,ROWS> y_vec;
+//                std::array<vec_T<MAX_NRHS,Real>,COLS> x_vec;
+//                std::array<vec_T<MAX_NRHS,Real>,ROWS> y_vec;
 //
 //                // This explicity copying is somewhat insane but will probably optimized a bit by the compiler.
 //                for( Int j = 0; j < COLS; ++j )
 //                {
-//                    for( Int k = 0; k < MAX_RHS_COUNT; ++k )
+//                    for( Int k = 0; k < MAX_NRHS; ++k )
 //                    {
 //                        x_vec[j][k] = get_x(j,k);
 //                    }
@@ -128,7 +128,7 @@ namespace Repulsor
 //                // This explicity copying is somewhat insane but will probably optimized a bit by the compiler.
 //                for( Int j = 0; j < ROWS; ++j )
 //                {
-//                    for( Int k = 0; k < MAX_RHS_COUNT; ++k )
+//                    for( Int k = 0; k < MAX_NRHS; ++k )
 //                    {
 //                        y_vec[j][k] = get_y(j,k);
 //                    }
@@ -148,7 +148,7 @@ namespace Repulsor
 //                // This explicity copying is somewhat insane but will probably optimized a bit by the compiler.
 //                for( Int j = 0; j < ROWS; ++j )
 //                {
-//                    for( Int k = 0; k < MAX_RHS_COUNT; ++k )
+//                    for( Int k = 0; k < MAX_NRHS; ++k )
 //                    {
 //                        get_y(j,k) = y_vec[j][k];
 //                    }
@@ -159,7 +159,7 @@ namespace Repulsor
                 
                 const Real a_0 ( a[0] );
 
-                for( Int k = 0; k < MAX_RHS_COUNT; ++k )
+                for( Int k = 0; k < MAX_NRHS; ++k )
                 {
                     FMA( a_0, get_x(0,k), get_y(0,k) );
                 }
@@ -168,7 +168,7 @@ namespace Repulsor
 
                 for( Int j = 1; j < COLS; ++j )
                 {
-                    for( Int k = 0; k < MAX_RHS_COUNT; ++k )
+                    for( Int k = 0; k < MAX_NRHS; ++k )
                     {
                         FMA( a_1, get_x(j,k), get_y(j,k) );
                     }
@@ -182,7 +182,7 @@ namespace Repulsor
         {
             return "TP0_Kernel_MultiplyMetric_fixed<"
                 +ToString(AMB_DIM)
-            +","+ToString(MAX_RHS_COUNT)
+            +","+ToString(MAX_NRHS)
             +","+TypeName<Real>+","+TypeName<Real_in>+","+TypeName<Real_out>
             +","+TypeName<Int>+","+TypeName<LInt>
             +","+ToString(alpha_flag)

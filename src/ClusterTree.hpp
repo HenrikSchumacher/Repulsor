@@ -814,7 +814,10 @@ namespace Repulsor
         }
         
         
-        void Pre( const ExtReal * input, const Int nrhs, const OperatorType op_type ) const override
+        void Pre( 
+            const ExtReal * X, const Int ldX,
+            const Int nrhs, const OperatorType op_type
+        ) const override
         {
             ptic(ClassName()+"::Pre");
 
@@ -869,8 +872,8 @@ namespace Repulsor
                 case 1:
                 {
                     pre->template Dot<1>(
-                        Scalar::One <Real>, input,
-                        Scalar::Zero<Real>, P_in.data(),
+                        Scalar::One <Real>, X,           ldX,
+                        Scalar::Zero<Real>, P_in.data(), 1,
                         1
                     );
                     break;
@@ -878,8 +881,8 @@ namespace Repulsor
                 case AMB_DIM:
                 {
                     pre->template Dot<AMB_DIM>(
-                        Scalar::One <Real>, input,
-                        Scalar::Zero<Real>, P_in.data(),
+                        Scalar::One <Real>, X,           ldX,
+                        Scalar::Zero<Real>, P_in.data(), AMB_DIM,
                         AMB_DIM
                     );
                     break;
@@ -887,8 +890,8 @@ namespace Repulsor
                 default:
                 {
                     pre->template Dot<VarSize>(
-                        Scalar::One <Real>, input,
-                        Scalar::Zero<Real>, P_in.data(),
+                        Scalar::One <Real>, X,           ldX,
+                        Scalar::Zero<Real>, P_in.data(), nrhs,
                         nrhs
                     );
                     break;
@@ -908,7 +911,11 @@ namespace Repulsor
         }; // Pre
 
 
-        void Post( ExtReal * output, const ExtReal alpha, const ExtReal beta, const OperatorType op_type ) const override
+        void Post( 
+            const ExtReal alpha,
+            const ExtReal beta, ExtReal * Y, const Int ldY,  
+            const OperatorType op_type
+        ) const override
         {
             ptic(ClassName()+"::Post");
 
@@ -965,8 +972,8 @@ namespace Repulsor
                 case 1:
                 {
                     post->template Dot<1>(
-                        alpha, P_out.data(),
-                        beta,  output,
+                        alpha, P_out.data(), 1,
+                        beta,  Y,            ldY,
                         1
                     );
                     break;
@@ -974,8 +981,8 @@ namespace Repulsor
                 case AMB_DIM:
                 {
                     post->template Dot<AMB_DIM>(
-                        alpha, P_out.data(),
-                        beta,  output,
+                        alpha, P_out.data(), AMB_DIM,
+                        beta,  Y,            ldY,
                         AMB_DIM
                     );
                     break;
@@ -983,8 +990,8 @@ namespace Repulsor
                 default:
                 {
                     post->template Dot<VarSize>(
-                        alpha, P_out.data(),
-                        beta,  output,
+                        alpha, P_out.data(), nrhs,
+                        beta,  Y,            ldY,
                         nrhs
                     );
                 }

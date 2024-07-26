@@ -346,7 +346,7 @@ namespace Repulsor
             
             const Int old_vertex_count = vertex_count;
             
-            V_lookup.Resize(old_vertex_count);
+            V_lookup.template Resize<false>(old_vertex_count);
             
             vertex_count = 0;
             

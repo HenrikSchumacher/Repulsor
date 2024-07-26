@@ -37,7 +37,7 @@ protected:
         );
         
         
-        logprint("Breadth-first scan to for the top levels of the tree.");
+        logprint("Breadth-first scan for the top levels of the tree.");
         for( Int level = forest.TopLevels(); level --> 0 ; )
         {
             for( Int C : forest.Row(level) )
