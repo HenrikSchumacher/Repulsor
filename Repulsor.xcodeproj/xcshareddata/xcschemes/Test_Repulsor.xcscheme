@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AF9C9BCA2A5230B8008AB9E6"
-               BuildableName = "Test_Preconditioner"
-               BlueprintName = "Test_Preconditioner"
+               BlueprintIdentifier = "AF2E85D62B5F342C0093AA00"
+               BuildableName = "Test_Repulsor"
+               BlueprintName = "Test_Repulsor"
                ReferencedContainer = "container:Repulsor.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -30,10 +30,9 @@
       shouldAutocreateTestPlan = "YES">
    </TestAction>
    <LaunchAction
-      buildConfiguration = "Debug"
+      buildConfiguration = "Release"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      enableAddressSanitizer = "YES"
       launchStyle = "0"
       useCustomWorkingDirectory = "NO"
       ignoresPersistentStateOnLaunch = "NO"
@@ -45,9 +44,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "AF9C9BCA2A5230B8008AB9E6"
-            BuildableName = "Test_Preconditioner"
-            BlueprintName = "Test_Preconditioner"
+            BlueprintIdentifier = "AF2E85D62B5F342C0093AA00"
+            BuildableName = "Test_Repulsor"
+            BlueprintName = "Test_Repulsor"
             ReferencedContainer = "container:Repulsor.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -62,9 +61,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "AF9C9BCA2A5230B8008AB9E6"
-            BuildableName = "Test_Preconditioner"
-            BlueprintName = "Test_Preconditioner"
+            BlueprintIdentifier = "AF2E85D62B5F342C0093AA00"
+            BuildableName = "Test_Repulsor"
+            BlueprintName = "Test_Repulsor"
             ReferencedContainer = "container:Repulsor.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

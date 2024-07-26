@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AF9C9BCA2A5230B8008AB9E6"
-               BuildableName = "Test_Preconditioner"
-               BlueprintName = "Test_Preconditioner"
+               BlueprintIdentifier = "AF26D85F2B696A4F00C13DAB"
+               BuildableName = "Example_Surface"
+               BlueprintName = "Example_Surface"
                ReferencedContainer = "container:Repulsor.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -30,10 +30,9 @@
       shouldAutocreateTestPlan = "YES">
    </TestAction>
    <LaunchAction
-      buildConfiguration = "Debug"
-      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
-      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      enableAddressSanitizer = "YES"
+      buildConfiguration = "Release"
+      selectedDebuggerIdentifier = ""
+      selectedLauncherIdentifier = "Xcode.IDEFoundation.Launcher.PosixSpawn"
       launchStyle = "0"
       useCustomWorkingDirectory = "NO"
       ignoresPersistentStateOnLaunch = "NO"
@@ -45,9 +44,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "AF9C9BCA2A5230B8008AB9E6"
-            BuildableName = "Test_Preconditioner"
-            BlueprintName = "Test_Preconditioner"
+            BlueprintIdentifier = "AF26D85F2B696A4F00C13DAB"
+            BuildableName = "Example_Surface"
+            BlueprintName = "Example_Surface"
             ReferencedContainer = "container:Repulsor.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -62,9 +61,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "AF9C9BCA2A5230B8008AB9E6"
-            BuildableName = "Test_Preconditioner"
-            BlueprintName = "Test_Preconditioner"
+            BlueprintIdentifier = "AF26D85F2B696A4F00C13DAB"
+            BuildableName = "Example_Surface"
+            BlueprintName = "Example_Surface"
             ReferencedContainer = "container:Repulsor.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

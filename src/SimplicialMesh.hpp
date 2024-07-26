@@ -686,12 +686,7 @@ namespace Repulsor
                 V_charges,
                 buffer
             );
-            
-            dump(alpha);
-            dump(beta);
-            dump(Y);
-            dump(ldY);
-            
+
             DerivativeAssembler().template Dot<AMB_DIM>(
                 alpha, buffer.data(), AMB_DIM,
                 beta , Y            , ldY,

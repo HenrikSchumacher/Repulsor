@@ -100,11 +100,6 @@ namespace Repulsor
             
             const ExtReal en = differential(M);
             
-            dump(alpha);
-            dump(beta);
-            dump(Y);
-            dump(ldY);
-            
             M.Assemble_ClusterTree_Derivatives(
                 alpha, beta, Y, ldY
             );
