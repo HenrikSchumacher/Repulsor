@@ -303,11 +303,11 @@ namespace Repulsor
         {
             if constexpr ( metric_flag )
             {
-                const Int rhs_count = S.BufferDimension() / Kernel_Block_Mul_T::ROWS;
+                const Int nrhs = S.BufferDimension() / Kernel_Block_Mul_T::ROWS;
                 
                 if( NF_flag && ( S.PrimitiveCount()> 0) )
                 {
-                    NF_MultiplyMetric(rhs_count);
+                    NF_MultiplyMetric(nrhs);
                 }
                 else
                 {
@@ -322,7 +322,7 @@ namespace Repulsor
         
     protected:
 
-        void NF_MultiplyMetric( const Int rhs_count ) const
+        void NF_MultiplyMetric( const Int nrhs ) const
         {
             // TODO: DenseKernelMatrix
 //            SparseKernelMatrixCSR<Kernel_Block_Mul_T> matrix ( bct.Near() );
@@ -331,7 +331,7 @@ namespace Repulsor
 //                metric_values.NF.data(),
 //                one,  T.PrimitiveInputBuffer().data(),
 //                zero, S.PrimitiveOutputBuffer().data(),
-//                rhs_count
+//                nrhs
 //            );
             
             if constexpr ( symmetricQ )
@@ -345,7 +345,7 @@ namespace Repulsor
                     metric_values.NF_diag.data(),
                     one, T.PrimitiveInputBuffer().data(),
                     one, S.PrimitiveOutputBuffer().data(),
-                    rhs_count
+                    nrhs
                 );
             }
         }

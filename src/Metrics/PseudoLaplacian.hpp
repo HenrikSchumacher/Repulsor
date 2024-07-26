@@ -73,12 +73,12 @@ namespace Repulsor
         }
         
         virtual void multiply_preconditioner(
-            cref<Mesh_T> M, cptr<ExtReal> X, mptr<ExtReal> Y, const Int rhs_count
+            cref<Mesh_T> M, cptr<ExtReal> X, mptr<ExtReal> Y, const Int nrhs
         ) const override
         {
             wprint(ClassName()+"::multiply_preconditioner: No preconditioner available. Appluing identity transformation.");
             
-            copy_buffer<VarSize,Parallel>(X, Y, M.VertexCount() * rhs_count );
+            copy_buffer<VarSize,Parallel>(X, Y, M.VertexCount() * nrhs );
             return;
         }
         

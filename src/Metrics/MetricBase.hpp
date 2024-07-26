@@ -33,7 +33,7 @@ namespace Repulsor
             cref<MeshBase_T> M,
             cref<ExtReal> alpha, cptr<ExtReal> X,
             cref<ExtReal> beta,  mptr<ExtReal> Y,
-            const Int  rhs_count,
+            const Int  nrhs,
             const bool VF_flag = true,
             const bool NF_flag = true,
             const bool FF_flag = true
@@ -52,23 +52,23 @@ namespace Repulsor
         }
         
         virtual void MultiplyPreconditioner(
-            cref<MeshBase_T> M, cptr<ExtReal> X, mptr<ExtReal> Y, const Int rhs_count
+            cref<MeshBase_T> M, cptr<ExtReal> X, mptr<ExtReal> Y, const Int nrhs
         ) const = 0;
 
         virtual void Solve(
-            cref<MeshBase_T> M, cptr<ExtReal> B, mptr<ExtReal> X, const Int  rhs_count,
+            cref<MeshBase_T> M, cptr<ExtReal> B, mptr<ExtReal> X, const Int  nrhs,
             const Int  max_iter,
             const Real tolerance
         ) const = 0;
         
     
-        ExtReal FrobeniusNorm( cref<MeshBase_T> M, cptr<ExtReal> X, const Int rhs_count ) const
+        ExtReal FrobeniusNorm( cref<MeshBase_T> M, cptr<ExtReal> X, const Int nrhs ) const
         {
-            Tensor2<ExtReal,Int> Y ( M.VertexCount(), rhs_count );
+            Tensor2<ExtReal,Int> Y ( M.VertexCount(), nrhs );
             
-            MultiplyMetric(M, Scalar::One<ExtReal>, X, Scalar::Zero<ExtReal>, Y.data(), rhs_count );
+            MultiplyMetric(M, Scalar::One<ExtReal>, X, Scalar::Zero<ExtReal>, Y.data(), nrhs );
             
-            return Sqrt( dot_buffers( X, Y.data(), M.VertexCount() * rhs_count, M.ThreadCount() ) );
+            return Sqrt( dot_buffers( X, Y.data(), M.VertexCount() * nrhs, M.ThreadCount() ) );
         }
         
         Int CG_IterationCount() const

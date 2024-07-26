@@ -34,7 +34,7 @@ namespace Repulsor
         
         using Base_T::ROWS;
         using Base_T::COLS;
-        using Base_T::MAX_RHS_COUNT;
+        using Base_T::MAX_NRHS;
         
         static constexpr LInt BLOCK_NNZ = 2;
         static constexpr LInt DIAG_NNZ  = 2;
@@ -62,9 +62,9 @@ namespace Repulsor
             cptr<Scal>     A_,
             cref<Scal_out> alpha_,  cptr<Scal_in> X_,
             cref<Scal_out> beta_,   mptr<Scal>    Y_,
-            const Int      rhs_count_
+            const Int      nrhs_
         )
-        :   Base_T( A_, alpha_, X_, beta_, Y_, rhs_count_ )
+        :   Base_T( A_, alpha_, X_, beta_, Y_, nrhs_ )
         {}
         
         // Copy constructor
@@ -108,7 +108,7 @@ namespace Repulsor
             
             const Scal a_0 ( a[0] );
 
-            for( Int k = 0; k < MAX_RHS_COUNT; ++k )
+            for( Int k = 0; k < MAX_NRHS; ++k )
             {
                 y[0][k] += a_0 * x[0][k];
             }

@@ -291,11 +291,11 @@ namespace Repulsor
             const bool FF_flag = true
         ) const
         {
-            const Int rhs_count = bct.GetS().BufferDimension() / Kernel_Block_Mul_T::ROWS;
+            const Int nrhs = bct.GetS().BufferDimension() / Kernel_Block_Mul_T::ROWS;
             
             if( NF_flag && (bct.Near().NonzeroCount() > 0) )
             {
-                NF_MultiplyMetric(rhs_count);
+                NF_MultiplyMetric(nrhs);
             }
             else
             {
@@ -304,13 +304,13 @@ namespace Repulsor
             
             if( VF_flag && (bct.VeryNear().NonzeroCount() > 0) )
             {
-                VF_MultiplyMetric(rhs_count);
+                VF_MultiplyMetric(nrhs);
             }
             
             
             if( FF_flag && (bct.Far().NonzeroCount() > 0) )
             {
-                FF_MultiplyMetric(rhs_count);
+                FF_MultiplyMetric(nrhs);
             }
             else
             {
@@ -324,7 +324,7 @@ namespace Repulsor
         
     protected:
 
-        void NF_MultiplyMetric( const Int rhs_count ) const
+        void NF_MultiplyMetric( const Int nrhs ) const
         {
             Sparse::KernelMatrixCSR<Kernel_Block_Mul_T> matrix ( bct.Near() );
         
@@ -332,7 +332,7 @@ namespace Repulsor
                 metric_values.NF.data(),
                 one,  bct.GetT().PrimitiveInputBuffer().data(),
                 zero, bct.GetS().PrimitiveOutputBuffer().data(),
-                rhs_count
+                nrhs
             );
             
             if constexpr ( symmetricQ )
@@ -346,12 +346,12 @@ namespace Repulsor
                     metric_values.NF_diag.data(),
                     one, bct.GetT().PrimitiveInputBuffer().data(),
                     one, bct.GetS().PrimitiveOutputBuffer().data(),
-                    rhs_count
+                    nrhs
                 );
             }
         }
         
-        void VF_MultiplyMetric( const Int rhs_count ) const
+        void VF_MultiplyMetric( const Int nrhs ) const
         {
             Sparse::KernelMatrixCSR<Kernel_Block_MulAdd_T> matrix ( bct.VeryNear() );
             
@@ -359,7 +359,7 @@ namespace Repulsor
                 metric_values.VF.data(),
                 one, bct.GetT().PrimitiveInputBuffer().data(),
                 one, bct.GetS().PrimitiveOutputBuffer().data(),
-                rhs_count
+                nrhs
             );
             
             if constexpr ( symmetricQ )
@@ -373,12 +373,12 @@ namespace Repulsor
                     metric_values.VF_diag.data(),
                     one, bct.GetT().PrimitiveInputBuffer().data(),
                     one, bct.GetS().PrimitiveOutputBuffer().data(),
-                    rhs_count
+                    nrhs
                 );
             }
         }
         
-        void FF_MultiplyMetric( const Int rhs_count ) const
+        void FF_MultiplyMetric( const Int nrhs ) const
         {
             Sparse::KernelMatrixCSR<Kernel_Block_Mul_T> matrix ( bct.Far() );
             
@@ -386,7 +386,7 @@ namespace Repulsor
                 metric_values.FF.data(),
                 one,  bct.GetT().ClusterInputBuffer().data(),
                 zero, bct.GetS().ClusterOutputBuffer().data(),
-                rhs_count
+                nrhs
            );
             
             if constexpr ( symmetricQ )
@@ -400,7 +400,7 @@ namespace Repulsor
                     metric_values.FF_diag.data(),
                     one, bct.GetT().ClusterInputBuffer().data(),
                     one, bct.GetS().ClusterOutputBuffer().data(),
-                    rhs_count
+                    nrhs
                 );
             }
         }
