@@ -812,17 +812,13 @@ namespace Repulsor
      
     public:
         
-        virtual void WriteToFile( cref<std::string> file_name ) const override
+        virtual void WriteToFile( const std::filesystem::path & file ) const override
         {
             ptic(ClassName()+"::WriteToFile");
             
-            print("Writing mesh to file "+file_name+".");
+            print("Writing mesh to file "+ file.string() +".");
             
-            std::ofstream s (file_name);
-            
-            valprint("std::numeric_limits<Real>::digits",std::numeric_limits<Real>::digits10);
-            
-            s << std::setprecision( std::numeric_limits<Real>::digits );
+            std::ofstream s (file);
             
             const Int vertex_count = VertexCount();
             const Int simplex_count = SimplexCount();
@@ -834,6 +830,8 @@ namespace Repulsor
             s << "ambient_dimension" << "\t" << AMB_DIM << "\n";
             s << "vertex_count" << "\t" << vertex_count << "\n";
             s << "simplex_count" << "\t" << simplex_count << "\n";
+            
+            s << std::scientific << std::uppercase << std::setprecision( std::numeric_limits<Real>::digits10 + 1 );
             
             for( Int i = 0; i < vertex_count; ++i )
             {

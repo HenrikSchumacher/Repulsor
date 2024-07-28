@@ -159,19 +159,21 @@ namespace Repulsor
         
     public:
         
-        [[nodiscard]] std::unique_ptr<MeshBase_T> Make_FromFile( const std::string & file_name, const Int thread_count )
+        [[nodiscard]] std::unique_ptr<MeshBase_T> Make_FromFile( 
+            const std::filesystem::path & file, const Int thread_count
+        )
         {
-            ptic(ClassName()+"Make_FromFile");
+            ptic(ClassName()+"::Make_FromFile");
             
-            print("Reading mesh from file "+file_name+".");
+            print("Reading mesh from file " + file.string() + ".");
             
-            std::ifstream s (file_name);
+            std::ifstream s ( file );
             
             if( !s.good() )
             {
-                eprint("Make_FromFile: File "+file_name+" could not be opened.");
+                eprint("Make_FromFile: File " + file.string() + " could not be opened.");
                 
-                ptoc(ClassName()+"Make_FromFile");
+                ptoc(ClassName()+"::Make_FromFile");
                 
                 return nullptr;
             }
@@ -229,7 +231,7 @@ namespace Repulsor
                 thread_count
             );
 
-            ptoc(ClassName()+"Make_FromFile");
+            ptoc(ClassName()+"::Make_FromFile");
             
             return M;
         }

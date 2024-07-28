@@ -169,7 +169,7 @@ namespace Repulsor
      
     public:
         
-        virtual void WriteToFile( cref<std::string> file_name ) const = 0;
+        virtual void WriteToFile( const std::filesystem::path & file ) const = 0;
         
 //#################################################################################
 //      Remesher
