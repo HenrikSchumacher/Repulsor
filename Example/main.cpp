@@ -43,7 +43,7 @@ int main(void)
     print("");
     
     /// Set up profiler to write to `~/Tools_Profile.tsv` and `~/Tools_Log.txt`
-    Profiler::Clear( getenv("HOME") );
+    Profiler::Clear();
 
     int thread_count = 1;
     

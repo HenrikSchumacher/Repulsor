@@ -31,7 +31,7 @@ using ExtReal = Real64;
 int main(void)
 {
     /// Set up profiler to write to `~/Tools_Profile.tsv` and `~/Tools_Log.txt`
-    Profiler::Clear( getenv("HOME") );
+    Profiler::Clear();
     
     using Mesh_T      = SimplicialMesh<0,3,Real,Int,LInt,SReal,ExtReal>;
     using MeshBase_T  = SimplicialMeshBase<Real,Int,LInt,SReal,ExtReal>;
@@ -47,7 +47,7 @@ int main(void)
     std::filesystem::path mesh_file = repo_dir / "Meshes" / "Sphere_Points.txt";
     
     std::unique_ptr<MeshBase_T> M_ptr = mesh_factory.Make_FromFile(
-        mesh_file.c_str(), thread_count
+        mesh_file, thread_count
     );
 
     Tensor1<Real,Int> vertex_charges ( M_ptr->VertexCount(), 1. );

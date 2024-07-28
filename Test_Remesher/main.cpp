@@ -1,9 +1,6 @@
 #include <filesystem>
 #include <iostream>
 
-#include <sys/types.h>
-#include <pwd.h>
-
 //#define TOOLS_DEBUG
 
 #define TOOLS_ENABLE_PROFILER // enable profiler
@@ -43,7 +40,7 @@ int main(void)
     print("###############################################################");
     print("");
     
-    Profiler::Clear( getenv("HOME") );
+    Profiler::Clear();
     
     const int thread_count = 8;
     

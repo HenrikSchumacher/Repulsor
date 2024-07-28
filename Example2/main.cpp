@@ -33,7 +33,7 @@ using Real    = double;
 int main(void)
 {
     /// Set up profiler to write to `~/Tools_Profile.tsv` and `~/Tools_Log.txt`
-    Profiler::Clear( getenv("HOME") );
+    Profiler::Clear();
     
     using Mesh_T   = Repulsor::SimplicialMeshBase<Real,Int,LInt>;
     using Energy_T = Repulsor::EnergyBase<Mesh_T>;
@@ -61,9 +61,7 @@ int main(void)
     std::filesystem::path repo_dir  = this_file.parent_path().parent_path();
     std::filesystem::path mesh_file = repo_dir / "Meshes" / "TorusMesh_00038400T.txt";
     
-    std::unique_ptr<Mesh_T> M_ptr = mesh_factory.Make_FromFile(
-        mesh_file.c_str(), thread_count
-    );
+    std::unique_ptr<Mesh_T> M_ptr = mesh_factory.Make_FromFile( mesh_file, thread_count );
     
     auto & M = *M_ptr;
 
@@ -99,7 +97,12 @@ int main(void)
     
     tic("Solving for gradient");
     /// We have to solve M.AmbDim() equations at once.
-    tpm.Solve(M, diff.data(), gradient.data(), M.AmbDim(), max_iter, relative_tolerance );
+    tpm.Solve(M,
+        Real(1), diff.data(),     M.AmbDim(),
+        Real(0), gradient.data(), M.AmbDim(),
+        M.AmbDim(),
+        max_iter, relative_tolerance
+    );
     toc("Solving for gradient");
     
     dump(tpm.CG_IterationCount());

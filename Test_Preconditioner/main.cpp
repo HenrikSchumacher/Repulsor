@@ -41,7 +41,7 @@ int main(void)
     print("###############################################################");
     print("");
     
-    Profiler::Clear( getenv("HOME") );
+    Profiler::Clear();
 
     
     int thread_count = 1;
