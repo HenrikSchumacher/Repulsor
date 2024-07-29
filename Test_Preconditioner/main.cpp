@@ -59,7 +59,11 @@ int main(void)
     std::filesystem::path this_file { __FILE__ };
     std::filesystem::path repo_dir  = this_file.parent_path().parent_path();
 //    std::filesystem::path mesh_file = repo_dir / "Meshes" / "TorusMesh_00002400T.txt";
-    std::filesystem::path mesh_file = repo_dir / "Meshes" / "TorusMesh_00038400T.txt";
+//    std::filesystem::path mesh_file = repo_dir / "Meshes" / "TorusMesh_00038400T.txt";
+    
+    std::filesystem::path mesh_file = "/Users/Henrik/github/BAEMM/Meshes/Spot_00093696T.txt";
+    
+//    std::filesystem::path mesh_file = "/Users/Henrik/github/BAEMM/Meshes/Spot_00023424T.txt";
     
     std::unique_ptr<MeshBase_T> M_ptr = mesh_factory.Make_FromFile(
         mesh_file.c_str(), thread_count
