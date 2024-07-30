@@ -496,7 +496,8 @@ namespace Repulsor
         // where P_in is the input buffer of the tree.
         virtual void Pre(
             const ExtReal * X, const Int ldX,
-        const Int nrsh, const OperatorType op_type ) const = 0;
+            const Int nrsh, const OperatorType op_type
+        ) const = 0;
         
         // Writes Y[:,0..ldY] = alpha * P_out + beta * Y[:,0..ldY],
         // where P_out is the output buffer of the tree.
