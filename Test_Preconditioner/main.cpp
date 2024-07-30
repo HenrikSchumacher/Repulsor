@@ -66,7 +66,7 @@ int main(void)
 //    std::filesystem::path mesh_file = "/Users/Henrik/github/BAEMM/Meshes/Spot_00023424T.txt";
     
     std::unique_ptr<MeshBase_T> M_ptr = mesh_factory.Make_FromFile(
-        mesh_file.c_str(), thread_count
+        mesh_file, thread_count
     );
     
     auto & M = *M_ptr;
