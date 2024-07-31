@@ -147,8 +147,6 @@ namespace Repulsor
             
             en = zero;
             
-            DummyAllocators();
-
             if constexpr ( diff_flag || density_flag )
             {
                 S.CleanseDerivativeBuffers();
@@ -161,8 +159,6 @@ namespace Repulsor
 
             if constexpr ( metric_flag )
             {
-                ptic("Allocate accumulators");
-                
                 S.NF_Accumulator()
                 = Accumulator_T( thread_count, S.PrimitiveCount(), NF_blk_size, 0 );
 
@@ -171,11 +167,10 @@ namespace Repulsor
                     T.NF_Accumulator()
                     = Accumulator_T( thread_count, T.GetT().PrimitiveCount(), NF_blk_size, 0 );
                 }
-                ptoc("Allocate accumulators");
             }
             else
             {
-                DummyAllocators();
+                AllocateDummyAccumulator();
             }
             
             if( q_half_real >= one )
@@ -228,23 +223,20 @@ namespace Repulsor
 
             if constexpr ( metric_flag )
             {
-                DummyAllocators();
+                AllocateDummyAccumulator();
             }
             
             return en;
         }
      
-        void DummyAllocators()
+        void AllocateDummyAccumulator()
         {
-            ptic("Allocate dummy accumulators");
-
             const Int thread_count = Min( S.ThreadCount(), T.ThreadCount() );
             S.NF_Accumulator() = Accumulator_T( thread_count, 1, 1, 0 );
             if constexpr ( !symmetricQ )
             {
                 T.NF_Accumulator() = Accumulator_T( thread_count, 1, 1, 0 );
             }
-            ptoc("Allocate dummy accumulators");
         }
         
 
@@ -283,9 +275,7 @@ namespace Repulsor
 //                    matrix.FillLowerTriangleFromUpperTriangle( ker.OffDiag().data() );
                 }
 
-                ptic("Reduce NF_Accumulators");
                 ker.Diag() = S.NF_Accumulator().template AddReduce<Real,LInt>();
-                ptoc("Reduce NF_Accumulators");
             }
 
             ptoc(ClassName()+"::NF_Compute");

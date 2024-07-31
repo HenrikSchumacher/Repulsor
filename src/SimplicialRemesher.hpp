@@ -243,7 +243,6 @@ namespace Repulsor
             
             with_data = ( vertex_data_ != nullptr ) && ( vertex_data_dim_ > zero );
             
-            ptic("Allocations");
 //            max_vertex_count  = vertex_count + S_vertex_count * simplex_count;
 //            max_edge_count    = S_edge_count * simplex_count + S_edge_count * simplex_count;
 //            max_simplex_count = simplex_count + simplex_count;
@@ -276,10 +275,7 @@ namespace Repulsor
             
             V_parent_simplices = std::vector<SimplexList_T> ( max_vertex_count );
             E_parent_simplices = std::vector<SimplexList_T> ( max_edge_count );
-            
-            ptoc("Allocations");
 
-            ptic("Copy");
 
             if( vertex_coords_ColMajorQ )
             {
@@ -310,16 +306,12 @@ namespace Repulsor
                     V_data.Read( vertex_data_ );
                 }
             }
-            
-            ptoc("Copy");
 
             
-            ptic("ComputeSimplexConnectivity");
             for( Simplex_T s = 0; s < simplex_count; ++s )
             {
               ComputeSimplexConnectivity(s);
             }
-            ptoc("ComputeSimplexConnectivity");
             
             compressedQ = true;
             

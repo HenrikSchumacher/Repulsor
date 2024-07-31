@@ -114,10 +114,6 @@ namespace Repulsor
         {
             const Int thread_count = bct.ThreadCount();
             
-            DummyAllocators();
-
-            ptic("Allocate accumulators");
-            
             bct.GetS().VF_Accumulator()
             = Accumulator_T( thread_count, bct.GetS().PrimitiveCount(), VF_blk_size, 0 );
             bct.GetS().NF_Accumulator()
@@ -134,21 +130,18 @@ namespace Repulsor
                 bct.GetT().FF_Accumulator()
                 = Accumulator_T( thread_count, bct.GetT().ClusterCount(),   FF_blk_size, 0 );
             }
-            ptoc("Allocate accumulators");
             
             VF_Compute();
             NF_Compute();
             FF_Compute();
 
-            DummyAllocators();
+            AllocateDummyAccumulator();
             
             return 0;
         }
      
-        void DummyAllocators()
+        void AllocateDummyAccumulator()
         {
-            ptic("Allocate dummy accumulators");
-
             const Int thread_count = bct.ThreadCount();
 
             bct.GetS().VF_Accumulator() = Accumulator_T( thread_count, 1, 1, 0 );
@@ -161,7 +154,6 @@ namespace Repulsor
                 bct.GetT().NF_Accumulator() = Accumulator_T( thread_count, 1, 1, 0 );
                 bct.GetT().FF_Accumulator() = Accumulator_T( thread_count, 1, 1, 0 );
             }
-            ptoc("Allocate dummy accumulators");
         }
         
 
@@ -236,9 +228,7 @@ namespace Repulsor
                 matrix.FillLowerTriangleFromUpperTriangle( ker.OffDiag().data() );
             }
 
-            ptic("Reduce NF_Accumulators");
             ker.Diag() = bct.GetS().NF_Accumulator().template AddReduce<Real,LInt>();
-            ptoc("Reduce NF_Accumulators");
 
             ptoc(ClassName()+"::NF_Compute");
         }

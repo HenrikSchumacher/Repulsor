@@ -819,8 +819,6 @@ namespace Repulsor
             const Int nrhs, const OperatorType op_type
         ) const override
         {
-            ptic(ClassName()+"::Pre");
-
             std::string tag = ClassName();
             SparseMatrix_T * pre;
             
@@ -828,28 +826,28 @@ namespace Repulsor
             {
                 case OperatorType::FractionalOnly:
                 {
-                    tag += " pre->Dot (lo)";
+                    tag += "(lo)";
                     pre  = &lo_pre ;
                     this->RequireBuffers( nrhs );
                     break;
                 }
                 case OperatorType::HighOrder:
                 {
-                    tag += " pre->Dot (hi)";
+                    tag += "(hi)";
                     pre  = &hi_pre ;
                     this->RequireBuffers( AmbDim() * nrhs ); // Beware: The derivative operator increases the number of columns!
                     break;
                 }
                 case OperatorType::LowOrder:
                 {
-                    tag += " pre->Dot (lo)";
+                    tag += "(lo)";
                     pre  = &lo_pre ;
                     this->RequireBuffers( nrhs );
                     break;
                 }
                 case OperatorType::MixedOrder:
                 {
-                    tag += " pre->Dot (mi)";
+                    tag += "(mi)";
                     pre  = &mi_pre ;
                     this->RequireBuffers( (AmbDim()+1) * nrhs ); // Beware: The mixed preprocessor operator increases the number of columns!
                     break;
@@ -898,16 +896,14 @@ namespace Repulsor
                 }
             }
 
-            ptoc(tag);
             
             // Accumulate into leaf clusters.
             PrimitivesToClusters(false);
             
             this->PercolateUp();
             
+            ptoc(tag);
             
-
-            ptoc(ClassName()+"::Pre");
         }; // Pre
 
 
@@ -917,8 +913,6 @@ namespace Repulsor
             const OperatorType op_type
         ) const override
         {
-            ptic(ClassName()+"::Post");
-
             SparseMatrix_T * post;
             
             this->PercolateDown();
@@ -931,32 +925,31 @@ namespace Repulsor
             {
                 case OperatorType::FractionalOnly:
                 {
-                    tag += " post->Dot (lo)";
+                    tag += "(lo)";
                     post  = &lo_post;
                     break;
                 }
                 case OperatorType::HighOrder:
                 {
-                    tag += " post->Dot (hi)";
+                    tag += "(hi)";
                     post  = &hi_post;
                     break;
                 }
                 case OperatorType::LowOrder:
                 {
-                    tag += " post->Dot (lo)";
+                    tag += "(lo)";
                     post  = &lo_post;
                     break;
                 }
                 case OperatorType::MixedOrder:
                 {
-                    tag += " post->Dot (mi)";
+                    tag += "(mi)";
                     post  = &mi_post;
                     break;
                 }
                 default:
                 {
                     eprint("Unknown kernel. Doing nothing.");
-                    ptoc(ClassName()+"::Post");
                     return;
                 }
             }
@@ -998,8 +991,7 @@ namespace Repulsor
             }
             
             ptoc(tag);
-                
-            ptoc(ClassName()+"::Post");
+            
         }; // Post
         
     public:

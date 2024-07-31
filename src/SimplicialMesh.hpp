@@ -479,7 +479,6 @@ namespace Repulsor
                 ptic(className()+"::GetClusterTree");
                 if( (V_coords.Dimension(0) > 0) && (simplices.Dimension(0) > 0) )
                 {
-                    ptic("Allocations");
                     auto P_coords      = Tensor2<Real,Int> ( SimplexCount(), AMB_DIM, Scalar::Zero<Real> );
                     auto P_hull_coords = Tensor3<Real,Int> ( SimplexCount(), SIZE, AMB_DIM );
                     auto P_near        = Tensor2<Real,Int> ( SimplexCount(), NEAR_DIM );
@@ -505,8 +504,6 @@ namespace Repulsor
 
                     AvOp.Outer()[SimplexCount()] = SimplexCount() * SIZE;
 
-                    ptoc("Allocations");
-
                     // What remains is to compute P_coords, P_hull_coords, P_near and P_far and the nonzero values of DiffOp.
                     
                     ComputeNearFarDataOps( P_coords, P_hull_coords, P_near, P_far, DiffOp, AvOp );
@@ -514,7 +511,7 @@ namespace Repulsor
 
                     const JobPointers<Int> job_ptr ( SimplexCount(), ThreadCount() );
 
-                    ptic("Creating primitives");
+//                    ptic("Creating primitives");
                     ParallelDo(
                         [&]( const Int thread )
                         {
@@ -533,9 +530,9 @@ namespace Repulsor
                         job_ptr.ThreadCount()
                     );
 
-                    ptoc("Creating primitives");
+//                    ptoc("Creating primitives");
 
-                    ptic("Initializing cluster prototypes");
+//                    ptic("Initializing cluster prototypes");
 
                     std::shared_ptr<BoundingVolume_T> C_proto;
 
@@ -566,7 +563,7 @@ namespace Repulsor
                         }
                     }
 
-                    ptoc("Initializing cluster prototypes");
+//                    ptoc("Initializing cluster prototypes");
 
                     if( cluster_tree_settings.thread_count <= 0 )
                     {
