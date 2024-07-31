@@ -338,9 +338,7 @@ namespace Repulsor
                     matrix.FillLowerTriangleFromUpperTriangle( ker.OffDiag().data() );
                 }
                 
-                ptic("Reduce VF_Accumulators");
                 ker.Diag() = bct.GetS().VF_Accumulator().template AddReduce<Real,LInt>();
-                ptoc("Reduce VF_Accumulators");
             }
             
             ptoc(ClassName()+"::VF_Compute");
@@ -416,9 +414,7 @@ namespace Repulsor
                     matrix.FillLowerTriangleFromUpperTriangle( ker.OffDiag().data() );
                 }
                 
-                ptic("Reduce FF_Accumulators");
                 ker.Diag()= bct.GetS().FF_Accumulator().template AddReduce<Real,LInt>();
-                ptoc("Reduce FF_Accumulators");
             }
 
             ptoc(ClassName()+"::FF_Compute");

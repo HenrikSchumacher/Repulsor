@@ -234,14 +234,13 @@ namespace Repulsor
 
             std::vector<BlockSplitter_T> kernels;
 
-            ptic(className()+"::ComputeBlocks: prepare kernels");
+            // Prepare kernels.
             for( Int thread = 0; thread < thread_count; ++thread )
             {
                 kernels.emplace_back( S, T, thread, far_theta2, near_theta2 );
             }
-            ptoc(className()+"::ComputeBlocks: prepare kernels");
             
-            ptic(className()+"::ComputeBlocks: traversal");
+            // Tree traversal.
             if( (S.SplitThreshold()==1) && (T.SplitThreshold()==1) )
             {
                 ClusterTreePairTraversor<BlockSplitter_T,symmetricQ,true > traversor ( S, T, kernels );
@@ -254,11 +253,8 @@ namespace Repulsor
 
                 traversor.Traverse();
             }
-            ptoc(className()+"::ComputeBlocks: traversal");
             
-            
-            ptic(className()+"::ComputeBlocks: reduce kernels");
-
+            // Reduce kernels.
             ParallelDo(
                 [&kernels]( const Int thread )
                 {
@@ -301,45 +297,31 @@ namespace Repulsor
             {
                 wprint(className()+"::ComputeBlocks detected "+ToString(intersection_count)+" intersections.");
             }
-            
-            ptoc(className()+"::ComputeBlocks: reduce kernels");
 
 
-            ptic(className()+"::ComputeBlocks: Primitive intersection data");
-            
+            // Primitive intersection data.
             inter = Inter_Pattern_T( inter_idx, S.PrimitiveCount(), T.PrimitiveCount(),
                 thread_count, false, symmetricQ );
 
             pdump(inter.Stats());
-
-            ptoc(className()+"::ComputeBlocks: Primitive intersection data");
             
 
-            ptic(className()+"::ComputeBlocks: Very near field interaction data");
-
+            // Very near field interaction data.
             verynear = VeryNear_Pattern_T( verynear_idx, S.PrimitiveCount(), T.PrimitiveCount(),
                 thread_count, false, symmetricQ );
             
             pdump(verynear.Stats());
 
-            ptoc(className()+"::ComputeBlocks: Very near field interaction data");
-            
 
-            ptic(className()+"::ComputeBlocks: Near field interaction data");
-            
+            // Near field interaction data.
             near = Near_Pattern_T( near_idx, S.PrimitiveCount(), T.PrimitiveCount(),
                 thread_count, false, symmetricQ );
             
-            ptoc(className()+"::ComputeBlocks: Near field interaction data");
-
             
-            ptic(className()+"::ComputeBlocks: Far field interaction data");
-            
+            // Far field interaction data.
             far = Far_Pattern_T( far_idx, S.ClusterCount(), T.ClusterCount(),
                     thread_count, false, symmetricQ );
             
-            ptoc(className()+"::ComputeBlocks: Far field interaction data");
-
             
             blocks_initialized = true;
             

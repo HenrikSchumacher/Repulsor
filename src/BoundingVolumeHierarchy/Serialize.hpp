@@ -21,12 +21,10 @@ private:
         threads.emplace_back( [this](){ C_next  = Tensor1<Int,Int>( ClusterCount() ); } );
         threads.emplace_back( [this](){ leaf_cluster_lookup = Tensor1<Int,Int>( ClusterCount(), -1 ); } );
         
-        ptic(className()+"::Serialize: allocation");
         for( auto & thread : threads )
         {
             thread.join();
         }
-        ptoc(className()+"::Serialize: allocation");
         
         logprint("Breadth-first scan to serialize the first few levels.");
         
