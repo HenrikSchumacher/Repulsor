@@ -298,7 +298,7 @@ namespace Repulsor
 //                M.VertexCount(), max_iter, nrhs, M.ThreadCount()
 //            );
 //            
-//            solver( A, P, alpha, B, ldB, beta, X, ldX, tolerance, 3 );
+//            solver( A, P, alpha, B, ldB, beta, X, ldX, tolerance, 10 );
             
             iter          = solver.IterationCount();
             rel_residuals = solver.RelativeResiduals();

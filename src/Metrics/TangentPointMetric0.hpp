@@ -30,7 +30,7 @@ namespace Repulsor
         :   BASE       (                             )
         ,   q          ( static_cast<Real>(p_)       )
         ,   p          ( static_cast<Real>( 2 * p_)  )
-        ,   s          ( (p - Scalar::Two<Real>) / q )
+        ,   s          ( (p - Real(DOM_DIM)) / q     )
         ,   pseudo_lap ( Scalar::Two<Real> - s       )
         {}
         
@@ -38,8 +38,8 @@ namespace Repulsor
         :   BASE       (                              )
         ,   q          ( static_cast<Real>(q_)        )
         ,   p          ( static_cast<Real>(p_)        )
-        ,   s          ( (p - Scalar::Two<Real>) / q )
-        ,   pseudo_lap ( Scalar::Two<Real> - s       )
+        ,   s          ( (p - Real(DOM_DIM)) / q      )
+        ,   pseudo_lap ( Scalar::Two<Real> - s        )
         {}
         
         virtual ~CLASS() = default;
@@ -132,7 +132,18 @@ namespace Repulsor
         
         std::string className() const
         {
-            return TO_STD_STRING(CLASS)+"<"+ToString(DOM_DIM)+","+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<LInt>+","+TypeName<SReal>+","+TypeName<ExtReal>+">("+ToString(q)+","+ToString(p)+")";
+            return TO_STD_STRING(CLASS)
+                + "<" + ToString(DOM_DIM)
+                + "," + ToString(AMB_DIM)
+                + "," + TypeName<Real>
+                + "," + TypeName<Int>
+                + "," + TypeName<LInt>
+                + "," + TypeName<SReal>
+                + "," + TypeName<ExtReal>
+                +">(" + ToString(q)
+                + "," + ToString(p)
+                + "," + ToString(s)
+                + ")";
         }
         
         virtual std::string ClassName() const override

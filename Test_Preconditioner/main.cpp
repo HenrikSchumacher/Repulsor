@@ -44,7 +44,7 @@ int main(void)
     Profiler::Clear();
 
     
-    int thread_count = 1;
+    int thread_count = 8;
     
     
     using MeshBase_T = SimplicialMeshBase<Real,Int,LInt,SReal,ExtReal>;
@@ -175,8 +175,8 @@ int main(void)
     dump( B.CountNaNs() );
     dump( X.CountNaNs() );
     
-    dump(tpm.CG_IterationCount());
-    dump(tpm.CG_RelativeResiduals());
+    dump(tpm.Solver_IterationCount());
+    dump(tpm.Solver_RelativeResiduals());
     
     print("");
     
@@ -191,8 +191,8 @@ int main(void)
     dump( B.CountNaNs() );
     dump( X.CountNaNs() );
     
-    dump(tpm.CG_IterationCount());
-    dump(tpm.CG_RelativeResiduals());
+    dump(tpm.Solver_IterationCount());
+    dump(tpm.Solver_RelativeResiduals());
     
     // Checking the result.
     
@@ -271,8 +271,8 @@ int main(void)
     );
     toc("Computing X = alpha * A^{-1}.B - X_true.");
     
-    dump(tpm.CG_IterationCount());
-    dump(tpm.CG_RelativeResiduals());
+    dump(tpm.Solver_IterationCount());
+    dump(tpm.Solver_RelativeResiduals());
     
     tic("Computing X = alpha * A^{-1}.B - X_true.");
     tpm.Solve( M,
@@ -284,8 +284,8 @@ int main(void)
     
 //    dump( ArrayToString( X.data(), {print_rows,ld}, 8 ) );
     
-    dump(tpm.CG_IterationCount());
-    dump(tpm.CG_RelativeResiduals());
+    dump(tpm.Solver_IterationCount());
+    dump(tpm.Solver_RelativeResiduals());
     
     Tiny::Vector<2,Real,Int> abs_metric_errors = {
         tpm.MetricNorm( M, &X[0][0   ], ldX, nrhs ),
