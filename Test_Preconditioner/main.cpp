@@ -113,7 +113,7 @@ int main(void)
     print("");
 
 //    constexpr Int NRHS = 3;
-    const Int print_rows = 4;
+//    const Int print_rows = 4;
     const Int ld   = 6;
     const Int nrhs = 3;
     
