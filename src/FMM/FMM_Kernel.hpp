@@ -54,7 +54,7 @@ namespace Repulsor
         ,   T             ( conf.GetT()          )
         ,   metric_values ( conf.MetricValues()  )   // In configure mode, kernels needs
         {
-            debug_print(std::string( "Initializing " + this-> ClassName() + " from Configurator_T on thread " + ToString(thread)) );
+            TOOLS_DEBUG_PRINT(std::string( "Initializing " + this-> ClassName() + " from Configurator_T on thread " + ToString(thread)) );
         }
         
         FMM_Kernel( cref<FMM_Kernel> other, const Int thread_ )
@@ -63,7 +63,7 @@ namespace Repulsor
         ,   T             ( other.T              )
         ,   metric_values ( other.metric_values  )
         {
-            debug_print(std::string( "Initializing " + this->ClassName() + " from "+ClassName()+" on thread " + ToString(thread)) );
+            TOOLS_DEBUG_PRINT(std::string( "Initializing " + this->ClassName() + " from "+ClassName()+" on thread " + ToString(thread)) );
         }
         
         

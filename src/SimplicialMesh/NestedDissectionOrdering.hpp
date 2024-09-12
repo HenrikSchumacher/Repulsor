@@ -56,17 +56,17 @@ public:
             
             while( queue_0.size() > 0 )
             {
-                debug_print("Starting level " + ToString(level) + "." );
+                TOOLS_DEBUG_PRINT("Starting level " + ToString(level) + "." );
                 
                 queue_1.resize(0);
                 
-                debug_print("queue_0 = "+ToString(queue_0));
+                TOOLS_DEBUG_PRINT("queue_0 = "+ToString(queue_0));
                 
                 perm_1.Read( perm_0.data() );
                 
                 v.SetZero();
                 
-                debug_print("Compute indicators.");
+                TOOLS_DEBUG_PRINT("Compute indicators.");
                 
 //                ptic("Compute indicators");
                 ParallelDo(
@@ -107,7 +107,7 @@ public:
                     2
                 );
 
-                debug_print("Compute types.");
+                TOOLS_DEBUG_PRINT("Compute types.");
 //                ptic("Compute types");
                 ParallelDo(
                     [&]( const Int i )
@@ -124,7 +124,7 @@ public:
                 );
 //                ptoc("Compute types");
                 
-                debug_print("Modify permutation.");
+                TOOLS_DEBUG_PRINT("Modify permutation.");
 //                ptic("Modify permutation");
                 ParallelDo(
                     [&]( const Int k )
@@ -191,13 +191,13 @@ public:
                 );
 //                ptoc("Modify permutation");
                 
-                debug_print("Swapping.");
+                TOOLS_DEBUG_PRINT("Swapping.");
                 
                 std::swap( queue_0, queue_1 );
                 
                 swap( perm_0, perm_1 );
                 
-                debug_print("Done with level " + ToString(level) + "." );
+                TOOLS_DEBUG_PRINT("Done with level " + ToString(level) + "." );
                 
                 ++level;
             }

@@ -558,7 +558,7 @@ namespace Repulsor
                 
                 {
                     // We assume that each row has the same number of nonzeros.
-                    debug_assert(
+                    TOOLS_DEBUG_ASSERT(
                         lo_pre.Outer(1) - lo_pre.Outer(0) == hi_pre.Outer(1) - hi_pre.Outer(0),
                         ""
                     );

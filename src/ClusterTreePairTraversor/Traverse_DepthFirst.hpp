@@ -4,7 +4,7 @@ public:
         const Int thread, const Int i0, const Int j0
     )
     {
-        debug_print(className()+"::Traverse_DepthFirst("+ToString(thread)+")...");
+        TOOLS_DEBUG_PRINT(className()+"::Traverse_DepthFirst("+ToString(thread)+")...");
         
         mref<Kernel_T> K = kernels[thread];
         
@@ -276,7 +276,7 @@ public:
             eprint( ClassName() + "::Traverse_DepthFirst: Stack overflow." );
         }
         
-        debug_print(className()+"::Traverse_DepthFirst("+ToString(thread)+") done.");
+        TOOLS_DEBUG_PRINT(className()+"::Traverse_DepthFirst("+ToString(thread)+") done.");
         
     } // Traverse_DepthFirst
     

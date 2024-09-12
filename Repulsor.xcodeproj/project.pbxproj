@@ -800,7 +800,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					/opt/homebrew/opt/openblas/lib,
 					/opt/homebrew/lib,
-					"/opt/homebrew/Cellar/suite-sparse/7.7.0/lib",
+					/opt/homebrew/opt/suitesparse/lib,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
@@ -823,7 +823,7 @@
 					/usr/include,
 					/opt/homebrew/include,
 					/opt/homebrew/opt/openblas/include,
-					"/opt/homebrew/Cellar/suite-sparse/7.7.0/include/suitesparse",
+					/opt/homebrew/opt/suitesparse/include/suitesparse,
 				);
 				USER_HEADER_SEARCH_PATHS = (
 					/opt/homebrew/include,
@@ -893,7 +893,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					/opt/homebrew/opt/openblas/lib,
 					/opt/homebrew/lib,
-					"/opt/homebrew/Cellar/suite-sparse/7.7.0/lib",
+					/opt/homebrew/opt/suitesparse/lib,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -916,7 +916,7 @@
 					/usr/include,
 					/opt/homebrew/include,
 					/opt/homebrew/opt/openblas/include,
-					"/opt/homebrew/Cellar/suite-sparse/7.7.0/include/suitesparse",
+					/opt/homebrew/opt/suitesparse/include/suitesparse,
 				);
 				USER_HEADER_SEARCH_PATHS = (
 					/opt/homebrew/include,
@@ -1048,6 +1048,11 @@
 					"-lmetis",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = (
+					/opt/homebrew/include,
+					/usr/include,
+					/opt/homebrew/opt/openblas/include,
+				);
 			};
 			name = Debug;
 		};
@@ -1064,6 +1069,11 @@
 					"-lmetis",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = (
+					/opt/homebrew/include,
+					/usr/include,
+					/opt/homebrew/opt/openblas/include,
+				);
 			};
 			name = Release;
 		};

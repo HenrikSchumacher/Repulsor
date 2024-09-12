@@ -160,7 +160,7 @@ namespace Repulsor
                                   Min(S_Tree_T::MaxLevel(),S_Tree_T::MaxLevel())
                               )                                                                )
         {
-            debug_print(std::string( "Initializing " + this->ClassName() + " from Configurator_T on thread " + ToString(thread)) );
+            TOOLS_DEBUG_PRINT(std::string( "Initializing " + this->ClassName() + " from Configurator_T on thread " + ToString(thread)) );
             
             if( GetS().PrimitiveSerialized().Dimension(1) != S_Tree.SimplexPrototype().Size() )
             {
@@ -195,7 +195,7 @@ namespace Repulsor
         ,   max_level_reached   ( other.max_level_reached                           )
         ,   evaluations         ( other.evaluations                                 )
         {
-            debug_print(std::string( "Initializing "+ClassName()+" from "+ClassName()+" on thread " + ToString(thread)) );
+            TOOLS_DEBUG_PRINT(std::string( "Initializing "+ClassName()+" from "+ClassName()+" on thread " + ToString(thread)) );
         }
         
         ~FMM_Kernel_VF()

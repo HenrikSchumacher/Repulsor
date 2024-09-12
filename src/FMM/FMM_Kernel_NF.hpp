@@ -100,7 +100,7 @@ namespace Repulsor
         ,   T_D_data    ( GetT().ThreadPrimitiveDNearFieldData().data(thread) )
         ,   T_diag      ( GetT().NF_Accumulator().data(               thread) )
         {
-            debug_print(std::string( "Initializing "+ this->ClassName() + " from Configurator_T on thread " + ToString(thread)) );
+            TOOLS_DEBUG_PRINT(std::string( "Initializing "+ this->ClassName() + " from Configurator_T on thread " + ToString(thread)) );
             
             if( GetS().PrimitiveNearFieldData().Dimension(1) != S_DATA_DIM )
             {
@@ -139,7 +139,7 @@ namespace Repulsor
         ,   T_D_data    ( other.GetT().ThreadPrimitiveDNearFieldData().data(thread) )
         ,   T_diag      ( other.GetT().NF_Accumulator().data(               thread) )
         {
-            debug_print(std::string( "Initializing " + this->ClassName() + " from "+ClassName()+" on thread " + ToString(thread)) );
+            TOOLS_DEBUG_PRINT(std::string( "Initializing " + this->ClassName() + " from "+ClassName()+" on thread " + ToString(thread)) );
         }
         
         ~FMM_Kernel_NF() = default;
