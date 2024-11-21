@@ -339,7 +339,7 @@ namespace Repulsor
             const Int  far_dim =  FarDim();
 
             ParallelDo(
-                [=]( const Int i )
+                [=,this]( const Int i )
                 {
                     const Int j = P_ordering[i];
 
