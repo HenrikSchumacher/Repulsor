@@ -15,6 +15,7 @@ namespace Repulsor
         using CotangentVector_T      = typename MeshBase_T::CotangentVector_T;
         using ValueContainer_T       = MetricValueContainer<Real,LInt>;
         using Solver_T               = ConjugateGradient<VarSize,Real,Int>;
+        using SolverVector_T         = typename Solver_T::RealVector_T;
         
         MetricBase() = default;
 
@@ -23,7 +24,7 @@ namespace Repulsor
     protected:
         
         mutable Int iter = 0;
-        mutable Solver_T::RealVector_T rel_residuals;
+        mutable SolverVector_T rel_residuals;
         
     public:
         
@@ -127,7 +128,7 @@ namespace Repulsor
             return iter;
         }
         
-        Solver_T::RealVector_T Solver_RelativeResiduals() const
+        SolverVector_T Solver_RelativeResiduals() const
         {
             return rel_residuals;
         }
