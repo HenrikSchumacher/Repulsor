@@ -137,6 +137,10 @@ namespace Repulsor
             const Int local_thread_count = 1
         ) const = 0;
         
+        virtual cref<Permutation<Int>> ApproximateMinimumDegreeOrdering() const = 0;
+        
+        virtual cref<Permutation<Int>> MetisOrdering() const = 0;
+        
         virtual mref<Sparse::CholeskyDecomposition<Real,Int,LInt>> H1Solver() const = 0;
         
         virtual Int H1SolverID() const = 0;

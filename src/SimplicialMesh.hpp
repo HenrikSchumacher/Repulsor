@@ -268,8 +268,10 @@ namespace Repulsor
 
 #include "SimplicialMesh/ComputeNearFarDataOps.hpp"
 #include "SimplicialMesh/ComputeNearFarData.hpp"
-#include "SimplicialMesh/H1Metric.hpp"
 #include "SimplicialMesh/NestedDissectionOrdering.hpp"
+#include "SimplicialMesh/ApproximateMinimumDegreeOrdering.hpp"
+#include "SimplicialMesh/MetisOrdering.hpp"
+#include "SimplicialMesh/H1Metric.hpp"
 
         
     public:

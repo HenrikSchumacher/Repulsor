@@ -148,7 +148,13 @@ public:
         
         if( !this->InCacheQ( tag ) )
         {
+            // Approximate Minimum Degree ordering is our favorite.
+            
+#ifdef TENSORS_HAS_AMD
+            this->SetCache( tag, Int(1) );
+#else
             this->SetCache( tag, Int(0) );
+#endif
         }
         
         return this->template GetCache<Int>( tag );
@@ -193,28 +199,12 @@ public:
                 }
                 case 1:
                 {
-#ifdef TENSORS_HAS_AMD
-                    perm = Sparse::ApproximateMinimumDegree<Int>()(
-                        A.Outer().data(), A.Inner().data(), A.RowCount(), ThreadCount()
-                    );
-#else
-                    wprint(ClassName()+"::H1Solver: Sparse::ApproximateMinimumDegree not available. Using default NestedDissectionOrdering.");
-                    
-                    perm = NestedDissectionOrdering();
-#endif
+                    perm = ApproximateMinimumDegreeOrdering();
                     break;
                 }
                 case 2:
                 {
-#ifdef TENSORS_HAS_METIS
-                    perm = Sparse::Metis<Int>()(
-                        A.Outer().data(), A.Inner().data(), A.RowCount(), ThreadCount()
-                    );
-#else
-                    wprint(ClassName()+"::H1Solver: Sparse::Metis not available. Using default NestedDissectionOrdering.");
-                    
-                    perm = NestedDissectionOrdering();
-#endif
+                    perm = MetisOrdering();
                     break;
                 }
                 default:
@@ -222,8 +212,7 @@ public:
                     wprint(ClassName()+"::H1Solver: Unknown H1SolverID "+ToString(ID)+". Using default NestedDissectionOrdering.");
                     
                     break;
-                }
-                    
+                }   
             }
             
             std::shared_ptr<Solver_T> S = std::make_shared<Solver_T>(
