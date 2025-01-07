@@ -96,14 +96,10 @@ namespace Repulsor
             
             mptr<Real> Z = Z_buf.data();
             
-            
-            // TODO: Once the solver works better, make these calls Parallel.
-            constexpr Parallel_T parQ = Sequential;
-
             const Real alpha_ = static_cast<Real>(alpha);
 
             // Actually, only nrhs = AMB_DIM should be allowed at this point.
-            M.H1Solver().template Solve<AMB_DIM,parQ>(
+            M.H1Solver().template Solve<AMB_DIM,Parallel>(
                 alpha_,             X, ldX,
                 Scalar::Zero<Real>, Z, nrhs,
                 nrhs
@@ -119,7 +115,7 @@ namespace Repulsor
             }
 
             // Actually, only nrhs = AMB_DIM should be allowed at this point.
-            M.H1Solver().template Solve<AMB_DIM,parQ>(
+            M.H1Solver().template Solve<AMB_DIM,Parallel>(
                 Scalar::One<ExtReal>, Z, nrhs,
                 beta,                 Y, ldY,
                 nrhs

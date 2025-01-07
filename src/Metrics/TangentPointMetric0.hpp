@@ -95,15 +95,11 @@ namespace Repulsor
             mref<Tensor2<Real,Int>> Z_buf = M.XBuffer( nrhs );
             
             mptr<Real> Z = Z_buf.data();
-            
-            // TODO: Once the solver works better, make these calls Parallel.
-
-            constexpr Parallel_T parQ = Sequential;
 
             const Real alpha_ = static_cast<Real>(alpha);
             
             // Actually, only nrhs = AMB_DIM should be allowed at this point.
-            M.H1Solver().template Solve<AMB_DIM,parQ>(
+            M.H1Solver().template Solve<AMB_DIM,Parallel>(
                 alpha_,             X, ldX,
                 Scalar::Zero<Real>, Z, nrhs,
                 nrhs
@@ -112,14 +108,14 @@ namespace Repulsor
             if( Abs(alpha_) > Scalar::Zero<Real> )
             {
                 pseudo_lap.MultiplyMetric( M,
-                    Scalar::One<Real>,  Z, nrhs,
+                    Scalar::One <Real>, Z, nrhs,
                     Scalar::Zero<Real>, Z, nrhs,
                     nrhs
                 );
             }
 
             // Actually, only nrhs = AMB_DIM should be allowed at this point.
-            M.H1Solver().template Solve<AMB_DIM,parQ>(
+            M.H1Solver().template Solve<AMB_DIM,Parallel>(
                 Scalar::One<ExtReal>, Z, nrhs,
                 beta,                 Y, ldY,
                 nrhs
