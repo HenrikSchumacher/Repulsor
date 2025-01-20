@@ -98,8 +98,10 @@ namespace Repulsor
 
             const Real alpha_ = static_cast<Real>(alpha);
             
+            constexpr Parallel_T parQ = Parallel;
+            
             // Actually, only nrhs = AMB_DIM should be allowed at this point.
-            M.H1Solver().template Solve<AMB_DIM,Parallel>(
+            M.H1Solver().template Solve<AMB_DIM,parQ>(
                 alpha_,             X, ldX,
                 Scalar::Zero<Real>, Z, nrhs,
                 nrhs
@@ -115,7 +117,7 @@ namespace Repulsor
             }
 
             // Actually, only nrhs = AMB_DIM should be allowed at this point.
-            M.H1Solver().template Solve<AMB_DIM,Parallel>(
+            M.H1Solver().template Solve<AMB_DIM,parQ>(
                 Scalar::One<ExtReal>, Z, nrhs,
                 beta,                 Y, ldY,
                 nrhs
