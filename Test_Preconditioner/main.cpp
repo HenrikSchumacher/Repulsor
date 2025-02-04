@@ -211,16 +211,16 @@ int main(void)
         nrhs
     );
     
-    Tiny::Vector<2,Real,Int> B_prec_norms = {
+    Tiny::Vector<2,Real,Int> B_prec_norms {
         tpm.PreconditionerNorm( M, &B[0][0   ], ldB, nrhs ),
         tpm.PreconditionerNorm( M, &B[0][nrhs], ldB, nrhs )
     };
-    Tiny::Vector<2,Real,Int> abs_prec_errors = {
+    Tiny::Vector<2,Real,Int> abs_prec_errors {
         tpm.PreconditionerNorm( M, &Y[0][0   ], ldB, nrhs ),
         tpm.PreconditionerNorm( M, &Y[0][nrhs], ldB, nrhs )
     };
     
-    Tiny::Vector<2,Real,Int> rel_prec_errors = {
+    Tiny::Vector<2,Real,Int> rel_prec_errors {
         abs_prec_errors[0] / B_prec_norms[0],
         abs_prec_errors[1] / B_prec_norms[1]
     };
@@ -243,7 +243,7 @@ int main(void)
     
 //    dump( ArrayToString( X.data(), {print_rows,ld}, 8 ) );
     
-    Tiny::Vector<2,Real,Int> X_true_metric_norms = {
+    Tiny::Vector<2,Real,Int> X_true_metric_norms {
         tpm.MetricNorm( M, &X[0][0   ], ldX, nrhs ),
         tpm.MetricNorm( M, &X[0][nrhs], ldX, nrhs )
     };
@@ -287,11 +287,11 @@ int main(void)
     dump(tpm.Solver_IterationCount());
     dump(tpm.Solver_RelativeResiduals());
     
-    Tiny::Vector<2,Real,Int> abs_metric_errors = {
+    Tiny::Vector<2,Real,Int> abs_metric_errors {
         tpm.MetricNorm( M, &X[0][0   ], ldX, nrhs ),
         tpm.MetricNorm( M, &X[0][nrhs], ldX, nrhs )
     };
-    Tiny::Vector<2,Real,Int> rel_metric_errors = {
+    Tiny::Vector<2,Real,Int> rel_metric_errors {
         abs_metric_errors[0] / X_true_metric_norms[0],
         abs_metric_errors[1] / X_true_metric_norms[1]
     };
