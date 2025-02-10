@@ -6,20 +6,21 @@ public:
     {
         ptic(className()+"::Traverse_BreadthFirst");
         
-        mref<Kernel_T> K = kernels[thread];
+        mref<Kernel_T> K = kernels[static_cast<Size_T>(thread)];
         
-        i_queue = std::deque<Int>();
-        j_queue = std::deque<Int>();
-        i_queue.push_back(static_cast<Int>(i0));
-        j_queue.push_back(static_cast<Int>(j0));
+        queue = std::deque<std::pair<Int,Int>>();
         
-        while( !i_queue.empty() && ( static_cast<Int>(i_queue.size()) < max_leaves ) )
+        auto push = [this]( const Int i, const Int j )
         {
-            const Int i = i_queue.front();
-            const Int j = j_queue.front();
-            
-            i_queue.pop_front();
-            j_queue.pop_front();
+            queue.push_back( std::pair(i,j) );
+        };
+        
+        push(i0,j0);
+        
+        while( !queue.empty() && ( static_cast<Int>(queue.size()) < max_leaves ) )
+        {
+            auto [i,j] = queue.front();
+            queue.pop_front();
             
             K.LoadClusterS(i);
             K.LoadClusterT(j);
@@ -28,17 +29,17 @@ public:
 
             if( !admissableQ )
             {
-                const Int left_i = S_C_left[i];
-                const Int left_j = T_C_left[j];
+                const Int L_i = S_C_L[i];
+                const Int L_j = T_C_L[j];
 
                 // Using that children are either both interiors or both leaves.
-                if( (left_i >= null) /*|| (left_j >= null)*/ )
+                if( (L_i >= null) || (L_j >= null) )
                 {
-                    const Int right_i = S_C_right[i];
-                    const Int right_j = T_C_right[j];
+                    const Int R_i = S_C_R[i];
+                    const Int R_j = T_C_R[j];
                     
-                    const SReal score_i = (left_i>=null) * K.ClusterScoreS();
-                    const SReal score_j = (left_j>=null) * K.ClusterScoreT();
+                    const SReal score_i = (L_i>=null) * K.ClusterScoreS();
+                    const SReal score_j = (L_j>=null) * K.ClusterScoreT();
 
                     if( score_i == score_j && score_i > zero )
                     {
@@ -49,49 +50,27 @@ public:
                             if( i == j )
                             {
                                 //  Creating 3 blockcluster children, since there is one block that is just the mirror of another one.
-                                
-                                i_queue.push_back(left_i);
-                                j_queue.push_back(right_j);
-                                
-                                i_queue.push_back(right_i);
-                                j_queue.push_back(right_j);
-                                
-                                i_queue.push_back(left_i);
-                                j_queue.push_back(left_j);
+                                push(L_i,R_j);
+                                push(R_i,R_j);
+                                push(L_i,L_j);
                             }
                             else
                             {
                                 // This is a very seldom case; still required to preserve symmetry.
                                 // This happens only if i and j represent_diffent clusters with same radii.
-                                
-                                i_queue.push_back(right_i);
-                                j_queue.push_back(right_j);
-                                
-                                i_queue.push_back(left_i);
-                                j_queue.push_back(right_j);
-                                
-                                i_queue.push_back(right_i);
-                                j_queue.push_back(left_j);
-                                
-                                i_queue.push_back(left_i);
-                                j_queue.push_back(left_j);
+                                push(R_i,R_j);
+                                push(L_i,R_j);
+                                push(R_i,L_j);
+                                push(L_i,L_j);
                             }
                         }
                         else
                         {
                             // Split both clusters
-                            
-                            i_queue.push_back(right_i);
-                            j_queue.push_back(right_j);
-                            
-                            i_queue.push_back(left_i);
-                            j_queue.push_back(right_j);
-                            
-                            i_queue.push_back(right_i);
-                            j_queue.push_back(left_j);
-                            
-                            i_queue.push_back(left_i);
-                            j_queue.push_back(left_j);
+                            push(R_i,R_j);
+                            push(L_i,R_j);
+                            push(R_i,L_j);
+                            push(L_i,L_j);
                         }
                     }
                     else
@@ -99,25 +78,18 @@ public:
                         // split only larger cluster
                         if( score_i > score_j )
                         {
-                            i_queue.push_back(right_i);
-                            j_queue.push_back(j);
-                            
-                            //split cluster i
-                            i_queue.push_back(left_i);
-                            j_queue.push_back(j);
+                            push(R_i,j);
+                            push(L_i,j);
                         }
                         else //score_i < score_j
                         {
                             //split cluster j
-                            i_queue.push_back(i);
-                            j_queue.push_back(right_j);
-                            
-                            i_queue.push_back(i);
-                            j_queue.push_back(left_j);
+                            push(i,R_j);
+                            push(i,L_j);
                         }
                     }
                 }
-                else // left_i < null && left_j < null
+                else // L_i < null && L_j < null
                 {
                     // We know that i and j are leaf clusters and that they belong either to the near field, the very near field or contain intersecting primitives.
                     

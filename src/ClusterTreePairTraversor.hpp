@@ -22,12 +22,12 @@ namespace Repulsor
         )
         :   kernels (kernels_)
         ,   thread_count( static_cast<Int>(kernels.size()) )
-        ,   S_C_left  ( S_.ClusterLeft().data()          )
-        ,   S_C_right ( S_.ClusterRight().data()         )
+        ,   S_C_L     ( S_.ClusterLeft().data()          )
+        ,   S_C_R     ( S_.ClusterRight().data()         )
         ,   S_C_begin ( S_.ClusterBegin().data()         )
         ,   S_C_end   ( S_.ClusterEnd().data()           )
-        ,   T_C_left  ( T_.ClusterLeft().data()          )
-        ,   T_C_right ( T_.ClusterRight().data()         )
+        ,   T_C_L     ( T_.ClusterLeft().data()          )
+        ,   T_C_R     ( T_.ClusterRight().data()         )
         ,   T_C_begin ( T_.ClusterBegin().data()         )
         ,   T_C_end   ( T_.ClusterEnd().data()           )
         {
@@ -54,17 +54,19 @@ namespace Repulsor
         
         BlockSplitMethod block_split_method = BlockSplitMethod::Parallel;
 
-        std::deque<Int> i_queue;
-        std::deque<Int> j_queue;
+//        std::deque<Int> i_queue;
+//        std::deque<Int> j_queue;
+        
+        std::deque<std::pair<Int,Int>> queue;
         
         
-        cptr<Int> S_C_left;
-        cptr<Int> S_C_right;
+        cptr<Int> S_C_L;
+        cptr<Int> S_C_R;
         cptr<Int> S_C_begin;
         cptr<Int> S_C_end;
         
-        cptr<Int> T_C_left;
-        cptr<Int> T_C_right;
+        cptr<Int> T_C_L;
+        cptr<Int> T_C_R;
         cptr<Int> T_C_begin;
         cptr<Int> T_C_end;
         
@@ -106,7 +108,7 @@ namespace Repulsor
         {
             ptic(className()+"::Traverse_Sequential");
             
-            Traverse_DepthFirst( 0, 0, 0 );
+            Traverse_DepthFirst( Int(0), Int(0), Int(0) );
             
             ptoc(className()+"::Traverse_Sequential");
         }
@@ -119,7 +121,7 @@ namespace Repulsor
         {
             ptic(className()+"::Traverse_Parallel");
             
-            Traverse_BreadthFirst( 0, 0, 0, static_cast<Int>(16) * ThreadCount() );
+            Traverse_BreadthFirst( Int(0), Int(0), Int(0), static_cast<Int>(16) * ThreadCount() );
             
             
             ParallelDo_Dynamic(
@@ -127,9 +129,11 @@ namespace Repulsor
                 {
                     TOOLS_DEBUG_PRINT(className()+"::Traverse_Parallel: Requesting kernel on thread " + ToString(thread) + " for task " + ToString(k) + "." );
                     
-                    Traverse_DepthFirst( thread, i_queue[k], j_queue[k] );
+                    auto [i,j] = queue[static_cast<Size_T>(k)];
+                    
+                    Traverse_DepthFirst( thread, i, j );
                 },
-                Scalar::Zero<Int>, static_cast<Int>( i_queue.size() ), Scalar::One<Int>,
+                Int(0), static_cast<Int>( queue.size() ), Int(1),
                 ThreadCount()
             );
             

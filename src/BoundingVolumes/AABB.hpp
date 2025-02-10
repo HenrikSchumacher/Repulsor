@@ -230,13 +230,14 @@ namespace Repulsor
             Int thread_count = 1                                    // how many threads to utilize
         ) const override
         {
-            using Vector_T = std::array<SReal,AMB_DIM>;
+//            using Vector_T = std::array<SReal,AMB_DIM>;
+            using Vector_T = Tiny::Vector<AMB_DIM,SReal,Int>;
             
             Vector_T lower;
             Vector_T upper;
-
-            lower.fill( Scalar::Max<SReal> );
-            upper.fill( Scalar::Min<SReal> );
+            
+            lower.Fill( Scalar::Max<SReal> );
+            upper.Fill( Scalar::Min<SReal> );
             
             if( thread_count <= 1 )
             {
@@ -274,8 +275,8 @@ namespace Repulsor
                         Vector_T L;
                         Vector_T U;
                         
-                        L.fill( Scalar::Max<SReal> );
-                        U.fill( Scalar::Min<SReal> );
+                        L.Fill( Scalar::Max<SReal> );
+                        U.Fill( Scalar::Min<SReal> );
 
                         for( Int i = i_begin; i < i_end; ++i )
                         {

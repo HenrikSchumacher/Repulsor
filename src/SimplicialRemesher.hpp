@@ -57,8 +57,7 @@ namespace Repulsor
 
         using Quadric_T          = Tiny::Matrix<AMB_DIM+1,AMB_DIM+1,Real,Int>;
         
-//        using BoolContainer_T = std::vector<bool>;
-        using BoolContainer_T = Tensor1<bool,Int>;
+        using BoolContainer_T    = Tensor1<bool,Int>;
         
         
     protected:

@@ -405,7 +405,7 @@ protected:
         {
             const Int R = C_right[C];
             
-            combine_buffers<Scalar::Flag::Plus,Scalar::Flag::Plus,BUFFER_DIM>(
+            combine_buffers3<Scalar::Flag::Plus,Scalar::Flag::Plus,BUFFER_DIM>(
                 Scalar::One<Real>, &C_in[buffer_dim * L],
                 Scalar::One<Real>, &C_in[buffer_dim * R],
                                    &C_in[buffer_dim * C],

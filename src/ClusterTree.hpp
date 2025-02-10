@@ -132,9 +132,9 @@ namespace Repulsor
             cref<ClusterTreeSettings> settings_ = ClusterTreeSettings()
         )
         :   Base_T( settings_ )
-        ,   P_proto      ( ThreadCount() )
-        ,   C_proto      ( ThreadCount() )
-        ,   P_moving     ( ThreadCount() )
+        ,   P_proto      ( ToSize_T(ThreadCount()) )
+        ,   C_proto      ( ToSize_T(ThreadCount()) )
+        ,   P_moving     ( ToSize_T(ThreadCount()) )
         {
             ptic(className()+"()");
             
@@ -150,13 +150,13 @@ namespace Repulsor
             }
             
             ParallelDo(
-                [&,this]( const Int thread )
+                [&,this]( const Size_T thread )
                 {
                     P_proto[thread] = P_proto_.Clone();
                     
                     C_proto[thread] = C_proto_.Clone();
                 },
-                ThreadCount()
+                ToSize_T(ThreadCount())
             );
             
             this->ComputeClusters();
@@ -1220,7 +1220,7 @@ namespace Repulsor
             
             const Int far_dim = FarDim();
             
-            this->RequireBuffers(far_dim);
+            this->RequireBuffers(FarDim());
             
             thread_C_D_far.AddReduce( C_out.data(), false );
             
