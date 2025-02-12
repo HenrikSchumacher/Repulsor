@@ -122,10 +122,10 @@ int main(void)
     const Int ldY = ld;
     const Int ldZ = ld;
     
-    Tensor2<ExtReal,Int> B  ( M.VertexCount(), ldB );
-    Tensor2<ExtReal,Int> X  ( M.VertexCount(), ldX );
-    Tensor2<ExtReal,Int> Y  ( M.VertexCount(), ldY );
-    Tensor2<ExtReal,Int> Z  ( M.VertexCount(), ldZ );
+    Tensor2<ExtReal,Int> B ( M.VertexCount(), ldB );
+    Tensor2<ExtReal,Int> X ( M.VertexCount(), ldX );
+    Tensor2<ExtReal,Int> Y ( M.VertexCount(), ldY );
+    Tensor2<ExtReal,Int> Z ( M.VertexCount(), ldZ );
     
     B.SetZero();
     X.SetZero();
