@@ -163,7 +163,7 @@ namespace Repulsor
             const std::filesystem::path & file, const Int thread_count
         )
         {
-            ptic(ClassName()+"::Make_FromFile");
+            TOOLS_PTIC(ClassName()+"::Make_FromFile");
             
             print("Reading mesh from file " + file.string() + ".");
             
@@ -173,7 +173,7 @@ namespace Repulsor
             {
                 eprint("Make_FromFile: File " + file.string() + " could not be opened.");
                 
-                ptoc(ClassName()+"::Make_FromFile");
+                TOOLS_PTOC(ClassName()+"::Make_FromFile");
                 
                 return nullptr;
             }
@@ -185,20 +185,20 @@ namespace Repulsor
             Int simplex_count;
             s >> str;
             s >> dom_dim;
-            dump(dom_dim);
+            TOOLS_DUMP(dom_dim);
             s >> str;
             s >> amb_dim;
-            dump(amb_dim);
+            TOOLS_DUMP(amb_dim);
             s >> str;
             s >> vertex_count;
-            dump(vertex_count);
+            TOOLS_DUMP(vertex_count);
             s >> str;
             s >> simplex_count;
-            dump(simplex_count);
+            TOOLS_DUMP(simplex_count);
             
             const Int simplex_size = dom_dim+1;
             
-            dump(simplex_size);
+            TOOLS_DUMP(simplex_size);
             
             Tensor2<ExtReal,Int> coords    (vertex_count, amb_dim);
             Tensor2<Int,Int>     simplices (simplex_count,simplex_size);
@@ -231,7 +231,7 @@ namespace Repulsor
                 thread_count
             );
 
-            ptoc(ClassName()+"::Make_FromFile");
+            TOOLS_PTOC(ClassName()+"::Make_FromFile");
             
             return M;
         }

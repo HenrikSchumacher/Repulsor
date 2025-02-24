@@ -380,7 +380,7 @@ namespace Repulsor
         
         void RequireBuffers( const Int nrhs ) const
         {
-            ptic(ClassName()+"::RequireBuffers");
+            TOOLS_PTIC(ClassName()+"::RequireBuffers");
             // TODO: parallelize allocation
             if( nrhs > max_buffer_dim )
             {
@@ -397,13 +397,13 @@ namespace Repulsor
                 
             }
             buffer_dim = nrhs;
-            ptoc(ClassName()+"::RequireBuffers");
+            TOOLS_PTOC(ClassName()+"::RequireBuffers");
             
         }; // RequireBuffers
 
         void CleanseBuffers() const
         {
-            ptic(ClassName()+"::CleanseBuffers");
+            TOOLS_PTIC(ClassName()+"::CleanseBuffers");
             
             P_in.SetZero();
             P_out.SetZero();
@@ -411,21 +411,21 @@ namespace Repulsor
             C_in.SetZero();
             C_out.SetZero();
         
-            ptoc(ClassName()+"::CleanseBuffers");
+            TOOLS_PTOC(ClassName()+"::CleanseBuffers");
         }; // CleanseBuffers
 
         
         void PercolateUp() const
         {
-//            ptic(ClassName()+"::PercolateUp");
+//            TOOLS_PTIC(ClassName()+"::PercolateUp");
             
             switch (settings.tree_perc_alg)
             {
                 case TreePercolationAlgorithm::Sequential:
                 {
-                    ptic(ClassName()+"::PercolateUp_DFS");
+                    TOOLS_PTIC(ClassName()+"::PercolateUp_DFS");
                     PercolateUp_DFS( Scalar::Zero<Int> );
-                    ptoc(ClassName()+"::PercolateUp_DFS");
+                    TOOLS_PTOC(ClassName()+"::PercolateUp_DFS");
                     break;
                 }
                 case TreePercolationAlgorithm::Recursive:
@@ -444,19 +444,19 @@ namespace Repulsor
                     break;
                 }
             }
-//            ptoc(ClassName()+"::PercolateUp");
+//            TOOLS_PTOC(ClassName()+"::PercolateUp");
         }; // PercolateUp
         
         void PercolateDown() const
         {
-//            ptic(ClassName()+"::PercolateDown");
+//            TOOLS_PTIC(ClassName()+"::PercolateDown");
             switch (settings.tree_perc_alg)
             {
                 case TreePercolationAlgorithm::Sequential:
                 {
-                    ptic(ClassName()+"::PercolateDown_DFS");
+                    TOOLS_PTIC(ClassName()+"::PercolateDown_DFS");
                     PercolateDown_DFS( Scalar::Zero<Int> );
-                    ptoc(ClassName()+"::PercolateDown_DFS");
+                    TOOLS_PTOC(ClassName()+"::PercolateDown_DFS");
                     break;
                 }
                 case TreePercolationAlgorithm::Recursive:
@@ -474,7 +474,7 @@ namespace Repulsor
                     PercolateDown_DFS( Scalar::Zero<Int> );
                 }
             }
-//            ptoc(ClassName()+"::PercolateDown");
+//            TOOLS_PTOC(ClassName()+"::PercolateDown");
         }; // PercolateUp
         
         
@@ -523,12 +523,12 @@ namespace Repulsor
             std::string tag ("PrimitiveAdjacencyMatrix");
             if( !InPersistentCacheQ(tag))
             {
-                ptic(ClassName()+"::" + tag );
+                TOOLS_PTIC(ClassName()+"::" + tag );
                 // We compute product of S->lo_pre and  S->lo_post because it is basically the primitive-primitive adjacency matrix, we two primitives are supposed to be adjacencent if they share a common degree of freedom.
                 
                 SparseBinaryMatrix_T P_adjacency_matrix = lo_pre.DotBinary(lo_post);
 
-                ptoc(ClassName()+"::" + tag );
+                TOOLS_PTOC(ClassName()+"::" + tag );
                 
                 this->SetPersistentCache(tag, std::move(P_adjacency_matrix) );
             }
@@ -584,29 +584,29 @@ namespace Repulsor
         
         void CleanseDerivativeBuffers() const
         {
-            ptic(ClassName()+"::CleanseDerivativeBuffers");
+            TOOLS_PTIC(ClassName()+"::CleanseDerivativeBuffers");
             
             thread_P_D_near.SetZero();
             thread_C_D_far.SetZero();
 
-            ptoc(ClassName()+"::CleanseDerivativeBuffers");
+            TOOLS_PTOC(ClassName()+"::CleanseDerivativeBuffers");
         }; // CleanseDerivativeBuffers
         
         void CollectDerivatives() const
         {
-            ptic(ClassName()+"::CollectDerivatives");
+            TOOLS_PTIC(ClassName()+"::CollectDerivatives");
             
             CollectFarFieldDerivatives ( false );
             CollectNearFieldDerivatives( false );
             
-            ptoc(ClassName()+"::CollectDerivatives");
+            TOOLS_PTOC(ClassName()+"::CollectDerivatives");
             
         } // CollectDerivatives
         
         
         void CollectPrimitiveDensities() const
         {
-            ptic(ClassName()+"::CollectPrimitiveDensities");
+            TOOLS_PTIC(ClassName()+"::CollectPrimitiveDensities");
             
             // Collect energies from primitives and clusters and store them in P_out.
             
@@ -659,13 +659,13 @@ namespace Repulsor
                 );
             }
                         
-            ptoc(ClassName()+"::CollectPrimitiveDensities");
+            TOOLS_PTOC(ClassName()+"::CollectPrimitiveDensities");
             
         } // CollectPrimitiveDensities
         
         void CollectPrimitiveDensities( mptr<ExtReal> output, const ExtReal weight, bool addTo = false ) const
         {
-            ptic(ClassName()+"::CollectPrimitiveDensities");
+            TOOLS_PTIC(ClassName()+"::CollectPrimitiveDensities");
             
             //Collect the energies into P_out.
             CollectPrimitiveDensities();
@@ -683,13 +683,13 @@ namespace Repulsor
                 ThreadCount()
             );
             
-            ptoc(ClassName()+"::CollectPrimitiveDensities");
+            TOOLS_PTOC(ClassName()+"::CollectPrimitiveDensities");
        
         } // CollectPrimitiveDensities
             
         void CollectVertexDensities( mptr<ExtReal> output, const ExtReal weight, bool addTo = false ) const
         {
-            ptic(ClassName()+"::CollectVertexDensities");
+            TOOLS_PTIC(ClassName()+"::CollectVertexDensities");
             
             // Partially using the pipeline for derivatives. Not optimized efficient, but also not performance critical.
             this->RequireBuffers( static_cast<Int>(1) );
@@ -727,7 +727,7 @@ namespace Repulsor
                 ThreadCount()
             );
             
-            ptoc(ClassName()+"::CollectVertexDensities");
+            TOOLS_PTOC(ClassName()+"::CollectVertexDensities");
             
         } // CollectVertexDensities
 

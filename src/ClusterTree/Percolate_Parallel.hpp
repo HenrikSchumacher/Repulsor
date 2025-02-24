@@ -120,7 +120,7 @@ public:
         
         if( !this->InPersistentCacheQ( tag ) )
         {
-            ptic(ClassName()+"::" + tag );
+            TOOLS_PTIC(ClassName()+"::" + tag );
             
             const Int max_depth = static_cast<Int>(settings.parallel_perc_depth);
             
@@ -179,7 +179,7 @@ public:
 
             this->SetPersistentCache(tag, std::move(forest) );
             
-            ptoc( ClassName()+"::" + tag );
+            TOOLS_PTOC( ClassName()+"::" + tag );
         }
         
         return this->template GetPersistentCache<Forest_T>(tag);
@@ -230,11 +230,11 @@ protected:
     {
         if constexpr( BUFFER_DIM > 0 )
         {
-            ptic(ClassName()+"::PercolateDown_Parallel<"+ToString(BUFFER_DIM)+">");
+            TOOLS_PTIC(ClassName()+"::PercolateDown_Parallel<"+ToString(BUFFER_DIM)+">");
         }
         else
         {
-            ptic(ClassName()+"::PercolateDown_Parallel<0> ("+ToString(buffer_dim)+")");
+            TOOLS_PTIC(ClassName()+"::PercolateDown_Parallel<0> ("+ToString(buffer_dim)+")");
         }
         
         cref<Forest_T> forest = Forest();
@@ -267,11 +267,11 @@ protected:
         
         if constexpr( BUFFER_DIM > 0 )
         {
-            ptoc(ClassName()+"::PercolateDown_Parallel<"+ToString(BUFFER_DIM)+">");
+            TOOLS_PTOC(ClassName()+"::PercolateDown_Parallel<"+ToString(BUFFER_DIM)+">");
         }
         else
         {
-            ptoc(ClassName()+"::PercolateDown_Parallel<0> ("+ToString(buffer_dim)+")");
+            TOOLS_PTOC(ClassName()+"::PercolateDown_Parallel<0> ("+ToString(buffer_dim)+")");
         }
 
     } // percolateDown_Parallel
@@ -347,11 +347,11 @@ protected:
     {
         if constexpr( BUFFER_DIM > 0 )
         {
-            ptic(ClassName()+"::PercolateUp_Parallel<"+ToString(BUFFER_DIM)+">");
+            TOOLS_PTIC(ClassName()+"::PercolateUp_Parallel<"+ToString(BUFFER_DIM)+">");
         }
         else
         {
-            ptic(ClassName()+"::PercolateUp_Parallel<0> ("+ToString(buffer_dim)+")");
+            TOOLS_PTIC(ClassName()+"::PercolateUp_Parallel<0> ("+ToString(buffer_dim)+")");
         }
         
         cref<Forest_T> forest = Forest();
@@ -385,11 +385,11 @@ protected:
 
         if constexpr( BUFFER_DIM > 0 )
         {
-            ptoc(ClassName()+"::PercolateUp_Parallel<"+ToString(BUFFER_DIM)+">");
+            TOOLS_PTOC(ClassName()+"::PercolateUp_Parallel<"+ToString(BUFFER_DIM)+">");
         }
         else
         {
-            ptoc(ClassName()+"::PercolateUp_Parallel<0> ("+ToString(buffer_dim)+")");
+            TOOLS_PTOC(ClassName()+"::PercolateUp_Parallel<0> ("+ToString(buffer_dim)+")");
         }
         
     } // percolateUp_Parallel

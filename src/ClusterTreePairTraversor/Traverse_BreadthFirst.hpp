@@ -1,10 +1,10 @@
 public:
 
-    force_flattening void Traverse_BreadthFirst(
+    TOOLS_FORCE_FLATTENING void Traverse_BreadthFirst(
         const Int thread, const Int i0, const Int j0, const Int max_leaves
     )
     {
-        ptic(className()+"::Traverse_BreadthFirst");
+        TOOLS_PTIC(className()+"::Traverse_BreadthFirst");
         
         mref<Kernel_T> K = kernels[static_cast<Size_T>(thread)];
         
@@ -229,6 +229,6 @@ public:
             }
         }
         
-        ptoc(className()+"::Traverse_BreadthFirst");
+        TOOLS_PTOC(className()+"::Traverse_BreadthFirst");
         
     } // Traverse_BreadthFirst

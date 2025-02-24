@@ -106,9 +106,9 @@ int main(void)
     toc("Initializing mesh from memory");
     
     
-    dump(M.VertexCount());
-    dump(M.SimplexCount());
-    dump(M.ThreadCount());
+    TOOLS_DUMP(M.VertexCount());
+    TOOLS_DUMP(M.SimplexCount());
+    TOOLS_DUMP(M.ThreadCount());
 
     /// Setup for bounding volume hierarchy and block cluster tree.
     /// These are the default values, so you will typically not have to bother about these.
@@ -142,7 +142,7 @@ int main(void)
     en = tpe.Value(M);
     toc("Compute tangent-point energy");
 
-    dump(en);
+    TOOLS_DUMP(en);
 
     
     /// Require differential of tangent-point energy and load it into the variable `diff`.
@@ -209,8 +209,8 @@ int main(void)
     );
     toc("Solving for gradient");
     
-    dump(tpm.CG_IterationCount());
-    dump(tpm.CG_RelativeResiduals());
+    TOOLS_DUMP(tpm.CG_IterationCount());
+    TOOLS_DUMP(tpm.CG_RelativeResiduals());
     
     
     Mesh_T::TangentVector_T downward_gradient = gradient;
@@ -254,9 +254,9 @@ int main(void)
     en_new = tpe.Value(M);
     toc("Compute tangent-point energy of updated mesh");
 
-    dump(en_new);
+    TOOLS_DUMP(en_new);
     
-    dump(en_new < en);
+    TOOLS_DUMP(en_new < en);
     
     print("");
     print("");
@@ -277,8 +277,8 @@ int main(void)
     
     print("");
 
-    dump(M.GetObstacle().VertexCount());
-    dump(M.GetObstacle().SimplexCount());
+    TOOLS_DUMP(M.GetObstacle().VertexCount());
+    TOOLS_DUMP(M.GetObstacle().SimplexCount());
     
     print("");
     
@@ -295,7 +295,7 @@ int main(void)
     en = tpo.Value(M);
     toc("Compute tangent-point energy between mesh and obstacle");
     
-    dump(en);
+    TOOLS_DUMP(en);
     
     print("");
 

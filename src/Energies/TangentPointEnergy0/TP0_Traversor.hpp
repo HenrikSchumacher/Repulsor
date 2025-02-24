@@ -285,7 +285,7 @@ namespace Repulsor
                 return;
             }
             
-            ptic(ClassName()+"::VF_Compute");
+            TOOLS_PTIC(ClassName()+"::VF_Compute");
             
             using Kernel_T = TP0_Kernel_VF<
                 S_DOM_DIM, T_DOM_DIM,
@@ -310,7 +310,7 @@ namespace Repulsor
                 ker.Diag() = bct.GetS().VF_Accumulator().template AddReduce<Real,LInt>();
             }
             
-            ptoc(ClassName()+"::VF_Compute");
+            TOOLS_PTOC(ClassName()+"::VF_Compute");
         }
             
         
@@ -322,7 +322,7 @@ namespace Repulsor
                 return;
             }
             
-            ptic(ClassName()+"::NF_Compute");
+            TOOLS_PTIC(ClassName()+"::NF_Compute");
 
             using Kernel_T = TP0_Kernel_NF<
                 S_DOM_DIM, T_DOM_DIM,
@@ -349,7 +349,7 @@ namespace Repulsor
                 ker.Diag() = bct.GetS().NF_Accumulator().template AddReduce<Real,LInt>();
             }
 
-            ptoc(ClassName()+"::NF_Compute");
+            TOOLS_PTOC(ClassName()+"::NF_Compute");
         }
         
             
@@ -361,7 +361,7 @@ namespace Repulsor
                 return;
             }
             
-            ptic(ClassName()+"::FF_Compute");
+            TOOLS_PTIC(ClassName()+"::FF_Compute");
             
             using Kernel_T = TP0_Kernel_FF<
                 S_DOM_DIM, T_DOM_DIM,
@@ -387,7 +387,7 @@ namespace Repulsor
                 
                 ker.Diag()= bct.GetS().FF_Accumulator().template AddReduce<Real,LInt>();
             }
-            ptoc(ClassName()+"::FF_Compute");
+            TOOLS_PTOC(ClassName()+"::FF_Compute");
         }
         
 //####################################################################################

@@ -118,11 +118,11 @@ int main( void )
     M.GetBlockClusterTree();
     toc("Creating BlockClusterTree");
 
-    dump(M.GetClusterTree().ThreadCount());
+    TOOLS_DUMP(M.GetClusterTree().ThreadCount());
 
-    dump(M.GetClusterTree().NearDim());
+    TOOLS_DUMP(M.GetClusterTree().NearDim());
 
-    dump(M.GetBlockClusterTree().PrimitiveIntersectionCount());
+    TOOLS_DUMP(M.GetBlockClusterTree().PrimitiveIntersectionCount());
 
     print("");
 
@@ -159,8 +159,8 @@ int main( void )
     en0 = tpe0.Value(M);
     toc("tpe0.Energy(M)");
 
-    dump(en);
-    dump(en0);
+    TOOLS_DUMP(en);
+    TOOLS_DUMP(en0);
 
     
     /// Require differential of tangent-point energy and load it into the variable `diff`.
@@ -260,7 +260,7 @@ int main( void )
     tic("Compute tangent-point energy between mesh and obstacle");
     en = tpo.Value(M);
     toc("Compute tangent-point energy between mesh and obstacle");
-    dump(en);
+    TOOLS_DUMP(en);
     print("");
 
     ///Compute derivative also of this energy.
@@ -272,7 +272,7 @@ int main( void )
     print("");
 
 
-    dump(tpe0.Value(M));
+    TOOLS_DUMP(tpe0.Value(M));
     
     return 0;
 }

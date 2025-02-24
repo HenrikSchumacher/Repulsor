@@ -4,12 +4,12 @@
 
 virtual Int DelaunayFlip( const Int max_iter = 128 ) override
 {
-    ptic(className()+"::DelaunayFlip");
+    TOOLS_PTIC(className()+"::DelaunayFlip");
     
     if constexpr ( DOM_DIM != 2 )
     {
         wprint(className()+"::DelaunayFlip: only implemented for domain dimension 2. Skipping.");
-        ptoc(className()+"::DelaunayFlip");
+        TOOLS_PTOC(className()+"::DelaunayFlip");
         return 0;
     }
     
@@ -52,7 +52,7 @@ virtual Int DelaunayFlip( const Int max_iter = 128 ) override
         wprint(className()+"::DelaunayFlip: Stopped after "+ToString(total_flip_count)+" flips  ("+ToString(iter)+" iterations).");
     }
     
-    ptoc(className()+"::DelaunayFlip");
+    TOOLS_PTOC(className()+"::DelaunayFlip");
     
     return total_flip_count;
 }

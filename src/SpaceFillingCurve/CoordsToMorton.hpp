@@ -3,7 +3,7 @@
     {
         ComputeBoundingBox( X, point_count );
         
-        ptic(ClassName()+"::CoordsToMorton");
+        TOOLS_PTIC(ClassName()+"::CoordsToMorton");
         
         Tensor1<MortonCode_T,Int> M ( point_count );
         
@@ -26,7 +26,7 @@
             thread_count
         );
         
-        ptoc(ClassName()+"::CoordsToMorton");
+        TOOLS_PTOC(ClassName()+"::CoordsToMorton");
         
         return M;
     }

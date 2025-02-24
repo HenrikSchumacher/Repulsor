@@ -47,8 +47,8 @@ int main(int argc, const char * argv[])
 //    toc("WriteToMatrixMarket");
     
     
-    dump( A.RowCount() );
-    dump( A.ColCount() );
+    TOOLS_DUMP( A.RowCount() );
+    TOOLS_DUMP( A.ColCount() );
     
     
     print("");
@@ -118,10 +118,10 @@ int main(int argc, const char * argv[])
     );
     
     print("");
-    dump( Z.MaxNorm() );
+    TOOLS_DUMP( Z.MaxNorm() );
     print("");
 
-    ptic("With load+write");
+    TOOLS_PTIC("With load+write");
     X.Read( &X_wide[0][p], ldX, thread_count );
     Y.Read( &Y_wide[0][p], ldY, thread_count );
     A.Dot(
@@ -131,6 +131,6 @@ int main(int argc, const char * argv[])
     );
     X.Write( &X_wide[0][p], ldX, thread_count );
     Y.Write( &Y_wide[0][p], ldY, thread_count );
-    ptoc("With load+write");
+    TOOLS_PTOC("With load+write");
 
 }

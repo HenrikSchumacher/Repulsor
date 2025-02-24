@@ -6,7 +6,7 @@ public:
 
     virtual Int CollapseEdges( cptr<Edge_T> e_list, const Int n ) override
     {
-        ptic(className()+"::CollapseEdges");
+        TOOLS_PTIC(className()+"::CollapseEdges");
         
         Int collapse_counter = 0;
         
@@ -19,7 +19,7 @@ public:
                 ++collapse_counter;
             }
         }
-        ptoc(className()+"::CollapseEdges");
+        TOOLS_PTOC(className()+"::CollapseEdges");
         
         return collapse_counter;
     }

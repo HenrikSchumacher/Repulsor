@@ -106,11 +106,11 @@ namespace Repulsor
         
         void Init()
         {
-//            dump(sizeof(BitField_T));
-//            dump(sizeof(Axes_T));
-//            dump(sizeof(MortonCode_T));
+//            TOOLS_DUMP(sizeof(BitField_T));
+//            TOOLS_DUMP(sizeof(Axes_T));
+//            TOOLS_DUMP(sizeof(MortonCode_T));
 
-            ptic("Creating lookup table");
+            TOOLS_PTIC("Creating lookup table");
             for( Int k = 0; k < 256; ++k )
             {
                 BitField_T m = 0;
@@ -124,9 +124,9 @@ namespace Repulsor
 
                 LUT[k] = m;
             }
-            ptoc("Creating lookup table");
+            TOOLS_PTOC("Creating lookup table");
             
-//            dump(LUT);
+//            TOOLS_DUMP(LUT);
         }
         
     public:
@@ -172,7 +172,7 @@ namespace Repulsor
         
         void ComputeBoundingBox( cptr<Real> X, const Int point_count )
         {
-            ptic(ClassName()+"::ComputeBoundingBox");
+            TOOLS_PTIC(ClassName()+"::ComputeBoundingBox");
             
             lower.Fill(Scalar::Max<Real>);
             upper.Fill(Scalar::Min<Real>);
@@ -228,7 +228,7 @@ namespace Repulsor
             
             scale = (Scalar::One<Real> - static_cast<Real>(128) * Scalar::eps<Real> ) / L;
             
-            ptoc(ClassName()+"::ComputeBoundingBox");
+            TOOLS_PTOC(ClassName()+"::ComputeBoundingBox");
         }
         
 #include "SpaceFillingCurve/CoordsToAxes.hpp"

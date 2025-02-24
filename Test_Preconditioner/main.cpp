@@ -79,7 +79,7 @@ int main(void)
     
     M.SetH1SolverID( 1 ); // Try to use AMD reordering if available.
 
-    dump(M.ThreadCount());
+    TOOLS_DUMP(M.ThreadCount());
 
     toc("Initializing mesh");
     
@@ -107,7 +107,7 @@ int main(void)
     en = tpe.Value(M);
     toc("tpe.Energy");
 
-    dump(en);
+    TOOLS_DUMP(en);
 
     
     print("");
@@ -131,8 +131,8 @@ int main(void)
     X.SetZero();
     Y.SetZero();
     
-    dump( B.Dimension(0) );
-    dump( B.Dimension(1) );
+    TOOLS_DUMP( B.Dimension(0) );
+    TOOLS_DUMP( B.Dimension(1) );
     
     print("");
     print("Experiment 1: Solve A.X = B for X and check the perconditioner norm of B - A.X ");
@@ -143,7 +143,7 @@ int main(void)
     tpe.Differential( M, Real(1), Real(0), &B[0][0], ldB );
     toc("tpe.Differential");
     
-//    dump( ArrayToString( B.data(), {print_rows,ld}, 8 ) );
+//    TOOLS_DUMP( ArrayToString( B.data(), {print_rows,ld}, 8 ) );
     
     
     print("");
@@ -153,7 +153,7 @@ int main(void)
     tpe.Differential( M, Real(0.5), Real(0), &B[0][nrhs], ldB );
     toc("tpe.Differential");
     
-//    dump( ArrayToString( B.data(), {print_rows,ld}, 8 ) );
+//    TOOLS_DUMP( ArrayToString( B.data(), {print_rows,ld}, 8 ) );
     print("");
     
 
@@ -172,11 +172,11 @@ int main(void)
     );
     toc("Solving for gradient");
     
-    dump( B.CountNaNs() );
-    dump( X.CountNaNs() );
+    TOOLS_DUMP( B.CountNaNs() );
+    TOOLS_DUMP( X.CountNaNs() );
     
-    dump(tpm.Solver_IterationCount());
-    dump(tpm.Solver_RelativeResiduals());
+    TOOLS_DUMP(tpm.Solver_IterationCount());
+    TOOLS_DUMP(tpm.Solver_RelativeResiduals());
     
     print("");
     
@@ -188,11 +188,11 @@ int main(void)
     );
     toc("Solving for gradient");
     
-    dump( B.CountNaNs() );
-    dump( X.CountNaNs() );
+    TOOLS_DUMP( B.CountNaNs() );
+    TOOLS_DUMP( X.CountNaNs() );
     
-    dump(tpm.Solver_IterationCount());
-    dump(tpm.Solver_RelativeResiduals());
+    TOOLS_DUMP(tpm.Solver_IterationCount());
+    TOOLS_DUMP(tpm.Solver_RelativeResiduals());
     
     // Checking the result.
     
@@ -225,9 +225,9 @@ int main(void)
         abs_prec_errors[1] / B_prec_norms[1]
     };
     
-//    dump(B_prec_norms);
-//    dump(abs_prec_errors);
-    dump(rel_prec_errors);
+//    TOOLS_DUMP(B_prec_norms);
+//    TOOLS_DUMP(abs_prec_errors);
+    TOOLS_DUMP(rel_prec_errors);
     
     print("");
     print("Experiment 1: Done.");
@@ -241,7 +241,7 @@ int main(void)
     M.VertexCoordinates().Write( &X[0][0   ], ldX );
     M.VertexCoordinates().Write( &X[0][nrhs], ldX );
     
-//    dump( ArrayToString( X.data(), {print_rows,ld}, 8 ) );
+//    TOOLS_DUMP( ArrayToString( X.data(), {print_rows,ld}, 8 ) );
     
     Tiny::Vector<2,Real,Int> X_true_metric_norms {
         tpm.MetricNorm( M, &X[0][0   ], ldX, nrhs ),
@@ -260,8 +260,8 @@ int main(void)
         nrhs
     );
     
-//    dump( ArrayToString( B.data(), {print_rows,ld}, 8 ) );
-//    dump( ArrayToString( X.data(), {print_rows,ld}, 8 ) );
+//    TOOLS_DUMP( ArrayToString( B.data(), {print_rows,ld}, 8 ) );
+//    TOOLS_DUMP( ArrayToString( X.data(), {print_rows,ld}, 8 ) );
     
     tic("Computing X = alpha * A^{-1}.B - X_true.");
     tpm.Solve( M,
@@ -271,8 +271,8 @@ int main(void)
     );
     toc("Computing X = alpha * A^{-1}.B - X_true.");
     
-    dump(tpm.Solver_IterationCount());
-    dump(tpm.Solver_RelativeResiduals());
+    TOOLS_DUMP(tpm.Solver_IterationCount());
+    TOOLS_DUMP(tpm.Solver_RelativeResiduals());
     
     tic("Computing X = alpha * A^{-1}.B - X_true.");
     tpm.Solve( M,
@@ -282,10 +282,10 @@ int main(void)
     );
     toc("Computing X = alpha * A^{-1}.B - X_true.");
     
-//    dump( ArrayToString( X.data(), {print_rows,ld}, 8 ) );
+//    TOOLS_DUMP( ArrayToString( X.data(), {print_rows,ld}, 8 ) );
     
-    dump(tpm.Solver_IterationCount());
-    dump(tpm.Solver_RelativeResiduals());
+    TOOLS_DUMP(tpm.Solver_IterationCount());
+    TOOLS_DUMP(tpm.Solver_RelativeResiduals());
     
     Tiny::Vector<2,Real,Int> abs_metric_errors {
         tpm.MetricNorm( M, &X[0][0   ], ldX, nrhs ),
@@ -296,9 +296,9 @@ int main(void)
         abs_metric_errors[1] / X_true_metric_norms[1]
     };
     
-//    dump(X_true_metric_norms);
-//    dump(abs_metric_errors);
-    dump(rel_metric_errors);
+//    TOOLS_DUMP(X_true_metric_norms);
+//    TOOLS_DUMP(abs_metric_errors);
+    TOOLS_DUMP(rel_metric_errors);
 
     print("");
     print("Experiment 2: Done.");

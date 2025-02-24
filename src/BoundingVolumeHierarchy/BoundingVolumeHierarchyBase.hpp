@@ -201,7 +201,7 @@ namespace Repulsor
         
         void ComputePrimitiveToClusterMatrix()
         {
-            ptic(className()+"::ComputePrimitiveToClusterMatrix");
+            TOOLS_PTIC(className()+"::ComputePrimitiveToClusterMatrix");
             
             SparseBinaryMatrix_T P_to_C (
                 ClusterCount(), PrimitiveCount(), PrimitiveCount(), ThreadCount() );
@@ -272,7 +272,7 @@ namespace Repulsor
                 std::move( C_to_P )
             );
             
-            ptoc(className()+"::ComputePrimitiveToCluster");
+            TOOLS_PTOC(className()+"::ComputePrimitiveToCluster");
         }
         
     public:

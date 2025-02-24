@@ -61,7 +61,7 @@ int main(void)
 
     M_ptr = nullptr;
 
-    dump(M.ThreadCount());
+    TOOLS_DUMP(M.ThreadCount());
 
     toc("Initializing mesh");
 
@@ -92,7 +92,7 @@ int main(void)
     en = E.Differential(M, diff.data());
     toc("tpe.Differential(M)");
 
-    dump(en);
+    TOOLS_DUMP(en);
     
     return 0;
 }

@@ -2,7 +2,7 @@ public:
 
     void ComputeErrorQuadrics()
     {
-        ptic(ClassName()+"::ComputeErrorQuadrics");
+        TOOLS_PTIC(ClassName()+"::ComputeErrorQuadrics");
         // Error quadrics a la Garland-Heckbert.
         
         Compress();
@@ -56,5 +56,5 @@ public:
             thread_count
         );
         
-        ptic(ClassName()+"::ComputeErrorQuadrics");
+        TOOLS_PTIC(ClassName()+"::ComputeErrorQuadrics");
     }

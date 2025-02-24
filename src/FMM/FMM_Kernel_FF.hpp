@@ -139,7 +139,7 @@ namespace Repulsor
         
     public:
         
-        force_inline void Prefetch( const Int j_next ) const
+        TOOLS_FORCE_INLINE void Prefetch( const Int j_next ) const
         {
             prefetch_buffer<T_DATA_DIM,0,0>( &T_data[T_DATA_DIM * j_next] );
             
@@ -151,7 +151,7 @@ namespace Repulsor
 
     protected:
         
-        force_inline void loadS( const Int i_global )
+        TOOLS_FORCE_INLINE void loadS( const Int i_global )
         {
             cptr<Real> X = &S_data[S_DATA_DIM * i_global];
 
@@ -170,7 +170,7 @@ namespace Repulsor
             }
         }
         
-        force_inline void loadT( const Int j_global )
+        TOOLS_FORCE_INLINE void loadT( const Int j_global )
         {
             cptr<Real> Y = &T_data[T_DATA_DIM * j_global];
             
@@ -188,7 +188,7 @@ namespace Repulsor
             }
         }
             
-        force_inline void writeS( const Int i_global )
+        TOOLS_FORCE_INLINE void writeS( const Int i_global )
         {
             if constexpr ( diff_flag || density_flag )
             {
@@ -198,7 +198,7 @@ namespace Repulsor
             }
         }
         
-        force_inline void writeT( const Int j_global )
+        TOOLS_FORCE_INLINE void writeT( const Int j_global )
         {
             if constexpr ( diff_flag || density_flag )
             {

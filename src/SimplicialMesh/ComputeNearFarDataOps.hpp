@@ -9,7 +9,7 @@ protected:
         mref<SparseMatrix_T> AvOp
     ) const
     {
-        ptic(ClassName()+"::ComputeNearFarDataOps");
+        TOOLS_PTIC(ClassName()+"::ComputeNearFarDataOps");
         
         ParallelDo(
             [&,this]( const Int thread )
@@ -61,5 +61,5 @@ protected:
             ThreadCount()
         );
         
-        ptoc(ClassName()+"::ComputeNearFarDataOps");
+        TOOLS_PTOC(ClassName()+"::ComputeNearFarDataOps");
     };

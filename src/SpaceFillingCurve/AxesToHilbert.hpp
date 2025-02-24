@@ -62,7 +62,7 @@ public:
 
     Tensor1<HilbertCode_T,Int> AxesToHilbert( cref<Tensor1<Axes_T,Int>> A  )
     {
-        ptic(ClassName()+"::AxesToHilbert");
+        TOOLS_PTIC(ClassName()+"::AxesToHilbert");
         
         Tensor1<HilbertCode_T,Int> H ( A.Dimension(0) );
         
@@ -80,7 +80,7 @@ public:
             thread_count
         );
         
-        ptoc(ClassName()+"::AxesToHilbert");
+        TOOLS_PTOC(ClassName()+"::AxesToHilbert");
         
         return H;
     }

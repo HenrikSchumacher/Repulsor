@@ -10,12 +10,12 @@ public:
         const Int  max_iter = 100
     ) override
     {
-        ptic(className()+"::UnifyEdgeLengths");
+        TOOLS_PTIC(className()+"::UnifyEdgeLengths");
 
         if( lower_bound > upper_bound  )
         {
             eprint(className()+"::UnifyEdgeLengths: lower_bound > upper_bound. Aborting");
-            ptoc(className()+"::UnifyEdgeLengths");
+            TOOLS_PTOC(className()+"::UnifyEdgeLengths");
             return 0;
         }
 
@@ -98,7 +98,7 @@ public:
            wprint(className()+"::UnifyEdgeLengths: "+ToString(splits.Size())+" long  edges could not be split.");
         }
 
-        ptoc(className()+"::UnifyEdgeLengths");
+        TOOLS_PTOC(className()+"::UnifyEdgeLengths");
 
         return (total_collapse_count > zero) || (total_split_count > zero);
         

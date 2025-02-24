@@ -29,12 +29,12 @@ namespace Repulsor
         {
             std::string tag ( ClassName()+"::MetricValues" );
 
-            ptic(tag);
+            TOOLS_PTIC(tag);
             if( !M.InCacheQ(tag))
             {
                 M.SetCache( tag, compute_metric(M) );
             }
-            ptoc(tag);
+            TOOLS_PTOC(tag);
             
             return M.template GetCache<ValueContainer_T>(tag);
         }
@@ -43,14 +43,14 @@ namespace Repulsor
         {
             std::string tag ( ClassName()+"::MetricValues" );
 
-            ptic(tag);
+            TOOLS_PTIC(tag);
             
             if( !M.InCacheQ(tag))
             {
                 M.SetCache( tag, compute_metric(M) );
             }
             
-            ptoc(tag);
+            TOOLS_PTOC(tag);
             
             return M.template GetCache<ValueContainer_T>(tag);
         }
@@ -124,13 +124,13 @@ namespace Repulsor
         {
             std::string tag = ClassName()+"::MultiplyMetric";
             
-            ptic(tag);
+            TOOLS_PTIC(tag);
             
             if( nrhs != AMB_DIM )
             {
                 NrhsError( tag, nrhs );
                 
-                ptoc(tag);
+                TOOLS_PTOC(tag);
                 
                 return;
             }
@@ -146,7 +146,7 @@ namespace Repulsor
 
             S.Post( alpha, beta, Y, ldY, op_type );
             
-            ptoc(tag);
+            TOOLS_PTOC(tag);
         }
     
         
@@ -190,13 +190,13 @@ namespace Repulsor
         {
             std::string tag = ClassName()+"::MultiplyPreconditioner";
             
-            ptic(tag);
+            TOOLS_PTIC(tag);
 
             if( nrhs != AMB_DIM )
             {
                 NrhsError( tag, nrhs );
                 
-                ptoc(tag);
+                TOOLS_PTOC(tag);
                 
                 return;
             }
@@ -207,7 +207,7 @@ namespace Repulsor
                 nrhs
             );
             
-            ptoc(tag);
+            TOOLS_PTOC(tag);
         }
         
         
@@ -256,13 +256,13 @@ namespace Repulsor
         {
             std::string tag = ClassName()+"::Solve";
             
-            ptic(tag);
+            TOOLS_PTIC(tag);
 
             if( nrhs != AMB_DIM )
             {
                 NrhsError( tag, nrhs );
                 
-                ptoc(tag);
+                TOOLS_PTOC(tag);
                 
                 return;
             }
@@ -303,7 +303,7 @@ namespace Repulsor
             iter          = solver.IterationCount();
             rel_residuals = solver.RelativeResiduals();
             
-            ptoc(tag);
+            TOOLS_PTOC(tag);
         }
         
         

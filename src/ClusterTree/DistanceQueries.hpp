@@ -11,7 +11,7 @@
         mptr<T> nearest_points
     ) const
     {
-        ptic(ClassName()+"::FindNearestToPoints");
+        TOOLS_PTIC(ClassName()+"::FindNearestToPoints");
         using GJK_T    = GJK<AMB_DIM,GJK_Real,Int>;
         using Point_T  = Point<AMB_DIM,GJK_Real,Int,SReal,T>;
         using Vector_T = Tiny::Vector<AMB_DIM,GJK_Real,Int>;
@@ -145,7 +145,7 @@
             thread_count
         );
         
-        ptoc(ClassName()+"::FindNearestToPoints");
+        TOOLS_PTOC(ClassName()+"::FindNearestToPoints");
     }
 
 

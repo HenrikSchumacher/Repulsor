@@ -233,7 +233,7 @@ namespace Repulsor
             const Int     thread_count_ = 1
         ) override
         {
-            ptic(className()+"::LoadMesh");
+            TOOLS_PTIC(className()+"::LoadMesh");
 
             vertex_count  = vertex_count_;
             edge_count    = 0;
@@ -316,7 +316,7 @@ namespace Repulsor
             
             // ComputeErrorQuadrics();
             
-            ptoc(className()+"::LoadMesh");
+            TOOLS_PTOC(className()+"::LoadMesh");
             
         } // LoadMesh
         
@@ -327,11 +327,11 @@ namespace Repulsor
         {
             // Packs all data in V_coords, edges, simplices to the beginning of the arrays.
             
-            ptic(className()+"::Compress");
+            TOOLS_PTIC(className()+"::Compress");
             
             if( compressedQ )
             {
-                ptoc(className()+"::Compress");
+                TOOLS_PTOC(className()+"::Compress");
                 return;
             }
             
@@ -464,7 +464,7 @@ namespace Repulsor
             
             compressedQ = true;
 
-            ptoc(className()+"::Compress");
+            TOOLS_PTOC(className()+"::Compress");
         } // Compress
         
 //        virtual std::unique_ptr<MeshBase_T> CreateMesh() override
@@ -499,7 +499,7 @@ namespace Repulsor
         virtual void SelfCheck() override
         {
             // Check whether all vertices of each undeleted simplex are undeleted.
-            ptic(className()+"::SelfCheck");
+            TOOLS_PTIC(className()+"::SelfCheck");
             
             
             Int deleted_parent_simplex_found_in_vertex = 0;
@@ -733,27 +733,27 @@ namespace Repulsor
             
             print("SelfCheck finished.");
             
-//            dump(invalid_edges_found_in_simplices);
-//            dump(deleted_edges_found_in_simplices);
-//            dump(edges_agnostic_of_their_parent_simplices);
+//            TOOLS_DUMP(invalid_edges_found_in_simplices);
+//            TOOLS_DUMP(deleted_edges_found_in_simplices);
+//            TOOLS_DUMP(edges_agnostic_of_their_parent_simplices);
 //
-//            dump(deleted_parent_simplex_found_in_vertex);
+//            TOOLS_DUMP(deleted_parent_simplex_found_in_vertex);
 //
-//            dump(deleted_vertices_found_in_edges);
-//            dump(deleted_parent_simplices_found_in_edges);
-//            dump(edges_agnostic_of_their_parent_simplices);
-//            dump(simplices_agnostic_of_their_child_edges);
+//            TOOLS_DUMP(deleted_vertices_found_in_edges);
+//            TOOLS_DUMP(deleted_parent_simplices_found_in_edges);
+//            TOOLS_DUMP(edges_agnostic_of_their_parent_simplices);
+//            TOOLS_DUMP(simplices_agnostic_of_their_child_edges);
 //
-//            dump(deleted_vertices_found_in_simplices);
+//            TOOLS_DUMP(deleted_vertices_found_in_simplices);
 //
-//            dump(simplices_agnostic_of_their_child_vertices);
-//            dump(vertices_agnostic_of_their_parent_simplices);
+//            TOOLS_DUMP(simplices_agnostic_of_their_child_vertices);
+//            TOOLS_DUMP(vertices_agnostic_of_their_parent_simplices);
 //
-//            dump(invalid_edges_found_in_simplices);
-//            dump(deleted_edges_found_in_simplices);
-//            dump(simplices_with_duplicates);
+//            TOOLS_DUMP(invalid_edges_found_in_simplices);
+//            TOOLS_DUMP(deleted_edges_found_in_simplices);
+//            TOOLS_DUMP(simplices_with_duplicates);
             
-            ptoc(className()+"::SelfCheck");
+            TOOLS_PTOC(className()+"::SelfCheck");
         }
         
     public:

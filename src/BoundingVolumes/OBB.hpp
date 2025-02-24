@@ -190,7 +190,7 @@ public:
             Int thread_count = 1                       // how many threads to utilize
         ) const override
         {
-//            ptic(ClassName()+"::FromPrimitives (PrimitiveSerialized)");
+//            TOOLS_PTIC(ClassName()+"::FromPrimitives (PrimitiveSerialized)");
             if( begin >= end )
             {
                 eprint(ClassName()+"::FromPrimitives : begin = "+ToString(begin)+" >= "+ToString(end)+" = end");
@@ -303,7 +303,7 @@ public:
                     center[j] += this->SReal_buffer[k] * rotationT[AMB_DIM * k + j];
                 }
             }
-//            ptoc(ClassName()+"::FromPrimitives (PrimitiveSerialized)");
+//            TOOLS_PTOC(ClassName()+"::FromPrimitives (PrimitiveSerialized)");
         }
         
         virtual Int Split(
@@ -319,7 +319,7 @@ public:
             Int thread_count = 1                                           // how many threads to utilize
         ) override
         {
-//            ptic(ClassName()+"::Split");
+//            TOOLS_PTIC(ClassName()+"::Split");
 //            valprint("begin",begin);
 //            valprint("end",end);
             
@@ -391,7 +391,7 @@ public:
                 split_index = -1;
             }
             // ... otherwise we assume that the bounding volume hierarchy / cluster tree won't do the split.
-//            ptoc(ClassName()+"::Split");
+//            TOOLS_PTOC(ClassName()+"::Split");
             
             return split_index;
             

@@ -182,7 +182,7 @@ public:
         
         if( !this->InCacheQ(tag))
         {
-            ptic(ClassName()+"::"+tag);
+            TOOLS_PTIC(ClassName()+"::"+tag);
             
             auto & A = H1Metric();
             
@@ -223,7 +223,7 @@ public:
             
             this->SetCache( tag, S );
             
-            ptoc(ClassName()+"::"+tag);
+            TOOLS_PTOC(ClassName()+"::"+tag);
         }
         
         return *(this->template GetCache<std::shared_ptr<Solver_T>>(tag) );
@@ -234,11 +234,11 @@ public:
         std::string tag ("H1Metric");
         if( !this->InCacheQ(tag))
         {
-            ptic(ClassName()+"::"+tag);
+            TOOLS_PTIC(ClassName()+"::"+tag);
             
             this->SetCache( tag, Create_H1Metric(H1_c_1,H1_c_0) );
             
-            ptoc(ClassName()+"::"+tag);
+            TOOLS_PTOC(ClassName()+"::"+tag);
         }
         
         return this->template GetCache<SparseMatrix_T>(tag);
@@ -251,11 +251,11 @@ public:
         
         if( !this->InCacheQ(tag))
         {
-            ptic(ClassName()+"::"+tag);
+            TOOLS_PTIC(ClassName()+"::"+tag);
             
             this->SetCache( tag, Create_H1Metric(1,0) );
             
-            ptoc(ClassName()+"::"+tag);
+            TOOLS_PTOC(ClassName()+"::"+tag);
         }
         
         return this->template GetCache<SparseMatrix_T>(tag);
@@ -268,11 +268,11 @@ public:
         
         if( !this->InCacheQ(tag))
         {
-            ptic(ClassName()+"::"+tag);
+            TOOLS_PTIC(ClassName()+"::"+tag);
             
             this->SetCache( tag, Create_H1Metric(0,1) );
             
-            ptoc(ClassName()+"::"+tag);
+            TOOLS_PTOC(ClassName()+"::"+tag);
         }
         
         return this->template GetCache<SparseMatrix_T>(tag);

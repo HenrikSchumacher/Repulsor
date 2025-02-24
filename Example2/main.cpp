@@ -86,7 +86,7 @@ int main(void)
     en = tpe.Differential(M, diff.data());
     toc("Compute tangent-point energy and derivative");
 
-    dump(en);
+    TOOLS_DUMP(en);
 
     
     /// This is how you can get the gradient of the tangent-point energy:
@@ -105,8 +105,8 @@ int main(void)
     );
     toc("Solving for gradient");
     
-    dump(tpm.CG_IterationCount());
-    dump(tpm.CG_RelativeResiduals());
+    TOOLS_DUMP(tpm.CG_IterationCount());
+    TOOLS_DUMP(tpm.CG_RelativeResiduals());
     
     
     Mesh_T::TangentVector_T downward_gradient = gradient;
@@ -152,9 +152,9 @@ int main(void)
     en_new = tpe.Value(M);
     toc("Compute tangent-point energy of updated mesh");
 
-    dump(en_new);
+    TOOLS_DUMP(en_new);
     
-    dump(en_new < en);
+    TOOLS_DUMP(en_new < en);
     
 
     return 0;

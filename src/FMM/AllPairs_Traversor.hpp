@@ -55,9 +55,9 @@ namespace Repulsor
         
     public:
 
-        force_flattening Real Compute()
+        TOOLS_FORCE_FLATTENING Real Compute()
         {
-            ptic(ClassName()+"::Compute");
+            TOOLS_PTIC(ClassName()+"::Compute");
             
             const Int thread_count = kernel.ThreadCount();
             
@@ -132,7 +132,7 @@ namespace Repulsor
                 thread_count
             );
 
-            ptoc(ClassName()+"::Compute");
+            TOOLS_PTOC(ClassName()+"::Compute");
 
             return global_sum;
         }

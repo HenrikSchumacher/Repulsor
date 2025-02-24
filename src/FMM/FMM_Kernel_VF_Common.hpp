@@ -1,6 +1,6 @@
 public:
 
-    force_inline Real Compute( const LInt k_global )
+    TOOLS_FORCE_INLINE Real Compute( const LInt k_global )
     {
         Real sum = Scalar::Zero<Real>;
         

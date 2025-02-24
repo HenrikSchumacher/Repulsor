@@ -13,7 +13,7 @@
     {
         ComputeBoundingBox( X, point_count );
         
-        ptic(ClassName()+"::CoordsToAxes");
+        TOOLS_PTIC(ClassName()+"::CoordsToAxes");
         
         Tensor1<Axes_T,Int> A ( point_count );
         
@@ -31,7 +31,7 @@
             thread_count
         );
         
-        ptoc(ClassName()+"::CoordsToAxes");
+        TOOLS_PTOC(ClassName()+"::CoordsToAxes");
         
         return A;
     }

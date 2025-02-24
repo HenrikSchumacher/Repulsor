@@ -1,6 +1,6 @@
 public:
 
-    force_flattening void Traverse_DepthFirst(
+    TOOLS_FORCE_FLATTENING void Traverse_DepthFirst(
         const Int thread, const Int i0, const Int j0
     )
     {
@@ -266,7 +266,7 @@ public:
         
     } // Traverse_DepthFirst
 
-    force_flattening void Traverse_DepthFirst_0(
+    TOOLS_FORCE_FLATTENING void Traverse_DepthFirst_0(
         const Int thread, const Int i0, const Int j0
     )
     {

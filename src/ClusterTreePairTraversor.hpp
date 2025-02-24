@@ -86,7 +86,7 @@ namespace Repulsor
         
         void Traverse()
         {
-            ptic(className()+"::Traverse");
+            TOOLS_PTIC(className()+"::Traverse");
             
             if( thread_count > 1 )
             {
@@ -97,7 +97,7 @@ namespace Repulsor
                 Traverse_Sequential();
             }
             
-            ptoc(className()+"::Traverse");
+            TOOLS_PTOC(className()+"::Traverse");
         }
         
     protected:
@@ -106,11 +106,11 @@ namespace Repulsor
         
         void Traverse_Sequential()
         {
-            ptic(className()+"::Traverse_Sequential");
+            TOOLS_PTIC(className()+"::Traverse_Sequential");
             
             Traverse_DepthFirst( Int(0), Int(0), Int(0) );
             
-            ptoc(className()+"::Traverse_Sequential");
+            TOOLS_PTOC(className()+"::Traverse_Sequential");
         }
         
     protected:
@@ -119,7 +119,7 @@ namespace Repulsor
         
         void Traverse_Parallel()
         {
-            ptic(className()+"::Traverse_Parallel");
+            TOOLS_PTIC(className()+"::Traverse_Parallel");
             
             Traverse_BreadthFirst( Int(0), Int(0), Int(0), static_cast<Int>(16) * ThreadCount() );
             
@@ -137,7 +137,7 @@ namespace Repulsor
                 ThreadCount()
             );
             
-            ptoc(className()+"::Traverse_Parallel");
+            TOOLS_PTOC(className()+"::Traverse_Parallel");
         }
 
     private:

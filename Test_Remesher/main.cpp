@@ -65,7 +65,7 @@ int main(void)
     
     auto & M = *M_ptr;
 
-    dump(M.ThreadCount());
+    TOOLS_DUMP(M.ThreadCount());
 
     toc("Initializing mesh");
 
@@ -158,8 +158,8 @@ int main(void)
         thread_count
     );
     
-    dump(N_ptr->VertexCount());
-    dump(N_ptr->SimplexCount());
+    TOOLS_DUMP(N_ptr->VertexCount());
+    TOOLS_DUMP(N_ptr->SimplexCount());
     
     return 0;
 }

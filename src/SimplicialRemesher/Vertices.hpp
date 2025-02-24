@@ -129,12 +129,12 @@ void ComputeVertexPosition( const Vertex_T v_0, const Vertex_T v_1, const Vertex
 //    //
 //    //        if( y.Norm() > 0.001 * b.Norm() )
 //    //        {
-//    //            dump(w);
-//    //            dump(lambda);
-//    //            dump(U);
-//    //            dump(y.Norm());
-//    //            dump(Q);
-//    //            dump(x);
+//    //            TOOLS_DUMP(w);
+//    //            TOOLS_DUMP(lambda);
+//    //            TOOLS_DUMP(U);
+//    //            TOOLS_DUMP(y.Norm());
+//    //            TOOLS_DUMP(Q);
+//    //            TOOLS_DUMP(x);
 //    //        }
 //
 //            x.Write( V_coords.data(w) );

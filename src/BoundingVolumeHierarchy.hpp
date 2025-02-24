@@ -125,8 +125,8 @@ namespace Repulsor
         :   P_proto (1)
         ,   C_proto (1)
         {
-            ptic(className()+" default constructor");
-            ptoc(className()+" default constructor");
+            TOOLS_PTIC(className()+" default constructor");
+            TOOLS_PTOC(className()+" default constructor");
         }
         
         // To allow polymorphism, we require the user to create instances of the desired types for the primitives and the bounding volumes, so that we can Clone() them.
@@ -143,7 +143,7 @@ namespace Repulsor
         ,   C_proto      ( ThreadCount()            )
 //        ,   Adj          ( std::move(Adj_)          )
         {
-            ptic(className()+"()");
+            TOOLS_PTIC(className()+"()");
             
             
             P_serialized = std::move(P_serialized_);
@@ -176,7 +176,7 @@ namespace Repulsor
             
             this->ComputeClusters();
             
-            ptoc(className()+"()");
+            TOOLS_PTOC(className()+"()");
         }
         
         virtual ~BoundingVolumeHierarchy() override = default;
@@ -216,7 +216,7 @@ namespace Repulsor
         
         void ComputeClusters()
         {
-            ptic(className()+"::ComputeClusters");
+            TOOLS_PTIC(className()+"::ComputeClusters");
             
             // Request some temporary memory for threads.
             
@@ -234,10 +234,10 @@ namespace Repulsor
             auto * root = new Cluster_T( thread, 0, 0, PrimitiveCount(), 0 );
             
             
-            ptic(className()+"::ComputeClusters: Initial bounding volume of root node");
+            TOOLS_PTIC(className()+"::ComputeClusters: Initial bounding volume of root node");
             C_proto[thread]->SetPointer( C_thread_serialized.data(thread), 0 );
             C_proto[thread]->FromPrimitives( *P_proto[thread], P_serialized.data(), 0, PrimitiveCount(), ThreadCount() );
-            ptoc(className()+"::ComputeClusters: Initial bounding volume of root node");
+            TOOLS_PTOC(className()+"::ComputeClusters: Initial bounding volume of root node");
             
             
             Split( root );
@@ -251,7 +251,7 @@ namespace Repulsor
             
             thread_cluster_counter = Tensor2<Int,Int>();
             
-            ptoc(className()+"::ComputeClusters");
+            TOOLS_PTOC(className()+"::ComputeClusters");
         }
         
     public:

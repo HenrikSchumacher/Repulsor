@@ -115,8 +115,8 @@ namespace Repulsor
         ,   C_proto (1)
         ,   P_moving(1)
         {
-            ptic(className()+" default constructor");
-            ptoc(className()+" default constructor");
+            TOOLS_PTIC(className()+" default constructor");
+            TOOLS_PTOC(className()+" default constructor");
         }
         
         // To allow polymorphism, we require the user to create instances of the desired types for the primitives and the bounding volumes, so that we can Clone() them.
@@ -136,7 +136,7 @@ namespace Repulsor
         ,   C_proto      ( ToSize_T(ThreadCount()) )
         ,   P_moving     ( ToSize_T(ThreadCount()) )
         {
-            ptic(className()+"()");
+            TOOLS_PTIC(className()+"()");
             
             P_serialized = P_serialized_;   // It's a unneccessary copy, but not too expensive.
             
@@ -186,7 +186,7 @@ namespace Repulsor
             
 //            this->ComputeMixedPrePost( DiffOp, AvOp );
             
-            ptoc(className()+"()");
+            TOOLS_PTOC(className()+"()");
         }
         
         virtual ~ClusterTree() override = default;
@@ -240,7 +240,7 @@ namespace Repulsor
         
         void ComputeClusters()
         {
-            ptic(className()+"::ComputeClusters");
+            TOOLS_PTIC(className()+"::ComputeClusters");
             
             // Request some temporary memory for threads.
             
@@ -258,12 +258,12 @@ namespace Repulsor
             auto * root = new Cluster_T( thread, 0, 0, PrimitiveCount(), 0 );
             
             
-            ptic(className()+"::ComputeClusters: Initial bounding volume of root node");
+            TOOLS_PTIC(className()+"::ComputeClusters: Initial bounding volume of root node");
             
             C_proto[thread]->SetPointer( C_thread_serialized.data(thread), 0 );
             C_proto[thread]->FromPrimitives( *P_proto[thread], P_serialized.data(), 0, PrimitiveCount(), ThreadCount() );
             
-            ptoc(className()+"::ComputeClusters: Initial bounding volume of root node");
+            TOOLS_PTOC(className()+"::ComputeClusters: Initial bounding volume of root node");
             
             
             Split( root );
@@ -277,7 +277,7 @@ namespace Repulsor
             
             thread_cluster_counter = Tensor2<Int,Int>();
             
-            ptoc(className()+"::ComputeClusters");
+            TOOLS_PTOC(className()+"::ComputeClusters");
         }
         
     public:
@@ -316,7 +316,7 @@ namespace Repulsor
             
         void AllocateNearFarData( const Int near_dim_, const Int far_dim_ ) // reordering and computing bounding boxes
         {
-            ptic(className()+"::AllocateNearFarData");
+            TOOLS_PTIC(className()+"::AllocateNearFarData");
             
             P_near   = DataContainer_T( PrimitiveCount(), near_dim_ );
             P_D_near = DataContainer_T( PrimitiveCount(), near_dim_ );
@@ -328,12 +328,12 @@ namespace Repulsor
             C_far           = DataContainer_T( ClusterCount(), far_dim_ );
             thread_C_D_far  = DerivativeContainer_T( ThreadCount(), ClusterCount(), far_dim_ );
             
-            ptoc(className()+"::AllocateNearFarData");
+            TOOLS_PTOC(className()+"::AllocateNearFarData");
         }
         
         void ComputePrimitiveData( cptr<Real> P_near_, cptr<Real> P_far_ ) const
         {
-            ptic(className()+"::ComputePrimitiveData");
+            TOOLS_PTIC(className()+"::ComputePrimitiveData");
             
             const Int near_dim = NearDim();
             const Int  far_dim =  FarDim();
@@ -350,7 +350,7 @@ namespace Repulsor
                 PrimitiveCount(), ThreadCount()
             );
             
-            ptoc(className()+"::ComputePrimitiveData");
+            TOOLS_PTOC(className()+"::ComputePrimitiveData");
         } //ComputePrimitiveData
         
     public:
@@ -359,7 +359,7 @@ namespace Repulsor
         
         void ComputePrimitiveToClusterMatrix()
         {
-            ptic(className()+"::ComputePrimitiveToClusterMatrix");
+            TOOLS_PTIC(className()+"::ComputePrimitiveToClusterMatrix");
             
             P_to_C = SparseBinaryMatrix_T(
                 ClusterCount(), PrimitiveCount(), PrimitiveCount(), ThreadCount() );
@@ -420,7 +420,7 @@ namespace Repulsor
                 }
             }
             
-            ptoc(className()+"::ComputePrimitiveToClusterMatrix");
+            TOOLS_PTOC(className()+"::ComputePrimitiveToClusterMatrix");
         }
         
 
@@ -432,12 +432,12 @@ namespace Repulsor
         {
             if( !this->pre_post_initialized )
             {
-                ptic(className()+"::ComputePrePost");
+                TOOLS_PTIC(className()+"::ComputePrePost");
 
                 
                 const Int primitive_count = PrimitiveCount();
                 
-//                ptic("hi_pre");
+//                TOOLS_PTIC("hi_pre");
                 
                 hi_pre = SparseMatrix_T(
                     DiffOp.RowCount(),
@@ -477,14 +477,14 @@ namespace Repulsor
                         PrimitiveCount(), ThreadCount()
                     );
                 }
-//                ptoc("hi_pre");
+//                TOOLS_PTOC("hi_pre");
                 
-//                ptic("hi_post");
-                pdump(hi_pre.Stats());
+//                TOOLS_PTIC("hi_post");
+                TOOLS_PDUMP(hi_pre.Stats());
                 hi_post = hi_pre.Transpose();
-//                ptoc("hi_post");
+//                TOOLS_PTOC("hi_post");
                 
-//                ptic("lo_pre");
+//                TOOLS_PTIC("lo_pre");
                 
                 lo_pre = SparseMatrix_T(
                     AvOp.RowCount(),
@@ -523,16 +523,16 @@ namespace Repulsor
                         PrimitiveCount(), ThreadCount()
                     );
                 }
-//                ptoc("lo_pre");
+//                TOOLS_PTOC("lo_pre");
                 
-//                ptic("lo_post");
-                pdump(lo_pre.Stats());
+//                TOOLS_PTIC("lo_post");
+                TOOLS_PDUMP(lo_pre.Stats());
                 lo_post = lo_pre.Transpose();
-//                ptoc("lo_post");
+//                TOOLS_PTOC("lo_post");
                 
                 this->pre_post_initialized = true;
                 
-                ptoc(className()+"::ComputePrePost");
+                TOOLS_PTOC(className()+"::ComputePrePost");
             }
             
         } // ComputePrePost
@@ -543,11 +543,11 @@ namespace Repulsor
             {
                 std::string tag = className()+"::RequireMixedPrePost";
                 
-                ptic(tag);
+                TOOLS_PTIC(tag);
                 
                 const Int primitive_count = PrimitiveCount();
                 
-//                ptic(tag + ": mi_pre");
+//                TOOLS_PTIC(tag + ": mi_pre");
                 
                 mi_pre = SparseMatrix_T(
                     lo_pre.RowCount()     + hi_pre.RowCount(),
@@ -611,11 +611,11 @@ namespace Repulsor
                         primitive_count, ThreadCount()
                     );
                 }
-//                ptoc(tag + ": mi_pre");
+//                TOOLS_PTOC(tag + ": mi_pre");
                 
-                pdump(mi_pre.Stats());
+                TOOLS_PDUMP(mi_pre.Stats());
                 
-//                ptic(tag + ": mi_post");
+//                TOOLS_PTIC(tag + ": mi_post");
                 
                 mi_post = SparseMatrix_T(
                     lo_post.RowCount(),
@@ -671,13 +671,13 @@ namespace Repulsor
                     );
                 }
                 
-//                ptoc(tag + ": mi_post");
+//                TOOLS_PTOC(tag + ": mi_post");
 
-                pdump(mi_post.Stats());
+                TOOLS_PDUMP(mi_post.Stats());
                 
                 this->mi_pre_post_initialized = true;
                 
-                ptoc(tag);
+                TOOLS_PTOC(tag);
             }
         }
         
@@ -685,7 +685,7 @@ namespace Repulsor
         
         void PrimitivesToClusters( bool add_to = false ) const override
         {
-            ptic(ClassName()+"::PrimitivesToClusters");
+            TOOLS_PTIC(ClassName()+"::PrimitivesToClusters");
             
             switch( buffer_dim )
             {
@@ -745,12 +745,12 @@ namespace Repulsor
                 }
             }
             
-            ptoc(ClassName()+"::PrimitivesToClusters");
+            TOOLS_PTOC(ClassName()+"::PrimitivesToClusters");
         }
 
         void ClustersToPrimitives( bool add_to = false ) const override
         {
-            ptic(ClassName()+"::ClustersToPrimitives");
+            TOOLS_PTIC(ClassName()+"::ClustersToPrimitives");
             
             switch ( buffer_dim )
             {
@@ -810,7 +810,7 @@ namespace Repulsor
                 }
             }
 
-            ptoc(ClassName()+"::ClustersToPrimitives");
+            TOOLS_PTOC(ClassName()+"::ClustersToPrimitives");
         }
         
         
@@ -855,12 +855,12 @@ namespace Repulsor
                 default:
                 {
                     eprint("Unknown kernel. Doing no.");
-                    ptoc(ClassName()+"::Pre");
+                    TOOLS_PTOC(ClassName()+"::Pre");
                     return;
                 }
             }
             
-            ptic(tag);
+            TOOLS_PTIC(tag);
 
             // Caution: Some magic is going on here high order term...
             // Apply diff/averaging operate, reorder and multiply by weights.
@@ -902,7 +902,7 @@ namespace Repulsor
             
             this->PercolateUp();
             
-            ptoc(tag);
+            TOOLS_PTOC(tag);
             
         }; // Pre
 
@@ -954,7 +954,7 @@ namespace Repulsor
                 }
             }
                          
-            ptic(tag);
+            TOOLS_PTIC(tag);
             
             // Multiply by weights, restore external ordering, and apply transpose of diff/averaging operator.
             
@@ -990,7 +990,7 @@ namespace Repulsor
                 }
             }
             
-            ptoc(tag);
+            TOOLS_PTOC(tag);
             
         }; // Post
         
@@ -1036,13 +1036,13 @@ namespace Repulsor
         {
             // Updates only the computational data like primitive/cluster areas, centers of mass and normals. All data related to clustering or multipole acceptance criteria remain are unchanged.
             
-            ptic(className()+"::SemiStaticUpdate");
+            TOOLS_PTIC(className()+"::SemiStaticUpdate");
             
             this->ComputePrimitiveData( P_near_, P_far_ );
             
             this->ComputeClusterData();
 
-            ptoc(className()+"::SemiStaticUpdate");
+            TOOLS_PTOC(className()+"::SemiStaticUpdate");
             
         } // SemiStaticUpdate
         
@@ -1052,7 +1052,7 @@ namespace Repulsor
             const SReal max_time
         ) const
         {
-            ptic(className()+"::TakeUpdateVectors");
+            TOOLS_PTIC(className()+"::TakeUpdateVectors");
             
             this->update_time = max_time;
             // ATTENTION: We assume here that P_velocities_serialized are handed over already in correct order and won't be used anymore and just destroyed by the caller. This allows us to just swap the Tensor2s here, saving us a big copy operation.
@@ -1069,7 +1069,7 @@ namespace Repulsor
             mptr<SReal> P_up_ser = P_updated_serialized.data();
             mptr<SReal> C_up_ser = C_updated_serialized.data();
             
-            ptic(className()+"::TakeUpdateVectors - Compute the primitives updated with max_time.");
+            TOOLS_PTIC(className()+"::TakeUpdateVectors - Compute the primitives updated with max_time.");
             
             // TODO: Potentially wasteful code.
             ParallelDo(
@@ -1091,9 +1091,9 @@ namespace Repulsor
                 ThreadCount()
             );
             
-            ptoc(className()+"::TakeUpdateVectors - Compute the primitives updated with max_time.");
+            TOOLS_PTOC(className()+"::TakeUpdateVectors - Compute the primitives updated with max_time.");
             
-            ptic(className()+"::TakeUpdateVectors - Compute the AABBs of the updated leaf clusters.");
+            TOOLS_PTIC(className()+"::TakeUpdateVectors - Compute the AABBs of the updated leaf clusters.");
             
             ParallelDo(
                 [=,this]( const Int thread )
@@ -1115,9 +1115,9 @@ namespace Repulsor
                 ThreadCount()
             );
             
-            ptoc(className()+"::TakeUpdateVectors - Compute the AABBs of the updated leaf clusters.");
+            TOOLS_PTOC(className()+"::TakeUpdateVectors - Compute the AABBs of the updated leaf clusters.");
             
-            ptic(className()+"::TakeUpdateVectors - Upward pass for AABBs.");
+            TOOLS_PTIC(className()+"::TakeUpdateVectors - Upward pass for AABBs.");
             {
                 Int stack [128];
                 Int stack_ptr = 0;
@@ -1162,9 +1162,9 @@ namespace Repulsor
                     eprint( ClassName() + "::TakeUpdateVectors: Stack overflow." );
                 }
             }
-            ptoc(className()+"::TakeUpdateVectors - Upward pass for AABBs.");
+            TOOLS_PTOC(className()+"::TakeUpdateVectors - Upward pass for AABBs.");
             
-            ptoc(className()+"::TakeUpdateVectors");
+            TOOLS_PTOC(className()+"::TakeUpdateVectors");
             
         } // TakeUpdateVectors
         
@@ -1172,7 +1172,7 @@ namespace Repulsor
         {
             // Collect derivative data from the primitives, stored in thread_P_D_near, into P_D_near.
             
-            ptic(className()+"::CollectNearFieldDerivatives");
+            TOOLS_PTIC(className()+"::CollectNearFieldDerivatives");
             
             const Int near_dim = NearDim();
             
@@ -1207,7 +1207,7 @@ namespace Repulsor
                     );
                 }
             }
-            ptoc(className()+"::CollectNearFieldDerivatives");
+            TOOLS_PTOC(className()+"::CollectNearFieldDerivatives");
             
         } // CollectNearFieldDerivatives
         
@@ -1216,7 +1216,7 @@ namespace Repulsor
         {
             // Collect derivative data from the clusters, stored in thread_C_D_far, into C_out; then use PercolatedDown and ClustersToPrimitives to collect these into P_D_far.
             
-            ptic(className()+"::CollectFarFieldDerivatives");
+            TOOLS_PTIC(className()+"::CollectFarFieldDerivatives");
             
             const Int far_dim = FarDim();
             
@@ -1256,7 +1256,7 @@ namespace Repulsor
                 );
             }
             
-            ptoc(className()+"::CollectFarFieldDerivatives");
+            TOOLS_PTOC(className()+"::CollectFarFieldDerivatives");
             
         } // CollectFarFieldDerivatives
         

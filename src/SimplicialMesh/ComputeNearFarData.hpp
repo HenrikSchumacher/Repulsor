@@ -5,7 +5,7 @@ protected:
         mref<Tensor2<Real,Int>> P_far
     ) const
     {
-        ptic(ClassName()+"::ComputeNearFarData");
+        TOOLS_PTIC(ClassName()+"::ComputeNearFarData");
         
         ParallelDo(
             [&]( const Int thread )
@@ -26,5 +26,5 @@ protected:
             ThreadCount()
         );
     
-        ptoc(ClassName()+"::ComputeNearFarData");
+        TOOLS_PTOC(ClassName()+"::ComputeNearFarData");
 };

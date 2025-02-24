@@ -2,7 +2,7 @@ private:
 
     void Serialize( Cluster_T * const root )
     {
-        ptic(className()+"::Serialize");
+        TOOLS_PTIC(className()+"::Serialize");
         
         //            tree_max_depth = root->max_depth;
         //
@@ -30,7 +30,7 @@ private:
         
         const Int top_level_count = int_cast<Int>(settings.parallel_perc_depth);
         
-        ptic(className()+"::Serialize: Breadth-first scan to serialize the first few levels.");
+        TOOLS_PTIC(className()+"::Serialize: Breadth-first scan to serialize the first few levels.");
         for( Int level = 0; level < top_level_count; ++level )
         {
             for( Cluster_T * C : tree_rows_ptr[level] )
@@ -38,13 +38,13 @@ private:
                 Serialize_Cluster<false>( null, C );
             }
         }
-        ptoc(className()+"::Serialize: Breadth-first scan to serialize the first few levels.");
+        TOOLS_PTOC(className()+"::Serialize: Breadth-first scan to serialize the first few levels.");
         
         logprint("Parallel depth-first scans for each subtree.");
         
         cref<std::vector<Cluster_T *>> tree_row = tree_rows_ptr[top_level_count];
         
-        ptic(className()+"::Serialize: Parallel depth-first scans for each subtree.");
+        TOOLS_PTIC(className()+"::Serialize: Parallel depth-first scans for each subtree.");
         ParallelDo_Dynamic(
             [=,this,&tree_row]( const Int thread, const Int i )
             {
@@ -53,12 +53,12 @@ private:
             null, static_cast<Int>(tree_row.size()), one,
             ThreadCount()
         );
-        ptoc(className()+"::Serialize: Parallel depth-first scans for each subtree.");
+        TOOLS_PTOC(className()+"::Serialize: Parallel depth-first scans for each subtree.");
         
 
         logprint("Reverse breadth-first scans for clean-up.");
         
-        ptic(className()+"::Serialize: Reverse breadth-first scans for clean-up.");
+        TOOLS_PTIC(className()+"::Serialize: Reverse breadth-first scans for clean-up.");
         for( Int level = top_level_count; level --> 0 ; )
         {
             for( Cluster_T * C : tree_rows_ptr[level] )
@@ -69,7 +69,7 @@ private:
                 }
             }
         }
-        ptoc(className()+"::Serialize: Reverse breadth-first scans for clean-up.");
+        TOOLS_PTOC(className()+"::Serialize: Reverse breadth-first scans for clean-up.");
         
         depth = root->max_depth;
         
@@ -95,7 +95,7 @@ private:
         
         tree_rows_ptr = std::vector<std::vector<Cluster_T *>>();
         
-        ptoc(className()+"::Serialize");
+        TOOLS_PTOC(className()+"::Serialize");
         
     } // Serialize
     

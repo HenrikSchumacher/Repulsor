@@ -2,7 +2,7 @@ public:
 
     Tensor1<MortonCode_T,Int> AxesToMorton( cref<Tensor1<Axes_T,Int>> A  )
     {
-        ptic(ClassName()+"::AxesToMorton");
+        TOOLS_PTIC(ClassName()+"::AxesToMorton");
         
         Tensor1<MortonCode_T,Int> M ( A.Dimension(0) );
         
@@ -20,7 +20,7 @@ public:
             thread_count
         );
         
-        ptoc(ClassName()+"::AxesToMorton");
+        TOOLS_PTOC(ClassName()+"::AxesToMorton");
         
         return M;
     }

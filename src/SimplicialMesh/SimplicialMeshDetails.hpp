@@ -27,12 +27,12 @@ namespace Repulsor
 		mref<Tensor3<Real,Int>> buffer
 	) const
     {
-        ptic(ClassName()+"::DNearFarToHulls");
+        TOOLS_PTIC(ClassName()+"::DNearFarToHulls");
         eprint(ClassName()+"::DNearFarToHulls not implemented. Returning 0.");
 		
 		buffer.Fill(static_cast<Real>(0));
 
-        ptoc(ClassName()+"::DNearFarToHulls");
+        TOOLS_PTOC(ClassName()+"::DNearFarToHulls");
     }
 
 	}; // SimplicialMeshDetails<DOM_DIM,AMB,Real,Int,LInt>
@@ -81,7 +81,7 @@ namespace Repulsor
 		mref<Tensor3<Real,Int>> buffer
 	) const
     {
-        ptic(ClassName()+"::DNearFarToHulls");
+        TOOLS_PTIC(ClassName()+"::DNearFarToHulls");
 
         if( P_D_near.Dimension(1) != 3 )
         {
@@ -109,7 +109,7 @@ namespace Repulsor
 			ThreadCount()
 		);
 
-        ptoc(ClassName()+"::DNearFarToHulls");
+        TOOLS_PTOC(ClassName()+"::DNearFarToHulls");
         
     }
 
@@ -158,7 +158,7 @@ namespace Repulsor
 		mref<Tensor3<Real,Int>> buffer
 	) const
     {
-        ptic(ClassName()+"::DNearFarToHulls");
+        TOOLS_PTIC(ClassName()+"::DNearFarToHulls");
 
         if( P_D_near.Dimension(1) != 6 )
         {
@@ -187,7 +187,7 @@ namespace Repulsor
 			ThreadCount()
 		);
 
-        ptoc(ClassName()+"::DNearFarToHulls");
+        TOOLS_PTOC(ClassName()+"::DNearFarToHulls");
         
     }
 
@@ -236,7 +236,7 @@ namespace Repulsor
 		mref<Tensor3<Real,Int>> buffer
 	) const
     {
-        ptic(ClassName()+"::DNearFarToHulls");
+        TOOLS_PTIC(ClassName()+"::DNearFarToHulls");
 
         if( P_D_near.Dimension(1) != 10 )
         {
@@ -266,7 +266,7 @@ namespace Repulsor
 			ThreadCount()
 		);
 
-        ptoc(ClassName()+"::DNearFarToHulls");
+        TOOLS_PTOC(ClassName()+"::DNearFarToHulls");
         
     }
 
@@ -315,7 +315,7 @@ namespace Repulsor
 		mref<Tensor3<Real,Int>> buffer
 	) const
     {
-        ptic(ClassName()+"::DNearFarToHulls");
+        TOOLS_PTIC(ClassName()+"::DNearFarToHulls");
 
         if( P_D_near.Dimension(1) != 15 )
         {
@@ -346,7 +346,7 @@ namespace Repulsor
 			ThreadCount()
 		);
 
-        ptoc(ClassName()+"::DNearFarToHulls");
+        TOOLS_PTOC(ClassName()+"::DNearFarToHulls");
         
     }
 
@@ -395,7 +395,7 @@ namespace Repulsor
 		mref<Tensor3<Real,Int>> buffer
 	) const
     {
-        ptic(ClassName()+"::DNearFarToHulls");
+        TOOLS_PTIC(ClassName()+"::DNearFarToHulls");
 
         if( P_D_near.Dimension(1) != 8 )
         {
@@ -515,7 +515,7 @@ namespace Repulsor
 			ThreadCount()
 		);
 
-        ptoc(ClassName()+"::DNearFarToHulls");
+        TOOLS_PTOC(ClassName()+"::DNearFarToHulls");
         
     }
 
@@ -564,7 +564,7 @@ namespace Repulsor
 		mref<Tensor3<Real,Int>> buffer
 	) const
     {
-        ptic(ClassName()+"::DNearFarToHulls");
+        TOOLS_PTIC(ClassName()+"::DNearFarToHulls");
 
         if( P_D_near.Dimension(1) != 13 )
         {
@@ -758,7 +758,7 @@ namespace Repulsor
 			ThreadCount()
 		);
 
-        ptoc(ClassName()+"::DNearFarToHulls");
+        TOOLS_PTOC(ClassName()+"::DNearFarToHulls");
         
     }
 
@@ -807,7 +807,7 @@ namespace Repulsor
 		mref<Tensor3<Real,Int>> buffer
 	) const
     {
-        ptic(ClassName()+"::DNearFarToHulls");
+        TOOLS_PTIC(ClassName()+"::DNearFarToHulls");
 
         if( P_D_near.Dimension(1) != 19 )
         {
@@ -1097,7 +1097,7 @@ namespace Repulsor
 			ThreadCount()
 		);
 
-        ptoc(ClassName()+"::DNearFarToHulls");
+        TOOLS_PTOC(ClassName()+"::DNearFarToHulls");
         
     }
 
@@ -1146,7 +1146,7 @@ namespace Repulsor
 		mref<Tensor3<Real,Int>> buffer
 	) const
     {
-        ptic(ClassName()+"::DNearFarToHulls");
+        TOOLS_PTIC(ClassName()+"::DNearFarToHulls");
 
         if( P_D_near.Dimension(1) != 16 )
         {
@@ -1450,7 +1450,7 @@ namespace Repulsor
 			ThreadCount()
 		);
 
-        ptoc(ClassName()+"::DNearFarToHulls");
+        TOOLS_PTOC(ClassName()+"::DNearFarToHulls");
         
     }
 
@@ -1499,7 +1499,7 @@ namespace Repulsor
 		mref<Tensor3<Real,Int>> buffer
 	) const
     {
-        ptic(ClassName()+"::DNearFarToHulls");
+        TOOLS_PTIC(ClassName()+"::DNearFarToHulls");
 
         if( P_D_near.Dimension(1) != 23 )
         {
@@ -3391,7 +3391,7 @@ namespace Repulsor
 			ThreadCount()
 		);
 
-        ptoc(ClassName()+"::DNearFarToHulls");
+        TOOLS_PTOC(ClassName()+"::DNearFarToHulls");
         
     }
 

@@ -143,27 +143,27 @@ namespace Repulsor
         
     public:
 
-        force_inline void LoadClusterS( const Int i )
+        TOOLS_FORCE_INLINE void LoadClusterS( const Int i )
         {
             C_i = i;
         }
         
-        force_inline void LoadClusterT( const Int j )
+        TOOLS_FORCE_INLINE void LoadClusterT( const Int j )
         {
             C_j = j;
         }
         
-        force_inline void LoadPrimitiveS( const Int i )
+        TOOLS_FORCE_INLINE void LoadPrimitiveS( const Int i )
         {
             P_i = i;
             
         }
-        force_inline void LoadPrimitiveT( const Int j )
+        TOOLS_FORCE_INLINE void LoadPrimitiveT( const Int j )
         {
             P_j = j;
         }
         
-        force_inline bool AdmissableQ()
+        TOOLS_FORCE_INLINE bool AdmissableQ()
         {
             Compute_AABB_CollisionTimeInterval<ClusterTree_T::AMB_DIM, SReal, Int> (
                 S_C_ser.data(C_i), S_C_up_ser.data(C_i),
@@ -174,19 +174,19 @@ namespace Repulsor
             return a >= Scalar::One<SReal>;
         }
         
-        force_inline SReal ClusterScoreS()
+        TOOLS_FORCE_INLINE SReal ClusterScoreS()
         {
             return S_C_ser(C_i,0);
         }
-        force_inline SReal ClusterScoreT()
+        TOOLS_FORCE_INLINE SReal ClusterScoreT()
         {
             return T_C_ser(C_j,0);
         }
         
-        force_inline void ComputeLeafDiagonal()
+        TOOLS_FORCE_INLINE void ComputeLeafDiagonal()
         {}
         
-        force_inline void ComputeLeaf()
+        TOOLS_FORCE_INLINE void ComputeLeaf()
         {
             if( A.NonzeroPositionQ(P_i,P_j) )
             {
@@ -205,7 +205,7 @@ namespace Repulsor
             }
         }
         
-        force_inline void ComputeLeafSwapped()
+        TOOLS_FORCE_INLINE void ComputeLeafSwapped()
         {
             if( A.NonzeroPositionQ(P_i,P_j) )
             {
@@ -224,10 +224,10 @@ namespace Repulsor
             }
         }
         
-        force_inline void ComputeAdmissable()
+        TOOLS_FORCE_INLINE void ComputeAdmissable()
         {}
         
-        force_inline void ComputeAdmissableSwapped()
+        TOOLS_FORCE_INLINE void ComputeAdmissableSwapped()
         {}
         
 

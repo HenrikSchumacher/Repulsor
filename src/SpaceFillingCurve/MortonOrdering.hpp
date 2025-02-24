@@ -3,15 +3,15 @@ public:
     template<typename Real, typename ExtInt>
     void MortonOrdering( cptr<Real> X, mptr<ExtInt> perm, const Int point_count )
     {
-        ptic(ClassName()+"::MortonOrdering");
+        TOOLS_PTIC(ClassName()+"::MortonOrdering");
 
         Tensor1<MortonCode_T,Int> M = CoordsToMorton( X, point_count );
         
-        ptic("Ordering");
+        TOOLS_PTIC("Ordering");
         Ordering( M.data(), perm, point_count );
-        ptoc("Ordering");
+        TOOLS_PTOC("Ordering");
         
-        ptoc(ClassName()+"::MortonOrdering");
+        TOOLS_PTOC(ClassName()+"::MortonOrdering");
     }
 
 

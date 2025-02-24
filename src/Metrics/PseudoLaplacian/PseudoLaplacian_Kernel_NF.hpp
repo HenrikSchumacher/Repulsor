@@ -112,7 +112,7 @@ namespace Repulsor
     public:
         
         
-        force_inline Real Compute( const LInt k_global )
+        TOOLS_FORCE_INLINE Real Compute( const LInt k_global )
         {
             Real v [AMB_DIM ] = {};
             
@@ -137,28 +137,28 @@ namespace Repulsor
         }
         
         
-        force_inline void LoadS( const Int i_global )
+        TOOLS_FORCE_INLINE void LoadS( const Int i_global )
         {
             this->loadS( i_global );
             
             ii_block = Scalar::Zero<Real>;
         }
         
-        force_inline void WriteS( const Int i_global )
+        TOOLS_FORCE_INLINE void WriteS( const Int i_global )
         {
             this->writeS( i_global );
             
             S_diag[DIAG_NNZ * i_global] += ii_block;
         }
         
-        force_inline void LoadT( const Int j_global )
+        TOOLS_FORCE_INLINE void LoadT( const Int j_global )
         {
             this->loadT( j_global );
             
             jj_block = Scalar::Zero<Real>;
         }
 
-        force_inline void WriteT( const Int j_global )
+        TOOLS_FORCE_INLINE void WriteT( const Int j_global )
         {
             T_diag[DIAG_NNZ * j_global] += jj_block;
         }

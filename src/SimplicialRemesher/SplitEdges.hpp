@@ -6,7 +6,7 @@ public:
 
     virtual Int SplitEdges( cptr<Edge_T> e_list, const Int n ) override
     {
-        ptic(className()+"::SplitEdges");
+        TOOLS_PTIC(className()+"::SplitEdges");
         
         Int split_counter = 0;
 
@@ -20,7 +20,7 @@ public:
             }
         }
         
-        ptoc(className()+"::SplitEdges");
+        TOOLS_PTOC(className()+"::SplitEdges");
         return split_counter;
     }
 

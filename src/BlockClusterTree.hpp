@@ -64,7 +64,7 @@ namespace Repulsor
         ,   thread_count( Min(S_.ThreadCount(), T_.ThreadCount()) )
 //        ,   symmetricQ( std::addressof(S_) == std::addressof(T_) )
         {
-            ptic(className());
+            TOOLS_PTIC(className());
             
             if constexpr ( symmetricQ )
             {
@@ -79,7 +79,7 @@ namespace Repulsor
                 ComputeBlocks();
             }
 
-            ptoc(className());
+            TOOLS_PTOC(className());
         } // Constructor
         
     protected:
@@ -230,7 +230,7 @@ namespace Repulsor
                 return;
             }
 
-            ptic(className()+"::ComputeBlocks");
+            TOOLS_PTIC(className()+"::ComputeBlocks");
 
             std::vector<BlockSplitter_T> kernels;
 
@@ -303,14 +303,14 @@ namespace Repulsor
             inter = Inter_Pattern_T( inter_idx, S.PrimitiveCount(), T.PrimitiveCount(),
                 thread_count, false, symmetricQ );
 
-            pdump(inter.Stats());
+            TOOLS_PDUMP(inter.Stats());
             
 
             // Very near field interaction data.
             verynear = VeryNear_Pattern_T( verynear_idx, S.PrimitiveCount(), T.PrimitiveCount(),
                 thread_count, false, symmetricQ );
             
-            pdump(verynear.Stats());
+            TOOLS_PDUMP(verynear.Stats());
 
 
             // Near field interaction data.
@@ -326,7 +326,7 @@ namespace Repulsor
             blocks_initialized = true;
             
             
-            ptoc(className()+"::ComputeBlocks");
+            TOOLS_PTOC(className()+"::ComputeBlocks");
 
         }; // ComputeBlocks
         

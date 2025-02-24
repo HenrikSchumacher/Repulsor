@@ -45,7 +45,7 @@ namespace Repulsor
         ,   T( T_ )
         ,   thread_count( Min(S_.ThreadCount(), T_.ThreadCount()) )
         {
-            ptic(className()+"()");
+            TOOLS_PTIC(className()+"()");
             if constexpr ( symmetricQ )
             {
                 if( std::addressof(S_) != std::addressof(T_) )
@@ -53,7 +53,7 @@ namespace Repulsor
                     eprint(className()+": symmetricQ == true, bu S != T.");
                 }
             }
-            ptoc(className()+"()");
+            TOOLS_PTOC(className()+"()");
         }
         
 //        // Copy constructor
@@ -91,11 +91,11 @@ namespace Repulsor
         {
             if( !P_collision_matrix_initialized )
             {
-                ptic(ClassName()+"PrimitiveCollisionMatrix");
+                TOOLS_PTIC(ClassName()+"PrimitiveCollisionMatrix");
                 
                 using Kernel_T = Collision_Kernel<ClusterTree_T>;
                 
-                ptic(ClassName()+"::PrimitiveCollisionMatrix: Prepare kernels");
+                TOOLS_PTIC(ClassName()+"::PrimitiveCollisionMatrix: Prepare kernels");
                 std::vector<Kernel_T> kernels;
                 kernels.reserve(thread_count);
                 
@@ -105,7 +105,7 @@ namespace Repulsor
                 {
                     kernels.emplace_back( S, T, thread, t, static_cast<SReal>(0.0625) );
                 }
-                ptoc(ClassName()+"::PrimitiveCollisionMatrix: Prepare kernels");
+                TOOLS_PTOC(ClassName()+"::PrimitiveCollisionMatrix: Prepare kernels");
                 
                 if( S.SplitThreshold()==1 && T.SplitThreshold()==1 )
                 {
@@ -122,7 +122,7 @@ namespace Repulsor
                 
                 std::vector<TripleAggregator<Int,Int,SReal,LInt>> triples (thread_count);
                 
-                ptic(ClassName()+"::PrimitiveCollisionMatrix: Reduce kernels");
+                TOOLS_PTIC(ClassName()+"::PrimitiveCollisionMatrix: Reduce kernels");
 
                 
                 ParallelDo(
@@ -141,7 +141,7 @@ namespace Repulsor
                     thread_count
                 );
 
-                ptoc(ClassName()+"::PrimitiveCollisionMatrix: Reduce kernels");
+                TOOLS_PTOC(ClassName()+"::PrimitiveCollisionMatrix: Reduce kernels");
                 
                 P_collision_matrix = CollisionMatrix_T(
                     triples,
@@ -151,7 +151,7 @@ namespace Repulsor
                 
                 P_collision_matrix_initialized = true;
                 
-                ptoc(ClassName()+"PrimitiveCollisionMatrix");
+                TOOLS_PTOC(ClassName()+"PrimitiveCollisionMatrix");
             }
             
             return P_collision_matrix;
@@ -168,7 +168,7 @@ namespace Repulsor
             const SReal TOL
         ) const override
         {
-            ptic(ClassName()+"::MaximumSafeStepSize");
+            TOOLS_PTIC(ClassName()+"::MaximumSafeStepSize");
             
             using Kernel_T = MaximumSafeStepSize_Kernel<ClusterTree_T>;
             
@@ -181,12 +181,12 @@ namespace Repulsor
             
             SReal t = Min( t_, Min( S.UpdateTime(), T.UpdateTime() ) );
             
-            ptic(ClassName()+"::MaximumSafeStepSize: Prepare kernels");
+            TOOLS_PTIC(ClassName()+"::MaximumSafeStepSize: Prepare kernels");
                 for( Int thread = 0; thread < thread_count; ++thread )
                 {
                     kernels.emplace_back( S, T, thread,t, TOL );
                 }
-            ptoc(ClassName()+"::MaximumSafeStepSize: Prepare kernels");
+            TOOLS_PTOC(ClassName()+"::MaximumSafeStepSize: Prepare kernels");
             
             if( S.SplitThreshold()==1 && T.SplitThreshold()==1 )
             {
@@ -201,16 +201,16 @@ namespace Repulsor
                 traversor.Traverse();
             }
             
-            ptic(ClassName()+"::MaximumSafeStepSize: Reduce kernels");
+            TOOLS_PTIC(ClassName()+"::MaximumSafeStepSize: Reduce kernels");
                 for( Int thread = 0; thread < thread_count; ++thread )
                 {
                     SReal s = kernels[thread].MaxTime();
                     t = Min( t, s );
                 }
-            ptoc(ClassName()+"::MaximumSafeStepSize: Reduce kernels");
+            TOOLS_PTOC(ClassName()+"::MaximumSafeStepSize: Reduce kernels");
             
             
-            ptoc(ClassName()+"::MaximumSafeStepSize");
+            TOOLS_PTOC(ClassName()+"::MaximumSafeStepSize");
             
             return t;
         }

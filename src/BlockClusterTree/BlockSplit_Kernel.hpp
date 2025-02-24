@@ -133,52 +133,52 @@ namespace Repulsor
         
     public:
 
-        force_inline void LoadClusterS( const Int i )
+        TOOLS_FORCE_INLINE void LoadClusterS( const Int i )
         {
             C_i = i;
             S_C_proto->SetPointer( S_C_serialized, i );
         }
         
-        force_inline void LoadClusterT( const Int j )
+        TOOLS_FORCE_INLINE void LoadClusterT( const Int j )
         {
             C_j = j;
             T_C_proto->SetPointer( T_C_serialized, j );
         }
         
-        force_inline void LoadPrimitiveS( const Int i )
+        TOOLS_FORCE_INLINE void LoadPrimitiveS( const Int i )
         {
             P_i = i;
             S_P_proto->SetPointer( S_P_serialized, i );
         }
-        force_inline void LoadPrimitiveT( const Int j )
+        TOOLS_FORCE_INLINE void LoadPrimitiveT( const Int j )
         {
             P_j = j;
             T_P_proto->SetPointer( T_P_serialized, j );
         }
         
-        force_inline bool AdmissableQ()
+        TOOLS_FORCE_INLINE bool AdmissableQ()
         {
             const bool result = G.MultipoleAcceptanceCriterion( *S_C_proto, *T_C_proto, far_theta2 );
             
             return result;
         }
         
-        force_inline SReal ClusterScoreS()
+        TOOLS_FORCE_INLINE SReal ClusterScoreS()
         {
             return S_C_proto->SquaredRadius();
         }
         
-        force_inline SReal ClusterScoreT()
+        TOOLS_FORCE_INLINE SReal ClusterScoreT()
         {
             return T_C_proto->SquaredRadius();
         }
         
-        force_inline void ComputeLeafDiagonal()
+        TOOLS_FORCE_INLINE void ComputeLeafDiagonal()
         {
 //            near_idx.Push(P_i,P_i);
         }
         
-        force_inline void ComputeLeaf()
+        TOOLS_FORCE_INLINE void ComputeLeaf()
         {
             const bool neighbor_found = A.NonzeroPositionQ(P_i,P_j);
             
@@ -207,7 +207,7 @@ namespace Repulsor
             }
         }
         
-        force_inline void ComputeLeafSwapped()
+        TOOLS_FORCE_INLINE void ComputeLeafSwapped()
         {
             const bool neighbor_found = A.NonzeroPositionQ(P_i,P_j);
             
@@ -236,11 +236,11 @@ namespace Repulsor
             }
         }
         
-        force_inline void ComputeAdmissable()
+        TOOLS_FORCE_INLINE void ComputeAdmissable()
         {
             far_idx.Push(C_i,C_j);
         }
-        force_inline void ComputeAdmissableSwapped()
+        TOOLS_FORCE_INLINE void ComputeAdmissableSwapped()
         {
             far_idx.Push(C_j,C_i);
         }

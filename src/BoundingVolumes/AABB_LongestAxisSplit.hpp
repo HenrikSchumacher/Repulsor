@@ -152,7 +152,7 @@ namespace Repulsor
 //            {
 //                eprint(ClassName()+"Split: longest axis has length <=0.");
 //                DUMP(this->DataString());
-//                //                ptoc(ClassName()+"::Split (PrimitiveSerialized)");
+//                //                TOOLS_PTOC(ClassName()+"::Split (PrimitiveSerialized)");
 //                return -1;
 //            }
             

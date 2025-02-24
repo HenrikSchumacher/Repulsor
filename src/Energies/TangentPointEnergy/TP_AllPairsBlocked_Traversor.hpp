@@ -221,7 +221,7 @@ namespace Repulsor
         template< typename T1, typename T2 >
         void NF_Compute( const T1 q_half_, const T1 p_half_ )
         {
-            ptic(ClassName()+"::NF_Compute");
+            TOOLS_PTIC(ClassName()+"::NF_Compute");
             
             using Kernel_T = TP_Kernel_NF<
             S_DOM_DIM, T_DOM_DIM,
@@ -249,7 +249,7 @@ namespace Repulsor
                 ker.Diag() = S.NF_Accumulator().template AddReduce<Real,LInt>();
             }
             
-            ptoc(ClassName()+"::NF_Compute");
+            TOOLS_PTOC(ClassName()+"::NF_Compute");
         }
         
 //######################################################################################

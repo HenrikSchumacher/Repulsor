@@ -85,13 +85,13 @@ namespace Repulsor
         }
                 
 
-        force_inline void TransposeBlock( const LInt from, const LInt to ) const
+        TOOLS_FORCE_INLINE void TransposeBlock( const LInt from, const LInt to ) const
         {
             copy_buffer<2>( &A[ BLOCK_NNZ * from], &A[ BLOCK_NNZ * to  ] );
         }
         
         
-        force_inline void ApplyBlock( const LInt k_global, const Int j_global )
+        TOOLS_FORCE_INLINE void ApplyBlock( const LInt k_global, const Int j_global )
         {
             ReadX( j_global );
             
