@@ -2,11 +2,42 @@ protected:
     
     using Solver_T = Sparse::CholeskyDecomposition<Real,Int,LInt>;
 
-    mutable Real H1_c_0 = 1;
-    mutable Real H1_c_1 = 1;
+    // Weights for the H^1 metric.
+    mutable Real stiffness_weight = 1;
+    mutable Real mass_weight      = 1;
+
+public:
+
+    Real H1StiffnessWeight() const override
+    {
+        return stiffness_weight;
+    }
+
+    void SetH1StiffnessWeight( const Real weight ) override
+    {
+        stiffness_weight = weight;
+        this->ClearCache("H1Solver");
+        this->ClearCache("H1Metric");
+    }
+
+    Real H1MassWeight() const override
+    {
+        return mass_weight;
+    }
+
+    void SetH1MassWeight( const Real weight ) override
+    {
+        mass_weight = weight;
+        this->ClearCache("H1Solver");
+        this->ClearCache("H1Metric");
+    }
 
 
-    SparseMatrix_T Create_H1Metric( const Real c_1, const Real c_0 ) const
+protected:
+
+    SparseMatrix_T Create_H1Metric(
+        const Real stiffness_weight_, const Real mass_weight_
+    ) const
     {
         if constexpr ( DOM_DIM <= 0 )
         {
@@ -21,7 +52,7 @@ protected:
             Tensor2<Real,Int> alist ( SimplexCount(), SIZE * SIZE );
             
             ParallelDo(
-                [this,&ilist,&jlist,&alist,c_1,c_0]( const Int thread )
+                [this,&ilist,&jlist,&alist,stiffness_weight_,mass_weight_]( const Int thread )
                 {
                     const Int n = SimplexCount();
                     const Int k_begin = JobPointer<Int>( n, ThreadCount(), thread     );
@@ -38,7 +69,7 @@ protected:
                     Tiny::Matrix<SIZE,SIZE,Real,Int> mass;
                     
                     const Real m_factor = Frac<Real>( 
-                        c_0,
+                        mass_weight_,
                         StandardSimplexVolume<Real>(DOM_DIM) * Factorial<Real>(DOM_DIM + 2)
                     );
                     
@@ -90,7 +121,7 @@ protected:
                         
                         g.CholeskySolve( g_inv );
                         
-                        const Real l_factor = a * c_1;
+                        const Real l_factor = a * stiffness_weight_;
                         
                         for( Int i = 0; i < DOM_DIM; ++i )
                         {
@@ -236,7 +267,7 @@ public:
         {
             TOOLS_PTIC(ClassName()+"::"+tag);
             
-            this->SetCache( tag, Create_H1Metric(H1_c_1,H1_c_0) );
+            this->SetCache( tag, Create_H1Metric(stiffness_weight,mass_weight) );
             
             TOOLS_PTOC(ClassName()+"::"+tag);
         }

@@ -129,6 +129,14 @@ namespace Repulsor
         
         virtual cref<SparseMatrix_T> H1Metric() const = 0;
         
+        virtual Real H1StiffnessWeight() const = 0;
+
+        virtual void SetH1StiffnessWeight( const Real weight ) = 0;
+
+        virtual Real H1MassWeight() const  = 0;
+
+        virtual void SetH1MassWeight( const Real weight )  = 0;
+        
         virtual cref<SparseMatrix_T> StiffnessMatrix() const = 0;
         
         virtual cref<SparseMatrix_T> MassMatrix() const = 0;

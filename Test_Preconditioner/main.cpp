@@ -78,6 +78,11 @@ int main(void)
     M.adaptivity_settings.theta                                    = 10.0;
     
     M.SetH1SolverID( 1 ); // Try to use AMD reordering if available.
+    
+    // You can adapt the weights of the two terms in the H^1 metric.
+    // Typically, you should set H1StiffnessWeight to 1 and H1MassWeight to a relatively small value. However, if the latter is too small, the solver might become instable.
+    M.SetH1StiffnessWeight( 1 );
+    M.SetH1MassWeight( 0.1 );
 
     TOOLS_DUMP(M.ThreadCount());
 
