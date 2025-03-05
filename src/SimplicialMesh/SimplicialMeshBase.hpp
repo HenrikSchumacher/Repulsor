@@ -149,11 +149,19 @@ namespace Repulsor
         
         virtual cref<Permutation<Int>> MetisOrdering() const = 0;
         
+        
         virtual mref<Sparse::CholeskyDecomposition<Real,Int,LInt>> H1Solver() const = 0;
         
         virtual Int H1SolverID() const = 0;
 
-        virtual void SetH1SolverID( const Int ID ) const =0;
+        virtual void SetH1SolverID( const Int ID ) const = 0;
+        
+        
+        virtual mref<Sparse::CholeskyDecomposition<Real,Int,LInt>> MassSolver() const = 0;
+        
+        virtual Int MassSolverID() const = 0;
+
+        virtual void SetMassSolverID( const Int ID ) const = 0;
         
 //#######################################################################################
 //      Obstacle

@@ -308,3 +308,91 @@ public:
         
         return this->template GetCache<SparseMatrix_T>(tag);
     }
+
+
+    virtual Int MassSolverID() const override
+    {
+        std::string tag ("MassSolverID");
+        
+        if( !this->InCacheQ( tag ) )
+        {
+            // Approximate Minimum Degree ordering is our favorite.
+            
+    #ifdef TENSORS_HAS_AMD
+            this->SetCache( tag, Int(1) );
+    #else
+            this->SetCache( tag, Int(0) );
+    #endif
+        }
+        
+        return this->template GetCache<Int>( tag );
+    }
+
+    virtual void SetMassSolverID( const Int ID ) const override
+    {
+        const Int current_ID = MassSolverID();
+        
+        std::string tag ("MassSolverID");
+        
+        if( ID != current_ID )
+        {
+            this->ClearCache( tag );
+            
+            this->ClearCache( "MassSolver" );
+            
+            this->SetCache( tag, ID );
+        }
+    }
+
+    virtual mref<Solver_T> MassSolver() const override
+    {
+        std::string tag ("MassSolver");
+        
+        if( !this->InCacheQ(tag))
+        {
+            TOOLS_PTIC(ClassName()+"::"+tag);
+            
+            auto & A = MassMatrix();
+            
+            Permutation<Int> perm;
+            
+            const Int ID = MassSolverID();
+            
+            switch( ID )
+            {
+                case 0:
+                {
+                    perm = NestedDissectionOrdering();
+                    break;
+                }
+                case 1:
+                {
+                    perm = ApproximateMinimumDegreeOrdering();
+                    break;
+                }
+                case 2:
+                {
+                    perm = MetisOrdering();
+                    break;
+                }
+                default:
+                {
+                    wprint(ClassName()+"::MassSolver: Unknown MassSolverID "+ToString(ID)+". Using default NestedDissectionOrdering.");
+                    
+                    break;
+                }
+            }
+            
+            std::shared_ptr<Solver_T> S = std::make_shared<Solver_T>(
+                A.Outer().data(), A.Inner().data(), std::move(perm)
+            );
+            
+            S->NumericFactorization( A.Values().data(), Scalar::Zero<Real> );
+            
+            this->SetCache( tag, S );
+            
+            TOOLS_PTOC(ClassName()+"::"+tag);
+        }
+        
+        return *(this->template GetCache<std::shared_ptr<Solver_T>>(tag) );
+    }
