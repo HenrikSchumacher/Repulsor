@@ -162,14 +162,14 @@ namespace Repulsor
         {
             TOOLS_DEBUG_PRINT(std::string( "Initializing " + this->ClassName() + " from Configurator_T on thread " + ToString(thread)) );
             
-            if( GetS().PrimitiveSerialized().Dimension(1) != S_Tree.SimplexPrototype().Size() )
+            if( GetS().PrimitiveSerialized().Dim(1) != S_Tree.SimplexPrototype().Size() )
             {
-                eprint(ClassName()+" Constructor: GetS().PrimitiveSerialized().Dimension(1) != S_Tree.SimplexPrototype().Size()");
+                eprint(ClassName()+" Constructor: GetS().PrimitiveSerialized().Dim(1) != S_Tree.SimplexPrototype().Size()");
             }
             
-            if( GetT().PrimitiveSerialized().Dimension(1) != T_Tree.SimplexPrototype().Size() )
+            if( GetT().PrimitiveSerialized().Dim(1) != T_Tree.SimplexPrototype().Size() )
             {
-                eprint(ClassName()+" Constructor: GetT().PrimitiveSerialized().Dimension(1) != T_Tree.SimplexPrototype().Size()");
+                eprint(ClassName()+" Constructor: GetT().PrimitiveSerialized().Dim(1) != T_Tree.SimplexPrototype().Size()");
             }
             
             if( max_refinement_ > max_refinement )

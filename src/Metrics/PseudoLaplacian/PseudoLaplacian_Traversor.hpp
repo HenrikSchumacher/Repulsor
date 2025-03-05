@@ -277,7 +277,7 @@ namespace Repulsor
             const bool FF_flag = true
         ) const
         {
-            const Int nrhs = bct.GetS().BufferDimension() / Kernel_Block_Mul_T::ROWS;
+            const Int nrhs = bct.GetS().BufferDim() / Kernel_Block_Mul_T::ROWS;
             
             if( NF_flag && (bct.Near().NonzeroCount() > 0) )
             {

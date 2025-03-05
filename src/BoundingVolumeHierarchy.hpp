@@ -149,12 +149,12 @@ namespace Repulsor
             P_serialized = std::move(P_serialized_);
             
             P_ordering   =  (
-                ( P_ordering_.Dimension(0) == P_serialized.Dimension(0) )
+                ( P_ordering_.Dim(0) == P_serialized.Dim(0) )
                 ? std::move( P_ordering_ )
-                : iota<Int,Int>( P_serialized.Dimension(0) )
+                : iota<Int,Int>( P_serialized.Dim(0) )
             );
             
-//            if( P_serialized.Dimension(0) != Adj.RowCount() )
+//            if( P_serialized.Dim(0) != Adj.RowCount() )
 //            {
 //                eprint(className()+": Number of primitives does not match size of adjacency matrix.");
 //            }

@@ -350,7 +350,7 @@ namespace Repulsor
                     if( with_data )
                     {
                         copy_buffer<VarSize,Sequential>( 
-                            V_data.data(v), V_data.data(vertex_count), V_data.Dimension(1)
+                            V_data.data(v), V_data.data(vertex_count), V_data.Dim(1)
                         );
                     }
                     
@@ -820,7 +820,7 @@ namespace Repulsor
         
         virtual Int DataDim() const override
         {
-            return V_data.Dimension(1);
+            return V_data.Dim(1);
         }
         
     private:

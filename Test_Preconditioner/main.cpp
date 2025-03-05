@@ -136,8 +136,8 @@ int main(void)
     X.SetZero();
     Y.SetZero();
     
-    TOOLS_DUMP( B.Dimension(0) );
-    TOOLS_DUMP( B.Dimension(1) );
+    TOOLS_DUMP( B.Dim(0) );
+    TOOLS_DUMP( B.Dim(1) );
     
     print("");
     print("Experiment 1: Solve A.X = B for X and check the perconditioner norm of B - A.X ");

@@ -10,9 +10,9 @@ public:
         if constexpr ( metric_flag )
         {
             if(
-               this->OffDiag().Dimension(0) != nnz
+               this->OffDiag().Dim(0) != nnz
                ||
-               this->OffDiag().Dimension(1) != BLOCK_NNZ
+               this->OffDiag().Dim(1) != BLOCK_NNZ
             )
             {
                 this->OffDiag() = Values_T( nnz, BLOCK_NNZ );

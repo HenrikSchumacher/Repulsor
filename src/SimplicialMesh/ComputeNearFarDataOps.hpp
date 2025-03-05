@@ -25,7 +25,7 @@ protected:
     
                 SimplexDataKernel_T ker ( V_coords, simplices, V_charges );
                 
-                const Int simplex_count = simplices.Dimension(0);
+                const Int simplex_count = simplices.Dim(0);
                 const Int i_begin = JobPointer<Int>(simplex_count, ThreadCount(), thread  );
                 const Int i_end   = JobPointer<Int>(simplex_count, ThreadCount(), thread+1);
                 

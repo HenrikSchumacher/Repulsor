@@ -4,13 +4,13 @@ public:
     {
         TOOLS_PTIC(ClassName()+"::AxesToMorton");
         
-        Tensor1<MortonCode_T,Int> M ( A.Dimension(0) );
+        Tensor1<MortonCode_T,Int> M ( A.Dim(0) );
         
         ParallelDo(
             [&]( const Int thread )
             {
-                const Int k_begin = JobPointer( A.Dimension(0), thread_count, thread     );
-                const Int k_end   = JobPointer( A.Dimension(0), thread_count, thread + 1 );
+                const Int k_begin = JobPointer( A.Dim(0), thread_count, thread     );
+                const Int k_end   = JobPointer( A.Dim(0), thread_count, thread + 1 );
 
                 for( Int k = k_begin; k < k_end; ++k )
                 {   

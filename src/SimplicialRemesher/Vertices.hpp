@@ -22,7 +22,7 @@ protected:
             
             if( with_data )
             {
-                V_data.template Resize<true>( max_vertex_count, V_data.Dimension(1) );
+                V_data.template Resize<true>( max_vertex_count, V_data.Dim(1) );
             }
         }
         
@@ -60,7 +60,7 @@ void ComputeVertexPosition( const Vertex_T v_0, const Vertex_T v_1, const Vertex
 
     if( with_data )
     {
-        const Int data_dim = V_data.Dimension(1);
+        const Int data_dim = V_data.Dim(1);
 
         for( Int k = 0; k < data_dim; ++k )
         {
@@ -148,7 +148,7 @@ void ComputeVertexPosition( const Vertex_T v_0, const Vertex_T v_1, const Vertex
 //
 //            if( with_data )
 //            {
-//                const Int data_dim = V_data.Dimension(1);
+//                const Int data_dim = V_data.Dim(1);
 //
 //                for( Int k = 0; k < data_dim; ++k )
 //                {

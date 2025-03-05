@@ -264,7 +264,7 @@ namespace Repulsor
         {
             if constexpr ( metric_flag )
             {
-                const Int nrhs = S.BufferDimension() / Kernel_Block_Mul_T::ROWS;
+                const Int nrhs = S.BufferDim() / Kernel_Block_Mul_T::ROWS;
                 
                 if( NF_flag && ( S.PrimitiveCount()> 0) )
                 {
@@ -277,9 +277,9 @@ namespace Repulsor
             }
         }
         
-//##############################################################################################
+//###########################################################################################
 //      Multiply metric subroutines
-//##############################################################################################
+//###########################################################################################
         
     protected:
         

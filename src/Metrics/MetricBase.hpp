@@ -52,9 +52,9 @@ namespace Repulsor
         ) const
         {
             this->MultiplyMetric( M, 
-                alpha, X.data(), X.Dimension(1),
-                beta,  Y.data(), Y.Dimension(1),
-                X.Dimension(1), VF_flag, NF_flag, FF_flag
+                alpha, X.data(), X.Dim(1),
+                beta,  Y.data(), Y.Dim(1),
+                X.Dim(1), VF_flag, NF_flag, FF_flag
             );
         }
         

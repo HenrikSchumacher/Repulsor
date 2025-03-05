@@ -81,24 +81,24 @@ namespace Repulsor
         )
         :   SimplicialMesh(
                   V_coords_.data(),
-                  V_coords_.Dimension(0),
+                  V_coords_.Dim(0),
                   false,
                   simplices_.data(),
-                  simplices_.Dimension(0),
+                  simplices_.Dim(0),
                   false,
                   int_cast<Int>(thread_count_)
             )
         {
             TOOLS_PTIC(className()+"()");
-            if( V_coords_.Dimension(1) != AMB_DIM )
+            if( V_coords_.Dim(1) != AMB_DIM )
             {
-                eprint(className()+" : V_coords.Dimension(1) != AMB_DIM");
+                eprint(className()+" : V_coords.Dim(1) != AMB_DIM");
                 TOOLS_PTOC(className()+"()");
                 return;
             }
-            if( simplices_.Dimension(1) != DOM_DIM+1 )
+            if( simplices_.Dim(1) != DOM_DIM+1 )
             {
-                eprint(className()+" : simplices_.Dimension(1) != DOM_DIM+1");
+                eprint(className()+" : simplices_.Dim(1) != DOM_DIM+1");
                 TOOLS_PTOC(className()+"()");
                 return;
             }
@@ -116,31 +116,31 @@ namespace Repulsor
         )
         :   SimplicialMesh(
                   V_coords_.data(),
-                  V_coords_.Dimension(0),
+                  V_coords_.Dim(0),
                   false,
                   simplices_.data(),
-                  simplices_.Dimension(0),
+                  simplices_.Dim(0),
                   false,
                   V_charges_.data(),
                   int_cast<Int>(thread_count_)
             )
         {
             TOOLS_PTIC(className()+"()");
-            if( V_coords_.Dimension(1) != AMB_DIM )
+            if( V_coords_.Dim(1) != AMB_DIM )
             {
-                eprint(className()+" : V_coords.Dimension(1) != AMB_DIM");
+                eprint(className()+" : V_coords.Dim(1) != AMB_DIM");
                 TOOLS_PTOC(className()+"()");
                 return;
             }
-            if( simplices_.Dimension(1) != DOM_DIM+1 )
+            if( simplices_.Dim(1) != DOM_DIM+1 )
             {
-                eprint(className()+" : simplices_.Dimension(1) != DOM_DIM+1");
+                eprint(className()+" : simplices_.Dim(1) != DOM_DIM+1");
                 TOOLS_PTOC(className()+"()");
                 return;
             }
-            if( V_charges_.Dimension(0) != V_coords_.Dimension(0) )
+            if( V_charges_.Dim(0) != V_coords_.Dim(0) )
             {
-                eprint(className()+" : V_charges_.Dimension(0) != V_coords_.Dimension(0) ");
+                eprint(className()+" : V_charges_.Dim(0) != V_coords_.Dim(0) ");
                 TOOLS_PTOC(className()+"()");
                 return;
             }
@@ -318,12 +318,12 @@ namespace Repulsor
         
         virtual Int VertexCount() const override
         {
-            return V_coords.Dimension(0);
+            return V_coords.Dim(0);
         }
         
         virtual Int SimplexCount() const override
         {
-            return simplices.Dimension(0);
+            return simplices.Dim(0);
         }
     
         virtual Int DofCount() const override
@@ -479,7 +479,7 @@ namespace Repulsor
             if( !this->InPersistentCacheQ( tag ) )
             {
                 TOOLS_PTIC(className()+"::GetClusterTree");
-                if( (V_coords.Dimension(0) > 0) && (simplices.Dimension(0) > 0) )
+                if( (V_coords.Dim(0) > 0) && (simplices.Dim(0) > 0) )
                 {
                     auto P_coords      = Tensor2<Real,Int> ( SimplexCount(), AMB_DIM, Scalar::Zero<Real> );
                     auto P_hull_coords = Tensor3<Real,Int> ( SimplexCount(), SIZE, AMB_DIM );
@@ -583,7 +583,7 @@ namespace Repulsor
                 }
                 else
                 {
-                    eprint(ClassName()+"(V_coords.Dimension(0) <= 0) || (simplices.Dimension(0) <= 0)");
+                    eprint(ClassName()+"(V_coords.Dim(0) <= 0) || (simplices.Dim(0) <= 0)");
 
                     this->SetPersistentCache( tag, std::make_any<ClusterTree_T>() );
                 }
@@ -867,9 +867,9 @@ namespace Repulsor
             
                 Remesher_T * R = new Remesher_T(
                     VertexCoordinates().data(),
-                    VertexCoordinates().Dimension(0), false,
+                    VertexCoordinates().Dim(0), false,
                     Simplices().data(),
-                    Simplices().Dimension(0),         false,
+                    Simplices().Dim(0),         false,
                     VertexCharges().data(),     1,
                     ThreadCount()
                 );

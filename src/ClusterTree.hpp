@@ -140,13 +140,13 @@ namespace Repulsor
             
             P_serialized = P_serialized_;   // It's a unneccessary copy, but not too expensive.
             
-            if( P_ordering_.Dimension(0) == P_serialized.Dimension(0) )
+            if( P_ordering_.Dim(0) == P_serialized.Dim(0) )
             {
                 P_ordering = P_ordering_;
             }
             else
             {
-                P_ordering = iota<Int,Int>( P_serialized.Dimension(0) );
+                P_ordering = iota<Int,Int>( P_serialized.Dim(0) );
             }
             
             ParallelDo(
@@ -161,18 +161,18 @@ namespace Repulsor
             
             this->ComputeClusters();
             
-            if( P_near_.Dimension(0) != PrimitiveCount() )
+            if( P_near_.Dim(0) != PrimitiveCount() )
             {
-                eprint(className()+" : P_near_.Dimension(0) != PrimitiveCount()");
+                eprint(className()+" : P_near_.Dim(0) != PrimitiveCount()");
                 return;
             }
-            if( P_far_.Dimension(0) != PrimitiveCount() )
+            if( P_far_.Dim(0) != PrimitiveCount() )
             {
-                eprint(className()+" : P_far_.Dimension(0) != PrimitiveCount()");
+                eprint(className()+" : P_far_.Dim(0) != PrimitiveCount()");
                 return;
             }
             
-            this->AllocateNearFarData( P_near_.Dimension(1), P_far_.Dimension(1) );
+            this->AllocateNearFarData( P_near_.Dim(1), P_far_.Dim(1) );
             
             this->ComputePrimitiveData( P_near_.data(), P_far_.data() );
             
@@ -304,7 +304,7 @@ namespace Repulsor
         
         Int NearDim() const override
         {
-            return P_near.Dimension(1);
+            return P_near.Dim(1);
         }
         
         Int FarDim() const override
@@ -997,7 +997,7 @@ namespace Repulsor
     public:
         
         // Updates only the computational data (primitive/cluster areas, centers of mass and normals).
-        // All data related to clustering or multipole acceptance criteria remain are unchanged, as well
+        // All data related to clustering or multipole acceptance criteria remain unchanged, as well
         // as the preprocessor and postprocessor matrices (that are needed for matrix-vector multiplies of the BCT.)
         
         void SemiStaticUpdate(
@@ -1005,26 +1005,26 @@ namespace Repulsor
             cref<Tensor2<Real,Int>> P_far_
         ) const override
         {
-            if( P_near_.Dimension(0) != PrimitiveCount() )
+            if( P_near_.Dim(0) != PrimitiveCount() )
             {
-                eprint(className()+"::SemiStaticUpdate: P_near_.Dimension(0) = "+ToString(P_near_.Dimension(0))+" != "+ToString(PrimitiveCount())+" = PrimitiveCount(). Skipping update.");
+                eprint(className()+"::SemiStaticUpdate: P_near_.Dim(0) = "+ToString(P_near_.Dim(0))+" != "+ToString(PrimitiveCount())+" = PrimitiveCount(). Skipping update.");
                 return;
             }
-            if( P_near_.Dimension(1) != NearDim() )
+            if( P_near_.Dim(1) != NearDim() )
             {
-                eprint(className()+"::SemiStaticUpdate: P_near_.Dimension(1) "+ToString(P_near_.Dimension(1))+" != "+ToString(NearDim())+" = NearDim(). Skipping update.");
-                return;
-            }
-            
-            if( P_far_.Dimension(0) != PrimitiveCount() )
-            {
-                eprint(className()+"::SemiStaticUpdate: P_far_.Dimension(0) "+ToString(P_far_.Dimension(0))+" != "+ToString(PrimitiveCount())+" = PrimitiveCount(). Skipping update.");
+                eprint(className()+"::SemiStaticUpdate: P_near_.Dim(1) "+ToString(P_near_.Dim(1))+" != "+ToString(NearDim())+" = NearDim(). Skipping update.");
                 return;
             }
             
-            if( P_far_.Dimension(1) != FarDim() )
+            if( P_far_.Dim(0) != PrimitiveCount() )
             {
-                eprint(className()+"::SemiStaticUpdate: P_far_.Dimension(1) "+ToString(P_far_.Dimension(1))+" != "+ToString(FarDim())+" = FarDim(). Skipping update.");
+                eprint(className()+"::SemiStaticUpdate: P_far_.Dim(0) "+ToString(P_far_.Dim(0))+" != "+ToString(PrimitiveCount())+" = PrimitiveCount(). Skipping update.");
+                return;
+            }
+            
+            if( P_far_.Dim(1) != FarDim() )
+            {
+                eprint(className()+"::SemiStaticUpdate: P_far_.Dim(1) "+ToString(P_far_.Dim(1))+" != "+ToString(FarDim())+" = FarDim(). Skipping update.");
                 return;
             }
             

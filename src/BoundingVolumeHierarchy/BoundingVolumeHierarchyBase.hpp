@@ -104,27 +104,27 @@ namespace Repulsor
         
         Int PrimitiveCount() const
         {
-            return P_serialized.Dimension(0);
+            return P_serialized.Dim(0);
         }
 
         Int PrimitiveSize() const
         {
-            return P_serialized.Dimension(1);
+            return P_serialized.Dim(1);
         }
 
         Int ClusterCount() const
         {
-            return C_serialized.Dimension(0);
+            return C_serialized.Dim(0);
         }
 
         Int ClusterSize() const
         {
-            return C_serialized.Dimension(1);
+            return C_serialized.Dim(1);
         }
 
         Int LeafClusterCount() const
         {
-            return leaf_clusters.Dimension(0);
+            return leaf_clusters.Dim(0);
         }
         
 //##################################################################################################

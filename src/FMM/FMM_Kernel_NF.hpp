@@ -102,29 +102,29 @@ namespace Repulsor
         {
             TOOLS_DEBUG_PRINT(std::string( "Initializing "+ this->ClassName() + " from Configurator_T on thread " + ToString(thread)) );
             
-            if( GetS().PrimitiveNearFieldData().Dimension(1) != S_DATA_DIM )
+            if( GetS().PrimitiveNearFieldData().Dim(1) != S_DATA_DIM )
             {
-                eprint(ClassName()+" Constructor: GetS().PrimitiveNearFieldData().Dimension(1) != S_DATA_DIM");
+                eprint(ClassName()+" Constructor: GetS().PrimitiveNearFieldData().Dim(1) != S_DATA_DIM");
             }
             
             if constexpr ( diff_flag || density_flag )
             {
-                if( GetS().ThreadPrimitiveDNearFieldData().Dimension(2) != S_DATA_DIM )
+                if( GetS().ThreadPrimitiveDNearFieldData().Dim(2) != S_DATA_DIM )
                 {
-                    eprint(ClassName()+" Constructor: GetS().ThreadPrimitiveDNearFieldData().Dimension(2) != S_DATA_DIM");
+                    eprint(ClassName()+" Constructor: GetS().ThreadPrimitiveDNearFieldData().Dim(2) != S_DATA_DIM");
                 }
             }
                
-            if( GetT().PrimitiveNearFieldData().Dimension(1) != T_DATA_DIM)
+            if( GetT().PrimitiveNearFieldData().Dim(1) != T_DATA_DIM)
             {
-               eprint(ClassName()+" Constructor: GetT().PrimitiveNearFieldData().Dimension(1) != T_DATA_DIM ");
+               eprint(ClassName()+" Constructor: GetT().PrimitiveNearFieldData().Dim(1) != T_DATA_DIM ");
             }
             
             if constexpr ( diff_flag || density_flag )
             {
-                if( GetT().ThreadPrimitiveDNearFieldData().Dimension(2) != T_DATA_DIM )
+                if( GetT().ThreadPrimitiveDNearFieldData().Dim(2) != T_DATA_DIM )
                 {
-                    eprint(ClassName()+" Constructor: GetT().ThreadPrimitiveDNearFieldData().Dimension(2) != T_DATA_DIM ");
+                    eprint(ClassName()+" Constructor: GetT().ThreadPrimitiveDNearFieldData().Dim(2) != T_DATA_DIM ");
                 }
             }
         }

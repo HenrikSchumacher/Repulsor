@@ -95,29 +95,29 @@ namespace Repulsor
         {
             TOOLS_DEBUG_PRINT(std::string( "Initializing " + this->ClassName()+" from Configurator_T on thread " + ToString(thread)) );
             
-            if( GetS().ClusterFarFieldData().Dimension(1) != S_DATA_DIM )
+            if( GetS().ClusterFarFieldData().Dim(1) != S_DATA_DIM )
             {
-                eprint(ClassName()+" Constructor: GetS().ClusterFarFieldData().Dimension(1) != S_DATA_DIM");
+                eprint(ClassName()+" Constructor: GetS().ClusterFarFieldData().Dim(1) != S_DATA_DIM");
             }
             
             if constexpr ( diff_flag || density_flag )
             {
-                if( GetS().ThreadClusterDFarFieldData().Dimension(2) != S_DATA_DIM )
+                if( GetS().ThreadClusterDFarFieldData().Dim(2) != S_DATA_DIM )
                 {
-                    eprint(ClassName()+" Constructor: GetS().ThreadClusterDFarFieldData().Dimension(2) != S_DATA_DIM");
+                    eprint(ClassName()+" Constructor: GetS().ThreadClusterDFarFieldData().Dim(2) != S_DATA_DIM");
                 }
             }
                
-            if( GetT().ClusterFarFieldData().Dimension(1) != T_DATA_DIM)
+            if( GetT().ClusterFarFieldData().Dim(1) != T_DATA_DIM)
             {
-               eprint(ClassName()+" Constructor: GetT().ClusterFarFieldData().Dimension(1) != T_DATA_DIM ");
+               eprint(ClassName()+" Constructor: GetT().ClusterFarFieldData().Dim(1) != T_DATA_DIM ");
             }
             
             if constexpr ( diff_flag || density_flag )
             {
-                if( GetT().ThreadClusterDFarFieldData().Dimension(2) != T_DATA_DIM )
+                if( GetT().ThreadClusterDFarFieldData().Dim(2) != T_DATA_DIM )
                 {
-                    eprint(ClassName()+" Constructor: GetT().ThreadClusterDFarFieldData().Dimension(2) != T_DATA_DIM ");
+                    eprint(ClassName()+" Constructor: GetT().ThreadClusterDFarFieldData().Dim(2) != T_DATA_DIM ");
                 }
             }
         }

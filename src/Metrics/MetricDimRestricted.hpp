@@ -140,7 +140,7 @@ namespace Repulsor
 
             T.Pre( X, ldX, nrhs, op_type );
             
-            S.RequireBuffers( T.BufferDimension() ); // Tell the S-side what it has to expect.
+            S.RequireBuffers( T.BufferDim() ); // Tell the S-side what it has to expect.
             
             multiply_metric( M, VF_flag, NF_flag, FF_flag );
 

@@ -83,9 +83,9 @@ namespace Repulsor
     {
         TOOLS_PTIC(ClassName()+"::DNearFarToHulls");
 
-        if( P_D_near.Dimension(1) != 3 )
+        if( P_D_near.Dim(1) != 3 )
         {
-            eprint("in DNearFarToHulls: P_D_near.Dimension(1) != 3. Aborting");
+            eprint("in DNearFarToHulls: P_D_near.Dim(1) != 3. Aborting");
         }
 
 		//cptr<Real> X = V_coords.data();
@@ -105,7 +105,7 @@ namespace Repulsor
 				charge *= nth;
 				B[1*i+0] = charge*(F[3*i+1] + N[3*i+1]);
 			},
-			simplices.Dimension(0),
+			simplices.Dim(0),
 			ThreadCount()
 		);
 
@@ -160,9 +160,9 @@ namespace Repulsor
     {
         TOOLS_PTIC(ClassName()+"::DNearFarToHulls");
 
-        if( P_D_near.Dimension(1) != 6 )
+        if( P_D_near.Dim(1) != 6 )
         {
-            eprint("in DNearFarToHulls: P_D_near.Dimension(1) != 6. Aborting");
+            eprint("in DNearFarToHulls: P_D_near.Dim(1) != 6. Aborting");
         }
 
 		//cptr<Real> X = V_coords.data();
@@ -183,7 +183,7 @@ namespace Repulsor
 				B[2*i+0] = charge*(F[6*i+1] + N[6*i+1]);
 				B[2*i+1] = charge*(F[6*i+2] + N[6*i+2]);
 			},
-			simplices.Dimension(0),
+			simplices.Dim(0),
 			ThreadCount()
 		);
 
@@ -238,9 +238,9 @@ namespace Repulsor
     {
         TOOLS_PTIC(ClassName()+"::DNearFarToHulls");
 
-        if( P_D_near.Dimension(1) != 10 )
+        if( P_D_near.Dim(1) != 10 )
         {
-            eprint("in DNearFarToHulls: P_D_near.Dimension(1) != 10. Aborting");
+            eprint("in DNearFarToHulls: P_D_near.Dim(1) != 10. Aborting");
         }
 
 		//cptr<Real> X = V_coords.data();
@@ -262,7 +262,7 @@ namespace Repulsor
 				B[3*i+1] = charge*(F[10*i+2] + N[10*i+2]);
 				B[3*i+2] = charge*(F[10*i+3] + N[10*i+3]);
 			},
-			simplices.Dimension(0),
+			simplices.Dim(0),
 			ThreadCount()
 		);
 
@@ -317,9 +317,9 @@ namespace Repulsor
     {
         TOOLS_PTIC(ClassName()+"::DNearFarToHulls");
 
-        if( P_D_near.Dimension(1) != 15 )
+        if( P_D_near.Dim(1) != 15 )
         {
-            eprint("in DNearFarToHulls: P_D_near.Dimension(1) != 15. Aborting");
+            eprint("in DNearFarToHulls: P_D_near.Dim(1) != 15. Aborting");
         }
 
 		//cptr<Real> X = V_coords.data();
@@ -342,7 +342,7 @@ namespace Repulsor
 				B[4*i+2] = charge*(F[15*i+3] + N[15*i+3]);
 				B[4*i+3] = charge*(F[15*i+4] + N[15*i+4]);
 			},
-			simplices.Dimension(0),
+			simplices.Dim(0),
 			ThreadCount()
 		);
 
@@ -397,9 +397,9 @@ namespace Repulsor
     {
         TOOLS_PTIC(ClassName()+"::DNearFarToHulls");
 
-        if( P_D_near.Dimension(1) != 8 )
+        if( P_D_near.Dim(1) != 8 )
         {
-            eprint("in DNearFarToHulls: P_D_near.Dimension(1) != 8. Aborting");
+            eprint("in DNearFarToHulls: P_D_near.Dim(1) != 8. Aborting");
         }
 
 		cptr<Real> X = V_coords.data();
@@ -511,7 +511,7 @@ namespace Repulsor
 				B[4*i+2] = charge*(s12*s3*s35 + s12*s3*s36 + s0*s12*s3*s37 + (s11 + s12*s2*s3)*s38 + (s12*s3*s47*s48)/2. + s39*((s12*s3*s40)/2. + s49) + s12*s3*s5*s50 + s42*s67 + s43*s67 + s12*s3*s41*s7 + s51*s73 + s52*s73 + s56*s76 + s58*s76);
 				B[4*i+3] = charge*(s42*s79 + s43*s79 + s12*s35*s8 + s12*s36*s8 + s0*s12*s37*s8 + s12*s2*s38*s8 + (s12*s39*s40*s8)/2. + s12*s5*s50*s8 + s47*(s49 + (s12*s48*s8)/2.) + s41*(s11 + s12*s7*s8) + s51*s82 + s52*s82 + s56*s88 + s58*s88);
 			},
-			simplices.Dimension(0),
+			simplices.Dim(0),
 			ThreadCount()
 		);
 
@@ -566,9 +566,9 @@ namespace Repulsor
     {
         TOOLS_PTIC(ClassName()+"::DNearFarToHulls");
 
-        if( P_D_near.Dimension(1) != 13 )
+        if( P_D_near.Dim(1) != 13 )
         {
-            eprint("in DNearFarToHulls: P_D_near.Dimension(1) != 13. Aborting");
+            eprint("in DNearFarToHulls: P_D_near.Dim(1) != 13. Aborting");
         }
 
 		cptr<Real> X = V_coords.data();
@@ -754,7 +754,7 @@ namespace Repulsor
 				B[6*i+4] = charge*(s130*s61 + s130*s62 + s132*s66 + s132*s67 + s135*s74 + s135*s75 + s141*s79 + s13*s18*s3*s48*s8 + s13*s18*s3*s49*s8 + s19*s50*s8 + s19*s51*s8 + s0*s19*s52*s8 + s10*s19*s53*s8 + s19*s2*s54*s8 + (s19*s55*s56*s8)/2. + s12*s19*s58*s8 + (s19*s59*s60*s8)/2. + s19*s5*s73*s8 + s57*(s16 + s19*s7*s8) + s70*(s72 + (s19*s71*s8)/2.) + s141*s81 + s144*s88 + s144*s89);
 				B[6*i+5] = charge*(s146*s48 + s146*s49 + s13*s19*s50 + s13*s19*s51 + s0*s13*s19*s52 + s10*s13*s19*s53 + s13*s19*s2*s54 + (s13*s19*s55*s56)/2. + (s16 + s12*s13*s19)*s58 + s148*s66 + s148*s67 + s13*s19*s57*s7 + (s13*s19*s70*s71)/2. + s59*((s13*s19*s60)/2. + s72) + s13*s19*s5*s73 + s151*s74 + s151*s75 + s154*s79 + s13*s18*s3*s61*s8 + s13*s18*s3*s62*s8 + s154*s81 + s160*s88 + s160*s89);
 			},
-			simplices.Dimension(0),
+			simplices.Dim(0),
 			ThreadCount()
 		);
 
@@ -809,9 +809,9 @@ namespace Repulsor
     {
         TOOLS_PTIC(ClassName()+"::DNearFarToHulls");
 
-        if( P_D_near.Dimension(1) != 19 )
+        if( P_D_near.Dim(1) != 19 )
         {
-            eprint("in DNearFarToHulls: P_D_near.Dimension(1) != 19. Aborting");
+            eprint("in DNearFarToHulls: P_D_near.Dim(1) != 19. Aborting");
         }
 
 		cptr<Real> X = V_coords.data();
@@ -1093,7 +1093,7 @@ namespace Repulsor
 				B[8*i+6] = charge*(s100*s221 + s104*s224 + s106*s224 + s113*s230 + s114*s230 + s118*s233 + s119*s233 + s214*s61 + s214*s62 + s13*s18*s23*s3*s63 + s13*s18*s23*s3*s64 + s218*s65 + s218*s66 + s13*s24*s67 + s13*s24*s68 + s0*s13*s24*s69 + s10*s13*s24*s70 + s13*s15*s24*s71 + s13*s2*s24*s72 + (s13*s24*s73*s74)/2. + s13*s24*s7*s75 + (s21 + s12*s13*s24)*s76 + s13*s17*s24*s79 + (s13*s24*s80*s81)/2. + s13*s23*s3*s8*s82 + s13*s23*s3*s8*s83 + s216*s87 + s216*s88 + s13*s18*s23*s8*s91 + s13*s18*s23*s8*s92 + (s13*s24*s95*s96)/2. + s77*((s13*s24*s78)/2. + s97) + s13*s24*s5*s98 + s221*s99);
 				B[8*i+7] = charge*(s100*s242 + s104*s245 + s106*s245 + s113*s248 + s114*s248 + s118*s254 + s119*s254 + s13*s18*s23*s3*s61 + s13*s18*s23*s3*s62 + s235*s63 + s235*s64 + s239*s65 + s239*s66 + s18*s24*s67 + s18*s24*s68 + s0*s18*s24*s69 + s10*s18*s24*s70 + s15*s18*s24*s71 + s18*s2*s24*s72 + (s18*s24*s73*s74)/2. + s18*s24*s7*s75 + s12*s18*s24*s76 + (s18*s24*s77*s78)/2. + (s21 + s17*s18*s24)*s79 + s18*s23*s3*s8*s82 + s18*s23*s3*s8*s83 + s13*s18*s23*s8*s87 + s13*s18*s23*s8*s88 + s237*s91 + s237*s92 + (s18*s24*s95*s96)/2. + s80*((s18*s24*s81)/2. + s97) + s18*s24*s5*s98 + s242*s99);
 			},
-			simplices.Dimension(0),
+			simplices.Dim(0),
 			ThreadCount()
 		);
 
@@ -1148,9 +1148,9 @@ namespace Repulsor
     {
         TOOLS_PTIC(ClassName()+"::DNearFarToHulls");
 
-        if( P_D_near.Dimension(1) != 16 )
+        if( P_D_near.Dim(1) != 16 )
         {
-            eprint("in DNearFarToHulls: P_D_near.Dimension(1) != 16. Aborting");
+            eprint("in DNearFarToHulls: P_D_near.Dim(1) != 16. Aborting");
         }
         
 		cptr<Real> X = V_coords.data();
@@ -1446,7 +1446,7 @@ namespace Repulsor
 				B[9*i+7] = charge*(s100*s242 + s105*s245 + s106*s245 + (s113*s229*s3*s44)/4. + s110*(s112 + (s111*s229*s44)/12.) - (s229*s32*s36*s61)/4. - (s229*s32*s36*s62)/4. + (s229*s44*s70)/4. + (s229*s44*s71)/4. + (s15*s229*s44*s72)/4. + (s0*s229*s44*s73)/4. + (s16*s229*s44*s74)/4. + (s1*s229*s44*s75)/4. + (s229*s4*s44*s76)/4. + (s14*s229*s44*s77)/4. + (s229*s44*s78*s79)/12. + (s114 + (s229*s44*s6)/4.)*s80 + (s229*s44*s82*s83)/12. + s232*s84 + s232*s85 + s235*s89 + (s229*s44*s81*s9)/4. + s235*s90 + s238*s94 + s238*s95 + s242*s99);
 				B[9*i+8] = charge*(s100*s256 + s105*s266 + s106*s266 + (s110*s111*s250*s44)/12. + (s113*s250*s3*s44)/4. + s259*s61 + s259*s62 + (s250*s44*s70)/4. + (s250*s44*s71)/4. + (s15*s250*s44*s72)/4. + (s0*s250*s44*s73)/4. + (s16*s250*s44*s74)/4. + (s1*s250*s44*s75)/4. + (s250*s4*s44*s76)/4. + (s14*s250*s44*s77)/4. + (s250*s44*s78*s79)/12. + (s250*s44*s6*s80)/4. + s82*(s112 + (s250*s44*s83)/12.) - (s24*s250*s36*s84)/4. - (s24*s250*s36*s85)/4. + s253*s89 + s81*(s114 + (s250*s44*s9)/4.) + s253*s90 + s263*s94 + s263*s95 + s256*s99);
 			},
-			simplices.Dimension(0),
+			simplices.Dim(0),
 			ThreadCount()
 		);
 
@@ -1501,9 +1501,9 @@ namespace Repulsor
     {
         TOOLS_PTIC(ClassName()+"::DNearFarToHulls");
 
-        if( P_D_near.Dimension(1) != 23 )
+        if( P_D_near.Dim(1) != 23 )
         {
-            eprint("in DNearFarToHulls: P_D_near.Dimension(1) != 23. Aborting");
+            eprint("in DNearFarToHulls: P_D_near.Dim(1) != 23. Aborting");
         }
         
 		cptr<Real> X = V_coords.data();
@@ -3387,7 +3387,7 @@ namespace Repulsor
 				B[12*i+10] = charge*((charge*s152*s1646*s396)/4. + (charge*s152*s1646*s397)/4. + (charge*s152*s1646*s3*s432)/4. + (charge*s10*s152*s1646*s433)/4. + (charge*s11*s152*s1646*s434)/4. + (charge*s152*s1646*s2*s435)/4. + (charge*s0*s152*s1646*s436)/4. + (charge*s152*s1646*s4*s437)/4. + (charge*s152*s1646*s440*s441)/12. + (charge*s12*s152*s1646*s442)/4. + (charge*s152*s16*s1646*s446)/4. + (charge*s152*s1646*s447*s448)/12. + (charge*s152*s1646*s449*s450)/12. + s444*((charge*s152*s1646*s445)/12. + s451) + s443*((charge*s14*s152*s1646)/4. + s453) + s1661*s454 + s1661*s465 + s1667*s480 + s1667*s481 + s1673*s488 + s1673*s489 + s1679*s496 + s1679*s497 + s1691*s504 + s1691*s506 + s1697*s525 + s1697*s526 + s1703*s533 + s1703*s534 + s1716*s541 + s1716*s542 + s1722*s559 + s1722*s560 + s1735*s567 + s1735*s568 + (charge*s152*s1646*s438*s6)/4. + (charge*s152*s1646*s452*s8)/4. + (charge*s152*s1646*s439*s9)/4.);
 				B[12*i+11] = charge*((charge*s152*s1763*s396)/4. + (charge*s152*s1763*s397)/4. + (charge*s152*s1763*s3*s432)/4. + (charge*s10*s152*s1763*s433)/4. + (charge*s11*s152*s1763*s434)/4. + (charge*s152*s1763*s2*s435)/4. + (charge*s0*s152*s1763*s436)/4. + (charge*s152*s1763*s4*s437)/4. + (charge*s152*s1763*s440*s441)/12. + (charge*s12*s152*s1763*s442)/4. + (charge*s14*s152*s1763*s443)/4. + (charge*s152*s1763*s444*s445)/12. + (charge*s152*s1763*s449*s450)/12. + s447*((charge*s152*s1763*s448)/12. + s451) + s446*((charge*s152*s16*s1763)/4. + s453) + s1778*s454 + s1778*s465 + s1784*s480 + s1784*s481 + s1790*s488 + s1790*s489 + s1796*s496 + s1796*s497 + s1808*s504 + s1808*s506 + s1814*s525 + s1814*s526 + s1820*s533 + s1820*s534 + s1832*s541 + s1832*s542 + s1838*s559 + s1838*s560 + s1851*s567 + s1851*s568 + (charge*s152*s1763*s438*s6)/4. + (charge*s152*s1763*s452*s8)/4. + (charge*s152*s1763*s439*s9)/4.);
 			},
-			simplices.Dimension(0),
+			simplices.Dim(0),
 			ThreadCount()
 		);
 
