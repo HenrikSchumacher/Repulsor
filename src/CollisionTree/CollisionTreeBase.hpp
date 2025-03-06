@@ -32,13 +32,6 @@ namespace Repulsor
         
         virtual ~CollisionTreeBase() = default;
         
-        CollisionTreeBase ( cref<ClusterTreeBase_T> S, cref<ClusterTreeBase_T> T )
-        {}
-
-        
-    protected:
-        
-        
     public:
         
         virtual Int AmbDim() const = 0;

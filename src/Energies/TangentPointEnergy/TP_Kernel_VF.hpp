@@ -134,6 +134,8 @@ namespace Repulsor
         
         TOOLS_FORCE_INLINE Real compute()
         {
+            TOOLS_MAKE_FP_FAST()
+            
             Real x    [AMB_DIM]  = {};
             Real y    [AMB_DIM]  = {};
             Real v    [AMB_DIM]  = {};
@@ -447,7 +449,6 @@ namespace Repulsor
             return std::string("TP_Kernel_VF<")
             + ToString(S_DOM_DIM) + ","
             + ToString(T_DOM_DIM) + ","
-//            + this->S.ClassName() + ","
             + "...,"
             + TypeName<T1> + ","
             + TypeName<T2> + ","

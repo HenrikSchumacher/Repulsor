@@ -131,27 +131,31 @@ namespace Repulsor
             r = Sqrt(r_2);
         }
         
-        virtual void WriteCoordinatesSerialized( mptr<SReal> p_serialized, const Int i = 0 ) const override
+        virtual void WriteCoordinatesSerialized( mptr<SReal> p_ ) const override
         {
             // Reads from serialized data in the format of Polytope<POINT_COUNT,AMB_DIM,...>
             
-            mptr<SReal> p__ = &p_serialized[COORD_SIZE * i];
-            
-            p__[0] = r * r;
-            
-            copy_buffer<AMB_DIM>              ( &av_position[0],  &p__[1]         );
-            copy_buffer<AMB_DIM * POINT_COUNT>( &positions[0][0], &p__[1+AMB_DIM] );
+            p_[0] = r * r;
+            copy_buffer<AMB_DIM>              ( &av_position[0],  &p_[1]         );
+            copy_buffer<AMB_DIM * POINT_COUNT>( &positions[0][0], &p_[1+AMB_DIM] );
         }
         
-        virtual void ReadCoordinatesSerialized( cptr<SReal> p_serialized, const Int i = 0 ) override
+        virtual void WriteCoordinatesSerialized( mptr<SReal> p_serialized, const Int i ) const override
+        {
+            WriteCoordinatesSerialized( &p_serialized[COORD_SIZE * i] );
+        }
+
+        virtual void ReadCoordinatesSerialized( cptr<SReal> p_ ) override
         {
             // Write to serialized data in the format of Polytope<POINT_COUNT,AMB_DIM,...>
-            cptr<SReal> p__ = &p_serialized[COORD_SIZE * i];
-            
-            r = Sqrt(p__[0]);
-            
-            copy_buffer<AMB_DIM              >( &p__[1],         &av_position[0] );
-            copy_buffer<AMB_DIM * POINT_COUNT>( &p__[1+AMB_DIM], &positions[0][0] );
+            r = Sqrt(p_[0]);
+            copy_buffer<AMB_DIM              >( &p_[1],         &av_position[0] );
+            copy_buffer<AMB_DIM * POINT_COUNT>( &p_[1+AMB_DIM], &positions[0][0] );
+        }
+        
+        virtual void ReadCoordinatesSerialized( cptr<SReal> p_serialized, const Int i ) override
+        {
+            ReadCoordinatesSerialized( &p_serialized[COORD_SIZE * i] );
         }
         
 
@@ -257,44 +261,45 @@ namespace Repulsor
         }
         
         
-        virtual void WriteVelocitiesSerialized( mptr<SReal> v_serialized, const Int i = 0 ) const override
+        virtual void WriteVelocitiesSerialized( mptr<SReal> v_ ) const override
         {
-            // Loads from serialized data as stored by Polytope<POINT_COUNT,AMB_DIM,...>
-            mptr<SReal> v__ = &v_serialized[VELOC_SIZE * i];
+            v_[0] = w;
             
-            v__[0] = w;
+            copy_buffer<AMB_DIM              >( &av_velocity[0],   &v_[1]         );
+            copy_buffer<AMB_DIM * POINT_COUNT>( &velocities[0][0], &v_[1+AMB_DIM] );
             
-            copy_buffer<AMB_DIM              >( &av_velocity[0],   &v__[1]         );
-            copy_buffer<AMB_DIM * POINT_COUNT>( &velocities[0][0], &v__[1+AMB_DIM] );
-            
-            v__[VELOC_SIZE-1] = v;
+            v_[VELOC_SIZE-1] = v;
         }
         
-        virtual void ReadVelocitiesSerialized( cptr<SReal> v_serialized, const Int i = 0 ) override
+        virtual void WriteVelocitiesSerialized( mptr<SReal> v_serialized, const Int i ) const override
+        {
+            WriteVelocitiesSerialized( &v_serialized[VELOC_SIZE * i] );
+        }
+            
+        
+        virtual void ReadVelocitiesSerialized( cptr<SReal> v_ ) override
         {
             // Reads from serialized data as stored by WriteVelocitiesSerialized
-            cptr<SReal> v__ = &v_serialized[VELOC_SIZE * i];
+            w = v_[0];
+            copy_buffer<AMB_DIM              >( &v_[1],         &av_velocity[0]   );
+            copy_buffer<AMB_DIM * POINT_COUNT>( &v_[1+AMB_DIM], &velocities[0][0] );
             
-            w = v__[0];
+            v = v_[VELOC_SIZE-1];
+        }
             
-            copy_buffer<AMB_DIM              >( &v__[1],         &av_velocity[0]   );
-            copy_buffer<AMB_DIM * POINT_COUNT>( &v__[1+AMB_DIM], &velocities[0][0] );
-            
-            v = v__[VELOC_SIZE-1];
+        virtual void ReadVelocitiesSerialized( cptr<SReal> v_serialized, const Int i ) override
+        {
+            ReadVelocitiesSerialized( &v_serialized[VELOC_SIZE * i] );
         }
 
         
         
-        virtual void WriteDeformedSerialized( mptr<SReal> p_serialized, const SReal t, const Int i = 0 ) const override
+        virtual void WriteDeformedSerialized( mptr<SReal> p_, const SReal t ) const override
         {
             // Reads from serialized data in the format of Polytope<POINT_COUNT,AMB_DIM,...>
-            mptr<SReal> p = p_serialized + COORD_SIZE * i;
-            
-//            p[0] = r * r;
-            
             for( Int k = 0; k < AMB_DIM; ++k )
             {
-                p[1+k] = av_position[k] + t * av_velocity[k];
+                p_[1+k] = av_position[k] + t * av_velocity[k];
             }
                      
             SReal r2 = 0;
@@ -305,9 +310,9 @@ namespace Repulsor
                 
                 for( Int k = 0; k < AMB_DIM; ++k )
                 {
-                    p[1+AMB_DIM+AMB_DIM*j+k] = positions[j][k] + t * velocities[j][k];
+                    p_[1+AMB_DIM+AMB_DIM*j+k] = positions[j][k] + t * velocities[j][k];
                     
-                    SReal diff = p[1+AMB_DIM+AMB_DIM*j+k] - p[1+k];
+                    SReal diff = p_[1+AMB_DIM+AMB_DIM*j+k] - p_[1+k];
                     
                     r2_local += diff * diff;
                 }
@@ -315,7 +320,12 @@ namespace Repulsor
                 r2 = Max(r2,r2_local);
             }
             
-            p[0] = r2;
+            p_[0] = r2;
+        }
+        
+        virtual void WriteDeformedSerialized( mptr<SReal> p_serialized, const SReal t, const Int i ) const override
+        {
+            WriteDeformedSerialized( &p_serialized[COORD_SIZE * i], t );
         }
         
         

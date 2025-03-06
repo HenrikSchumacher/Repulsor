@@ -76,18 +76,25 @@ namespace Repulsor
             T = T_;
         }
         
-        virtual SReal TimeScale( const SReal T_ ) const
+        virtual SReal TimeScale() const
         {
             return T;
         }
         
-        virtual void WriteCoordinatesSerialized(       SReal * const p_ser, const Int i = 0 ) const =0;
-        virtual void ReadCoordinatesSerialized ( const SReal * const p_ser, const Int i = 0 ) = 0;
+        virtual void WriteCoordinatesSerialized(       SReal * const p_ ) const = 0;
+        virtual void WriteCoordinatesSerialized(       SReal * const p_ser, const Int i ) const =0;
         
-        virtual void WriteVelocitiesSerialized (       SReal * const v_ser, const Int i = 0 ) const =0;
-        virtual void ReadVelocitiesSerialized  ( const SReal * const v_ser, const Int i = 0 ) = 0;
+        virtual void ReadCoordinatesSerialized ( const SReal * const p_ ) = 0;
+        virtual void ReadCoordinatesSerialized ( const SReal * const p_ser, const Int i ) = 0;
+
+        virtual void WriteVelocitiesSerialized (       SReal * const v_ ) const = 0;
+        virtual void WriteVelocitiesSerialized (       SReal * const v_ser, const Int i ) const = 0;
         
-        virtual void WriteDeformedSerialized   (       SReal * const p_ser, const SReal t, const Int i = 0 ) const = 0;
+        virtual void ReadVelocitiesSerialized  ( const SReal * const v_ ) = 0;
+        virtual void ReadVelocitiesSerialized  ( const SReal * const v_ser, const Int i ) = 0;
+        
+        virtual void WriteDeformedSerialized   (       SReal * const p_,    const SReal t ) const = 0;
+        virtual void WriteDeformedSerialized   (       SReal * const p_ser, const SReal t, const Int i ) const = 0;
         
         virtual std::string ClassName() const override
         {

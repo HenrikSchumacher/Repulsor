@@ -17,12 +17,19 @@ StringJoin[
 		mref<Tensor3<Real,Int>> buffer
 	) const
     {
-        ptic(ClassName()+\"::",name,"\");
+        TOOLS_PTIC(ClassName()+\"::",name,"\");
+
+		(void)V_coords;
+		(void)simplices;
+		(void)P_D_near;
+		(void)P_D_far;
+		(void)V_charges;
+
         eprint(ClassName()+\"::",name," not implemented. Returning 0.\");
 		
 		buffer.Fill(static_cast<Real>(0));
 
-        ptoc(ClassName()+\"::",name,"\");
+        TOOLS_PTOC(ClassName()+\"::",name,"\");
     }
 "]
 ];
@@ -88,15 +95,17 @@ StringJoin["
 		mref<Tensor3<Real,Int>> buffer
 	) const
     {
-        ptic(ClassName()+\"::"<>name<>"\");
+        TOOLS_PTIC(ClassName()+\"::"<>name<>"\");
 
-        if( P_D_near.Dimension(1) != "<>NearDim<>" )
+        if( P_D_near.Dim(1) != "<>NearDim<>" )
         {
-            eprint(\"in "<>name<>": P_D_near.Dimension(1) != "<>NearDim<>". Aborting\");
+            eprint(\"in "<>name<>": P_D_near.Dim(1) != "<>NearDim<>". Aborting\");
         }
+		
+		(void)V_coords;
 
 		//cptr<Real> X = V_coords.data();
-		//cptr<Int>  S = simplices.data();
+		cptr<Int>  S = simplices.data();
 		cptr<Real> N = P_D_near.data();
 		cptr<Real> F = P_D_far.data();
 		mptr<Real> B = buffer.data();
@@ -107,16 +116,16 @@ StringJoin["
 				Real charge = 0;
 				for( Int k = 0; k < SIZE; ++k )
 				{
-					charge += V_charges[simplices(i,k)];
+					charge += V_charges[S[SIZE * i + k]];
 				}
 				charge *= nth;
 "<>codestringAssign<>"
 			},
-			simplices.Dimension(0),
+			simplices.Dim(0),
 			ThreadCount()
 		);
 
-        ptoc(ClassName()+\"::"<>name<>"\");
+        TOOLS_PTOC(ClassName()+\"::"<>name<>"\");
         
     }
 "]
@@ -184,11 +193,11 @@ StringJoin["
 		mref<Tensor3<Real,Int>> buffer
 	) const
     {
-        ptic(ClassName()+\"::"<>name<>"\");
+        TOOLS_PTIC(ClassName()+\"::"<>name<>"\");
 
-        if( P_D_near.Dimension(1) != "<>NearDim<>" )
+        if( P_D_near.Dim(1) != "<>NearDim<>" )
         {
-            eprint(\"in "<>name<>": P_D_near.Dimension(1) != "<>NearDim<>". Aborting\");
+            eprint(\"in "<>name<>": P_D_near.Dim(1) != "<>NearDim<>". Aborting\");
         }
 
 		cptr<Real> X = V_coords.data();
@@ -203,16 +212,16 @@ StringJoin["
 				Real charge = 0;
 				for( Int k = 0; k < SIZE; ++k )
 				{
-					charge += V_charges[simplices(i,k)];
+					charge += V_charges[S[SIZE * i + k]];
 				}
 				charge *= nth;
 "<>codestringAssign<>"
 			},
-			simplices.Dimension(0),
+			simplices.Dim(0),
 			ThreadCount()
 		);
 
-        ptoc(ClassName()+\"::"<>name<>"\");
+        TOOLS_PTOC(ClassName()+\"::"<>name<>"\");
         
     }
 "]
@@ -292,11 +301,11 @@ StringJoin["
 		mref<Tensor3<Real,Int>> buffer
 	) const
     {
-        ptic(ClassName()+\"::"<>name<>"\");
+        TOOLS_PTIC(ClassName()+\"::"<>name<>"\");
 
-        if( P_D_near.Dimension(1) != "<>NearDim<>" )
+        if( P_D_near.Dim(1) != "<>NearDim<>" )
         {
-            eprint(\"in "<>name<>": P_D_near.Dimension(1) != "<>NearDim<>". Aborting\");
+            eprint(\"in "<>name<>": P_D_near.Dim(1) != "<>NearDim<>". Aborting\");
         }
         
 		cptr<Real> X = V_coords.data();
@@ -311,17 +320,17 @@ StringJoin["
 				Real charge = 0;
 				for( Int k = 0; k < SIZE; ++k )
 				{
-					charge += V_charges[simplices(i,k)];
+					charge += V_charges[S[SIZE * i + k]];
 				}
 				charge *= nth;
 
 "<>codestringAssign<>"
 			},
-			simplices.Dimension(0),
+			simplices.Dim(0),
 			ThreadCount()
 		);
 
-        ptoc(ClassName()+\"::"<>name<>"\");
+        TOOLS_PTOC(ClassName()+\"::"<>name<>"\");
         
     }
 "]

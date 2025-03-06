@@ -236,6 +236,8 @@ namespace Repulsor
 
         TOOLS_FORCE_INLINE void loadS( const Int i_global )
         {
+            TOOLS_MAKE_FP_FAST()
+            
             cptr<Real> X = &S_data[S_DATA_DIM * i_global];
     
             S_Tree.RequireSimplex(S_ser, i_global);
@@ -257,6 +259,8 @@ namespace Repulsor
         
         TOOLS_FORCE_INLINE void loadT( const Int j_global )
         {
+            TOOLS_MAKE_FP_FAST()
+            
             cptr<Real> Y = &T_data[T_DATA_DIM * j_global];
     
             T_Tree.RequireSimplex(T_ser, j_global);

@@ -1,6 +1,6 @@
 namespace Repulsor
 {
-    template < class T, int ...N> class CONCAT(CLASS,_Factory) {};
+    template < class T, int ...N> class TOOLS_CONCAT2(CLASS,_Factory) {};
     
     template<
         int MIN_DOM_DIM_S_, int MAX_DOM_DIM_S_,
@@ -8,7 +8,7 @@ namespace Repulsor
         int MIN_AMB_DIM_,  int MAX_AMB_DIM_,
         typename Real, typename Int, typename LInt, typename SReal, typename ExtReal
     >
-    class CONCAT(CLASS,_Factory)<BESH, MIN_DOM_DIM_S_, MAX_DOM_DIM_S_, MIN_DOM_DIM_T_, MAX_DOM_DIM_T_, MIN_AMB_DIM_, MAX_AMB_DIM_ >
+    class TOOLS_CONCAT2(CLASS,_Factory)<BESH, MIN_DOM_DIM_S_, MAX_DOM_DIM_S_, MIN_DOM_DIM_T_, MAX_DOM_DIM_T_, MIN_AMB_DIM_, MAX_AMB_DIM_ >
     {
     public:
         static constexpr Int MIN_AMB_DIM = Max( Int(1), Int(MIN_AMB_DIM_) );
@@ -21,9 +21,9 @@ namespace Repulsor
         static constexpr Int MAX_DOM_DIM_T = Min( Int(MAX_AMB_DIM-1), Int(MAX_DOM_DIM_T_) );
 
         
-        CONCAT(CLASS,_Factory)() = default;
+        TOOLS_CONCAT2(CLASS,_Factory)() = default;
         
-        ~CONCAT(CLASS,_Factory)() = default;
+        ~TOOLS_CONCAT2(CLASS,_Factory)() = default;
 
         [[nodiscard]] std::unique_ptr<ROOT> Make( const Int dom_dim_S, const Int dom_dim_T, const Int amb_dim, const Real q, const Real p )
         {
@@ -112,7 +112,7 @@ namespace Repulsor
             
         std::unique_ptr<ROOT> Error( const Int dom_dim_S, const Int dom_dim_T, const Int amb_dim )
         {
-            eprint(ClassName()+" cannot create "+TO_STD_STRING(CLASS)+" with domain dimension "+ToString(dom_dim_S)+",obstacle's domain dimension "+ToString(dom_dim_T)+", and ambient dimension "+ToString(amb_dim)+".");
+            eprint(ClassName()+" cannot create "+TOOLS_TO_STD_STRING(CLASS)+" with domain dimension "+ToString(dom_dim_S)+",obstacle's domain dimension "+ToString(dom_dim_T)+", and ambient dimension "+ToString(amb_dim)+".");
             
             return std::unique_ptr<ROOT>( nullptr );
         }
@@ -121,7 +121,7 @@ namespace Repulsor
         
         std::string ClassName()
         {
-            return TO_STD_STRING(CLASS)+"_Factory<"
+            return TOOLS_TO_STD_STRING(CLASS)+"_Factory<"
             + ToString(MIN_DOM_DIM_S)    + ","
             + ToString(MAX_DOM_DIM_S)    + ","
             + ToString(MIN_DOM_DIM_T)    + ","
@@ -136,7 +136,7 @@ namespace Repulsor
             + ">";
         }
         
-    }; // CONCAT(CLASS,_Factory)
+    }; // TOOLS_CONCAT2(CLASS,_Factory)
 }
 
 

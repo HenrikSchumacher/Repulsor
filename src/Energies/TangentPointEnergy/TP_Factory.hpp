@@ -1,13 +1,13 @@
 namespace Repulsor
 {
-    template < class Mesh_T, int ...N> class CONCAT(CLASS,_Factory) {};
+    template < class Mesh_T, int ...N> class TOOLS_CONCAT2(CLASS,_Factory) {};
     
     template<
         typename Real, typename Int, typename LInt, typename SReal, typename ExtReal,
         int MIN_DOM_DIM_, int MAX_DOM_DIM_,
         int MIN_AMB_DIM_, int MAX_AMB_DIM_
     >
-    class CONCAT(CLASS,_Factory)<BESH, MIN_DOM_DIM_, MAX_DOM_DIM_, MIN_AMB_DIM_, MAX_AMB_DIM_>
+    class TOOLS_CONCAT2(CLASS,_Factory)<BESH, MIN_DOM_DIM_, MAX_DOM_DIM_, MIN_AMB_DIM_, MAX_AMB_DIM_>
     {
     public:
         
@@ -17,9 +17,9 @@ namespace Repulsor
         static constexpr Int MIN_DOM_DIM = Max( Int(0), Int(MIN_DOM_DIM_) );
         static constexpr Int MAX_DOM_DIM = Min( Int(MAX_AMB_DIM-1), Int(MAX_DOM_DIM_) );
         
-        CONCAT(CLASS,_Factory)() = default;
+        TOOLS_CONCAT2(CLASS,_Factory)() = default;
         
-        ~CONCAT(CLASS,_Factory)() = default;
+        ~TOOLS_CONCAT2(CLASS,_Factory)() = default;
 
         [[nodiscard]] std::unique_ptr<ROOT> Make( const Int dom_dim, const Int amb_dim, const Real q, const Real p )
         {
@@ -83,7 +83,7 @@ namespace Repulsor
             
         std::unique_ptr<ROOT> Error( const Int dom_dim, const Int amb_dim )
         {
-            eprint(ClassName()+" cannot create "+TO_STD_STRING(CLASS)+" with domain dimension "+ToString(dom_dim)+" and  ambient dimension "+ToString(amb_dim)+".");
+            eprint(ClassName()+" cannot create "+TOOLS_TO_STD_STRING(CLASS)+" with domain dimension "+ToString(dom_dim)+" and  ambient dimension "+ToString(amb_dim)+".");
             
             return std::unique_ptr<ROOT>( nullptr );
         }
@@ -92,7 +92,7 @@ namespace Repulsor
         
         std::string ClassName()
         {
-            return TO_STD_STRING(CLASS)+"_Factory<"
+            return TOOLS_TO_STD_STRING(CLASS)+"_Factory<"
             + ToString(MIN_DOM_DIM)+ ","
             + ToString(MAX_DOM_DIM)+ ","
             + ToString(MIN_AMB_DIM)+ ","
@@ -105,6 +105,6 @@ namespace Repulsor
             + ">";
         }
         
-    }; // CONCAT(CLASS,_Factory)
+    }; // TOOLS_CONCAT2(CLASS,_Factory)
 }
 

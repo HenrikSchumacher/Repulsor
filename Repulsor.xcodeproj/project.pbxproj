@@ -128,6 +128,7 @@
 		AF809C802AAD3767005895C7 /* Test_SpaceFillingCurve */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Test_SpaceFillingCurve; sourceTree = BUILT_PRODUCTS_DIR; };
 		AF809C822AAD3767005895C7 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		AF83C2E8293B426000A23318 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
+		AF84544C2D7A042E00BE83C3 /* compile.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = compile.sh; sourceTree = "<group>"; };
 		AF88400F28ECEEBA0040A2FC /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		AF88401028ECEEBA0040A2FC /* Repulsor.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Repulsor.hpp; sourceTree = "<group>"; };
 		AF8B89222A6D09F8009498F2 /* Test_Remesher */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Test_Remesher; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -327,6 +328,7 @@
 		AF9C9BCC2A5230B8008AB9E6 /* Test_Preconditioner */ = {
 			isa = PBXGroup;
 			children = (
+				AF84544C2D7A042E00BE83C3 /* compile.sh */,
 				AF9C9BCD2A5230B8008AB9E6 /* main.cpp */,
 			);
 			path = Test_Preconditioner;

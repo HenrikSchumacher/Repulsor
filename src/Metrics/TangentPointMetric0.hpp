@@ -130,7 +130,7 @@ namespace Repulsor
         
         std::string className() const
         {
-            return TO_STD_STRING(CLASS)
+            return TOOLS_TO_STD_STRING(CLASS)
                 + "<" + ToString(DOM_DIM)
                 + "," + ToString(AMB_DIM)
                 + "," + TypeName<Real>

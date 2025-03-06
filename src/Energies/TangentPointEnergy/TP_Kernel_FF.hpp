@@ -121,6 +121,8 @@ namespace Repulsor
         
         TOOLS_FORCE_INLINE Real Compute( const LInt k_global )
         {
+            TOOLS_MAKE_FP_FAST()
+            
             Real v    [AMB_DIM ] = {};
             Real Pv   [AMB_DIM ] = {};
             Real Qv   [AMB_DIM ] = {};
@@ -393,7 +395,6 @@ namespace Repulsor
         std::string ClassName() const
         {
             return std::string("TP_Kernel_FF<")
-//            + this->S.ClassName() + ","
             + "...,"
             + TypeName<T1> + ","
             + TypeName<T2> + ","

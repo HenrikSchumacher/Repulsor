@@ -160,6 +160,8 @@ namespace Repulsor
         
         TOOLS_FORCE_INLINE void loadS( const Int i_global )
         {
+            TOOLS_MAKE_FP_FAST()
+            
             cptr<Real> X = &S_data[S_DATA_DIM * i_global];
             
             a = X[0];
@@ -187,6 +189,8 @@ namespace Repulsor
         
         TOOLS_FORCE_INLINE void loadT( const Int j_global )
         {
+            TOOLS_MAKE_FP_FAST()
+            
             cptr<Real> Y = &T_data[T_DATA_DIM * j_global];
             
             b = Y[0];
@@ -257,7 +261,9 @@ namespace Repulsor
 
         
         void Reduce( cref<FMM_Kernel_NF> ker )
-        {}
+        {
+            (void)ker;
+        }
         
         std::string ClassName() const
         {

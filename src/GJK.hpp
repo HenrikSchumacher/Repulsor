@@ -153,9 +153,9 @@ namespace Repulsor
             visited[0] = true;
         }
 
-        GJK( const GJK & other ) : GJK() {};
-        
-        GJK( GJK  && other ) : GJK() {};
+//        GJK( const GJK & other ) : GJK() {};
+//        
+//        GJK( GJK  && other ) : GJK() {};
         
         ~GJK() = default;
         
@@ -799,6 +799,8 @@ namespace Repulsor
             const Real theta_squared_ = one
         )
         {
+            (void)theta_squared_;
+            
             return AABB_SquaredDistance(P,Q) <= zero;
         }
         

@@ -20,6 +20,7 @@ namespace Repulsor
         
         void ToChild( const Int k )
         {
+            (void)k;
             print(ClassName()+"::ToChild not implemented.");
         }
         

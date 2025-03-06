@@ -63,15 +63,7 @@ namespace Repulsor
             FF =  2
         };
     }
-    
-//    namespace FMM
-//    {
-//        static constexpr int IN = -1;
-//        static constexpr int VF =  0;
-//        static constexpr int NF =  1;
-//        static constexpr int FF =  2;
-//    };
-    
+
     static std::map<OperatorType, std::string> OperatorTypeName
     {
         {OperatorType::FractionalOnly, "FractionalOnly"},

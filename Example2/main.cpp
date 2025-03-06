@@ -105,9 +105,8 @@ int main(void)
     );
     toc("Solving for gradient");
     
-    TOOLS_DUMP(tpm.CG_IterationCount());
-    TOOLS_DUMP(tpm.CG_RelativeResiduals());
-    
+    TOOLS_DUMP(tpm.Solver_IterationCount());
+    TOOLS_DUMP(tpm.Solver_RelativeResiduals());
     
     Mesh_T::TangentVector_T downward_gradient = gradient;
     

@@ -604,6 +604,8 @@ namespace Repulsor
         } // CollectDerivatives
         
         
+    protected:
+        
         void CollectPrimitiveDensities() const
         {
             TOOLS_PTIC(ClassName()+"::CollectPrimitiveDensities");
@@ -663,6 +665,8 @@ namespace Repulsor
             
         } // CollectPrimitiveDensities
         
+    public:
+        
         void CollectPrimitiveDensities( mptr<ExtReal> output, const ExtReal weight, bool addTo = false ) const
         {
             TOOLS_PTIC(ClassName()+"::CollectPrimitiveDensities");
@@ -673,15 +677,31 @@ namespace Repulsor
             const Int primitive_count = PrimitiveCount();
             
             // Copy the values to output. We also have to reorder.
-            ParallelDo(
-                [=,this]( const Int i )
-                {
-                    const Int j = P_inverse_ordering[i];
-                    output[i] = static_cast<ExtReal>(P_out[j]);
-                },
-                primitive_count,
-                ThreadCount()
-            );
+            
+            if( addTo )
+            {
+                ParallelDo(
+                    [=,this]( const Int i )
+                    {
+                        const Int j = P_inverse_ordering[i];
+                        output[i] += weight * static_cast<ExtReal>(P_out[j]);
+                    },
+                    primitive_count,
+                    ThreadCount()
+                );
+            }
+            else
+            {
+                ParallelDo(
+                    [=,this]( const Int i )
+                    {
+                        const Int j = P_inverse_ordering[i];
+                        output[i] = weight *    static_cast<ExtReal>(P_out[j]);
+                    },
+                    primitive_count,
+                    ThreadCount()
+                );
+            }
             
             TOOLS_PTOC(ClassName()+"::CollectPrimitiveDensities");
        
@@ -712,9 +732,8 @@ namespace Repulsor
             
             // Distribute the energy densities to energies per vertex. (Note that lo_post also multiplies by the primitives' volumes!)
             lo_post.template Dot<1>(
-                Scalar::One<Real>,           P_out.data(),
-                static_cast<ExtReal>(addTo), output,
-                Scalar::One<Int>
+                weight,                      P_out.data(),
+                static_cast<ExtReal>(addTo), output
             );
 
             // Finally, we divide by the dual volumes to obtain the vertex densities.

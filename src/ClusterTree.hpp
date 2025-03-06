@@ -370,7 +370,7 @@ namespace Repulsor
             C_to_P.Outer()[PrimitiveCount()] = PrimitiveCount();
             
             {
-                mptr<Int> inner__ = C_to_P.Inner().data();
+                mptr<Int> inner_ = C_to_P.Inner().data();
                 
                 ParallelDo(
                     [=,this]( const Int i )
@@ -381,7 +381,7 @@ namespace Repulsor
 
                         for( Int k = begin; k < end; ++k )
                         {
-                            inner__[k] = leaf;
+                            inner_[k] = leaf;
                         }
                     },
                     LeafClusterCount(), ThreadCount()
@@ -404,19 +404,19 @@ namespace Repulsor
             {
                 Int cluster_count = ClusterCount();
                 
-                mptr<LInt> outer__ = P_to_C.Outer().data();
-                cptr< Int> left__  = C_left.data();
-                cptr< Int> begin__ = C_begin.data();
-                cptr< Int> end__   = C_end.data();
+                mptr<LInt> outer_ = P_to_C.Outer().data();
+                cptr< Int> left_  = C_left.data();
+                cptr< Int> begin_ = C_begin.data();
+                cptr< Int> end_   = C_end.data();
                 
                 for ( Int C = 0; C < cluster_count; ++C )
                 {
-                    outer__[C+1] =
-                        outer__[C]
+                    outer_[C+1] =
+                        outer_[C]
                         +
-                        static_cast<LInt>(left__[C] < 0)
+                        static_cast<LInt>(left_[C] < 0)
                         *
-                        static_cast<LInt>(end__[C] - begin__[C]);
+                        static_cast<LInt>(end_[C] - begin_[C]);
                 }
             }
             

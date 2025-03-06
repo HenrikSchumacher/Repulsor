@@ -28,6 +28,13 @@ namespace Repulsor
 	) const
     {
         TOOLS_PTIC(ClassName()+"::DNearFarToHulls");
+
+		(void)V_coords;
+		(void)simplices;
+		(void)P_D_near;
+		(void)P_D_far;
+		(void)V_charges;
+
         eprint(ClassName()+"::DNearFarToHulls not implemented. Returning 0.");
 		
 		buffer.Fill(static_cast<Real>(0));
@@ -87,9 +94,11 @@ namespace Repulsor
         {
             eprint("in DNearFarToHulls: P_D_near.Dim(1) != 3. Aborting");
         }
+		
+		(void)V_coords;
 
 		//cptr<Real> X = V_coords.data();
-		//cptr<Int>  S = simplices.data();
+		cptr<Int>  S = simplices.data();
 		cptr<Real> N = P_D_near.data();
 		cptr<Real> F = P_D_far.data();
 		mptr<Real> B = buffer.data();
@@ -100,7 +109,7 @@ namespace Repulsor
 				Real charge = 0;
 				for( Int k = 0; k < SIZE; ++k )
 				{
-					charge += V_charges[simplices(i,k)];
+					charge += V_charges[S[SIZE * i + k]];
 				}
 				charge *= nth;
 				B[1*i+0] = charge*(F[3*i+1] + N[3*i+1]);
@@ -164,9 +173,11 @@ namespace Repulsor
         {
             eprint("in DNearFarToHulls: P_D_near.Dim(1) != 6. Aborting");
         }
+		
+		(void)V_coords;
 
 		//cptr<Real> X = V_coords.data();
-		//cptr<Int>  S = simplices.data();
+		cptr<Int>  S = simplices.data();
 		cptr<Real> N = P_D_near.data();
 		cptr<Real> F = P_D_far.data();
 		mptr<Real> B = buffer.data();
@@ -177,7 +188,7 @@ namespace Repulsor
 				Real charge = 0;
 				for( Int k = 0; k < SIZE; ++k )
 				{
-					charge += V_charges[simplices(i,k)];
+					charge += V_charges[S[SIZE * i + k]];
 				}
 				charge *= nth;
 				B[2*i+0] = charge*(F[6*i+1] + N[6*i+1]);
@@ -242,9 +253,11 @@ namespace Repulsor
         {
             eprint("in DNearFarToHulls: P_D_near.Dim(1) != 10. Aborting");
         }
+		
+		(void)V_coords;
 
 		//cptr<Real> X = V_coords.data();
-		//cptr<Int>  S = simplices.data();
+		cptr<Int>  S = simplices.data();
 		cptr<Real> N = P_D_near.data();
 		cptr<Real> F = P_D_far.data();
 		mptr<Real> B = buffer.data();
@@ -255,7 +268,7 @@ namespace Repulsor
 				Real charge = 0;
 				for( Int k = 0; k < SIZE; ++k )
 				{
-					charge += V_charges[simplices(i,k)];
+					charge += V_charges[S[SIZE * i + k]];
 				}
 				charge *= nth;
 				B[3*i+0] = charge*(F[10*i+1] + N[10*i+1]);
@@ -321,9 +334,11 @@ namespace Repulsor
         {
             eprint("in DNearFarToHulls: P_D_near.Dim(1) != 15. Aborting");
         }
+		
+		(void)V_coords;
 
 		//cptr<Real> X = V_coords.data();
-		//cptr<Int>  S = simplices.data();
+		cptr<Int>  S = simplices.data();
 		cptr<Real> N = P_D_near.data();
 		cptr<Real> F = P_D_far.data();
 		mptr<Real> B = buffer.data();
@@ -334,7 +349,7 @@ namespace Repulsor
 				Real charge = 0;
 				for( Int k = 0; k < SIZE; ++k )
 				{
-					charge += V_charges[simplices(i,k)];
+					charge += V_charges[S[SIZE * i + k]];
 				}
 				charge *= nth;
 				B[4*i+0] = charge*(F[15*i+1] + N[15*i+1]);
@@ -414,7 +429,7 @@ namespace Repulsor
 				Real charge = 0;
 				for( Int k = 0; k < SIZE; ++k )
 				{
-					charge += V_charges[simplices(i,k)];
+					charge += V_charges[S[SIZE * i + k]];
 				}
 				charge *= nth;
 				const Real s0 = X[2*S[2*i+0]+0];
@@ -583,7 +598,7 @@ namespace Repulsor
 				Real charge = 0;
 				for( Int k = 0; k < SIZE; ++k )
 				{
-					charge += V_charges[simplices(i,k)];
+					charge += V_charges[S[SIZE * i + k]];
 				}
 				charge *= nth;
 				const Real s0 = X[3*S[2*i+0]+0];
@@ -826,7 +841,7 @@ namespace Repulsor
 				Real charge = 0;
 				for( Int k = 0; k < SIZE; ++k )
 				{
-					charge += V_charges[simplices(i,k)];
+					charge += V_charges[S[SIZE * i + k]];
 				}
 				charge *= nth;
 				const Real s0 = X[4*S[2*i+0]+0];
@@ -1165,7 +1180,7 @@ namespace Repulsor
 				Real charge = 0;
 				for( Int k = 0; k < SIZE; ++k )
 				{
-					charge += V_charges[simplices(i,k)];
+					charge += V_charges[S[SIZE * i + k]];
 				}
 				charge *= nth;
 
@@ -1518,7 +1533,7 @@ namespace Repulsor
 				Real charge = 0;
 				for( Int k = 0; k < SIZE; ++k )
 				{
-					charge += V_charges[simplices(i,k)];
+					charge += V_charges[S[SIZE * i + k]];
 				}
 				charge *= nth;
 

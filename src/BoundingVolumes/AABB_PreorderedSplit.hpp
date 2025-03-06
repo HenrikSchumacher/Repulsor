@@ -127,6 +127,13 @@ namespace Repulsor
             Int thread_count                                            // how many threads to utilize
         )
         {
+            (void)P_ordering;
+            (void)C_data;
+            (void)C_ID;
+            (void)score;
+            (void)perm;
+            (void)inv_perm;
+            
             Int split_index = begin + ((end-begin)/2);
             
             // Compute bounding volume of left child.

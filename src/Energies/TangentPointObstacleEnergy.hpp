@@ -118,7 +118,7 @@ namespace Repulsor
         
         std::string className() const
         {
-            return TO_STD_STRING(CLASS)+"<"+ToString(DOM_DIM_S)+","+ToString(DOM_DIM_T)+","+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<LInt>+","+TypeName<SReal>+","+TypeName<ExtReal>+"("+ToString(q)+","+ToString(p)+")";
+            return TOOLS_TO_STD_STRING(CLASS)+"<"+ToString(DOM_DIM_S)+","+ToString(DOM_DIM_T)+","+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<LInt>+","+TypeName<SReal>+","+TypeName<ExtReal>+"("+ToString(q)+","+ToString(p)+")";
         }
         
         virtual std::string ClassName() const override

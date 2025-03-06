@@ -232,7 +232,9 @@ namespace Repulsor
         }
 
         void Reduce( cref<FMM_Kernel_FF> ker )
-        {}
+        {
+            (void)ker;
+        }
         
         std::string ClassName() const
         {

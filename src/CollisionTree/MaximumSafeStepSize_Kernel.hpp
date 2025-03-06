@@ -43,50 +43,50 @@ namespace Repulsor
         {}
         
 
-        MaximumSafeStepSize_Kernel( cref<MaximumSafeStepSize_Kernel> other, const Int thread_ )
-        :   thread      ( other.thread      )
-        ,   S_C_ser     ( other.S_C_ser     )
-        ,   S_C_up_ser  ( other.S_C_up_ser  )
-        ,   T_C_ser     ( other.T_C_ser     )
-        ,   T_C_up_ser  ( other.T_C_up_ser  )
-        ,   S_P_ser     ( other.S_P_ser     )
-        ,   S_P_v_ser   ( other.S_P_v_ser   )
-        ,   T_P_ser     ( other.T_P_ser     )
-        ,   T_P_v_ser   ( other.T_P_v_ser   )
-        ,   A           ( other.A           )
-        ,   C           ( other.C           )
-        ,   t_init      ( other.t_init      )
-        ,   t_max       ( other.t_max       )
-        {}
-        
-        friend void swap( MaximumSafeStepSize_Kernel & X, MaximumSafeStepSize_Kernel & Y )
-        {
-            // see https://stackoverflow.com/questions/5695548/public-friend-swap-member-function for details
-            using std::swap;
-
-            swap( X.thread,         Y.thread        );
-            swap( X.S_C_ser,        Y.S_C_ser       );
-            swap( X.S_C_up_ser,     Y.S_C_up_ser    );
-            swap( X.T_C_ser,        Y.T_C_ser       );
-            swap( X.T_C_up_ser,     Y.T_C_up_ser    );
-            swap( X.S_P_ser,        Y.S_P_ser       );
-            swap( X.S_P_v_ser,      Y.S_P_v_ser     );
-            swap( X.T_P_ser,        Y.T_P_ser       );
-            swap( X.T_P_v_ser,      Y.T_P_v_ser     );
-            swap( X.A,              Y.A             );
-            swap( X.C,              Y.C             );
-            swap( X.t_init,         Y.t_init        );
-            swap( X.t_max,          Y.t_max         );
-        }
-
-        // Copy assignment
-        MaximumSafeStepSize_Kernel & operator=( MaximumSafeStepSize_Kernel other ) // Intentionally no pass-by-reference here!
-        {
-            swap(*this, other);
-
-            return *this;
-        }
-                
+//        MaximumSafeStepSize_Kernel( cref<MaximumSafeStepSize_Kernel> other )
+//        :   thread      ( other.thread      )
+//        ,   S_C_ser     ( other.S_C_ser     )
+//        ,   S_C_up_ser  ( other.S_C_up_ser  )
+//        ,   T_C_ser     ( other.T_C_ser     )
+//        ,   T_C_up_ser  ( other.T_C_up_ser  )
+//        ,   S_P_ser     ( other.S_P_ser     )
+//        ,   S_P_v_ser   ( other.S_P_v_ser   )
+//        ,   T_P_ser     ( other.T_P_ser     )
+//        ,   T_P_v_ser   ( other.T_P_v_ser   )
+//        ,   A           ( other.A           )
+//        ,   C           ( other.C           )
+//        ,   t_init      ( other.t_init      )
+//        ,   t_max       ( other.t_max       )
+//        {}
+//        
+//        friend void swap( MaximumSafeStepSize_Kernel & X, MaximumSafeStepSize_Kernel & Y )
+//        {
+//            // see https://stackoverflow.com/questions/5695548/public-friend-swap-member-function for details
+//            using std::swap;
+//
+//            swap( X.thread,         Y.thread        );
+//            swap( X.S_C_ser,        Y.S_C_ser       );
+//            swap( X.S_C_up_ser,     Y.S_C_up_ser    );
+//            swap( X.T_C_ser,        Y.T_C_ser       );
+//            swap( X.T_C_up_ser,     Y.T_C_up_ser    );
+//            swap( X.S_P_ser,        Y.S_P_ser       );
+//            swap( X.S_P_v_ser,      Y.S_P_v_ser     );
+//            swap( X.T_P_ser,        Y.T_P_ser       );
+//            swap( X.T_P_v_ser,      Y.T_P_v_ser     );
+//            swap( X.A,              Y.A             );
+//            swap( X.C,              Y.C             );
+//            swap( X.t_init,         Y.t_init        );
+//            swap( X.t_max,          Y.t_max         );
+//        }
+//
+//        // Copy assignment
+//        MaximumSafeStepSize_Kernel & operator=( MaximumSafeStepSize_Kernel other ) // Intentionally no pass-by-reference here!
+//        {
+//            swap(*this, other);
+//
+//            return *this;
+//        }
+//                
 //        // Move constructor
 //        MaximumSafeStepSize_Kernel( MaximumSafeStepSize_Kernel && other ) noexcept
 //        {

@@ -40,7 +40,7 @@ namespace Repulsor
         
         
         CollisionTree( cref<ClusterTree_T> S_, cref<ClusterTree_T> T_ )
-        :   Base_T( S_,T_ )
+        :   Base_T()
         ,   S( S_ )
         ,   T( T_ )
         ,   thread_count( Min(S_.ThreadCount(), T_.ThreadCount()) )
