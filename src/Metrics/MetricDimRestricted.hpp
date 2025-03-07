@@ -287,18 +287,20 @@ namespace Repulsor
                 );
             };
             
-            ConjugateGradient<AMB_DIM,Real,Int,false,false> solver (
-                M.VertexCount(), max_iter, nrhs, M.ThreadCount()
-            );
+            // TODO: Look into why this does not converge as quickly as GMRES!
             
-            solver( A, P, alpha, B, ldB, beta, X, ldX, tolerance );
-            
-
-//            GMRES<AMB_DIM,Real,Int,Side::Left,false,false> solver (
+//            ConjugateGradient<AMB_DIM,Real,Int,false,false> solver (
 //                M.VertexCount(), max_iter, nrhs, M.ThreadCount()
 //            );
 //            
-//            solver( A, P, alpha, B, ldB, beta, X, ldX, tolerance, 10 );
+//            solver( A, P, alpha, B, ldB, beta, X, ldX, tolerance );
+            
+
+            GMRES<AMB_DIM,Real,Int,Side::Left,false,false> solver (
+                M.VertexCount(), max_iter, nrhs, M.ThreadCount()
+            );
+            
+            solver( A, P, alpha, B, ldB, beta, X, ldX, tolerance, max_iter );
             
             iter          = solver.IterationCount();
             rel_residuals = solver.RelativeResiduals();
