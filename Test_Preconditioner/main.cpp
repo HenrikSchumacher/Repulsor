@@ -24,12 +24,13 @@ using namespace Tools;
 
 // We have to toggle which domain dimensions and ambient dimensions shall be supported by runtime polymorphism before we load Repulsor.hpp
 // You can activate everything you want, but compile times might increase substatially.
-using Int     = Int64;
-using LInt    = Int64;
+//using Int     = Int64;
+using Int     = Int32;  // Used for the indices of the mesh triangles. 32 bits should suffice.
+using LInt    = Int64;  // We need this 64 for the row pointers of big sparse matrices
 using ExtInt  = Int64;
 
-using Real    = Real64;
-using SReal   = Real64;
+using Real    = Real64; // We need full precision here, definitely.
+using SReal   = Real64; // We need full precision here, definitely.
 using ExtReal = Real64;
 
 
@@ -43,16 +44,12 @@ int main(void)
     
     Profiler::Clear();
 
-    
     int thread_count = 8;
-    
     
     using MeshBase_T = SimplicialMeshBase<Real,Int,LInt,SReal,ExtReal>;
     using Mesh_T     = SimplicialMesh<2,3,Real,Int,LInt,SReal,ExtReal>;
 
     SimplicialMesh_Factory<MeshBase_T,2,2,3,3> mesh_factory;
-
-
     
     tic("Initializing mesh");
     
@@ -142,13 +139,10 @@ int main(void)
     print("");
     print("Experiment 1: Solve A.X = B for X and check the perconditioner norm of B - A.X ");
     print("");
-//    print("tpe.Differential( M, Real(1), Real(0), &B[0][0], ldB );");
     
     tic("tpe.Differential");
     tpe.Differential( M, Real(1), Real(0), &B[0][0], ldB );
     toc("tpe.Differential");
-    
-//    TOOLS_DUMP( ArrayToString( B.data(), {print_rows,ld}, 8 ) );
     
     
     print("");
@@ -163,8 +157,8 @@ int main(void)
     
 
     // Computing X = alpha * A^{-1} . B + beta * X using CG method.
-    const Int  max_iter  = 100;
-    const Real tolerance = 0.0001;
+    const Int  max_iter  = 50;
+    const Real tolerance = 0.00001;
     const Real alpha = 1;
     const Real beta  = 0;
     
@@ -230,8 +224,6 @@ int main(void)
         abs_prec_errors[1] / B_prec_norms[1]
     };
     
-//    TOOLS_DUMP(B_prec_norms);
-//    TOOLS_DUMP(abs_prec_errors);
     TOOLS_DUMP(rel_prec_errors);
     
     print("");
@@ -245,8 +237,6 @@ int main(void)
     
     M.VertexCoordinates().Write( &X[0][0   ], ldX );
     M.VertexCoordinates().Write( &X[0][nrhs], ldX );
-    
-//    TOOLS_DUMP( ArrayToString( X.data(), {print_rows,ld}, 8 ) );
     
     Tiny::Vector<2,Real,Int> X_true_metric_norms {
         tpm.MetricNorm( M, &X[0][0   ], ldX, nrhs ),
@@ -264,9 +254,6 @@ int main(void)
         Real(0),   &B[0][nrhs], ldB,
         nrhs
     );
-    
-//    TOOLS_DUMP( ArrayToString( B.data(), {print_rows,ld}, 8 ) );
-//    TOOLS_DUMP( ArrayToString( X.data(), {print_rows,ld}, 8 ) );
     
     tic("Computing X = alpha * A^{-1}.B - X_true.");
     tpm.Solve( M,
@@ -287,8 +274,6 @@ int main(void)
     );
     toc("Computing X = alpha * A^{-1}.B - X_true.");
     
-//    TOOLS_DUMP( ArrayToString( X.data(), {print_rows,ld}, 8 ) );
-    
     TOOLS_DUMP(tpm.Solver_IterationCount());
     TOOLS_DUMP(tpm.Solver_RelativeResiduals());
     
@@ -301,8 +286,6 @@ int main(void)
         abs_metric_errors[1] / X_true_metric_norms[1]
     };
     
-//    TOOLS_DUMP(X_true_metric_norms);
-//    TOOLS_DUMP(abs_metric_errors);
     TOOLS_DUMP(rel_metric_errors);
 
     print("");

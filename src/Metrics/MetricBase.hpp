@@ -14,8 +14,8 @@ namespace Repulsor
         using TangentVector_T        = typename MeshBase_T::TangentVector_T;
         using CotangentVector_T      = typename MeshBase_T::CotangentVector_T;
         using ValueContainer_T       = MetricValueContainer<Real,LInt>;
-        using Solver_T               = ConjugateGradient<VarSize,Real,Int>;
-        using SolverVector_T         = typename Solver_T::RealVector_T;
+//        using Solver_T               = ConjugateGradient<VarSize,Real,Int>;
+        using SolverVector_T         = typename ConjugateGradient<VarSize,Real,Int>::RealVector_T;
         
         MetricBase() = default;
 
