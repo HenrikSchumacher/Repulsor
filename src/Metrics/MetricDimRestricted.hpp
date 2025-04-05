@@ -296,6 +296,7 @@ namespace Repulsor
 //            solver( A, P, alpha, B, ldB, beta, X, ldX, tolerance );
             
 
+            // TODO: Find out why GMRES is so much slower in parallel mode.
             GMRES<AMB_DIM,Real,Int,Side::Left,false,false> solver (
                 M.VertexCount(), max_iter, nrhs, M.ThreadCount()
             );

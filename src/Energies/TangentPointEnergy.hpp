@@ -81,7 +81,7 @@ namespace Repulsor
         
         std::string className() const
         {
-            return std::string("TangentPointEnergy")+"<"+ToString(DOM_DIM)+","+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<LInt>+","+TypeName<SReal>+","+TypeName<ExtReal>+">("+ToString(q)+","+ToString(p)+")";
+            return std::string("TangentPointEnergy")+"<"+ToString(DOM_DIM)+","+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<LInt>+","+TypeName<SReal>+","+TypeName<ExtReal>+">("+ToStringFPGeneral(q)+","+ToStringFPGeneral(p)+")";
         }
         
         virtual std::string ClassName() const override
