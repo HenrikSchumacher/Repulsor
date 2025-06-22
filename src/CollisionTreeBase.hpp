@@ -17,9 +17,18 @@ namespace Repulsor
         
         using CollisionMatrix_T = SparseMatrixCSR<SReal,Int,Int>;
         
-        CollisionTreeBase () {}
-        
+        // Default constructor
+        CollisionTreeBase() = default;
+        // Destructor
         virtual ~CollisionTreeBase() = default;
+        // Copy constructor
+        CollisionTreeBase( const CollisionTreeBase & other ) = default;
+        // Copy assignment operator
+        CollisionTreeBase & operator=( const CollisionTreeBase & other ) = default;
+        // Move constructor
+        CollisionTreeBase( CollisionTreeBase && other ) = default;
+        // Move assignment operator
+        CollisionTreeBase & operator=( CollisionTreeBase && other ) = default;
         
     protected:
         

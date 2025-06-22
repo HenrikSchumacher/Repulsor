@@ -38,8 +38,6 @@ namespace Repulsor
         
     public:
 
-        FMM_Configurator() = delete;
-        
         FMM_Configurator(
             cref<ClusterTree_T> S_,
             cref<ClusterTree_T> T_,
@@ -50,14 +48,18 @@ namespace Repulsor
         ,   metric_values ( metric_values_ )
         {}
         
+        // Default constructor
+        FMM_Configurator() = delete;
+        // Destructor
+        virtual ~FMM_Configurator() = default;
         // Copy constructor
-        FMM_Configurator( cref<FMM_Configurator> other )
-        :   S             ( other.S             )
-        ,   T             ( other.T             )
-        ,   metric_values ( other.metric_values )
-        {}
-        
-        ~FMM_Configurator() = default;
+        FMM_Configurator( const FMM_Configurator & other ) = default;
+        // Copy assignment operator
+        FMM_Configurator & operator=( const FMM_Configurator & other ) = default;
+        // Move constructor
+        FMM_Configurator( FMM_Configurator && other ) = default;
+        // Move assignment operator
+        FMM_Configurator & operator=( FMM_Configurator && other ) = default;
 
     protected:
 

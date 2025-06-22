@@ -76,7 +76,18 @@ namespace Repulsor
             }
         }
         
+        // No default constructor
+        SimplexDataKernel() = delete;
+        // Destructor
         ~SimplexDataKernel() = default;
+        // Copy constructor~
+        SimplexDataKernel( const SimplexDataKernel & other ) = default;
+        // Copy assignment operator
+        SimplexDataKernel & operator=( const SimplexDataKernel & other ) = default;
+        // Move constructor
+        SimplexDataKernel( SimplexDataKernel && other ) = default;
+        // Move assignment operator
+        SimplexDataKernel & operator=( SimplexDataKernel && other ) = default;
         
         void ReadSimplex( const Int i )
         {

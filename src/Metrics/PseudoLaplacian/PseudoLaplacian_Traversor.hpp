@@ -77,8 +77,6 @@ namespace Repulsor
     
     public:
         
-        PseudoLaplacian_Traversor() = delete;
-        
         PseudoLaplacian_Traversor(
               cref<BlockClusterTree_T> bct_,
               mref<ValueContainer_T>   metric_values_,
@@ -90,7 +88,18 @@ namespace Repulsor
         ,   s             ( s_             )
         {}
 
-        ~PseudoLaplacian_Traversor() = default;
+        // Default constructor
+        PseudoLaplacian_Traversor() = delete;
+        // Destructor
+        virtual ~PseudoLaplacian_Traversor() = default;
+        // Copy constructor
+        PseudoLaplacian_Traversor( const PseudoLaplacian_Traversor & other ) = default;
+        // Copy assignment operator
+        PseudoLaplacian_Traversor & operator=( const PseudoLaplacian_Traversor & other ) = default;
+        // Move constructor
+        PseudoLaplacian_Traversor( PseudoLaplacian_Traversor && other ) = default;
+        // Move assignment operator
+        PseudoLaplacian_Traversor & operator=( PseudoLaplacian_Traversor && other ) = default;
         
 
     protected:
@@ -106,9 +115,9 @@ namespace Repulsor
     public:
         
 
-//##############################################################################################
+//###########################################################
 //      Compute
-//##############################################################################################
+//###########################################################
         
         Real Compute()
         {
@@ -158,9 +167,9 @@ namespace Repulsor
         
 
         
-//##############################################################################################
+//###########################################################
 //      Compute subroutines
-//##############################################################################################
+//###########################################################
     
     protected:
         
@@ -265,9 +274,9 @@ namespace Repulsor
             TOOLS_PTOC(ClassName()+"::FF_Compute");
         }
         
-//##############################################################################################
+//###########################################################
 //      Multiply metric
-//##############################################################################################
+//###########################################################
         
     public:
         
@@ -304,9 +313,9 @@ namespace Repulsor
             }
         }
         
-//##############################################################################################
+//###########################################################
 //      Multiply metric subroutines
-//##############################################################################################
+//###########################################################
         
     protected:
 

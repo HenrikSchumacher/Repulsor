@@ -119,6 +119,7 @@ namespace Repulsor
 
     public:
         
+        // No default constructor
         GJK()
         {
             // Initializing facet_sizes, facet_vertices, and facet_faces.
@@ -153,11 +154,15 @@ namespace Repulsor
             visited[0] = true;
         }
 
-//        GJK( const GJK & other ) : GJK() {};
-//        
-//        GJK( GJK  && other ) : GJK() {};
-        
         ~GJK() = default;
+        // Copy constructor
+        GJK( const GJK & other ) = default;
+        // Copy assignment operator
+        GJK & operator=( const GJK & other ) = default;
+        // Move constructor
+        GJK( GJK && other ) = default;
+        // Move assignment operator
+        GJK & operator=( GJK && other ) = default;
         
         constexpr Int AmbDim() const
         {

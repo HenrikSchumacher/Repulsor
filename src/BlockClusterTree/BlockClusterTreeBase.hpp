@@ -29,11 +29,20 @@ namespace Repulsor
         
         using ClusterTreeBase_T  = ClusterTreeBase<Real,Int,LInt,SReal,ExtReal>;
 
-    protected:
-
     public:
         
+        // No default constructor.
+        BlockClusterTreeBase() = default;
+        // Destructor
         virtual ~BlockClusterTreeBase() = default;
+        // Copy constructor
+        BlockClusterTreeBase( const BlockClusterTreeBase & other ) = default;
+        // Copy assignment operator
+        BlockClusterTreeBase & operator=( const BlockClusterTreeBase & other ) = default;
+        // Move constructor
+        BlockClusterTreeBase( BlockClusterTreeBase && other ) = default;
+        // Move assignment operator
+        BlockClusterTreeBase & operator=( BlockClusterTreeBase && other ) = default;
         
         virtual Int AmbDim() const = 0;
 

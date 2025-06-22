@@ -28,13 +28,18 @@ namespace Repulsor
         :   settings ( settings_ )
         {}
         
-        virtual ~BoundingVolumeHierarchyBase() = default;
-        
-    public:
-        
-        BoundingVolumeHierarchyBase( const BoundingVolumeHierarchyBase & rhs ) = default;
-        
-        BoundingVolumeHierarchyBase( BoundingVolumeHierarchyBase && rhs ) = default;
+        // Default constructor
+        BoundingVolumeHierarchyBase() = default;
+        // Destructor
+        virtual ~BoundingVolumeHierarchyBase() override = default;
+        // Copy constructor
+        BoundingVolumeHierarchyBase( const BoundingVolumeHierarchyBase & other ) = default;
+        // Copy assignment operator
+        BoundingVolumeHierarchyBase & operator=( const BoundingVolumeHierarchyBase & other ) = default;
+        // Move constructor
+        BoundingVolumeHierarchyBase( BoundingVolumeHierarchyBase && other ) = default;
+        // Move assignment operator
+        BoundingVolumeHierarchyBase & operator=( BoundingVolumeHierarchyBase && other ) = default;
         
     protected:
         

@@ -140,9 +140,6 @@ namespace Repulsor
         
     public:
         
-//        FMM_Kernel_VF() = default;
-        FMM_Kernel_VF() = delete;
-        
         FMM_Kernel_VF( mref<Configurator_T> conf, const Int thread_, const Real theta_, const Int max_refinement_  )
         :   Base_T         ( conf, thread_                                       )
         ,   S_data         ( GetS().PrimitiveNearFieldData().data()              )
@@ -198,7 +195,11 @@ namespace Repulsor
             TOOLS_DEBUG_PRINT(std::string( "Initializing "+ClassName()+" from "+ClassName()+" on thread " + ToString(thread)) );
         }
         
-        ~FMM_Kernel_VF()
+        
+        // Default constructor
+        FMM_Kernel_VF() = delete;
+        // Destructor
+        virtual ~FMM_Kernel_VF() override
         {
 //#ifdef REPULSOR__PRINT_REPORTS_FOR_ADAPTIVE_KERNELS
 //            logfile
@@ -217,6 +218,15 @@ namespace Repulsor
 //            logfile << std::endl;
 //#endif
         };
+        // Copy constructor
+        FMM_Kernel_VF( const FMM_Kernel_VF & other ) = default;
+        // Copy assignment operator
+        FMM_Kernel_VF & operator=( const FMM_Kernel_VF & other ) = default;
+        // Move constructor
+        FMM_Kernel_VF( FMM_Kernel_VF && other ) = default;
+        // Move assignment operator
+        FMM_Kernel_VF & operator=( FMM_Kernel_VF && other ) = default;
+        
 
     public:
         

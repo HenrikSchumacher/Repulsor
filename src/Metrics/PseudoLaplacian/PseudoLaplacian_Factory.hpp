@@ -18,8 +18,6 @@ namespace Repulsor
         static constexpr Int MAX_DOM_DIM = Min( Int(MAX_AMB_DIM-1), Int(MAX_DOM_DIM_) );
         
         TOOLS_CONCAT2(CLASS,_Factory)() = default;
-        
-        ~TOOLS_CONCAT2(CLASS,_Factory)() = default;
 
         [[nodiscard]] std::unique_ptr<ROOT> Make( const Int dom_dim, const Int amb_dim, const Real s )
         {

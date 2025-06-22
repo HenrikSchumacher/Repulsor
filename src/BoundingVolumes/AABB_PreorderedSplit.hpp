@@ -16,27 +16,20 @@ namespace Repulsor
         
         using Base_T = AABB<AMB_DIM,Real,Int,SReal>;
         
-        AABB_PreorderedSplit() : Base_T() {}
-
-        // Copy constructor
-        AABB_PreorderedSplit( const AABB_PreorderedSplit & other ) : Base_T( other ) {}
-        
-        // Move constructor
-        AABB_PreorderedSplit( AABB_PreorderedSplit && other ) noexcept : Base_T( other ) {}
-        
-        // Copy assignment
-        const AABB_PreorderedSplit & operator=( const AABB_PreorderedSplit & rhs)
-        {
-            return AABB_PreorderedSplit ( rhs );
-        }
-        
-        // Move assignment
-        const AABB_PreorderedSplit & operator=( AABB_PreorderedSplit && rhs)
-        {
-            return AABB_PreorderedSplit ( std::move(rhs) );
-        }
-        
+        // Default constructor
+        AABB_PreorderedSplit()
+        : Base_T()
+        {}
+        // Destructor
         virtual ~AABB_PreorderedSplit() override = default;
+        // Copy constructor
+        AABB_PreorderedSplit( const AABB_PreorderedSplit & other ) = default;
+        // Copy assignment operator
+        AABB_PreorderedSplit & operator=( const AABB_PreorderedSplit & other ) = default;
+        // Move constructor
+        AABB_PreorderedSplit( AABB_PreorderedSplit && other ) = default;
+        // Move assignment operator
+        AABB_PreorderedSplit & operator=( AABB_PreorderedSplit && other ) = default;
         
     protected:
         

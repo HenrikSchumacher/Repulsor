@@ -20,13 +20,15 @@ namespace Repulsor
         SReal t_1 = 1;
     public:
         
-        SpaceTimePrism() {}
-        
         explicit SpaceTimePrism( const Proto_T & proto )
         :   proto_0(proto->Clone())
         ,   proto_1(proto->Clone())
         {}
         
+        // Default constructor
+        SpaceTimePrism() = default;
+        // Destructor
+        virtual ~SpaceTimePrism() override = default;
         // Copy constructor
         SpaceTimePrism( const SpaceTimePrism & other )
         :   Base_T()
@@ -35,9 +37,19 @@ namespace Repulsor
         ,   t_0(other.t_0)
         ,   t_1(other.t_1)
         {}
-
+        
+        // Copy assignment
+        // A verbose, but (i) SpaceTimePrism is an abstract class and (ii) proto_0 and proto_1 need Clone(). So
+        SpaceTimePrism & operator=( const SpaceTimePrism & other )
+        {
+            proto_0 = other.proto_0->Clone();
+            proto_1 = other.proto_1->Clone();
+            t_0 = other.t_0;
+            t_1 = other.t_1;
+        }
+        
         // Move constructor
-        SpaceTimePrism( SpaceTimePrism && other ) noexcept 
+        SpaceTimePrism( SpaceTimePrism && other )
         :   Base_T()
         ,   proto_0(std::move(other.proto_0->Clone()))
         ,   proto_1(std::move(other.proto_1->Clone()))
@@ -45,8 +57,28 @@ namespace Repulsor
         ,   t_1(other.t_1)
         {}
         
-        virtual ~SpaceTimePrism() override = default;
-        
+        // Move assignment
+        SpaceTimePrism & operator=( SpaceTimePrism && other )
+        {
+            proto_0 = std::move(other.proto_0->Clone());
+            proto_1 = std::move(other.proto_1->Clone());
+            t_0 = other.t_0;
+            t_1 = other.t_1;
+        }
+
+        // Swap function
+        friend void swap( SpaceTimePrism & X, SpaceTimePrism & Y ) noexcept
+        {
+            // see https://stackoverflow.com/questions/5695548/public-friend-swap-member-function for details
+            using std::swap;
+            
+            swap(static_cast<Base_T & >(X), static_cast<Base_T &>(Y));
+            
+            swap( X.proto_0 , Y.proto_0 );
+            swap( X.proto_1 , Y.proto_1 );
+            swap( X.t_0     , Y.t_0     );
+            swap( X.t_1     , Y.t_1     );
+        }
 
     public:
             

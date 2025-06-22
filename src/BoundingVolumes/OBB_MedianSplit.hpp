@@ -20,15 +20,20 @@ namespace Repulsor
         
         using Base_T = OBB<AMB_DIM,Real,Int,SReal>;
         
-        OBB_MedianSplit() : Base_T() {}
-
-        // Copy constructor
-        OBB_MedianSplit( const OBB_MedianSplit & other ) : Base_T( other ) {}
-        
-        // Move constructor
-        OBB_MedianSplit( OBB_MedianSplit && other ) noexcept : Base_T( other ) {}
-        
+        // Default constructor
+        OBB_MedianSplit()
+        : Base_T()
+        {}
+        // Destructor
         virtual ~OBB_MedianSplit() override = default;
+        // Copy constructor
+        OBB_MedianSplit( const OBB_MedianSplit & other ) = default;
+        // Copy assignment operator
+        OBB_MedianSplit & operator=( const OBB_MedianSplit & other ) = default;
+        // Move constructor
+        OBB_MedianSplit( OBB_MedianSplit && other ) = default;
+        // Move assignment operator
+        OBB_MedianSplit & operator=( OBB_MedianSplit && other ) = default;
         
         static constexpr Int SIZE = 1 + AMB_DIM + AMB_DIM + AMB_DIM * AMB_DIM;
         

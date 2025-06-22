@@ -10,18 +10,20 @@ namespace Repulsor
         
         using Base_T = PrimitiveSerialized<AMB_DIM,Real,Int,SReal>;
         
-        BoundingVolumeBase() : Base_T()
+        // Default constructor
+        BoundingVolumeBase()
+        : Base_T()
         {}
-        
-        // Copy constructor
-        BoundingVolumeBase( const BoundingVolumeBase & other ) : Base_T(other)
-        {}
-        
-        // Move constructor
-        BoundingVolumeBase( BoundingVolumeBase && other ) noexcept : Base_T(other)
-        {}
-        
+        // Destructor
         virtual ~BoundingVolumeBase() override = default;
+        // Copy constructor
+        BoundingVolumeBase( const BoundingVolumeBase & other ) = default;
+        // Copy assignment operator
+        BoundingVolumeBase & operator=( const BoundingVolumeBase & other ) = default;
+        // Move constructor
+        BoundingVolumeBase( BoundingVolumeBase && other ) = default;
+        // Move assignment operator
+        BoundingVolumeBase & operator=( BoundingVolumeBase && other ) = default;
         
     public:
         

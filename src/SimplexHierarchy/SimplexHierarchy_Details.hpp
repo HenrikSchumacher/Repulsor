@@ -36,12 +36,21 @@ protected:
     
 public:
     
+    // Default constructor
     SimplexHierarchy()
     {
         P.SetPointer(&simplex_serialized[0]);
     }
-
+    // Destructor
     virtual ~SimplexHierarchy() = default;
+    // Copy constructor
+    SimplexHierarchy( const SimplexHierarchy & other ) = default;
+    // Copy assignment operator
+    SimplexHierarchy & operator=( const SimplexHierarchy & other ) = default;
+    // Move constructor
+    SimplexHierarchy( SimplexHierarchy && other ) = default;
+    // Move assignment operator
+    SimplexHierarchy & operator=( SimplexHierarchy && other ) = default;
     
     bool Check()
     {

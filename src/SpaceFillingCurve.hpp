@@ -131,14 +131,31 @@ namespace Repulsor
         
     public:
         
-        SpaceFillingCurve( const Int thread_count_ = 1 )
+        
+        SpaceFillingCurve( const Int thread_count_  )
         :   thread_count( thread_count_ )
 //        ,   q_max( one << (bit_count - 1) )
         {
             Init();
         }
         
+        // No default constructor
+        SpaceFillingCurve()
+        :   thread_count( Int(1) )
+//        ,   q_max( one << (bit_count - 1) )
+        {
+            Init();
+        }
+        // Destructor
         ~SpaceFillingCurve() = default;
+        // Copy constructor
+        SpaceFillingCurve( const SpaceFillingCurve & other ) = default;
+        // Copy assignment operator
+        SpaceFillingCurve & operator=( const SpaceFillingCurve & other ) = default;
+        // Move constructor
+        SpaceFillingCurve( SpaceFillingCurve && other ) = default;
+        // Move assignment operator
+        SpaceFillingCurve & operator=( SpaceFillingCurve && other ) = default;
         
         // Conventions:
         // X - Coordinate vector with entries in [ 0, 2^bit_count -1 [.

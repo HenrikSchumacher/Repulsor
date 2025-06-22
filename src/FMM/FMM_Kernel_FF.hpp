@@ -82,8 +82,6 @@ namespace Repulsor
         
     public:
         
-        FMM_Kernel_FF() = default;
-        
         explicit FMM_Kernel_FF( mref<Configurator_T> conf, Int thread_ )
         :   Base_T      ( conf, thread_                                    )
         ,   S_data      ( GetS().ClusterFarFieldData().data()              )
@@ -135,7 +133,18 @@ namespace Repulsor
             TOOLS_DEBUG_PRINT(std::string( "Initializing "+ClassName()+" from "+ClassName()+" on thread " + ToString(thread)) );
         }
         
-        ~FMM_Kernel_FF() = default;
+        // Default constructor
+        FMM_Kernel_FF() = delete;
+        // Destructor
+        virtual ~FMM_Kernel_FF() override = default;
+        // Copy constructor
+        FMM_Kernel_FF( const FMM_Kernel_FF & other ) = default;
+        // Copy assignment operator
+        FMM_Kernel_FF & operator=( const FMM_Kernel_FF & other ) = default;
+        // Move constructor
+        FMM_Kernel_FF( FMM_Kernel_FF && other ) = default;
+        // Move assignment operator
+        FMM_Kernel_FF & operator=( FMM_Kernel_FF && other ) = default;
         
     public:
         

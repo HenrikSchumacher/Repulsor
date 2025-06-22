@@ -45,8 +45,6 @@ namespace Repulsor
         const Int thread = 0;
         
     public:
-
-        FMM_Kernel() = delete;
         
         explicit FMM_Kernel( mref<Configurator_T> conf, const Int thread_ )
         :   thread        ( thread_              )
@@ -77,7 +75,18 @@ namespace Repulsor
             return "(" + ToString(thread) +")";
         }
         
-        ~FMM_Kernel() = default;
+        // Default constructor
+        FMM_Kernel() = delete;
+        // Destructor
+        virtual ~FMM_Kernel() = default;
+        // Copy constructor
+        FMM_Kernel( const FMM_Kernel & other ) = default;
+        // Copy assignment operator
+        FMM_Kernel & operator=( const FMM_Kernel & other ) = default;
+        // Move constructor
+        FMM_Kernel( FMM_Kernel && other ) = default;
+        // Move assignment operator
+        FMM_Kernel & operator=( FMM_Kernel && other ) = default;
 
     public:
         

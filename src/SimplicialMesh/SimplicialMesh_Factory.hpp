@@ -40,8 +40,6 @@ namespace Repulsor
         static constexpr Int MaxDomDim = Min( Int(MaxAmbDim-1), Int(MaxDomDim_) );
         
         SimplicialMesh_Factory() = default;
-        
-        ~SimplicialMesh_Factory() = default;
 
         template<typename ExtInt>
         [[nodiscard]] std::unique_ptr<MeshBase_T> Make(

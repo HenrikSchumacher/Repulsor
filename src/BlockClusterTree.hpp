@@ -46,10 +46,6 @@ namespace Repulsor
         using BlockClusterTreeBase_T::Settings;
         
     public:
-
-        // In order to prevent GetS() and GetT() shooting a segfault, we have to initialize S and T here. This is the only case in which BlockClusterTree owns these raw pointers.
-        
-        virtual ~BlockClusterTree() = default;
         
         BlockClusterTree(
             cref<ClusterTree_T> S_,
@@ -81,6 +77,20 @@ namespace Repulsor
 
             TOOLS_PTOC(className());
         } // Constructor
+        
+        
+        // No default constructor.
+        BlockClusterTree() = delete;
+        // Destructor
+        virtual ~BlockClusterTree() override = default;
+        // Copy constructor
+        BlockClusterTree( const BlockClusterTree & other ) = default;
+        // Copy assignment operator
+        BlockClusterTree & operator=( const BlockClusterTree & other ) = default;
+        // Move constructor
+        BlockClusterTree( BlockClusterTree && other ) = default;
+        // Move assignment operator
+        BlockClusterTree & operator=( BlockClusterTree && other ) = default;
         
     protected:
 

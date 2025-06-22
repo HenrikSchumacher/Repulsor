@@ -38,12 +38,22 @@ namespace Repulsor
         using TangentVector_T                = Tensor2<ExtReal,Int>;
         using CotangentVector_T              = Tensor2<ExtReal,Int>;
         
+        // Default constructor
         SimplicialMeshBase() = default;
-
+        // Destructor
         virtual ~SimplicialMeshBase() = default;
+        // Copy constructor
+        SimplicialMeshBase( const SimplicialMeshBase & other ) = default;
+        // Copy assignment operator
+        SimplicialMeshBase & operator=( const SimplicialMeshBase & other ) = default;
+        // Move constructor
+        SimplicialMeshBase( SimplicialMeshBase && other ) = default;
+        // Move assignment operator
+        SimplicialMeshBase & operator=( SimplicialMeshBase && other ) = default;
+        
         
         explicit SimplicialMeshBase( const Int thread_count_ )
-        :   thread_count( Ramp_1(thread_count_) )
+        :   thread_count( Max(Int(1),thread_count_) )
         {};
         
         mutable      ClusterTreeSettings       cluster_tree_settings;

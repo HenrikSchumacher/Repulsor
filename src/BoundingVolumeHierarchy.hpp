@@ -66,7 +66,7 @@ namespace Repulsor
             ,   right(nullptr)
             {}
             
-            ~Cluster() = default;
+//            ~Cluster() = default;
             
             const Int thread = -1;               // thread that created this cluster
             const Int l_ID = -1;                 // local ID of cluster within this thread

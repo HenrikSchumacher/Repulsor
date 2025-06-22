@@ -109,15 +109,7 @@ namespace Repulsor
         using Base_T::mi_post;
         
     public:
-        
-        ClusterTree()
-        :   P_proto (1)
-        ,   C_proto (1)
-        ,   P_moving(1)
-        {
-            TOOLS_PTIC(className()+" default constructor");
-            TOOLS_PTOC(className()+" default constructor");
-        }
+
         
         // To allow polymorphism, we require the user to create instances of the desired types for the primitives and the bounding volumes, so that we can Clone() them.
         ClusterTree(
@@ -188,22 +180,26 @@ namespace Repulsor
             
             TOOLS_PTOC(className()+"()");
         }
-        
+    
+        // Default constructor
+        ClusterTree()
+        :   Base_T()
+        ,   P_proto (1)
+        ,   C_proto (1)
+        ,   P_moving(1)
+        {
+            TOOLS_PTIMER(timer,className()+" default constructor");
+        }
+        // Destructor
         virtual ~ClusterTree() override = default;
-        
-        ClusterTree(const ClusterTree & rhs) = default;
-        
-        ClusterTree( ClusterTree && rhs) = default;
-        
-        const ClusterTree & operator=( const ClusterTree & rhs)
-        {
-            return ClusterTree ( rhs );
-        };
-        
-        const ClusterTree & operator=( ClusterTree && rhs)
-        {
-            return ClusterTree ( std::move(rhs) );
-        };
+        // Copy constructor
+        ClusterTree( const ClusterTree & other ) = default;
+        // Copy assignment operator
+        ClusterTree & operator=( const ClusterTree & other ) = default;
+        // Move constructor
+        ClusterTree( ClusterTree && other ) = default;
+        // Move assignment operator
+        ClusterTree & operator=( ClusterTree && other ) = default;
         
     protected:
         
@@ -219,6 +215,7 @@ namespace Repulsor
         
         mutable std::vector<std::shared_ptr<MovingPrimitive_T>> P_moving;
         
+        // TODO: This is very awkward. Is there a better way?
         std::vector<std::vector<Cluster_T *>> tree_rows_ptr;
         
     public:
@@ -1078,8 +1075,8 @@ namespace Repulsor
                     const Int i_begin = JobPointer<Int>(PrimitiveCount(), ThreadCount(), thread     );
                     const Int i_end   = JobPointer<Int>(PrimitiveCount(), ThreadCount(), thread + 1 );
                     
-                    P_moving[thread] = P_moving_.Clone();
-                    MovingPrimitive_T & P_mov = *P_moving[thread];
+                    P_moving[ToSize_T(thread)] = P_moving_.Clone();
+                    MovingPrimitive_T & P_mov = *P_moving[ToSize_T(thread)];
                     
                     for( Int i = i_begin; i < i_end; ++i )
                     {
@@ -1101,8 +1098,8 @@ namespace Repulsor
                     const Int i_begin = JobPointer<Int>(LeafClusterCount(), ThreadCount(), thread     );
                     const Int i_end   = JobPointer<Int>(LeafClusterCount(), ThreadCount(), thread + 1 );
                     
-                    mref<Primitive_T>      P_   = *P_proto[thread];
-                    mref<BoundingVolume_T> C_bv = *C_proto[thread];
+                    mref<Primitive_T>      P_   = *P_proto[ToSize_T(thread)];
+                    mref<BoundingVolume_T> C_bv = *C_proto[ToSize_T(thread)];
                                        
                     for( Int i = i_begin; i < i_end; ++i )
                     {
@@ -1261,15 +1258,12 @@ namespace Repulsor
         } // CollectFarFieldDerivatives
         
         
-    
-        
         cref<Tensor2<Real,Int>> ClusterMoments() const override
         {
             return C_moments;
         }
         
     public:
-        
         
         std::string Stats() const override
         {

@@ -20,16 +20,21 @@ namespace Repulsor
         
         using Base_T = BoundingVolumeBase<AMB_DIM,Real,Int,SReal>;
         
-        OBB() : Base_T() {}
-
-        // Copy constructor
-        OBB( const OBB & other ) : Base_T( other ) {}
-        
-        // Move constructor
-        OBB( OBB && other ) noexcept : Base_T( other ) {}
-        
-        
+        // Default constructor
+        OBB()
+        : Base_T()
+        {}
+        // Destructor
         virtual ~OBB() override = default;
+        // Copy constructor
+        OBB( const OBB & other ) = default;
+        // Copy assignment operator
+        OBB & operator=( const OBB & other ) = default;
+        // Move constructor
+        OBB( OBB && other ) = default;
+        // Move assignment operator
+        OBB & operator=( OBB && other ) = default;
+        
         
         static constexpr Int SIZE = 1 + AMB_DIM + AMB_DIM + AMB_DIM * AMB_DIM;
         

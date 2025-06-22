@@ -56,15 +56,18 @@ namespace Repulsor
             TOOLS_PTOC(className()+"()");
         }
         
-//        // Copy constructor
-//        CollisionTree( const CollisionTree & other )
-//        :   S( other.S_ )
-//        ,   T( other.T_ )
-//        ,   thread_count( other.thread_count )
-//        {}
-        
-        
-        virtual ~CollisionTree() = default;
+        // Default constructor
+        CollisionTree() = delete;
+        // Destructor
+        virtual ~CollisionTree() override = default;
+        // Copy constructor
+        CollisionTree( const CollisionTree & other ) = default;
+        // Copy assignment operator
+        CollisionTree & operator=( const CollisionTree & other ) = default;
+        // Move constructor
+        CollisionTree( CollisionTree && other ) = default;
+        // Move assignment operator
+        CollisionTree & operator=( CollisionTree && other ) = default;
         
     protected:
         
@@ -81,9 +84,9 @@ namespace Repulsor
         mutable CollisionMatrix_T P_collision_matrix;
         
 
-//#################################################################################
+//###########################################################
 //      PrimitiveCollisionMatrix
-//#################################################################################
+//###########################################################
 
     public:
         
@@ -157,9 +160,9 @@ namespace Repulsor
             return P_collision_matrix;
         }
 
-//#################################################################################
+//###########################################################
 //      MaximumSafeStepSize
-//#################################################################################
+//###########################################################
         
     public:
         

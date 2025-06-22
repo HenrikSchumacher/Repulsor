@@ -137,8 +137,6 @@ namespace Repulsor
             }
         }
         
-        SimplicialRemesher() = default;
-        
 //        explicit SimplicialRemesher( const Mesh_T & M )
 //        {
 //            Init();
@@ -200,7 +198,18 @@ namespace Repulsor
            );
         }
         
-        virtual ~SimplicialRemesher() = default;
+        // Default constructor
+        SimplicialRemesher() = default;
+        // Destructor
+        virtual ~SimplicialRemesher() override = default;
+        // Copy constructor
+        SimplicialRemesher( const SimplicialRemesher & other ) = default;
+        // Copy assignment operator
+        SimplicialRemesher & operator=( const SimplicialRemesher & other ) = default;
+        // Move constructor
+        SimplicialRemesher( SimplicialRemesher && other ) = default;
+        // Move assignment operator
+        SimplicialRemesher & operator=( SimplicialRemesher && other ) = default;
         
         
         virtual Int VertexCount() const override

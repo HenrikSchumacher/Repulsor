@@ -18,8 +18,6 @@ namespace Repulsor
         using       Primitive_T =       PolytopeBase<AMB_DIM,GJK_Real,Int,SReal>;
         using MovingPrimitive_T = MovingPolytopeBase<AMB_DIM,GJK_Real,Int,SReal>;
 
-        CollisionFinder() {};
-
         CollisionFinder(
             cref<MovingPrimitive_T> P_,
             cref<MovingPrimitive_T> Q_,
@@ -30,11 +28,46 @@ namespace Repulsor
         ,   eps(TOL)
         {}
         
+        // Default constructor
+        CollisionFinder() = default;
+        
+        // Destructor
+        virtual ~CollisionFinder() = default;
+        
+        // Copy constructor
         CollisionFinder( const CollisionFinder & other )
         :   P { other.P->Clone() }
         ,   Q { other.Q->Clone() }
         ,   eps(other.eps)
         {}
+        
+        // Copy assignment
+        CollisionFinder & operator=( CollisionFinder other )
+        {
+            swap(*this,other);
+            return *this;
+        }
+        
+        // Move constructor
+        CollisionFinder( CollisionFinder && other )
+        {
+            swap(*this,other);
+            return *this;
+        }
+        
+        // Move assignment no needed.
+        
+        
+        // Swap function
+        friend void swap( CollisionFinder & X, CollisionFinder & Y ) noexcept
+        {
+            // for details see https://stackoverflow.com/questions/5695548/public-friend-swap-member-function
+            using std::swap;
+            
+            swap( X.P   , Y.P   );
+            swap( X.Q   , Y.Q   );
+            swap( X.eps , Y.eps );
+        }
       
     protected:
 

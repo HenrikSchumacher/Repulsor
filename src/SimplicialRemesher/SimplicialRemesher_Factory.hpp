@@ -38,8 +38,6 @@ namespace Repulsor
         static constexpr Int MaxDomDim = Min( Int(MaxAmbDim-1), Int(MaxDomDim_) );
         
         SimplicialRemesher_Factory() = default;
-        
-        ~SimplicialRemesher_Factory() = default;
 
         [[nodiscard]] std::unique_ptr<RemesherBase_T> Make(
             cptr<ExtReal> vertex_coords, // vertex coordinates; size = vertex_count_ x amb_dim

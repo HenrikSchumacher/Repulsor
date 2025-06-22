@@ -20,8 +20,9 @@ namespace Repulsor
         using TangentVector_T   = typename Base_T::TangentVector_T;
         using CotangentVector_T = typename Base_T::CotangentVector_T;
         
+        // Default constructor
         EnergyDimRestricted() = default;
-
+        // Destructor
         virtual ~EnergyDimRestricted() override = default;
         
         using Base_T::Value;

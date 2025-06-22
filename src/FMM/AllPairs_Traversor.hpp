@@ -25,8 +25,6 @@ namespace Repulsor
         
         static constexpr bool symmetricQ = Kernel_T::symmetricQ;
         
-        AllPairs_Traversor() = default;
-        
         template<typename I0, typename I1>
         AllPairs_Traversor( const I0 m_, const I1 n_, mref<Kernel_T> kernel_ )
         :   m       ( m_      )
@@ -37,14 +35,18 @@ namespace Repulsor
             static_assert(IntQ<I1>,"");
         }
         
+        // Default constructor
+        AllPairs_Traversor() = delete;
+        // Destructor
+        virtual ~AllPairs_Traversor() = default;
         // Copy constructor
-        AllPairs_Traversor( cref<AllPairs_Traversor> other )
-        :   m       ( other.m      )
-        ,   n       ( other.n      )
-        ,   kernel  ( other.kernel )
-        {}
-
-        ~AllPairs_Traversor() = default;
+        AllPairs_Traversor( const AllPairs_Traversor & other ) = default;
+        // Copy assignment operator
+        AllPairs_Traversor & operator=( const AllPairs_Traversor & other ) = default;
+        // Move constructor
+        AllPairs_Traversor( AllPairs_Traversor && other ) = default;
+        // Move assignment operator
+        AllPairs_Traversor & operator=( AllPairs_Traversor && other ) = default;
         
     protected:
     

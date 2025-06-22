@@ -18,7 +18,8 @@ namespace Repulsor
         
     protected:
         
-        Real id_matrix[AMB_DIM][AMB_DIM];
+        Tiny::Matrix<AMB_DIM,AMB_DIM,Real,Int> id_matrix;
+//        Real id_matrix[AMB_DIM][AMB_DIM];
     
         const int bits = static_cast<int>(64-1) / static_cast<int>(AMB_DIM);
         const SReal power  = static_cast<SReal>(0.9999) * std::pow( Scalar::Two<SReal>, bits );
@@ -26,37 +27,51 @@ namespace Repulsor
         
     protected:
         
-        void Initialize()
-        {
-            for( Int k1 = 0; k1 < AMB_DIM; ++k1 )
-            {
-                for( Int k2 = 0; k2 < AMB_DIM; ++k2 )
-                {
-                    id_matrix[k1][k2] = static_cast<SReal>(k1==k2);
-                }
-            }
-        }
+//        void Initialize()
+//        {
+//            for( Int k1 = 0; k1 < AMB_DIM; ++k1 )
+//            {
+//                for( Int k2 = 0; k2 < AMB_DIM; ++k2 )
+//                {
+//                    id_matrix[k1][k2] = static_cast<SReal>(k1==k2);
+//                }
+//            }
+//        }
     
     public:
         
-        AABB() : Base_T()
+        // Default constructor
+        AABB()
+        : Base_T()
         {
-            Initialize();
+            id_matrix.SetIdentity();
         }
 
-        // Copy constructor
-        AABB( const AABB & other ) : Base_T( other )
-        {
-            Initialize();
-        }
-        
-        // Move constructor
-        AABB( AABB && other ) noexcept : Base_T( other )
-        {
-            Initialize();
-        }
-        
+        // Destructor
         virtual ~AABB() override = default;
+        // Copy constructor
+        AABB( const AABB & other ) = default;
+        // Copy assignment operator
+        AABB & operator=( const AABB & other ) = default;
+        // Move constructor
+        AABB( AABB && other ) = default;
+        // Move assignment operator
+        AABB & operator=( AABB && other ) = default;
+        
+
+//        // Copy constructor
+//        AABB( const AABB & other ) : Base_T( other )
+//        {
+//            Initialize();
+//        }
+//        
+//        // Move constructor
+//        AABB( AABB && other ) noexcept : Base_T( other )
+//        {
+//            Initialize();
+//        }
+//        
+//        virtual ~AABB() override = default;
         
         
         static constexpr Int SIZE = 1 + AMB_DIM + AMB_DIM;

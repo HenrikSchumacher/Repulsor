@@ -24,9 +24,18 @@ namespace Repulsor
         using Edge_T     = Int;
         using Simplex_T  = Int;
 
+        // Default constructor
         SimplicialRemesherBase() = default;
-
+        // Destructor
         virtual ~SimplicialRemesherBase() = default;
+        // Copy constructor
+        SimplicialRemesherBase( const SimplicialRemesherBase & other ) = default;
+        // Copy assignment operator
+        SimplicialRemesherBase & operator=( const SimplicialRemesherBase & other ) = default;
+        // Move constructor
+        SimplicialRemesherBase( SimplicialRemesherBase && other ) = default;
+        // Move assignment operator
+        SimplicialRemesherBase & operator=( SimplicialRemesherBase && other ) = default;
         
         virtual Int VertexCount() const = 0;
 

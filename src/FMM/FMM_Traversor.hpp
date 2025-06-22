@@ -25,20 +25,25 @@ namespace Repulsor
         
         static constexpr bool symmetricQ = Kernel_T::symmetricQ;
         
-        FMM_Traversor() = delete;
+    public:
         
         FMM_Traversor( cref<Pattern_T> pattern_, mref<Kernel_T> kernel_ )
         :   pattern ( pattern_ )
         ,   kernel  ( kernel_  )
         {}
         
+        // Default constructor
+        FMM_Traversor() = delete;
+        // Destructor
+        virtual ~FMM_Traversor() = default;
         // Copy constructor
-        FMM_Traversor( cref<FMM_Traversor> other )
-        :   pattern ( other.pattern )
-        ,   kernel  ( other.kernel  )
-        {}
-
-        ~FMM_Traversor() = default;
+        FMM_Traversor( const FMM_Traversor & other ) = default;
+        // Copy assignment operator
+        FMM_Traversor & operator=( const FMM_Traversor & other ) = default;
+        // Move constructor
+        FMM_Traversor( FMM_Traversor && other ) = default;
+        // Move assignment operator
+        FMM_Traversor & operator=( FMM_Traversor && other ) = default;
         
     protected:
     

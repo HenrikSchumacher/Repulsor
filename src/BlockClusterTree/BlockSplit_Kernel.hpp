@@ -15,10 +15,7 @@ namespace Repulsor
         using LInt          = typename ClusterTree_T::LInt;
         
     public:
-        
-        BlockSplit_Kernel() = delete;
-        
-        ~BlockSplit_Kernel() = default;
+
         
         BlockSplit_Kernel(
             cref<ClusterTree_T> S, cref<ClusterTree_T> T,
@@ -45,16 +42,21 @@ namespace Repulsor
         ,   intersection_theta2 ( near_theta2_                              )
         {}
         
+        // Default constructor
+        BlockSplit_Kernel() = delete;
+        // Destructor
+        ~BlockSplit_Kernel() = default;
+        // Copy constructor
         BlockSplit_Kernel( const BlockSplit_Kernel & other )
         :   inter_idx           ( other.inter_idx.Capacity()    )
         ,   verynear_idx        ( other.verynear_idx.Capacity() )
         ,   near_idx            ( other.near_idx.Capacity()     )
         ,   far_idx             ( other.far_idx.Capacity()      )
         ,   thread              ( other.thread                  )
-        ,   S_C_proto           ( other.S_C_proto->Clone()      )
-        ,   T_C_proto           ( other.T_C_proto->Clone()      )
-        ,   S_P_proto           ( other.S_P_proto->Clone()      )
-        ,   T_P_proto           ( other.T_P_proto->Clone()      )
+        ,   S_C_proto           ( other.S_C_proto->Clone()      ) // !!!
+        ,   T_C_proto           ( other.T_C_proto->Clone()      ) // !!!
+        ,   S_P_proto           ( other.S_P_proto->Clone()      ) // !!!
+        ,   T_P_proto           ( other.T_P_proto->Clone()      ) // !!!
         ,   S_C_serialized      ( other.S_C_serialized          )
         ,   T_C_serialized      ( other.T_C_serialized          )
         ,   S_P_serialized      ( other.S_P_serialized          )
@@ -65,7 +67,8 @@ namespace Repulsor
         ,   intersection_theta2 ( other.near_theta2             )
         {}
         
-        friend void swap( BlockSplit_Kernel & X, BlockSplit_Kernel & Y )
+        // Swap function
+        friend void swap( BlockSplit_Kernel & X, BlockSplit_Kernel & Y ) noexcept
         {
             // see https://stackoverflow.com/questions/5695548/public-friend-swap-member-function for details
             using std::swap;
@@ -89,12 +92,14 @@ namespace Repulsor
         }
 
         // Copy assignment
-        BlockSplit_Kernel & operator=(BlockSplit_Kernel other) // Intentionally no pass-by-reference here!
+        BlockSplit_Kernel & operator=( BlockSplit_Kernel other ) noexcept
         {
             swap(*this, other);
-
             return *this;
         }
+        
+        // Let's better not talk about the move constructor and move assignment here.
+        // Since this kernel is put into a std::vector, some move semantics are necessary. We let the compiler let them generate for us. The data in this kernel are mostly pointers and references, so we we are happy if copy semantics are used throughout.
         
     public:
         

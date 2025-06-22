@@ -16,27 +16,42 @@ namespace Repulsor
         
         using Base_T = AABB<AMB_DIM,Real,Int,SReal>;
         
-        AABB_LongestAxisSplit() : Base_T() {}
-
-        // Copy constructor
-        AABB_LongestAxisSplit( const AABB_LongestAxisSplit & other ) : Base_T( other ) {}
-        
-        // Move constructor
-        AABB_LongestAxisSplit( AABB_LongestAxisSplit && other ) noexcept : Base_T( other ) {}
-        
-        // Copy assignment
-        const AABB_LongestAxisSplit & operator=( const AABB_LongestAxisSplit & rhs)
-        {
-            return AABB_LongestAxisSplit ( rhs );
-        }
-        
-        // Move assignment
-        const AABB_LongestAxisSplit & operator=( AABB_LongestAxisSplit && rhs)
-        {
-            return AABB_LongestAxisSplit ( std::move(rhs) );
-        }
-        
+        // Default constructor
+        AABB_LongestAxisSplit()
+        : Base_T()
+        {}
+        // Destructor
         virtual ~AABB_LongestAxisSplit() override = default;
+        // Copy constructor
+        AABB_LongestAxisSplit( const AABB_LongestAxisSplit & other ) = default;
+        // Copy assignment operator
+        AABB_LongestAxisSplit & operator=( const AABB_LongestAxisSplit & other ) = default;
+        // Move constructor
+        AABB_LongestAxisSplit( AABB_LongestAxisSplit && other ) = default;
+        // Move assignment operator
+        AABB_LongestAxisSplit & operator=( AABB_LongestAxisSplit && other ) = default;
+        
+//        AABB_LongestAxisSplit() : Base_T() {}
+//
+//        // Copy constructor
+//        AABB_LongestAxisSplit( const AABB_LongestAxisSplit & other ) : Base_T( other ) {}
+//        
+//        // Move constructor
+//        AABB_LongestAxisSplit( AABB_LongestAxisSplit && other ) noexcept : Base_T( other ) {}
+//        
+//        // Copy assignment
+//        const AABB_LongestAxisSplit & operator=( const AABB_LongestAxisSplit & rhs)
+//        {
+//            return AABB_LongestAxisSplit ( rhs );
+//        }
+//        
+//        // Move assignment
+//        const AABB_LongestAxisSplit & operator=( AABB_LongestAxisSplit && rhs)
+//        {
+//            return AABB_LongestAxisSplit ( std::move(rhs) );
+//        }
+//        
+//        virtual ~AABB_LongestAxisSplit() override = default;
         
     protected:
         

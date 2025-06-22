@@ -47,8 +47,6 @@ namespace Repulsor
         
     public:
         
-        PseudoLaplacian_Kernel_FF() = delete;
-        
         PseudoLaplacian_Kernel_FF( mref<Configurator_T> conf, const Int thread_, const Real s_ )
         :   Base_T ( conf, thread_                   )
         ,   s      ( s_                              )
@@ -61,7 +59,18 @@ namespace Repulsor
         ,   s_exp  ( other.s_exp    )
         {}
         
-        ~PseudoLaplacian_Kernel_FF() = default;
+        // Default constructor
+        PseudoLaplacian_Kernel_FF() = delete;
+        // Destructor
+        virtual ~PseudoLaplacian_Kernel_FF() override = default;
+        // Copy constructor
+        PseudoLaplacian_Kernel_FF( const PseudoLaplacian_Kernel_FF & other ) = default;
+        // Copy assignment operator
+        PseudoLaplacian_Kernel_FF & operator=( const PseudoLaplacian_Kernel_FF & other ) = default;
+        // Move constructor
+        PseudoLaplacian_Kernel_FF( PseudoLaplacian_Kernel_FF && other ) = default;
+        // Move assignment operator
+        PseudoLaplacian_Kernel_FF & operator=( PseudoLaplacian_Kernel_FF && other ) = default;
         
     protected:
 

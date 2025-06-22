@@ -16,27 +16,40 @@ namespace Repulsor
         
         using Base_T = AABB<AMB_DIM,Real,Int,SReal>;
         
-        AABB_MedianSplit() : Base_T() {}
-
-        // Copy constructor
-        AABB_MedianSplit( const AABB_MedianSplit & other ) : Base_T( other ) {}
-        
-        // Move constructor
-        AABB_MedianSplit( AABB_MedianSplit && other ) noexcept : Base_T( other ) {}
-        
-        // Copy assignment
-        const AABB_MedianSplit & operator=( const AABB_MedianSplit & rhs)
-        {
-            return AABB_MedianSplit ( rhs );
-        }
-        
-        // Move assignment
-        const AABB_MedianSplit & operator=( AABB_MedianSplit && rhs)
-        {
-            return AABB_MedianSplit ( std::move(rhs) );
-        }
-        
+        // Default constructor
+        AABB_MedianSplit()
+        : Base_T()
+        {}
+        // Destructor
         virtual ~AABB_MedianSplit() override = default;
+        // Copy constructor
+        AABB_MedianSplit( const AABB_MedianSplit & other ) = default;
+        // Copy assignment operator
+        AABB_MedianSplit & operator=( const AABB_MedianSplit & other ) = default;
+        // Move constructor
+        AABB_MedianSplit( AABB_MedianSplit && other ) = default;
+        // Move assignment operator
+        AABB_MedianSplit & operator=( AABB_MedianSplit && other ) = default;
+//
+//        // Copy constructor
+//        AABB_MedianSplit( const AABB_MedianSplit & other ) : Base_T( other ) {}
+//        
+//        // Move constructor
+//        AABB_MedianSplit( AABB_MedianSplit && other ) noexcept : Base_T( other ) {}
+//        
+//        // Copy assignment
+//        const AABB_MedianSplit & operator=( const AABB_MedianSplit & rhs)
+//        {
+//            return AABB_MedianSplit ( rhs );
+//        }
+//        
+//        // Move assignment
+//        const AABB_MedianSplit & operator=( AABB_MedianSplit && rhs)
+//        {
+//            return AABB_MedianSplit ( std::move(rhs) );
+//        }
+//        
+//        virtual ~AABB_MedianSplit() override = default;
         
     protected:
         

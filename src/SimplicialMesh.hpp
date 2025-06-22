@@ -70,8 +70,6 @@ namespace Repulsor
         static constexpr Int  HULL_SIZE = AMB_DIM * SIZE;
         static constexpr Real nth       = Inv<Real>( SIZE );
         
-        SimplicialMesh() = default;
-
         SimplicialMesh(
             cref<Tensor2<Real,Int>> V_coords_,
             // vertex coordinates; assumed to be of size vertex_count_ x AMB_DIM
@@ -228,8 +226,18 @@ namespace Repulsor
             TOOLS_PTOC(className()+" (pointer,charges)");
         }
 
-        
+        // Default constructor
+        SimplicialMesh() = default;
+        // Destructor
         virtual ~SimplicialMesh() override = default;
+        // Copy constructor
+        SimplicialMesh( const SimplicialMesh & other ) = default;
+        // Copy assignment operator
+        SimplicialMesh & operator=( const SimplicialMesh & other ) = default;
+        // Move constructor
+        SimplicialMesh( SimplicialMesh && other ) = default;
+        // Move assignment operator
+        SimplicialMesh & operator=( SimplicialMesh && other ) = default;
         
     public:
         

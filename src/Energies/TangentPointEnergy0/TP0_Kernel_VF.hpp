@@ -65,8 +65,6 @@ namespace Repulsor
         
     public:
         
-        TP0_Kernel_VF() = delete;
-        
         TP0_Kernel_VF(
             mref<Configurator_T> conf, const Int thread_,
             const Real theta_, const Int max_refinement_, const T1 q_half_, const T2 p_half_
@@ -96,7 +94,19 @@ namespace Repulsor
         ,   s_exp                ( -Scalar::Half<Real> * (Scalar::Two<Real> * (s - Scalar::One<Real>) + S_DOM_DIM))
         {}
         
-        ~TP0_Kernel_VF() = default;
+
+        // Default constructor
+        TP0_Kernel_VF() = delete;
+        // Destructor
+        virtual ~TP0_Kernel_VF() override = default;
+        // Copy constructor
+        TP0_Kernel_VF( const TP0_Kernel_VF & other ) = default;
+        // Copy assignment operator
+        TP0_Kernel_VF & operator=( const TP0_Kernel_VF & other ) = default;
+        // Move constructor
+        TP0_Kernel_VF( TP0_Kernel_VF && other ) = default;
+        // Move assignment operator
+        TP0_Kernel_VF & operator=( TP0_Kernel_VF && other ) = default;
         
     protected:
         

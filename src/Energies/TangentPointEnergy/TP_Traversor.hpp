@@ -50,66 +50,33 @@ namespace Repulsor
             AMB_DIM+1, AMB_DIM+1, AMB_DIM,
             Real, Real, Real, Int, LInt,
             Plus, Plus, // CAUTION: We use add-in instead of overwrite!
-            true,
-            true, false,
-            true
+            true,  // copy matrix values?
+            true,  // x_RM
+            false, // prefetch?
+            true   // y_RM
         >;
         
         using Kernel_Block_Mul_T = ArrowheadBlockKernel_Tiny<
             AMB_DIM+1, AMB_DIM+1, AMB_DIM,
             Real, Real, Real, Int, LInt,
             Plus, Zero, // <-- overwrite
-            true,
-            true, false,
-            true
+            true,  // copy matrix values?
+            true,  // x_RM
+            false, // prefetch?
+            true   // y_RM
         >;
   
         using Kernel_Diag_MulAdd_T = DenseBlockKernel_Tiny<
             AMB_DIM+1, AMB_DIM+1, AMB_DIM,
             Real, Real, Real, Int, LInt,
             Plus, Plus, // <-- add-in
-            true, false, true,
-            true, true,
-            true
+            true,  // a_RM
+            false, // a_intRM
+            true,  // copy matrix values?
+            true,  // x_RM
+            false, // prefetch?
+            true   // y_RM
         >;
-        
-//        using Kernel_Block_MulAdd_T = ArrowheadBlockKernel_Tiny<
-//            AMB_DIM+1, AMB_DIM+1, AMB_DIM,
-//            Real, Real, Real, Int, LInt,
-//            Plus, Plus, // CAUTION: We use add-in instead of overwrite!
-//            true,
-//            true, false,
-//            true
-//        >;
-//        
-//        using Kernel_Block_Mul_T = ArrowheadBlockKernel_Tiny<
-//            AMB_DIM+1, AMB_DIM+1, AMB_DIM,
-//            Real, Real, Real, Int, LInt,
-//            Plus, Zero,
-//            true,
-//            true, false,
-//            true
-//        >;
-//  
-//        using Kernel_Diag_MulAdd_T = DenseBlockKernel_Tiny<
-//            AMB_DIM+1, AMB_DIM+1, AMB_DIM,
-//            Real, Real, Real, Int, LInt,
-//            Plus, Plus,
-//            true, false, true,
-//            true, true,
-//            true
-//        >;
-        
-//        using Kernel_Diag_MulAdd_T = DenseBlockKernel_fixed<
-//            AMB_DIM+1, AMB_DIM+1, AMB_DIM, true,
-//            Real, Real, Real, Int, LInt,
-//            Scalar::Flag::Plus, Scalar::Flag::Plus,
-//            true, false, true,
-//            true, false, true, true,
-//            true, false,
-//            1   , 2,
-//            true
-//        >;
     
         static constexpr Int VF_blk_size = Kernel_Block_MulAdd_T::ROWS * Kernel_Block_MulAdd_T::COLS;
         static constexpr Int NF_blk_size =    Kernel_Block_Mul_T::ROWS *    Kernel_Block_Mul_T::COLS;

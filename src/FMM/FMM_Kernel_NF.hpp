@@ -88,8 +88,6 @@ namespace Repulsor
         
     public:
         
-        FMM_Kernel_NF() = default;
-        
         // To be used for configuration of kernel.
         explicit FMM_Kernel_NF( mref<Configurator_T> conf, const Int thread_ )
         :   Base_T      ( conf, thread_                                       )
@@ -142,7 +140,18 @@ namespace Repulsor
             TOOLS_DEBUG_PRINT(std::string( "Initializing " + this->ClassName() + " from "+ClassName()+" on thread " + ToString(thread)) );
         }
         
-        ~FMM_Kernel_NF() = default;
+        // Default constructor
+        FMM_Kernel_NF() = delete;
+        // Destructor
+        virtual ~FMM_Kernel_NF() override = default;
+        // Copy constructor
+        FMM_Kernel_NF( const FMM_Kernel_NF & other ) = default;
+        // Copy assignment operator
+        FMM_Kernel_NF & operator=( const FMM_Kernel_NF & other ) = default;
+        // Move constructor
+        FMM_Kernel_NF( FMM_Kernel_NF && other ) = default;
+        // Move assignment operator
+        FMM_Kernel_NF & operator=( FMM_Kernel_NF && other ) = default;
 
     public:
         

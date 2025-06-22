@@ -20,15 +20,20 @@ namespace Repulsor
         
         using Base_T = OBB<AMB_DIM,Real,Int,SReal>;
         
-        OBB_PreorderedSplit() : Base_T() {}
-
-        // Copy constructor
-        OBB_PreorderedSplit( const OBB_PreorderedSplit & other ) : Base_T( other ) {}
-        
-        // Move constructor
-        OBB_PreorderedSplit( OBB_PreorderedSplit && other ) noexcept : Base_T( other ) {}
-        
+        // Default constructor
+        OBB_PreorderedSplit()
+        : Base_T()
+        {}
+        // Destructor
         virtual ~OBB_PreorderedSplit() override = default;
+        // Copy constructor
+        OBB_PreorderedSplit( const OBB_PreorderedSplit & other ) = default;
+        // Copy assignment operator
+        OBB_PreorderedSplit & operator=( const OBB_PreorderedSplit & other ) = default;
+        // Move constructor
+        OBB_PreorderedSplit( OBB_PreorderedSplit && other ) = default;
+        // Move assignment operator
+        OBB_PreorderedSplit & operator=( OBB_PreorderedSplit && other ) = default;
         
         static constexpr Int SIZE = 1 + AMB_DIM + AMB_DIM + AMB_DIM * AMB_DIM;
         
