@@ -12,7 +12,7 @@
 ///
     #include "../submodules/Tensors/Accelerate.hpp"
 #else
-/// This should work for OpenBLAS.
+/// This should work for OpenBLAS. Don't forget to ussie the compiler flag -fopenblas.
     #include "../submodules/Tensors/OpenBLAS.hpp"
 #endif
 
