@@ -52,11 +52,8 @@ namespace Repulsor
         CollisionFinder( CollisionFinder && other )
         {
             swap(*this,other);
-            return *this;
         }
-        
         // Move assignment no needed.
-        
         
         // Swap function
         friend void swap( CollisionFinder & X, CollisionFinder & Y ) noexcept
