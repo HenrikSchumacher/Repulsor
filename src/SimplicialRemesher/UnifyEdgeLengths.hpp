@@ -70,18 +70,18 @@ public:
             }
             
             // Order such that shortest edges are collapsed first.
-            sort( collapses.Get_1().data(), collapses.Get_0().data(), collapses.Size() );
+            sort( collapses.data_1(), collapses.data_0(), collapses.Size() );
 
 //            print(className()+"::UnifyEdgeLengths: iteration "+ToString(iter)+":");
             
-            collapse_count = CollapseEdges( collapses.Get_0().data(), collapses.Size() );
+            collapse_count = CollapseEdges( collapses.data_0(), collapses.Size() );
             total_collapse_count += collapse_count;
 //            valprint("  collapse_count",collapse_count);
             
             // Order such that longest edges are split first.
-            reverse_sort( splits.Get_1().data(), splits.Get_0().data(), splits.Size() );
+            reverse_sort( splits.data_1(), splits.data_0(), splits.Size() );
 
-            split_count = SplitEdges( splits.Get_0().data(), splits.Size() );
+            split_count = SplitEdges( splits.data_0(), splits.Size() );
             total_split_count += split_count;
 //            valprint("  split_count   ",split_count);
             

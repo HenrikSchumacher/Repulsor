@@ -264,17 +264,17 @@ namespace Repulsor
                 traversor.Traverse();
             }
             
-            // Reduce kernels.
-            ParallelDo(
-                [&kernels]( const Int thread )
-                {
-                    kernels[thread].inter_idx.Finalize();
-                    kernels[thread].verynear_idx.Finalize();
-                    kernels[thread].near_idx.Finalize();
-                    kernels[thread].far_idx.Finalize();
-                },
-                thread_count
-            );
+//            // Reduce kernels.
+//            ParallelDo(
+//                [&kernels]( const Int thread )
+//                {
+//                    kernels[thread].inter_idx.Finalize();
+//                    kernels[thread].verynear_idx.Finalize();
+//                    kernels[thread].near_idx.Finalize();
+//                    kernels[thread].far_idx.Finalize();
+//                },
+//                thread_count
+//            );
             
             std::vector<PairAggregator<Int,Int,LInt>> inter_idx    (thread_count);
             std::vector<PairAggregator<Int,Int,LInt>> verynear_idx (thread_count);

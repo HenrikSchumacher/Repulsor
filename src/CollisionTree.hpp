@@ -128,13 +128,13 @@ namespace Repulsor
                 TOOLS_PTIC(ClassName()+"::PrimitiveCollisionMatrix: Reduce kernels");
 
                 
-                ParallelDo(
-                    [&kernels]( const Int thread )
-                    {
-                        kernels[thread].triples.Finalize();
-                    },
-                    thread_count
-                );
+//                ParallelDo(
+//                    [&kernels]( const Int thread )
+//                    {
+//                        kernels[thread].triples.Finalize();
+//                    },
+//                    thread_count
+//                );
                 
                 ParallelDo(
                     [&kernels,&triples]( const Int thread )
