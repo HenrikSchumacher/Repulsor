@@ -731,7 +731,13 @@ namespace Repulsor
 
         virtual void LoadObstacle( std::unique_ptr<Obstacle_T> obstacle_ ) override
         {
-            static std::string tag ( "Obstacle" );
+            static std::string obct_tag ( "ObstacleBlockClusterTree" );
+            static std::string ocot_tag ( "ObstacleCollisionTree" );
+            static std::string obst_tag ( "Obstacle" );
+
+            this->ClearPersistentCache( obct_tag );
+            this->ClearPersistentCache( ocot_tag );
+            this->ClearCache();
             
             std::shared_ptr<Obstacle_T> obstacle;
             
@@ -750,7 +756,7 @@ namespace Repulsor
                 obstacle = std::move(obstacle_);
             }
             
-            this->SetPersistentCache(tag, obstacle );
+            this->SetPersistentCache( obst_tag, obstacle );
         }
         
         cref<Obstacle_T> GetObstacle() const override
