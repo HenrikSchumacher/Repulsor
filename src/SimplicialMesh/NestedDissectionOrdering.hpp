@@ -6,7 +6,7 @@ public:
         
         if( !this->InPersistentCacheQ(tag))
         {
-            TOOLS_PTIC(ClassName()+"::"+tag);
+            TOOLS_PTIMER(timer,ClassName()+"::"+tag);
             
             auto & tree = GetClusterTree();
             
@@ -54,7 +54,7 @@ public:
             
             Int level = 0;
             
-            while( queue_0.size() > 0 )
+            while( queue_0.size() > Size_T(0) )
             {
                 TOOLS_DEBUG_PRINT("Starting level " + ToString(level) + "." );
                 
@@ -68,7 +68,6 @@ public:
                 
                 TOOLS_DEBUG_PRINT("Compute indicators.");
                 
-//                TOOLS_PTIC("Compute indicators");
                 ParallelDo(
                     [&]( const Int k )
                     {
@@ -99,7 +98,6 @@ public:
                     },
                     static_cast<Int>(queue_0.size()), local_thread_count
                 );
-//                TOOLS_PTOC("Compute indicators");
                 
                 Adj.template Dot_<2>(
                     Scalar::One <Real>, v.data(), 2,
@@ -108,7 +106,6 @@ public:
                 );
 
                 TOOLS_DEBUG_PRINT("Compute types.");
-//                TOOLS_PTIC("Compute types");
                 ParallelDo(
                     [&]( const Int i )
                     {
@@ -122,10 +119,9 @@ public:
                     },
                     m, ThreadCount()
                 );
-//                TOOLS_PTOC("Compute types");
                 
                 TOOLS_DEBUG_PRINT("Modify permutation.");
-//                TOOLS_PTIC("Modify permutation");
+
                 ParallelDo(
                     [&]( const Int k )
                     {
@@ -189,7 +185,6 @@ public:
                     },
                     static_cast<Int>(queue_0.size()), local_thread_count
                 );
-//                TOOLS_PTOC("Modify permutation");
                 
                 TOOLS_DEBUG_PRINT("Swapping.");
                 
@@ -207,8 +202,6 @@ public:
             );
             
             this->SetPersistentCache( tag, std::move(perm) );
-            
-            TOOLS_PTOC(ClassName()+"::"+tag);
         }
         
         return this->template GetPersistentCache<Permutation<Int>>(tag);

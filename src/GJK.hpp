@@ -504,7 +504,7 @@ namespace Repulsor
                 }
 
                 // Upper triangular back substitution
-                for( Int i = LAST; i --> 0; )
+                for( Int i = LAST; i --> Int(0); )
                 {
                     for( Int j = i+1; j < LAST; ++j )
                     {
@@ -991,9 +991,9 @@ namespace Repulsor
             return dist * dist;
         }
         
-/// ##########################################################################
-/// ##                           Offset_Witnesses                           ##
-/// ##########################################################################
+/// ###########################################################
+/// ##                     Offset_Witnesses
+/// ###########################################################
         
         Real Offset_Witnesses(
             cref<PrimitiveBase_T> P, const Real P_offset, mptr<Real> x,
@@ -1131,9 +1131,9 @@ namespace Repulsor
             
         } // Offset_Witnesses
 
-/// ########################################################################
-/// ##                   InteriorPoints_SquaredDistance                   ##
-/// ########################################################################
+/// ###########################################################
+/// ##              InteriorPoints_SquaredDistance
+/// ###########################################################
         
         Real InteriorPoints_SquaredDistance(
             cref<PrimitiveBase_T> P,
@@ -1155,9 +1155,9 @@ namespace Repulsor
         }
         
         
-/// ########################################################################
-/// ##                     MultipoleAcceptanceCriterion                   ##
-/// ########################################################################
+/// ###########################################################
+/// ##              MultipoleAcceptanceCriterion
+/// ###########################################################
         
         bool MultipoleAcceptanceCriterion(
             cref<PrimitiveBase_T> P,

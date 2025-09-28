@@ -60,22 +60,20 @@ namespace Repulsor
         ,   thread_count( Min(S_.ThreadCount(), T_.ThreadCount()) )
 //        ,   symmetricQ( std::addressof(S_) == std::addressof(T_) )
         {
-            TOOLS_PTIC(className());
+            TOOLS_PTIMER(timer,className());
             
             if constexpr ( symmetricQ )
             {
                 if( std::addressof(S_) != std::addressof(T_) )
                 {
-                    eprint(className()+": symmetricQ == true, bu S != T.");
+                    eprint(className()+": symmetricQ == true, but S != T.");
                 }
             }
 
-            if( Min( S.PrimitiveCount(), T.PrimitiveCount()) > 0 )
+            if( Min( S.PrimitiveCount(), T.PrimitiveCount()) > Int(0) )
             {
                 ComputeBlocks();
             }
-
-            TOOLS_PTOC(className());
         } // Constructor
         
         
@@ -227,20 +225,17 @@ namespace Repulsor
 
         
     
-//#################################################################################################
+//###########################################################
 //      Initialization
-//#################################################################################################
+//###########################################################
         
     protected:
         
         void ComputeBlocks()
         {
-            if( blocks_initialized )
-            {
-                return;
-            }
+            if( blocks_initialized ) { return; }
 
-            TOOLS_PTIC(className()+"::ComputeBlocks");
+            TOOLS_PTIMER(timer,className()+"::ComputeBlocks");
 
             std::vector<BlockSplitter_T> kernels;
 
@@ -299,11 +294,9 @@ namespace Repulsor
                     + "\n\t far field:       \t" + ToString(far_idx[thread].Size())
                     + "\n"
                 );
-                
-                
             }
             
-            if( intersection_count > 0 )
+            if( intersection_count > Int(0) )
             {
                 wprint(className()+"::ComputeBlocks detected "+ToString(intersection_count)+" intersections.");
             }
@@ -332,12 +325,8 @@ namespace Repulsor
             far = Far_Pattern_T( far_idx, S.ClusterCount(), T.ClusterCount(),
                     thread_count, false, symmetricQ );
             
-            
             blocks_initialized = true;
             
-            
-            TOOLS_PTOC(className()+"::ComputeBlocks");
-
         }; // ComputeBlocks
         
     private:

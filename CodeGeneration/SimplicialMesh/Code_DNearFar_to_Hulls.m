@@ -17,7 +17,7 @@ StringJoin[
 		mref<Tensor3<Real,Int>> buffer
 	) const
     {
-        TOOLS_PTIC(ClassName()+\"::",name,"\");
+        TOOLS_PTIMER(timer,ClassName()+\"::",name,"\");
 
 		(void)V_coords;
 		(void)simplices;
@@ -28,8 +28,6 @@ StringJoin[
         eprint(ClassName()+\"::",name," not implemented. Returning 0.\");
 		
 		buffer.Fill(static_cast<Real>(0));
-
-        TOOLS_PTOC(ClassName()+\"::",name,"\");
     }
 "]
 ];
@@ -95,7 +93,7 @@ StringJoin["
 		mref<Tensor3<Real,Int>> buffer
 	) const
     {
-        TOOLS_PTIC(ClassName()+\"::"<>name<>"\");
+        TOOLS_PTIMER(timer,ClassName()+\"::"<>name<>"\");
 
         if( P_D_near.Dim(1) != "<>NearDim<>" )
         {
@@ -124,9 +122,6 @@ StringJoin["
 			simplices.Dim(0),
 			ThreadCount()
 		);
-
-        TOOLS_PTOC(ClassName()+\"::"<>name<>"\");
-        
     }
 "]
 ]
@@ -193,7 +188,7 @@ StringJoin["
 		mref<Tensor3<Real,Int>> buffer
 	) const
     {
-        TOOLS_PTIC(ClassName()+\"::"<>name<>"\");
+        TOOLS_PTIMER(timer,ClassName()+\"::"<>name<>"\");
 
         if( P_D_near.Dim(1) != "<>NearDim<>" )
         {
@@ -220,9 +215,6 @@ StringJoin["
 			simplices.Dim(0),
 			ThreadCount()
 		);
-
-        TOOLS_PTOC(ClassName()+\"::"<>name<>"\");
-        
     }
 "]
 ];
@@ -301,7 +293,7 @@ StringJoin["
 		mref<Tensor3<Real,Int>> buffer
 	) const
     {
-        TOOLS_PTIC(ClassName()+\"::"<>name<>"\");
+        TOOLS_PTIMER(timer,ClassName()+\"::"<>name<>"\");
 
         if( P_D_near.Dim(1) != "<>NearDim<>" )
         {
@@ -329,9 +321,6 @@ StringJoin["
 			simplices.Dim(0),
 			ThreadCount()
 		);
-
-        TOOLS_PTOC(ClassName()+\"::"<>name<>"\");
-        
     }
 "]
 ];

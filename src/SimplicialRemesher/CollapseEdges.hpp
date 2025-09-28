@@ -1,12 +1,12 @@
-//################################################################################################
+//############################################################
 //##    CollapseEdge
-//################################################################################################
+//############################################################
    
 public:
 
     virtual Int CollapseEdges( cptr<Edge_T> e_list, const Int n ) override
     {
-        TOOLS_PTIC(className()+"::CollapseEdges");
+        TOOLS_PTIMER(timer,className()+"::CollapseEdges");
         
         Int collapse_counter = 0;
         
@@ -19,7 +19,6 @@ public:
                 ++collapse_counter;
             }
         }
-        TOOLS_PTOC(className()+"::CollapseEdges");
         
         return collapse_counter;
     }

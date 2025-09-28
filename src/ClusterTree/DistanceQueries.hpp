@@ -1,6 +1,6 @@
-//#################################################################################
+//############################################################
 //##        Distance queries
-//#################################################################################
+//############################################################
     
     template<typename T, typename I>
     void FindNearestToPoints(
@@ -11,7 +11,7 @@
         mptr<T> nearest_points
     ) const
     {
-        TOOLS_PTIC(ClassName()+"::FindNearestToPoints");
+        TOOLS_PTIMER(timer,ClassName()+"::FindNearestToPoints");
         using GJK_T    = GJK<AMB_DIM,GJK_Real,Int>;
         using Point_T  = Point<AMB_DIM,GJK_Real,Int,SReal,T>;
         using Vector_T = Tiny::Vector<AMB_DIM,GJK_Real,Int>;
@@ -144,8 +144,6 @@
             },
             thread_count
         );
-        
-        TOOLS_PTOC(ClassName()+"::FindNearestToPoints");
     }
 
 

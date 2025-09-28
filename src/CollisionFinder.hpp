@@ -139,7 +139,7 @@ namespace Repulsor
                 
                 if( !intersecting )
                 {
-                    if( stack_ptr > 0 )
+                    if( stack_ptr > Int(0) )
                     {
                         a = b;
                         P->SetFirstTime(a);

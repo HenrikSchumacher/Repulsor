@@ -113,7 +113,7 @@ protected:
     // Sequential variant that uses a stack instead of recursion.
     void PercolateDown_DFS( const Int C, const Int max_depth = 64 ) const override
     {
-//        TOOLS_PTIC(ClassName()+"::PercolateDown_DFS");
+//        TOOLS_PTIMER(timer,ClassName()+"::PercolateDown_DFS");
         switch ( buffer_dim )
         {
             case 1:
@@ -146,7 +146,6 @@ protected:
                 percolateDown_DFS<0>(C,max_depth);
             }
         }
-//        TOOLS_PTOC(ClassName()+"::PercolateDown_DFS");
     }
 
     template<Int BUFFER_DIM>

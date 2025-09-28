@@ -5,9 +5,9 @@ namespace Repulsor
     struct ClusterTreeSettings
     {
         // An auxilliary data structure in order to feed and hold options for ClusterTree.
-        long long split_threshold     = 1;
-        long long thread_count        = 1;
-        long long parallel_perc_depth = 5;
+        int split_threshold     = 1;
+        int thread_count        = 1;
+        int parallel_perc_depth = 5;
         
 //        TreePercolationAlgorithm tree_perc_alg = TreePercolationAlgorithm::Tasks;
 //        TreePercolationAlgorithm tree_perc_alg = TreePercolationAlgorithm::Sequential;
@@ -19,6 +19,8 @@ namespace Repulsor
     
     struct BlockClusterTreeSettings
     {
+        using Int = int;
+        
         // handling symmetry properties of the BCT
         bool exploit_symmetry = true;
 

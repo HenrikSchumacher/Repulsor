@@ -120,7 +120,7 @@ public:
         
         if( !this->InPersistentCacheQ( tag ) )
         {
-            TOOLS_PTIC(ClassName()+"::" + tag );
+            TOOLS_PTIMER(timer,ClassName()+"::" + tag );
             
             const Int max_depth = static_cast<Int>(settings.parallel_perc_depth);
             
@@ -178,8 +178,6 @@ public:
             Forest_T forest ( std::move(top_tree_rows), C_next, ThreadCount() );
 
             this->SetPersistentCache(tag, std::move(forest) );
-            
-            TOOLS_PTOC( ClassName()+"::" + tag );
         }
         
         return this->template GetPersistentCache<Forest_T>(tag);
@@ -228,14 +226,10 @@ protected:
     template<Int BUFFER_DIM>
     void percolateDown_Parallel() const
     {
-        if constexpr( BUFFER_DIM > 0 )
-        {
-            TOOLS_PTIC(ClassName()+"::PercolateDown_Parallel<"+ToString(BUFFER_DIM)+">");
-        }
-        else
-        {
-            TOOLS_PTIC(ClassName()+"::PercolateDown_Parallel<0> ("+ToString(buffer_dim)+")");
-        }
+        TOOLS_PTIMER(timer,ClassName()+"::" + ( BUFFER_DIM > 0
+            ? std::string("PercolateDown_Parallel<")+ToString(BUFFER_DIM)+">"
+            : std::string("PercolateDown_Parallel<0> (")+ToString(buffer_dim)+")"
+        ));
         
         cref<Forest_T> forest = Forest();
         
@@ -264,16 +258,6 @@ protected:
             },
             forest.JobPtr()
         );
-        
-        if constexpr( BUFFER_DIM > 0 )
-        {
-            TOOLS_PTOC(ClassName()+"::PercolateDown_Parallel<"+ToString(BUFFER_DIM)+">");
-        }
-        else
-        {
-            TOOLS_PTOC(ClassName()+"::PercolateDown_Parallel<0> ("+ToString(buffer_dim)+")");
-        }
-
     } // percolateDown_Parallel
 
     template<Int BUFFER_DIM>
@@ -345,14 +329,10 @@ protected:
     template<Int BUFFER_DIM>
     void percolateUp_Parallel() const
     {
-        if constexpr( BUFFER_DIM > 0 )
-        {
-            TOOLS_PTIC(ClassName()+"::PercolateUp_Parallel<"+ToString(BUFFER_DIM)+">");
-        }
-        else
-        {
-            TOOLS_PTIC(ClassName()+"::PercolateUp_Parallel<0> ("+ToString(buffer_dim)+")");
-        }
+        TOOLS_PTIMER(timer,ClassName()+"::" + ( BUFFER_DIM > 0
+            ? std::string("PercolateUp_Parallel<")+ToString(BUFFER_DIM)+">"
+            : std::string("PercolateUp_Parallel<0> (")+ToString(buffer_dim)+")"
+        ));
         
         cref<Forest_T> forest = Forest();
         
@@ -382,16 +362,6 @@ protected:
                 PercolateUp_Step<BUFFER_DIM>(C);
             }
         }
-
-        if constexpr( BUFFER_DIM > 0 )
-        {
-            TOOLS_PTOC(ClassName()+"::PercolateUp_Parallel<"+ToString(BUFFER_DIM)+">");
-        }
-        else
-        {
-            TOOLS_PTOC(ClassName()+"::PercolateUp_Parallel<0> ("+ToString(buffer_dim)+")");
-        }
-        
     } // percolateUp_Parallel
 
 

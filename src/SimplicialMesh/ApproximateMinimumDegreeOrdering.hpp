@@ -6,7 +6,7 @@ public:
         
         if( !this->InPersistentCacheQ(tag))
         {
-            TOOLS_PTIC(ClassName()+"::"+tag);
+            TOOLS_PTIMER(timer,ClassName()+"::"+tag);
             
             Permutation<Int> perm;
             
@@ -24,8 +24,6 @@ public:
 #endif
             
             this->SetPersistentCache( tag, std::move(perm) );
-            
-            TOOLS_PTOC(ClassName()+"::"+tag);
         }
         
         return this->template GetPersistentCache<Permutation<Int>>(tag);

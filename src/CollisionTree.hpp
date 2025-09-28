@@ -45,7 +45,7 @@ namespace Repulsor
         ,   T( T_ )
         ,   thread_count( Min(S_.ThreadCount(), T_.ThreadCount()) )
         {
-            TOOLS_PTIC(className()+"()");
+            TOOLS_PTIMER(timer,className()+"()");
             if constexpr ( symmetricQ )
             {
                 if( std::addressof(S_) != std::addressof(T_) )
@@ -53,7 +53,6 @@ namespace Repulsor
                     eprint(className()+": symmetricQ == true, bu S != T.");
                 }
             }
-            TOOLS_PTOC(className()+"()");
         }
         
         // Default constructor
@@ -94,7 +93,7 @@ namespace Repulsor
         {
             if( !P_collision_matrix_initialized )
             {
-                TOOLS_PTIC(ClassName()+"PrimitiveCollisionMatrix");
+                TOOLS_PTIMER(timer,ClassName()+"PrimitiveCollisionMatrix");
                 
                 using Kernel_T = Collision_Kernel<ClusterTree_T>;
                 
@@ -153,8 +152,6 @@ namespace Repulsor
                 );
                 
                 P_collision_matrix_initialized = true;
-                
-                TOOLS_PTOC(ClassName()+"PrimitiveCollisionMatrix");
             }
             
             return P_collision_matrix;
@@ -171,7 +168,7 @@ namespace Repulsor
             const SReal TOL
         ) const override
         {
-            TOOLS_PTIC(ClassName()+"::MaximumSafeStepSize");
+            TOOLS_PTIMER(timer,ClassName()+"::MaximumSafeStepSize");
             
             using Kernel_T = MaximumSafeStepSize_Kernel<ClusterTree_T>;
             
@@ -191,7 +188,7 @@ namespace Repulsor
                 }
             TOOLS_PTOC(ClassName()+"::MaximumSafeStepSize: Prepare kernels");
             
-            if( S.SplitThreshold()==1 && T.SplitThreshold()==1 )
+            if( S.SplitThreshold() == Int(1) && T.SplitThreshold() == Int(1) )
             {
                 ClusterTreePairTraversor<Kernel_T, symmetricQ, true>  traversor (S, T, kernels);
                 
@@ -211,9 +208,6 @@ namespace Repulsor
                     t = Min( t, s );
                 }
             TOOLS_PTOC(ClassName()+"::MaximumSafeStepSize: Reduce kernels");
-            
-            
-            TOOLS_PTOC(ClassName()+"::MaximumSafeStepSize");
             
             return t;
         }

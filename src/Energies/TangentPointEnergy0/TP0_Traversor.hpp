@@ -122,9 +122,9 @@ namespace Repulsor
     public:
         
 
-//####################################################################################
+//############################################################
 //      Compute
-//####################################################################################
+//############################################################
         
         Real Compute()
         {
@@ -270,22 +270,18 @@ namespace Repulsor
         
 
         
-//####################################################################################
+//############################################################
 //      Compute subroutines
-//####################################################################################
+//############################################################
     
     protected:
         
         template< typename T1, typename T2, int q_flag >
         void VF_Compute( const T1 q_half_, const T2 p_half_ )
         {
+            if( bct.VeryNear().NonzeroCount() == 0 ) { return; }
             
-            if( bct.VeryNear().NonzeroCount() == 0 )
-            {
-                return;
-            }
-            
-            TOOLS_PTIC(ClassName()+"::VF_Compute");
+            TOOLS_PTIMER(timer,ClassName()+"::VF_Compute");
             
             using Kernel_T = TP0_Kernel_VF<
                 S_DOM_DIM, T_DOM_DIM,
@@ -309,20 +305,15 @@ namespace Repulsor
                 
                 ker.Diag() = bct.GetS().VF_Accumulator().template AddReduce<Real,LInt>();
             }
-            
-            TOOLS_PTOC(ClassName()+"::VF_Compute");
         }
             
         
         template< typename T1, typename T2, int q_flag >
         void NF_Compute( const T1 q_half_, const T2 p_half_ )
         {
-            if( bct.Near().NonzeroCount() == 0 )
-            {
-                return;
-            }
+            if( bct.Near().NonzeroCount() == LInt(0) ) { return; }
             
-            TOOLS_PTIC(ClassName()+"::NF_Compute");
+            TOOLS_PTIMER(timer,ClassName()+"::NF_Compute");
 
             using Kernel_T = TP0_Kernel_NF<
                 S_DOM_DIM, T_DOM_DIM,
@@ -348,20 +339,15 @@ namespace Repulsor
 
                 ker.Diag() = bct.GetS().NF_Accumulator().template AddReduce<Real,LInt>();
             }
-
-            TOOLS_PTOC(ClassName()+"::NF_Compute");
         }
         
             
         template< typename T1, typename T2, int q_flag >
         void FF_Compute( const T1 q_half_, const T2 p_half_ )
         {
-            if( bct.Far().NonzeroCount() == 0 )
-            {
-                return;
-            }
+            if( bct.Far().NonzeroCount() == LInt(0) ) { return; }
             
-            TOOLS_PTIC(ClassName()+"::FF_Compute");
+            TOOLS_PTIMER(timer,ClassName()+"::FF_Compute");
             
             using Kernel_T = TP0_Kernel_FF<
                 S_DOM_DIM, T_DOM_DIM,
@@ -387,12 +373,11 @@ namespace Repulsor
                 
                 ker.Diag()= bct.GetS().FF_Accumulator().template AddReduce<Real,LInt>();
             }
-            TOOLS_PTOC(ClassName()+"::FF_Compute");
         }
         
-//####################################################################################
+//###########################################################
 //      Multiply metric
-//####################################################################################
+//###########################################################
         
     public:
         
@@ -406,7 +391,7 @@ namespace Repulsor
             {
                 const Int nrhs = bct.GetS().BufferDim() / Kernel_Block_Mul_T::ROWS;
                 
-                if( NF_flag && (bct.Near().NonzeroCount() > 0) )
+                if( NF_flag && (bct.Near().NonzeroCount() > Int(0)) )
                 {
                     NF_MultiplyMetric(nrhs);
                 }
@@ -415,13 +400,13 @@ namespace Repulsor
                     bct.GetS().PrimitiveOutputBuffer().SetZero();
                 }
                 
-                if( VF_flag && (bct.VeryNear().NonzeroCount() > 0) )
+                if( VF_flag && (bct.VeryNear().NonzeroCount() > Int(0)) )
                 {
                     VF_MultiplyMetric(nrhs);
                 }
                 
                 
-                if( FF_flag && (bct.Far().NonzeroCount() > 0) )
+                if( FF_flag && (bct.Far().NonzeroCount() > Int(0)) )
                 {
                     FF_MultiplyMetric(nrhs);
                 }
@@ -432,9 +417,9 @@ namespace Repulsor
             }
         }
         
-//####################################################################################
+//###########################################################
 //      Multiply metric subroutines
-//####################################################################################
+//###########################################################
         
     protected:
 

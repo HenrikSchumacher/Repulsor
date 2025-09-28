@@ -125,8 +125,7 @@ namespace Repulsor
         :   P_proto (1)
         ,   C_proto (1)
         {
-            TOOLS_PTIC(className()+" default constructor");
-            TOOLS_PTOC(className()+" default constructor");
+            TOOLS_PTIMER(timer,className()+" default constructor");
         }
         
         // To allow polymorphism, we require the user to create instances of the desired types for the primitives and the bounding volumes, so that we can Clone() them.
@@ -143,7 +142,7 @@ namespace Repulsor
         ,   C_proto      ( ThreadCount()            )
 //        ,   Adj          ( std::move(Adj_)          )
         {
-            TOOLS_PTIC(className()+"()");
+            TOOLS_PTIMER(timer,className()+"()");
             
             
             P_serialized = std::move(P_serialized_);
@@ -175,8 +174,6 @@ namespace Repulsor
             );
             
             this->ComputeClusters();
-            
-            TOOLS_PTOC(className()+"()");
         }
         
         virtual ~BoundingVolumeHierarchy() override = default;
@@ -216,7 +213,7 @@ namespace Repulsor
         
         void ComputeClusters()
         {
-            TOOLS_PTIC(className()+"::ComputeClusters");
+            TOOLS_PTIMER(timer,className()+"::ComputeClusters");
             
             // Request some temporary memory for threads.
             
@@ -225,33 +222,24 @@ namespace Repulsor
             // Padding every row to prevent false sharing.
             thread_cluster_counter = Tensor2<Int,Int>( ThreadCount(), CacheLineWidth, 0 );
             
-            C_thread_serialized = Tensor3<SReal,Int>( ThreadCount(), 2*PrimitiveCount(), C_proto[0]->Size() );
+            C_thread_serialized = Tensor3<SReal,Int>( ThreadCount(), Int(2)*PrimitiveCount(), C_proto[0]->Size() );
             
             const Int thread = 0;
             
             ++thread_cluster_counter(thread,0);
             
             auto * root = new Cluster_T( thread, 0, 0, PrimitiveCount(), 0 );
-            
-            
-            TOOLS_PTIC(className()+"::ComputeClusters: Initial bounding volume of root node");
+           
             C_proto[thread]->SetPointer( C_thread_serialized.data(thread), 0 );
             C_proto[thread]->FromPrimitives( *P_proto[thread], P_serialized.data(), 0, PrimitiveCount(), ThreadCount() );
-            TOOLS_PTOC(className()+"::ComputeClusters: Initial bounding volume of root node");
-            
             
             Split( root );
-            
             Serialize( root );
-            
             delete root;
             
             // Free memory for threads.
             C_thread_serialized = Tensor3<SReal,Int>();
-            
             thread_cluster_counter = Tensor2<Int,Int>();
-            
-            TOOLS_PTOC(className()+"::ComputeClusters");
         }
         
     public:

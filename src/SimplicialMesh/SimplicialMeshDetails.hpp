@@ -27,7 +27,7 @@ namespace Repulsor
 		mref<Tensor3<Real,Int>> buffer
 	) const
     {
-        TOOLS_PTIC(ClassName()+"::DNearFarToHulls");
+        TOOLS_PTIMER(timer,ClassName()+"::DNearFarToHulls");
 
 		(void)V_coords;
 		(void)simplices;
@@ -38,13 +38,11 @@ namespace Repulsor
         eprint(ClassName()+"::DNearFarToHulls not implemented. Returning 0.");
 		
 		buffer.Fill(static_cast<Real>(0));
-
-        TOOLS_PTOC(ClassName()+"::DNearFarToHulls");
     }
 
 	}; // SimplicialMeshDetails<DOM_DIM,AMB,Real,Int,LInt>
 
-//-------------------------------------------------------------------------------
+//------------------------------------------------------------
 
     
     template<typename Real, typename Int, typename LInt>
@@ -88,7 +86,7 @@ namespace Repulsor
 		mref<Tensor3<Real,Int>> buffer
 	) const
     {
-        TOOLS_PTIC(ClassName()+"::DNearFarToHulls");
+        TOOLS_PTIMER(timer,ClassName()+"::DNearFarToHulls");
 
         if( P_D_near.Dim(1) != 3 )
         {
@@ -117,14 +115,11 @@ namespace Repulsor
 			simplices.Dim(0),
 			ThreadCount()
 		);
-
-        TOOLS_PTOC(ClassName()+"::DNearFarToHulls");
-        
     }
 
 	}; // SimplicialMeshDetails<0,1,Real,Int>
 
-//-------------------------------------------------------------------------------
+//------------------------------------------------------------
 
     template<typename Real, typename Int, typename LInt>
     struct SimplicialMeshDetails<0,2,Real,Int,LInt>
@@ -167,7 +162,7 @@ namespace Repulsor
 		mref<Tensor3<Real,Int>> buffer
 	) const
     {
-        TOOLS_PTIC(ClassName()+"::DNearFarToHulls");
+        TOOLS_PTIMER(timer,ClassName()+"::DNearFarToHulls");
 
         if( P_D_near.Dim(1) != 6 )
         {
@@ -197,14 +192,11 @@ namespace Repulsor
 			simplices.Dim(0),
 			ThreadCount()
 		);
-
-        TOOLS_PTOC(ClassName()+"::DNearFarToHulls");
-        
     }
 
 	}; // SimplicialMeshDetails<0,2,Real,Int>
 
-//-------------------------------------------------------------------------------
+//------------------------------------------------------------
 
     template<typename Real, typename Int, typename LInt>
     struct SimplicialMeshDetails<0,3,Real,Int,LInt>
@@ -247,7 +239,7 @@ namespace Repulsor
 		mref<Tensor3<Real,Int>> buffer
 	) const
     {
-        TOOLS_PTIC(ClassName()+"::DNearFarToHulls");
+        TOOLS_PTIMER(timer,ClassName()+"::DNearFarToHulls");
 
         if( P_D_near.Dim(1) != 10 )
         {
@@ -278,14 +270,11 @@ namespace Repulsor
 			simplices.Dim(0),
 			ThreadCount()
 		);
-
-        TOOLS_PTOC(ClassName()+"::DNearFarToHulls");
-        
     }
 
 	}; // SimplicialMeshDetails<0,3,Real,Int>
 
-//-------------------------------------------------------------------------------
+//------------------------------------------------------------
 
     template<typename Real, typename Int, typename LInt>
     struct SimplicialMeshDetails<0,4,Real,Int,LInt>
@@ -328,7 +317,7 @@ namespace Repulsor
 		mref<Tensor3<Real,Int>> buffer
 	) const
     {
-        TOOLS_PTIC(ClassName()+"::DNearFarToHulls");
+        TOOLS_PTIMER(timer,ClassName()+"::DNearFarToHulls");
 
         if( P_D_near.Dim(1) != 15 )
         {
@@ -360,14 +349,11 @@ namespace Repulsor
 			simplices.Dim(0),
 			ThreadCount()
 		);
-
-        TOOLS_PTOC(ClassName()+"::DNearFarToHulls");
-        
     }
 
 	}; // SimplicialMeshDetails<0,4,Real,Int>
 
-//-------------------------------------------------------------------------------
+//------------------------------------------------------------
 
     template<typename Real, typename Int, typename LInt>
     struct SimplicialMeshDetails<1,2,Real,Int,LInt>
@@ -410,7 +396,7 @@ namespace Repulsor
 		mref<Tensor3<Real,Int>> buffer
 	) const
     {
-        TOOLS_PTIC(ClassName()+"::DNearFarToHulls");
+        TOOLS_PTIMER(timer,ClassName()+"::DNearFarToHulls");
 
         if( P_D_near.Dim(1) != 8 )
         {
@@ -529,14 +515,11 @@ namespace Repulsor
 			simplices.Dim(0),
 			ThreadCount()
 		);
-
-        TOOLS_PTOC(ClassName()+"::DNearFarToHulls");
-        
     }
 
 	}; // SimplicialMeshDetails<1,2,Real,Int>
 
-//-------------------------------------------------------------------------------
+//------------------------------------------------------------
 
     template<typename Real, typename Int, typename LInt>
     struct SimplicialMeshDetails<1,3,Real,Int,LInt>
@@ -579,7 +562,7 @@ namespace Repulsor
 		mref<Tensor3<Real,Int>> buffer
 	) const
     {
-        TOOLS_PTIC(ClassName()+"::DNearFarToHulls");
+        TOOLS_PTIMER(timer,ClassName()+"::DNearFarToHulls");
 
         if( P_D_near.Dim(1) != 13 )
         {
@@ -772,14 +755,11 @@ namespace Repulsor
 			simplices.Dim(0),
 			ThreadCount()
 		);
-
-        TOOLS_PTOC(ClassName()+"::DNearFarToHulls");
-        
     }
 
 	}; // SimplicialMeshDetails<1,3,Real,Int>
 
-//-------------------------------------------------------------------------------
+//------------------------------------------------------------
 
     template<typename Real, typename Int, typename LInt>
     struct SimplicialMeshDetails<1,4,Real,Int,LInt>
@@ -822,7 +802,7 @@ namespace Repulsor
 		mref<Tensor3<Real,Int>> buffer
 	) const
     {
-        TOOLS_PTIC(ClassName()+"::DNearFarToHulls");
+        TOOLS_PTIMER(timer,ClassName()+"::DNearFarToHulls");
 
         if( P_D_near.Dim(1) != 19 )
         {
@@ -1111,14 +1091,11 @@ namespace Repulsor
 			simplices.Dim(0),
 			ThreadCount()
 		);
-
-        TOOLS_PTOC(ClassName()+"::DNearFarToHulls");
-        
     }
 
 	}; // SimplicialMeshDetails<1,4,Real,Int>
 
-//-------------------------------------------------------------------------------
+//------------------------------------------------------------
 
     template<typename Real, typename Int, typename LInt>
     struct SimplicialMeshDetails<2,3,Real,Int,LInt>
@@ -1161,7 +1138,7 @@ namespace Repulsor
 		mref<Tensor3<Real,Int>> buffer
 	) const
     {
-        TOOLS_PTIC(ClassName()+"::DNearFarToHulls");
+        TOOLS_PTIMER(timer,ClassName()+"::DNearFarToHulls");
 
         if( P_D_near.Dim(1) != 16 )
         {
@@ -1464,14 +1441,11 @@ namespace Repulsor
 			simplices.Dim(0),
 			ThreadCount()
 		);
-
-        TOOLS_PTOC(ClassName()+"::DNearFarToHulls");
-        
     }
 
 	}; // SimplicialMeshDetails<2,3,Real,Int>
 
-//-------------------------------------------------------------------------------
+//------------------------------------------------------------
 
     template<typename Real, typename Int, typename LInt>
     struct SimplicialMeshDetails<2,4,Real,Int,LInt>
@@ -1514,7 +1488,7 @@ namespace Repulsor
 		mref<Tensor3<Real,Int>> buffer
 	) const
     {
-        TOOLS_PTIC(ClassName()+"::DNearFarToHulls");
+        TOOLS_PTIMER(timer,ClassName()+"::DNearFarToHulls");
 
         if( P_D_near.Dim(1) != 23 )
         {
@@ -3405,9 +3379,6 @@ namespace Repulsor
 			simplices.Dim(0),
 			ThreadCount()
 		);
-
-        TOOLS_PTOC(ClassName()+"::DNearFarToHulls");
-        
     }
 
 	}; // SimplicialMeshDetails<2,4,Real,Int>

@@ -4,7 +4,7 @@ public:
         const Int thread, const Int i0, const Int j0, const Int max_leaves
     )
     {
-        TOOLS_PTIC(className()+"::Traverse_BreadthFirst");
+        TOOLS_PTIMER(timer,className()+"::Traverse_BreadthFirst");
         
         mref<Kernel_T> K = kernels[static_cast<Size_T>(thread)];
         
@@ -228,7 +228,5 @@ public:
                 }
             }
         }
-        
-        TOOLS_PTOC(className()+"::Traverse_BreadthFirst");
         
     } // Traverse_BreadthFirst

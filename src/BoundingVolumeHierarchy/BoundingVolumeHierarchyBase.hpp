@@ -81,9 +81,9 @@ namespace Repulsor
         
     public:
 
-//##################################################################################################
+//###########################################################
 //##        Get functions
-//##################################################################################################
+//###########################################################
         
         virtual constexpr Int AmbDim() const = 0;
         
@@ -132,9 +132,9 @@ namespace Repulsor
             return leaf_clusters.Dim(0);
         }
         
-//##################################################################################################
+//###########################################################
 //##        Get functions for containers
-//##################################################################################################
+//###########################################################
         
         
       cref<Tensor1<Int,Int>> LeafClusters() const
@@ -206,7 +206,7 @@ namespace Repulsor
         
         void ComputePrimitiveToClusterMatrix()
         {
-            TOOLS_PTIC(className()+"::ComputePrimitiveToClusterMatrix");
+            TOOLS_PTIMER(timer,className()+"::ComputePrimitiveToClusterMatrix");
             
             SparseBinaryMatrix_T P_to_C (
                 ClusterCount(), PrimitiveCount(), PrimitiveCount(), ThreadCount() );
@@ -276,8 +276,6 @@ namespace Repulsor
                 std::string("ClusterToPrimitiveMatrix"),
                 std::move( C_to_P )
             );
-            
-            TOOLS_PTOC(className()+"::ComputePrimitiveToCluster");
         }
         
     public:
@@ -313,9 +311,9 @@ namespace Repulsor
         }
       
         
-//################################################################################################
+//###########################################################
 //##        General reports
-//################################################################################################
+//###########################################################
         
         virtual std::string Stats() const = 0;
         

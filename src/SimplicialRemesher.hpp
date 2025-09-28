@@ -29,7 +29,7 @@ namespace Repulsor
     {
     public:
         
-        static_assert( DOM_DIM  > 0, "Remeshing for domain dimension 0 does not make sense." );
+        static_assert( DOM_DIM  > Int_(0), "Remeshing for domain dimension 0 does not make sense." );
         
         using Base_T     = SimplicialRemesherBase<Real_,Int_,ExtReal_,ExtInt_>;
         
@@ -242,7 +242,7 @@ namespace Repulsor
             const Int     thread_count_ = 1
         ) override
         {
-            TOOLS_PTIC(className()+"::LoadMesh");
+            TOOLS_PTIMER(timer,className()+"::LoadMesh");
 
             vertex_count  = vertex_count_;
             edge_count    = 0;
@@ -324,9 +324,7 @@ namespace Repulsor
             compressedQ = true;
             
             // ComputeErrorQuadrics();
-            
-            TOOLS_PTOC(className()+"::LoadMesh");
-            
+
         } // LoadMesh
         
         
@@ -336,13 +334,9 @@ namespace Repulsor
         {
             // Packs all data in V_coords, edges, simplices to the beginning of the arrays.
             
-            TOOLS_PTIC(className()+"::Compress");
+            TOOLS_PTIMER(timer,className()+"::Compress");
             
-            if( compressedQ )
-            {
-                TOOLS_PTOC(className()+"::Compress");
-                return;
-            }
+            if( compressedQ ) { return; }
             
             const Int old_vertex_count = vertex_count;
             
@@ -352,7 +346,7 @@ namespace Repulsor
             
             for( Int v = 0; v < old_vertex_count; ++v )
             {
-                if( V_active[v] && (V_parent_simplices[v].Size() > 0) )
+                if( V_active[v] && (V_parent_simplices[v].Size() > Int(0)) )
                 {
                     copy_buffer<AMB_DIM>( V_coords.data(v), V_coords.data(vertex_count) );
 
@@ -388,7 +382,7 @@ namespace Repulsor
 //            }
             
             
-            std::fill( &E_active  [0],             &E_active  [max_edge_count   ], false );
+            std::fill( &E_active[0], &E_active[max_edge_count], false );
             
             for( Int e = 0; e < max_edge_count; ++e )
             {
@@ -402,45 +396,9 @@ namespace Repulsor
                 E_parent_simplices[e].Clear();
             }
             
-//            // Should be superfluous.
-//            for( Int e = old_edge_count; e < max_edge_count; ++e )
-//            {
-//                E_parent_simplices[e].Clear();
-//            }
-            
             edge_lookup = std::unordered_map<Pair_T,Int,PairHasher>();
             
             edge_count = 0;
-            
-//
-//            for( Int e = 0; e < old_edge_count; ++e )
-//            {
-//                if( E_active[e] && (E_parent_simplices[e].Size() > 0) )
-//                {
-//                    const Vertex_T v_0 = V_lookup[edges[e][0]];
-//                    const Vertex_T v_1 = V_lookup[edges[e][1]];
-//
-//                    if( (v_0 < zero) || (v_1 < zero) )
-//                    {
-//                        eprint(className()+"::Compress: invalid vertex found in edge "+ToString(e)+".");
-//                    }
-//
-//                    if( v_0 == v_1 )
-//                    {
-//                        eprint(className()+"::Compress: edge "+ToString(e)+" is degenerate.");
-//                    }
-//
-//                    CreateEdge( v_0, v_1 );
-////
-////                    edges[edge_count][0] = Min(v_0,v_1);
-////                    edges[edge_count][1] = Max(v_0,v_1);
-////
-////                    E_active[e]       = false;
-////                    E_active[edge_count] = true;
-//
-////                    ++edge_count;
-//                }
-//            }
             
             const Int old_simplex_count = simplex_count;
             
@@ -472,8 +430,6 @@ namespace Repulsor
             }
             
             compressedQ = true;
-
-            TOOLS_PTOC(className()+"::Compress");
         } // Compress
         
 //        virtual std::unique_ptr<MeshBase_T> CreateMesh() override
@@ -500,16 +456,16 @@ namespace Repulsor
 #include "SimplicialRemesher/UnifyEdgeLengths.hpp"
 #include "SimplicialRemesher/TangentialSmoothing.hpp"
         
-//##############################################################################################
+//###########################################################
 //      SelfCheck
-//##############################################################################################
+//###########################################################
             
         
         virtual void SelfCheck() override
         {
             // Check whether all vertices of each undeleted simplex are undeleted.
-            TOOLS_PTIC(className()+"::SelfCheck");
-            
+            TOOLS_PTIMER(timer,className()+"::SelfCheck");
+
             
             Int deleted_parent_simplex_found_in_vertex = 0;
             
@@ -544,7 +500,7 @@ namespace Repulsor
                     {
                         if( !S_active[s] )
                         {
-                            if( deleted_parent_simplex_found_in_vertex==0 )
+                            if( deleted_parent_simplex_found_in_vertex == Int(0) )
                             {
                                 eprint(className()+"::SelfCheck: Vertex "+ToString(v)+" has deleted parent simplex "+ToString(s)+".");
                             }
@@ -565,7 +521,7 @@ namespace Repulsor
                             
                             if( !contained )
                             {
-                                if( simplices_agnostic_of_their_child_vertices==0 )
+                                if( simplices_agnostic_of_their_child_vertices==Int(0) )
                                 {
                                     eprint(className()+"::SelfCheck: simplex "+ToString(s)+" does not know about its child vertex "+ToString(v)+".");
                                     
@@ -593,7 +549,7 @@ namespace Repulsor
                         eprint(className()+"::SelfCheck: Edge "+ToString(e)+" = { "+ToString(edges(e,0))+","+ToString(edges(e,0))+"} is degenerate.");
                     }
                     
-                    for( Int i = 0; i < 2; ++i )
+                    for( Int i = 0; i < Int(2); ++i )
                     {
                         Vertex_T v = edges(e,i);
                         
@@ -611,7 +567,7 @@ namespace Repulsor
                     {
                         if( !S_active[s] )
                         {
-                            if( deleted_parent_simplices_found_in_edges==0 )
+                            if( deleted_parent_simplices_found_in_edges == Int(0) )
                             {
                                 eprint(className()+"::SelfCheck: Edge "+ToString(e)+" has deleted parent simplex "+ToString(s)+".");
                             }
@@ -663,7 +619,7 @@ namespace Repulsor
                         
                         if( !duplicate_freeQ )
                         {
-                            if( simplices_with_duplicates==0 )
+                            if( simplices_with_duplicates == Int(0) )
                             {
                                 eprint(className()+"::SelfCheck: simplex "+ToString(s)+" containes duplicate vertices.");
                             }
@@ -677,7 +633,7 @@ namespace Repulsor
                         
                         if( !V_active[v] )
                         {
-                            if( deleted_vertices_found_in_simplices==0 )
+                            if( deleted_vertices_found_in_simplices == Int(0) )
                             {
                                 eprint(className()+"::SelfCheck: Deleted vertex "+ToString(v)+" found in simplex "+ToString(s)+".");
                             }
@@ -685,11 +641,11 @@ namespace Repulsor
                         }
                         else
                         {
-                            bool contained = (V_parent_simplices[v].Find(s) >= 0);
+                            bool contained = (V_parent_simplices[v].Find(s) >= Int(0));
 //
                             if( !contained )
                             {
-                                if( vertices_agnostic_of_their_parent_simplices==0 )
+                                if( vertices_agnostic_of_their_parent_simplices == Int(0) )
                                 {
                                     eprint(className()+"::SelfCheck: vertex "+ToString(v)+" does not know about its parent simplex "+ToString(s));
                                 }
@@ -703,9 +659,9 @@ namespace Repulsor
                     {
                         const Edge_T e = SimplexFindEdge(s,j);
                         
-                        if( e < 0 )
+                        if( e < Edge_T(0) )
                         {
-                            if( invalid_edges_found_in_simplices==0 )
+                            if( invalid_edges_found_in_simplices == Int(0) )
                             {
                                 eprint(className()+"::SelfCheck: Invalid edge "+ToString(e)+" found in simplex "+ToString(s)+".");
                             }
@@ -722,7 +678,7 @@ namespace Repulsor
                         }
                         else
                         {
-                            bool contained = (E_parent_simplices[e].Find(s) >= 0);
+                            bool contained = (E_parent_simplices[e].Find(s) >= Int(0));
                             
                             if( !contained )
                             {
@@ -761,8 +717,6 @@ namespace Repulsor
 //            TOOLS_DUMP(invalid_edges_found_in_simplices);
 //            TOOLS_DUMP(deleted_edges_found_in_simplices);
 //            TOOLS_DUMP(simplices_with_duplicates);
-            
-            TOOLS_PTOC(className()+"::SelfCheck");
         }
         
     public:

@@ -189,7 +189,7 @@ namespace Repulsor
             Int thread_count = 1                       // how many threads to utilize
         ) const override
         {
-//            TOOLS_PTIC(ClassName()+"::FromPrimitives (PrimitiveSerialized)");
+//            TOOLS_PTIMER(timer,ClassName()+"::FromPrimitives (PrimitiveSerialized)");
             if( begin >= end )
             {
                 eprint(ClassName()+"FromPrimitives : begin = "+ToString(begin)+" >= "+ToString(end)+" = end");
@@ -303,7 +303,6 @@ namespace Repulsor
                     center[j] += this->SReal_buffer[k] * rotationT[AMB_DIM * k + j];
                 }
             }
-//            TOOLS_PTOC(ClassName()+"::FromPrimitives (PrimitiveSerialized)");
         }
         
         virtual Int Split(
@@ -319,7 +318,7 @@ namespace Repulsor
             Int thread_count = 1                                           // how many threads to utilize
         ) override
         {
-//            TOOLS_PTIC(ClassName()+"::Split");
+//            TOOLS_PTIMER(timer,ClassName()+"::Split");
 //            valprint("begin",begin);
 //            valprint("end",end);
             
@@ -411,7 +410,6 @@ namespace Repulsor
                 split_index = -1;
             }
             // ... otherwise we assume that the bounding volume hierarchy / cluster tree won't do the split.
-//            TOOLS_PTOC(ClassName()+"::Split");
             
             return split_index;
         

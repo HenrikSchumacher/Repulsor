@@ -41,14 +41,12 @@ namespace Repulsor
         {
             std::string tag = ClassName()+"::Value";
             
-            TOOLS_PTIC(tag);
+            TOOLS_PTIMER(timer,tag);
             
             if( !M.InCacheQ(tag) )
             {
                 M.SetCache( tag, value(M) );
             }
-            
-            TOOLS_PTOC(tag);
             
             return M.template GetCache<ExtReal>(tag);
         }
@@ -65,7 +63,7 @@ namespace Repulsor
         {
             std::string tag = ClassName()+"::Differential";
                 
-            TOOLS_PTIC(tag);
+            TOOLS_PTIMER(timer,tag);
             
             if( !M.InCacheQ(tag))
             {
@@ -84,9 +82,7 @@ namespace Repulsor
                 
                 M.SetCache( tag, std::move(diff) );
             }
-            
-            TOOLS_PTOC(tag);
-            
+
             return M.template GetCache<CotangentVector_T>(tag);
         }
         
@@ -96,16 +92,14 @@ namespace Repulsor
             const ExtReal alpha, const ExtReal beta, mptr<ExtReal> Y, const Int ldY
         ) const
         {
-            TOOLS_PTIC(ClassName()+"::Differential (pointer)");
+            TOOLS_PTIMER(timer,ClassName()+"::Differential (pointer)");
             
             const ExtReal en = differential(M);
             
             M.Assemble_ClusterTree_Derivatives(
                 alpha, beta, Y, ldY
             );
-            
-            TOOLS_PTOC(ClassName()+"::Differential (pointer)");
-            
+
             return en;
         }
         
@@ -115,15 +109,13 @@ namespace Repulsor
             mptr<ExtReal> Y, bool addto = false
         ) const
         {
-            TOOLS_PTIC(ClassName()+"::Differential (pointer)");
+            TOOLS_PTIMER(timer,ClassName()+"::Differential (pointer)");
             
             const ExtReal en = differential(M);
             
             M.Assemble_ClusterTree_Derivatives(
                 ExtReal(1), ExtReal(addto), Y, M.AmbDim()
             );
-            
-            TOOLS_PTOC(ClassName()+"::Differential (pointer)");
             
             return en;
         }
@@ -139,13 +131,11 @@ namespace Repulsor
         // Return the densities of the energy to a pointer; don't use any caching.
         ExtReal SimplexDensities( mref<MeshBase_T> M, mptr<ExtReal> density_ptr ) const
         {
-            TOOLS_PTIC(ClassName()+"::SimplexDensities (pointer)");
+            TOOLS_PTIMER(timer,ClassName()+"::SimplexDensities (pointer)");
             
             const ExtReal en = density(M);
             
             M.Assemble_ClusterTree_SimplexDensities( density_ptr, ExtReal(1), false );
-            
-            TOOLS_PTOC(ClassName()+"::SimplexDensities (pointer)");
             
             return en;
         }
@@ -153,13 +143,11 @@ namespace Repulsor
         // Return the densities of the energy to a pointer; don't use any caching.
         ExtReal VertexDensities( mref<MeshBase_T> M, mptr<ExtReal> density_ptr ) const
         {
-            TOOLS_PTIC(ClassName()+"::VertexDensities (pointer)");
+            TOOLS_PTIMER(timer,ClassName()+"::VertexDensities (pointer)");
             
             const ExtReal en = density(M);
             
             M.Assemble_ClusterTree_VertexDensities( density_ptr, ExtReal(1), false );
-            
-            TOOLS_PTOC(ClassName()+"::VertexDensities (pointer)");
             
             return en;
         }

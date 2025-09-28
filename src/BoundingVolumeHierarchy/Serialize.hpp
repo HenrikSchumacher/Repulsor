@@ -2,7 +2,7 @@ private:
 
     void Serialize( Cluster_T * const root )
     {
-        TOOLS_PTIC(className()+"::Serialize");
+        TOOLS_PTIMER(timer,className()+"::Serialize");
         
         //            tree_max_depth = root->max_depth;
         //
@@ -91,11 +91,8 @@ private:
         {
             leaf_cluster_ptr[ i + 1 ] = C_end[leaf_clusters[i]];
         }
-        
-        
+
         tree_rows_ptr = std::vector<std::vector<Cluster_T *>>();
-        
-        TOOLS_PTOC(className()+"::Serialize");
         
     } // Serialize
     

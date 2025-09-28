@@ -213,7 +213,7 @@ public:
         
         if( !this->InCacheQ(tag))
         {
-            TOOLS_PTIC(ClassName()+"::"+tag);
+            TOOLS_PTIMER(timer,ClassName()+"::"+tag);
             
             auto & A = H1Metric();
             
@@ -253,8 +253,6 @@ public:
             S->NumericFactorization( A.Values().data(), Scalar::Zero<Real> );
             
             this->SetCache( tag, S );
-            
-            TOOLS_PTOC(ClassName()+"::"+tag);
         }
         
         return *(this->template GetCache<std::shared_ptr<Solver_T>>(tag) );
@@ -265,11 +263,9 @@ public:
         std::string tag ("H1Metric");
         if( !this->InCacheQ(tag))
         {
-            TOOLS_PTIC(ClassName()+"::"+tag);
+            TOOLS_PTIMER(timer,ClassName()+"::"+tag);
             
             this->SetCache( tag, Create_H1Metric(stiffness_weight,mass_weight) );
-            
-            TOOLS_PTOC(ClassName()+"::"+tag);
         }
         
         return this->template GetCache<SparseMatrix_T>(tag);
@@ -282,11 +278,9 @@ public:
         
         if( !this->InCacheQ(tag))
         {
-            TOOLS_PTIC(ClassName()+"::"+tag);
+            TOOLS_PTIMER(timer,ClassName()+"::"+tag);
             
             this->SetCache( tag, Create_H1Metric(1,0) );
-            
-            TOOLS_PTOC(ClassName()+"::"+tag);
         }
         
         return this->template GetCache<SparseMatrix_T>(tag);
@@ -299,11 +293,9 @@ public:
         
         if( !this->InCacheQ(tag))
         {
-            TOOLS_PTIC(ClassName()+"::"+tag);
+            TOOLS_PTIMER(timer,ClassName()+"::"+tag);
             
             this->SetCache( tag, Create_H1Metric(0,1) );
-            
-            TOOLS_PTOC(ClassName()+"::"+tag);
         }
         
         return this->template GetCache<SparseMatrix_T>(tag);
@@ -350,7 +342,7 @@ public:
         
         if( !this->InCacheQ(tag))
         {
-            TOOLS_PTIC(ClassName()+"::"+tag);
+            TOOLS_PTIMER(timer,ClassName()+"::"+tag);
             
             auto & A = MassMatrix();
             
@@ -390,8 +382,6 @@ public:
             S->NumericFactorization( A.Values().data(), Scalar::Zero<Real> );
             
             this->SetCache( tag, S );
-            
-            TOOLS_PTOC(ClassName()+"::"+tag);
         }
         
         return *(this->template GetCache<std::shared_ptr<Solver_T>>(tag) );

@@ -1,6 +1,6 @@
-//######################################################################################################
+//############################################################
 //##    Unify edge lengths
-//######################################################################################################
+//############################################################
 
 public:
         
@@ -10,12 +10,11 @@ public:
         const Int  max_iter = 100
     ) override
     {
-        TOOLS_PTIC(className()+"::UnifyEdgeLengths");
+        TOOLS_PTIMER(timer,className()+"::UnifyEdgeLengths");
 
         if( lower_bound > upper_bound  )
         {
             eprint(className()+"::UnifyEdgeLengths: lower_bound > upper_bound. Aborting");
-            TOOLS_PTOC(className()+"::UnifyEdgeLengths");
             return 0;
         }
 
@@ -88,17 +87,15 @@ public:
             ++iter;
         }
         
-        if( collapses.Size() > 0 )
+        if( collapses.Size() > Int(0) )
         {
             wprint(className()+"::UnifyEdgeLengths: "+ToString(collapses.Size())+" short edges could not be collapsed.");
         }
                    
-        if( splits.Size() > 0 )
+        if( splits.Size() > Int(0) )
         {
            wprint(className()+"::UnifyEdgeLengths: "+ToString(splits.Size())+" long  edges could not be split.");
         }
-
-        TOOLS_PTOC(className()+"::UnifyEdgeLengths");
 
         return (total_collapse_count > zero) || (total_split_count > zero);
         

@@ -175,12 +175,9 @@ namespace Repulsor
         
         void VF_Compute()
         {
-            if( bct.VeryNear().NonzeroCount() == 0 )
-            {
-                return;
-            }
+            if( bct.VeryNear().NonzeroCount() == LInt(0) ) { return; }
             
-            TOOLS_PTIC(ClassName()+"::VF_Compute");
+            TOOLS_PTIMER(timer,ClassName()+"::VF_Compute");
             
             using Kernel_T = PseudoLaplacian_Kernel_VF<
                 S_DOM_DIM, T_DOM_DIM,
@@ -202,19 +199,14 @@ namespace Repulsor
             }
             
             ker.Diag() = bct.GetS().VF_Accumulator().template AddReduce<Real,LInt>();
-            
-            TOOLS_PTOC(ClassName()+"::VF_Compute");
         }
             
         
         void NF_Compute()
         {
-            if( bct.Near().NonzeroCount() == 0 )
-            {
-                return;
-            }
+            if( bct.Near().NonzeroCount() == LInt(0) ) { return; }
             
-            TOOLS_PTIC(ClassName()+"::NF_Compute");
+            TOOLS_PTIMER(timer,ClassName()+"::NF_Compute");
 
             using Kernel_T = PseudoLaplacian_Kernel_NF<
                 S_DOM_DIM, T_DOM_DIM,
@@ -236,19 +228,14 @@ namespace Repulsor
             }
 
             ker.Diag() = bct.GetS().NF_Accumulator().template AddReduce<Real,LInt>();
-
-            TOOLS_PTOC(ClassName()+"::NF_Compute");
         }
         
         
         void FF_Compute()
         {
-            if( bct.Far().NonzeroCount() == 0 )
-            {
-                return;
-            }
+            if( bct.Far().NonzeroCount() == LInt(0) ) { return; }
             
-            TOOLS_PTIC(ClassName()+"::FF_Compute");
+            TOOLS_PTIMER(timer,ClassName()+"::FF_Compute");
             
             using Kernel_T = PseudoLaplacian_Kernel_FF<
                 S_DOM_DIM, T_DOM_DIM,
@@ -270,8 +257,6 @@ namespace Repulsor
             }
             
             ker.Diag()= bct.GetS().FF_Accumulator().template AddReduce<Real,LInt>();
-            
-            TOOLS_PTOC(ClassName()+"::FF_Compute");
         }
         
 //###########################################################
@@ -288,7 +273,7 @@ namespace Repulsor
         {
             const Int nrhs = bct.GetS().BufferDim() / Kernel_Block_Mul_T::ROWS;
             
-            if( NF_flag && (bct.Near().NonzeroCount() > 0) )
+            if( NF_flag && (bct.Near().NonzeroCount() > LInt(0)) )
             {
                 NF_MultiplyMetric(nrhs);
             }
@@ -297,13 +282,13 @@ namespace Repulsor
                 bct.GetS().PrimitiveOutputBuffer().SetZero();
             }
             
-            if( VF_flag && (bct.VeryNear().NonzeroCount() > 0) )
+            if( VF_flag && (bct.VeryNear().NonzeroCount() > LInt(0)) )
             {
                 VF_MultiplyMetric(nrhs);
             }
             
             
-            if( FF_flag && (bct.Far().NonzeroCount() > 0) )
+            if( FF_flag && (bct.Far().NonzeroCount() > LInt(0)) )
             {
                 FF_MultiplyMetric(nrhs);
             }

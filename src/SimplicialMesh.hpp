@@ -87,20 +87,17 @@ namespace Repulsor
                   int_cast<Int>(thread_count_)
             )
         {
-            TOOLS_PTIC(className()+"()");
+            TOOLS_PTIMER(timer,className()+"()");
             if( V_coords_.Dim(1) != AMB_DIM )
             {
                 eprint(className()+" : V_coords.Dim(1) != AMB_DIM");
-                TOOLS_PTOC(className()+"()");
                 return;
             }
             if( simplices_.Dim(1) != DOM_DIM+1 )
             {
                 eprint(className()+" : simplices_.Dim(1) != DOM_DIM+1");
-                TOOLS_PTOC(className()+"()");
                 return;
             }
-            TOOLS_PTOC(className()+"()");
         }
         
         SimplicialMesh(
@@ -123,26 +120,22 @@ namespace Repulsor
                   int_cast<Int>(thread_count_)
             )
         {
-            TOOLS_PTIC(className()+"()");
+            TOOLS_PTIMER(timer,className()+"()");
             if( V_coords_.Dim(1) != AMB_DIM )
             {
                 eprint(className()+" : V_coords.Dim(1) != AMB_DIM");
-                TOOLS_PTOC(className()+"()");
                 return;
             }
             if( simplices_.Dim(1) != DOM_DIM+1 )
             {
                 eprint(className()+" : simplices_.Dim(1) != DOM_DIM+1");
-                TOOLS_PTOC(className()+"()");
                 return;
             }
             if( V_charges_.Dim(0) != V_coords_.Dim(0) )
             {
                 eprint(className()+" : V_charges_.Dim(0) != V_coords_.Dim(0) ");
-                TOOLS_PTOC(className()+"()");
                 return;
             }
-            TOOLS_PTOC(className()+"()");
         }
 
         template<typename ExtReal_2, typename ExtInt>
@@ -186,8 +179,7 @@ namespace Repulsor
         ,   P_charges ( int_cast<Int>(simplex_count_), Scalar::One<Real> )
         ,   details   ( int_cast<Int>(thread_count_ )                    )
         {
-            TOOLS_PTIC(className()+" (pointer)");
-            TOOLS_PTOC(className()+" (pointer)");
+            TOOLS_PTIMER(timer,className()+" (pointer)");
         }
 
         
@@ -222,8 +214,7 @@ namespace Repulsor
         ,   P_charges (                  int_cast<Int>(simplex_count_), Scalar::One<Real> )
         ,   details   ( int_cast<Int>(thread_count_) )
         {
-            TOOLS_PTIC(className()+" (pointer,charges)");
-            TOOLS_PTOC(className()+" (pointer,charges)");
+            TOOLS_PTIMER(timer,className()+" (pointer,charges)");
         }
 
         // Default constructor
@@ -360,7 +351,7 @@ namespace Repulsor
         
         virtual void SemiStaticUpdate( cptr<ExtReal> V_coords_, const bool transp_ = false ) const override
         {
-            TOOLS_PTIC(className()+"::SemiStaticUpdate");
+            TOOLS_PTIMER(timer,className()+"::SemiStaticUpdate");
             
             // We read the new coordinates onto V_coords, but not into C_coords_frozen!
             if( transp_ )
@@ -380,8 +371,6 @@ namespace Repulsor
             ComputeNearFarData( P_near, P_far );
             
             GetClusterTree().SemiStaticUpdate( P_near, P_far );
-            
-            TOOLS_PTOC(className()+"::SemiStaticUpdate");
         }
        
         
@@ -391,7 +380,7 @@ namespace Repulsor
             const bool transp_
         ) const override
         {
-            TOOLS_PTIC(className()+"::LoadUpdateVectors");
+            TOOLS_PTIMER(timer,className()+"::LoadUpdateVectors");
             
             max_update_step_size = static_cast<SReal>(max_time);
             
@@ -445,8 +434,6 @@ namespace Repulsor
             GetClusterTree().TakeUpdateVectors(
                 P_moving, P_velocities_serialized, static_cast<SReal>(max_time)
             );
-            
-            TOOLS_PTOC(className()+"::LoadUpdateVectors");
         }
         
         virtual ExtReal MaximumSafeStepSize(
@@ -456,7 +443,7 @@ namespace Repulsor
             const bool transp_ = false
         ) override
         {
-            TOOLS_PTIC(className()+"::MaximumSafeStepSize");
+            TOOLS_PTIMER(timer,className()+"::MaximumSafeStepSize");
             
             LoadUpdateVectors( vecs, max_time, transp_ );
             
@@ -475,8 +462,6 @@ namespace Repulsor
             
             logprint("GetCollisionTree().MaximumSafeStepSize(t)         = "+ToString(t));
             
-            TOOLS_PTOC(className()+"::MaximumSafeStepSize");
-            
             return t;
         }
         
@@ -486,8 +471,9 @@ namespace Repulsor
             
             if( !this->InPersistentCacheQ( tag ) )
             {
-                TOOLS_PTIC(className()+"::GetClusterTree");
-                if( (V_coords.Dim(0) > 0) && (simplices.Dim(0) > 0) )
+                TOOLS_PTIMER(timer,className()+"::GetClusterTree");
+                
+                if( (V_coords.Dim(0) > Int(0)) && (simplices.Dim(0) > Int(0)) )
                 {
                     auto P_coords      = Tensor2<Real,Int> ( SimplexCount(), AMB_DIM, Scalar::Zero<Real> );
                     auto P_hull_coords = Tensor3<Real,Int> ( SimplexCount(), SIZE, AMB_DIM );
@@ -521,7 +507,6 @@ namespace Repulsor
 
                     const JobPointers<Int> job_ptr ( SimplexCount(), ThreadCount() );
 
-//                    TOOLS_PTIC("Creating primitives");
                     ParallelDo(
                         [&]( const Int thread )
                         {
@@ -539,10 +524,6 @@ namespace Repulsor
                         },
                         job_ptr.ThreadCount()
                     );
-
-//                    TOOLS_PTOC("Creating primitives");
-
-//                    TOOLS_PTIC("Initializing cluster prototypes");
 
                     std::shared_ptr<BoundingVolume_T> C_proto;
 
@@ -573,11 +554,9 @@ namespace Repulsor
                         }
                     }
 
-//                    TOOLS_PTOC("Initializing cluster prototypes");
-
-                    if( cluster_tree_settings.thread_count <= 0 )
+                    if( cluster_tree_settings.thread_count <= int(0) )
                     {
-                        cluster_tree_settings.thread_count = ThreadCount();
+                        cluster_tree_settings.thread_count = int_cast<int>(ThreadCount());
                     }
 
                     this->SetPersistentCache( tag,
@@ -595,8 +574,6 @@ namespace Repulsor
 
                     this->SetPersistentCache( tag, std::make_any<ClusterTree_T>() );
                 }
-
-                TOOLS_PTOC(className()+"::GetClusterTree");
             }
 
             return this->template GetPersistentCache<ClusterTree_T>(tag);
@@ -608,7 +585,7 @@ namespace Repulsor
             
             if( !this->InPersistentCacheQ( tag ) )
             {
-                TOOLS_PTIC(className()+"::GetBlockClusterTree");
+                TOOLS_PTIMER(timer,className()+"::GetBlockClusterTree");
                 
                 block_cluster_tree_settings.near_field_separation_parameter = adaptivity_settings.theta;
                 block_cluster_tree_settings.near_field_intersection_parameter  = adaptivity_settings.intersection_theta;
@@ -622,8 +599,6 @@ namespace Repulsor
                         block_cluster_tree_settings
                     )
                 );
-                
-                TOOLS_PTOC(className()+"::GetBlockClusterTree");
             }
             
             return this->template GetPersistentCache<BlockClusterTree_T>(tag);
@@ -635,13 +610,11 @@ namespace Repulsor
             
             if( !this->InCacheQ( tag ) )
             {
-                TOOLS_PTIC(className()+"::GetCollisionTree");
+                TOOLS_PTIMER(timer,className()+"::GetCollisionTree");
 
                 this->SetCache( tag,
                     std::make_any<CollisionTree_T>( GetClusterTree(), GetClusterTree() )
                 );
-
-                TOOLS_PTOC(className()+"::GetCollisionTree");
             }
             
             return this->template GetCache<CollisionTree_T>(tag);
@@ -654,7 +627,7 @@ namespace Repulsor
             
             if( !this->InPersistentCacheQ( tag ) )
             {
-                TOOLS_PTIC(className()+"::DerivativeAssembler");
+                TOOLS_PTIMER(timer,className()+"::DerivativeAssembler");
             
                 auto A = SparseBinaryMatrix_T(
                     SimplexCount() * SIZE,
@@ -667,8 +640,6 @@ namespace Repulsor
                 A.Inner().Read(simplices.data());
                 
                 this->SetPersistentCache( tag, std::move(A.Transpose()) );
-                
-                TOOLS_PTOC(className()+"::DerivativeAssembler");
             }
             
             return this->template GetPersistentCache<SparseBinaryMatrix_T>(tag);
@@ -679,7 +650,7 @@ namespace Repulsor
             const ExtReal alpha, const ExtReal beta, mptr<ExtReal> Y, const Int ldY
         ) const override
         {
-            TOOLS_PTIC(className()+"::Assemble_ClusterTree_Derivatives");
+            TOOLS_PTIMER(timer,className()+"::Assemble_ClusterTree_Derivatives");
             
             Tensor3<Real,Int> buffer ( SimplexCount(), SIZE, AMB_DIM, Scalar::Zero<Real> );
             
@@ -699,8 +670,6 @@ namespace Repulsor
                 beta , Y            , ldY,
                 AMB_DIM
             );
-
-            TOOLS_PTOC(className()+"::Assemble_ClusterTree_Derivatives");
         }
         
         void Assemble_ClusterTree_VertexDensities( 
@@ -709,25 +678,19 @@ namespace Repulsor
             bool addTo = false
         ) const override
         {
-            TOOLS_PTIC(className()+"::Assemble_ClusterTree_VertexDensities");
-            
+            TOOLS_PTIMER(timer,className()+"::Assemble_ClusterTree_VertexDensities");
             GetClusterTree().CollectVertexDensities( output, weight, addTo );
-            
-            TOOLS_PTOC(className()+"::Assemble_ClusterTree_VertexDensities");
         }
         
         void Assemble_ClusterTree_SimplexDensities( mptr<ExtReal> output, const ExtReal weight, bool addTo = false ) const override
         {
-            TOOLS_PTIC(className()+"::Assemble_ClusterTree_SimplexDensities");
-            
+            TOOLS_PTIMER(timer,className()+"::Assemble_ClusterTree_SimplexDensities");
             GetClusterTree().CollectPrimitiveDensities( output, weight, addTo );
-            
-            TOOLS_PTOC(className()+"::Assemble_ClusterTree_SimplexDensities");
         }
 
-//#####################################################################################
+//###########################################################
 //      Obstacle
-//#####################################################################################
+//###########################################################
 
         virtual void LoadObstacle( std::unique_ptr<Obstacle_T> obstacle_ ) override
         {
@@ -779,16 +742,12 @@ namespace Repulsor
             
             if( !this->InPersistentCacheQ( tag ) )
             {
-                TOOLS_PTIC(className()+"::GetObstacleBlockClusterTree");
-                
+                TOOLS_PTIMER(timer,className()+"::GetObstacleBlockClusterTree");
                 this->SetPersistentCache( tag,
                     std::make_any<ObstacleBlockClusterTree_T>(
                         GetClusterTree(), GetObstacleClusterTree(), block_cluster_tree_settings
                     )
                 );
-                
-                TOOLS_PTOC(className()+"::GetObstacleBlockClusterTree");
-
             }
             
             return this->template GetPersistentCache<ObstacleBlockClusterTree_T>(tag);
@@ -800,28 +759,25 @@ namespace Repulsor
             
             if( !this->InPersistentCacheQ(tag) )
             {
-                TOOLS_PTIC(className()+"::GetObstacleCollisionTree");
-                
+                TOOLS_PTIMER(timer,className()+"::GetObstacleCollisionTree");
                 this->SetPersistentCache( tag,
                     std::make_any<ObstacleCollisionTree_T>( GetClusterTree(), GetObstacleClusterTree() )
                 );
-
-                TOOLS_PTOC(className()+"::GetObstacleCollisionTree");
             }
             
             return this->template GetPersistentCache<ObstacleCollisionTree_T>(tag);
         }
 
         
-//#####################################################################################
+//###########################################################
 //      IO
-//#####################################################################################
+//###########################################################
      
     public:
         
         virtual void WriteToFile( const std::filesystem::path & file ) const override
         {
-            TOOLS_PTIC(ClassName()+"::WriteToFile");
+            TOOLS_PTIMER(timer,className()+"::WriteToFile");
             
             print("Writing mesh to file "+ file.string() +".");
             
@@ -857,21 +813,19 @@ namespace Repulsor
                 }
                 s <<"\n";
             }
-            
-            TOOLS_PTOC(ClassName()+"::WriteToFile");
         }
         
-//#####################################################################################
+//###########################################################
 //      Remesher
-//#####################################################################################
+//###########################################################
         
     public:
         
         [[nodiscard]] virtual std::unique_ptr<RemesherBase_T> CreateRemesher() override
         {
-            if constexpr( DOM_DIM > 0 )
+            if constexpr( DOM_DIM > Int(0) )
             {
-            TOOLS_PTIC(ClassName()+"::CreateRemesher");
+                TOOLS_PTIMER(timer,className()+"::CreateRemesher");
             
                 Remesher_T * R = new Remesher_T(
                     VertexCoordinates().data(),
@@ -881,9 +835,7 @@ namespace Repulsor
                     VertexCharges().data(),     1,
                     ThreadCount()
                 );
-                
-                TOOLS_PTOC(ClassName()+"::CreateRemesher");
-                
+
                 return std::unique_ptr<RemesherBase_T>(R);
                 
             }
@@ -894,9 +846,9 @@ namespace Repulsor
             }
         }
         
-//#####################################################################################
+//###########################################################
 //      Standard interface
-//#####################################################################################
+//###########################################################
         
     public:
         

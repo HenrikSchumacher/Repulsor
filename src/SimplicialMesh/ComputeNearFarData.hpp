@@ -5,7 +5,7 @@ protected:
         mref<Tensor2<Real,Int>> P_far
     ) const
     {
-        TOOLS_PTIC(ClassName()+"::ComputeNearFarData");
+        TOOLS_PTIMER(timer,ClassName()+"::ComputeNearFarData");
         
         ParallelDo(
             [&]( const Int thread )
@@ -18,13 +18,10 @@ protected:
                 for( Int i = i_begin; i < i_end; ++i )
                 {
                     ker.ReadSimplex(i);
-                    
                     ker.WriteNear( P_near.data(i) );
                     ker.WriteFar ( P_far.data(i)  );
                 }
             },
             ThreadCount()
         );
-    
-        TOOLS_PTOC(ClassName()+"::ComputeNearFarData");
 };

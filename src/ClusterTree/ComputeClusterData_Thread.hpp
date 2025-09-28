@@ -15,7 +15,7 @@ protected:
     template<bool leaves_are_singletons>
     void computeClusterData() const
     {
-        TOOLS_PTIC(ClassName()+"::ComputeClusterData<"+ToString(leaves_are_singletons)+">");
+        TOOLS_PTIMER(timer,ClassName()+"::ComputeClusterData<"+ToString(leaves_are_singletons)+">");
         
         cref<Forest_T> forest = Forest();
         
@@ -45,9 +45,6 @@ protected:
                 ComputeClusterData_Step<leaves_are_singletons>(C);
             }
         }
-
-        TOOLS_PTOC(ClassName()+"::ComputeClusterData<"+ToString(leaves_are_singletons)+">");
-        
     } // computeClusterData
 
     template<bool leaves_are_singletons>

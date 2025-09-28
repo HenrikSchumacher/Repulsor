@@ -1,15 +1,14 @@
-//################################################################################################
+//############################################################
 //##    FlipEdge
-//################################################################################################
+//############################################################
 
 virtual Int DelaunayFlip( const Int max_iter = 128 ) override
 {
-    TOOLS_PTIC(className()+"::DelaunayFlip");
+    TOOLS_PTIMER(timer,className()+"::DelaunayFlip");
     
     if constexpr ( DOM_DIM != 2 )
     {
         wprint(className()+"::DelaunayFlip: only implemented for domain dimension 2. Skipping.");
-        TOOLS_PTOC(className()+"::DelaunayFlip");
         return 0;
     }
     
@@ -51,8 +50,6 @@ virtual Int DelaunayFlip( const Int max_iter = 128 ) override
     {
         wprint(className()+"::DelaunayFlip: Stopped after "+ToString(total_flip_count)+" flips  ("+ToString(iter)+" iterations).");
     }
-    
-    TOOLS_PTOC(className()+"::DelaunayFlip");
     
     return total_flip_count;
 }
@@ -106,7 +103,7 @@ Int FlipEdge( const Edge_T e, const bool check_Delaunay = false )
         return -1;
     }
     
-    if( e < 0 )
+    if( e < Edge_T(0) )
     {
 #ifdef REMESHER_VERBATIM
         eprint(ClassName()+"::FlipEdge: edge is invalid. Skipping.");
@@ -136,7 +133,7 @@ Int FlipEdge( const Edge_T e, const bool check_Delaunay = false )
     const Vertex_T v_0 = edges(e,0);
     const Vertex_T v_1 = edges(e,1);
     
-    if( v_0 < 0 )
+    if( v_0 < Vertex_T(0) )
     {
 //#ifdef REMESHER_VERBATIM
         wprint(className()+"::FlipEdge: Vertex "+ToString(v_0)+" of edge "+ToString(e)+" is invalid. Skipping.");
@@ -144,7 +141,7 @@ Int FlipEdge( const Edge_T e, const bool check_Delaunay = false )
         return -11;
     }
     
-    if( v_1 < 0 )
+    if( v_1 < Vertex_T(0) )
     {
 //#ifdef REMESHER_VERBATIM
         wprint(className()+"::FlipEdge: Vertex "+ToString(v_1)+" of edge "+ToString(e)+" is invalid. Skipping.");
@@ -316,7 +313,7 @@ Int FlipEdge( const Edge_T e, const bool check_Delaunay = false )
         // Taking care of the hinge's boundary edges.
         {
             Edge_T f = FindEdge(w_0,v_1);
-            if( f < 0 )
+            if( f < Edge_T(0) )
             {
                 eprint(className()+"::FlipEdge: edge {"+ToString(w_0)+", "+ToString(v_1)+"} not found. Aborting.");
                 return -222;
@@ -326,7 +323,7 @@ Int FlipEdge( const Edge_T e, const bool check_Delaunay = false )
         }
         {
             Edge_T f = FindEdge(w_1,v_0);
-            if( f < 0 )
+            if( f < Edge_T(0) )
             {
                 eprint(className()+"::FlipEdge: edge {"+ToString(w_1)+", "+ToString(v_0)+"} not found. Aborting.");
                 return -222;

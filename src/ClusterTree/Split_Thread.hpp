@@ -2,7 +2,7 @@ private:
 
     void Split( Cluster_T * root )
     {
-        TOOLS_PTIC(ClassName()+"::Split");
+        TOOLS_PTIMER(timer,ClassName()+"::Split");
         
         P_score_buffer = iota<SReal,Int>( PrimitiveCount() );
         
@@ -74,8 +74,6 @@ private:
         
         P_perm_buffer  = Tensor1<Int,Int>();
         P_score_buffer = Tensor1<SReal,Int>();
-        
-        TOOLS_PTOC(ClassName()+"::Split");
     }
 
 

@@ -3,7 +3,7 @@ public:
     void TangentialSmoothing( const Int max_iter = 1 ) override
     {
         
-        TOOLS_PTIC(ClassName()+"::TangentialSmoothing");
+        TOOLS_PTIMER(timer,ClassName()+"::TangentialSmoothing");
         
         // For each vertex v compute x_new[v] = (id - P) * ( mean( neighbor x[s] ) - x[v] );
         
@@ -14,7 +14,6 @@ public:
 //            if( !compressedQ )
 //            {
 //                eprint(ClassName()+"::VertexTangentialProjectors: run this routine only after compressing data structure! Aborting.");
-//                TOOLS_PTOC(ClassName()+"::TangentialSmoothing");
 //                return;
 //            }
         
@@ -109,6 +108,4 @@ public:
                 thread_count
             );
         }
-        
-        TOOLS_PTOC(ClassName()+"::TangentialSmoothing");
     }

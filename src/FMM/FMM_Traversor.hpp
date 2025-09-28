@@ -55,11 +55,10 @@ namespace Repulsor
 
         TOOLS_FORCE_FLATTENING Real Compute()
         {
-            TOOLS_PTIC(ClassName()+"::Compute");
+            TOOLS_PTIMER(timer,ClassName()+"::Compute");
 
             if( pattern.NonzeroCount() <= 0 )
             {
-                TOOLS_PTOC(ClassName()+"::Compute");
                 return static_cast<Real> (0);
             }
 
@@ -154,8 +153,6 @@ namespace Repulsor
                 job_ptr.ThreadCount()
             );
             
-            TOOLS_PTOC(ClassName()+"::Compute");
-
             return global_sum;
         }
         

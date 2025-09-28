@@ -2,7 +2,7 @@ protected:
     
     void PercolateUp_Recursive( const Int C ) const override
     {
-        TOOLS_PTIC(ClassName()+"::PercolateUp_Recursive");
+        TOOLS_PTIMER(timer,ClassName()+"::PercolateUp_Recursive");
         switch ( buffer_dim )
         {
             case 1:
@@ -35,7 +35,6 @@ protected:
                 percolateUp_Recursive<0>(C);
             }
         }
-        TOOLS_PTOC(ClassName()+"::PercolateUp_Recursive");
     }
     
     template<Int BUFFER_DIM>
@@ -70,7 +69,7 @@ protected:
     
     void PercolateDown_Recursive( const Int C ) const override
     {
-        TOOLS_PTIC(ClassName()+"::PercolateDown_Recursive");
+        TOOLS_PTIMER(timer,ClassName()+"::PercolateDown_Recursive");
         switch ( buffer_dim )
         {
             case 1:
@@ -103,7 +102,6 @@ protected:
                 percolateDown_Recursive<0>(C);
             }
         }
-        TOOLS_PTOC(ClassName()+"::PercolateDown_Recursive");
     }
     
     template<Int BUFFER_DIM>

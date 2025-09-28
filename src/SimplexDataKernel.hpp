@@ -116,7 +116,7 @@ namespace Repulsor
             
             a = charge * StandardSimplexVolume<Real>(DOM_DIM);
             
-            if constexpr ( DOM_DIM > 0 )
+            if constexpr ( DOM_DIM > Int(0) )
             {
                 for( Int l = 0; l < DOM_DIM; ++l )
                 {
