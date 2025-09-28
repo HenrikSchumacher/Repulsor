@@ -343,8 +343,7 @@ protected:
                 // Exploiting that the subtrees are in depth-first order, so that the inverse ordering is a post-ordering.
                 const Int begin = forest.TreeBegin(tree);
                 const Int end   = forest.TreeEnd  (tree);
-                
-//                print( "{ begin, end } =  { " + ToString(begin) + ", " +ToString(end) + " }" );
+
                 for( Int C = end; C --> begin; )
                 {
                     PercolateUp_Step<BUFFER_DIM>(C);

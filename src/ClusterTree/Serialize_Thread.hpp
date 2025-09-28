@@ -145,5 +145,4 @@ private:
         // Cleaning up after ourselves to prevent a destructor cascade.
         delete C->left;
         delete C->right;
-        
-    } // Serialize_Cluster_Post
+    }

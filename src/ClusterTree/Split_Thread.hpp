@@ -78,9 +78,13 @@ private:
 
 
     template<bool recursive>
-    void Split_Cluster( const Int thread, Cluster_T * C, std::mutex & tree_rows_ptr_mutex, const Int thread_count )
+    void Split_Cluster(
+        const Int thread,
+        Cluster_T * C,
+        std::mutex & tree_rows_ptr_mutex,
+        const Int thread_count
+    )
     {
-        
         const Int begin = C->begin;
         const Int end   = C->end;
         
@@ -135,7 +139,6 @@ private:
             else
             {
                 const std::lock_guard<std::mutex> lock( tree_rows_ptr_mutex );
-                
                 tree_rows_ptr[next_depth].push_back( C->left  );
                 tree_rows_ptr[next_depth].push_back( C->right );
             }
