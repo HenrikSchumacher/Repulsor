@@ -982,7 +982,7 @@ namespace Repulsor
         
         void SemiStaticUpdate( cptr<Real> P_near_, cptr<Real> P_far_ ) const override
         {
-            // Updates only the computational data like primitive/cluster areas, centers of mass and normals. All data related to clustering or multipole acceptance criteria remain are unchanged.
+            // Updates only the computational data like primitive/cluster areas, centers of mass and normals. All data related to clustering or multipole acceptance criteria remain unchanged.
             
             TOOLS_PTIMER(timer,className()+"::SemiStaticUpdate");
 
@@ -1029,9 +1029,9 @@ namespace Repulsor
                     
                     for( Int i = i_begin; i < i_end; ++i )
                     {
-                        P_mov.ReadCoordinatesSerialized ( P_p_ser           , i );
-                        P_mov.ReadVelocitiesSerialized  ( P_v_ser           , i );
-                        P_mov.WriteDeformedSerialized   ( P_up_ser, max_time, i );
+                        P_mov.ReadCoordinatesSerialized(P_p_ser           ,i);
+                        P_mov.ReadVelocitiesSerialized (P_v_ser           ,i);
+                        P_mov.WriteDeformedSerialized  (P_up_ser, max_time,i);
                     }
                 },
                 ThreadCount()
@@ -1134,7 +1134,9 @@ namespace Repulsor
                         [=]( const Int i )
                         {
                             copy_buffer<VarSize,Sequential>(
-                                &from[near_dim * inv_ord[i]], &to[near_dim * i], near_dim
+                                &from[near_dim * inv_ord[i]],
+                                &to[near_dim * i],
+                                near_dim
                             );
                         },
                         PrimitiveCount(), ThreadCount()
@@ -1145,7 +1147,11 @@ namespace Repulsor
                     ParallelDo(
                         [=]( const Int i )
                         {
-                            add_to_buffer( &from[near_dim * inv_ord[i]], &to[near_dim * i], near_dim );
+                            add_to_buffer(
+                                &from[near_dim * inv_ord[i]],
+                                &to[near_dim * i],
+                                near_dim
+                            );
                         },
                         PrimitiveCount(), ThreadCount()
                     );
