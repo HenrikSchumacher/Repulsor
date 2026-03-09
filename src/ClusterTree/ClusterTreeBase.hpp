@@ -3,7 +3,7 @@
 namespace Repulsor
 {
     template<typename Real_, typename Int_, typename LInt_, typename SReal_, typename ExtReal_>
-    class ClusterTreeBase : public CachedObject
+    class ClusterTreeBase : public CachedObject<1,1,1,1>
     {
         static_assert(IntQ< Int_>,"");
         static_assert(IntQ<LInt_>,"");

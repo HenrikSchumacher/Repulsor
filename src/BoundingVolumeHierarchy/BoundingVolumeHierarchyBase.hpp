@@ -3,7 +3,7 @@
 namespace Repulsor
 {
     template<typename Real_, typename Int_, typename LInt_, typename SReal_, typename ExtReal_>
-    class BoundingVolumeHierarchyBase : public CachedObject
+    class BoundingVolumeHierarchyBase : public CachedObject<1,1,0,0>
     {
         static_assert(IntQ< Int_>,"");
         static_assert(IntQ<LInt_>,"");
