@@ -76,9 +76,8 @@ namespace Repulsor
 
             kernel.Allocate( pattern.NonzeroCount() );
             
-            // DEBUG THIS!
             Real global_sum = ParallelDoReduce(
-                [=,this,&job_ptr]( const Int thread )
+                [&,this]( const Int thread )
                 {
                     Kernel_T ker ( kernel, thread );
 
@@ -110,31 +109,22 @@ namespace Repulsor
                             for( LInt k = k_begin; k < k_end-1; ++k )
                             {
                                 const Int j = ci[k];
-                                
                                 ker.LoadT(j);
-                                
                                 ker.Prefetch(ci[k+1]);
-
                                 local_sum += ker.Compute(k);
-
                                 ker.WriteT(j);
                             }
                             
                             // Perform last calculation in row without prefetch.
                             {
                                 const LInt k = k_end-1;
-                                
                                 const Int j = ci[k];
-                                
                                 ker.LoadT(j);
-                                
                                 local_sum += ker.Compute(k);
-                                
                                 ker.WriteT(j);
                             }
                             
                             // Incorporate the kernel's local vector chunk into the i-th chunk if the output Y.
-                            
                             ker.WriteS(i);
                         }
                         
@@ -148,7 +138,7 @@ namespace Repulsor
                     
                     return local_sum; 
                 },
-                AddReducer<Real, Real>(),
+                []( Real v, Real & r ) { r += v; },
                 Scalar::Zero<Real>,
                 job_ptr.ThreadCount()
             );

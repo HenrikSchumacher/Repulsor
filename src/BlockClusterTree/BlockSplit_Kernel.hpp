@@ -23,23 +23,23 @@ namespace Repulsor
             const Real far_theta2_,
             const Real near_theta2_
         )
-        :   inter_idx           ( 1 )
-        ,   verynear_idx        ( 1 )
-        ,   near_idx            ( 2 * ( S.PrimitiveCount() + T.PrimitiveCount() ) )
-        ,   far_idx             ( 2 * ( S.PrimitiveCount() + T.PrimitiveCount() ) )
-        ,   thread              ( thread_ )
-        ,   S_C_proto           ( S.ClusterPrototype().Clone()              )
-        ,   T_C_proto           ( T.ClusterPrototype().Clone()              )
-        ,   S_P_proto           ( S.PrimitivePrototype().Clone()            )
-        ,   T_P_proto           ( T.PrimitivePrototype().Clone()            )
-        ,   S_C_serialized      ( S.ClusterSerialized().data()              )
-        ,   T_C_serialized      ( T.ClusterSerialized().data()              )
-        ,   S_P_serialized      ( S.PrimitiveSerialized().data()            )
-        ,   T_P_serialized      ( T.PrimitiveSerialized().data()            )
-        ,   A                   ( S.PrimitiveAdjacencyMatrix()              )
-        ,   far_theta2          ( far_theta2_                               )
-        ,   near_theta2         ( near_theta2_                              )
-        ,   intersection_theta2 ( near_theta2_                              )
+        :   inter_idx           { 1 }
+        ,   verynear_idx        { 1 }
+        ,   near_idx            { 10 * ( S.PrimitiveCount() + T.PrimitiveCount() ) }
+        ,   far_idx             { 10 * ( S.PrimitiveCount() + T.PrimitiveCount() ) }
+        ,   thread              { thread_                                   }
+        ,   S_C_proto           { S.ClusterPrototype().Clone()              } // !!!
+        ,   T_C_proto           { T.ClusterPrototype().Clone()              } // !!!
+        ,   S_P_proto           { S.PrimitivePrototype().Clone()            } // !!!
+        ,   T_P_proto           { T.PrimitivePrototype().Clone()            } // !!!
+        ,   S_C_serialized      { S.ClusterSerialized().data()              }
+        ,   T_C_serialized      { T.ClusterSerialized().data()              }
+        ,   S_P_serialized      { S.PrimitiveSerialized().data()            }
+        ,   T_P_serialized      { T.PrimitiveSerialized().data()            }
+        ,   A                   { S.PrimitiveAdjacencyMatrix()              }
+        ,   far_theta2          { far_theta2_                               }
+        ,   near_theta2         { near_theta2_                              }
+        ,   intersection_theta2 { near_theta2_                              }
         {}
         
         // Default constructor
@@ -48,23 +48,23 @@ namespace Repulsor
         ~BlockSplit_Kernel() = default;
         // Copy constructor
         BlockSplit_Kernel( const BlockSplit_Kernel & other )
-        :   inter_idx           ( other.inter_idx.Capacity()    )
-        ,   verynear_idx        ( other.verynear_idx.Capacity() )
-        ,   near_idx            ( other.near_idx.Capacity()     )
-        ,   far_idx             ( other.far_idx.Capacity()      )
-        ,   thread              ( other.thread                  )
-        ,   S_C_proto           ( other.S_C_proto->Clone()      ) // !!!
-        ,   T_C_proto           ( other.T_C_proto->Clone()      ) // !!!
-        ,   S_P_proto           ( other.S_P_proto->Clone()      ) // !!!
-        ,   T_P_proto           ( other.T_P_proto->Clone()      ) // !!!
-        ,   S_C_serialized      ( other.S_C_serialized          )
-        ,   T_C_serialized      ( other.T_C_serialized          )
-        ,   S_P_serialized      ( other.S_P_serialized          )
-        ,   T_P_serialized      ( other.T_P_serialized          )
-        ,   A                   ( other.A                       )
-        ,   far_theta2          ( other.far_theta2              )
-        ,   near_theta2         ( other.near_theta2             )
-        ,   intersection_theta2 ( other.near_theta2             )
+        :   inter_idx           { other.inter_idx.Capacity()    }
+        ,   verynear_idx        { other.verynear_idx.Capacity() }
+        ,   near_idx            { other.near_idx.Capacity()     }
+        ,   far_idx             { other.far_idx.Capacity()      }
+        ,   thread              { other.thread                  }
+        ,   S_C_proto           { other.S_C_proto->Clone()      } // !!!
+        ,   T_C_proto           { other.T_C_proto->Clone()      } // !!!
+        ,   S_P_proto           { other.S_P_proto->Clone()      } // !!!
+        ,   T_P_proto           { other.T_P_proto->Clone()      } // !!!
+        ,   S_C_serialized      { other.S_C_serialized          }
+        ,   T_C_serialized      { other.T_C_serialized          }
+        ,   S_P_serialized      { other.S_P_serialized          }
+        ,   T_P_serialized      { other.T_P_serialized          }
+        ,   A                   { other.A                       }
+        ,   far_theta2          { other.far_theta2              }
+        ,   near_theta2         { other.near_theta2             }
+        ,   intersection_theta2 { other.near_theta2             }
         {}
         
         // Swap function

@@ -1,6 +1,6 @@
 public:
 
-    virtual cref<Permutation<Int>> NestedDissectionOrdering( const Int local_thread_count = 1 ) const override
+    virtual cref<Permutation_T> NestedDissectionOrdering( const Int local_thread_count = 1 ) const override
     {
         std::string tag ("NestedDissectionOrdering");
         
@@ -68,7 +68,7 @@ public:
                 
                 TOOLS_DEBUG_PRINT("Compute indicators.");
                 
-                ParallelDo(
+                Do<Parallel>(
                     [&]( const Int k )
                     {
                         const Int C = queue_0[k];
@@ -106,7 +106,7 @@ public:
                 );
 
                 TOOLS_DEBUG_PRINT("Compute types.");
-                ParallelDo(
+                Do<Parallel>(
                     [&]( const Int i )
                     {
                         const Int j = perm_0[i];
@@ -122,7 +122,7 @@ public:
                 
                 TOOLS_DEBUG_PRINT("Modify permutation.");
 
-                ParallelDo(
+                Do<Parallel>(
                     [&]( const Int k )
                     {
                         const Int C = queue_0[k];
@@ -197,12 +197,12 @@ public:
                 ++level;
             }
             
-            Permutation<Int> perm (
+            Permutation_T perm (
                 perm_0.data(), VertexCount(), Inverse::False, ThreadCount()
             );
             
             this->SetPersistentCache( tag, std::move(perm) );
         }
         
-        return this->template GetPersistentCache<Permutation<Int>>(tag);
+        return this->template GetPersistentCache<Permutation_T>(tag);
     }

@@ -129,7 +129,7 @@ namespace Repulsor
                     
                     return local_sum;
                 },
-                AddReducer<Real, Real>(),
+                []( Real v, Real & r ) { r += v; },
                 Scalar::Zero<Real>,
                 thread_count
             );

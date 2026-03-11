@@ -10,7 +10,7 @@ private:
         
         const Int top_level_count = int_cast<Int>(settings.parallel_perc_depth);
         
-        logprint("Breadth-first scan to split the first few levels.");
+//        logprint("Breadth-first scan to split the first few levels.");
         
         tree_rows_ptr = std::vector<std::vector<Cluster_T *>>(top_level_count+1);
         
@@ -47,7 +47,7 @@ private:
         // In particular `tree_rows_ptr[top_level_count]` contains all the nodes at level `top_level_count`.
         
         
-        logprint("Parallel depth-first scans to create the subtrees.");
+//        logprint("Parallel depth-first scans to create the subtrees.");
         
         mref<std::vector<Cluster_T *>> tree_row = tree_rows_ptr[top_level_count];
         
@@ -60,7 +60,7 @@ private:
             ThreadCount()
         );
         
-        logprint("Reverse breadth-first scan to calculate statistics.");
+//        logprint("Reverse breadth-first scan to calculate statistics.");
         for( Int level = top_level_count; level --> 0 ; )
         {
             for( Cluster_T * C : tree_rows_ptr[level] )

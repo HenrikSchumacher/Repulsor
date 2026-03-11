@@ -45,6 +45,14 @@ private:
         cref<std::vector<Cluster_T *>> tree_row = tree_rows_ptr[top_level_count];
         
         TOOLS_PTIC(className()+"::Serialize: Parallel depth-first scans for each subtree.");
+//        ParallelDo_Dynamic(
+//            [&tree_row,this]( const Int thread, const Int i )
+//            {
+//                Serialize_Cluster<true>( thread, tree_row[i] );
+//            },
+//            Int(0), static_cast<Int>(tree_row.size()), Int(1),
+//            ThreadCount()
+//        );
         ParallelDo_Dynamic(
             [=,this,&tree_row]( const Int thread, const Int i )
             {

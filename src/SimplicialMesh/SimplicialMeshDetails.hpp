@@ -9,8 +9,6 @@ namespace Repulsor
     {
 	public:
 
-		using SparseMatrix_T = Sparse::MatrixCSR<Real,Int,LInt>;
-
 		std::string ClassName() const
         {
             return std::string("SimplicialMeshDetails<")+ToString(DOM_DIM)+","+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<LInt>+">";
@@ -48,10 +46,6 @@ namespace Repulsor
     template<typename Real, typename Int, typename LInt>
     struct SimplicialMeshDetails<0,1,Real,Int,LInt>
     {
-	public:
-
-		using SparseMatrix_T = Sparse::MatrixCSR<Real,Int,LInt>;
-
 	private:
 
 		const Int thread_count = 1;
@@ -101,7 +95,7 @@ namespace Repulsor
 		cptr<Real> F = P_D_far.data();
 		mptr<Real> B = buffer.data();
         
-		ParallelDo(
+		Do<Parallel>(
 			[=]( const Int i )
 			{
 				Real charge = 0;
@@ -124,10 +118,6 @@ namespace Repulsor
     template<typename Real, typename Int, typename LInt>
     struct SimplicialMeshDetails<0,2,Real,Int,LInt>
     {
-	public:
-
-		using SparseMatrix_T = Sparse::MatrixCSR<Real,Int,LInt>;
-
 	private:
 
 		const Int thread_count = 1;
@@ -177,7 +167,7 @@ namespace Repulsor
 		cptr<Real> F = P_D_far.data();
 		mptr<Real> B = buffer.data();
         
-		ParallelDo(
+		Do<Parallel>(
 			[=]( const Int i )
 			{
 				Real charge = 0;
@@ -201,10 +191,6 @@ namespace Repulsor
     template<typename Real, typename Int, typename LInt>
     struct SimplicialMeshDetails<0,3,Real,Int,LInt>
     {
-	public:
-
-		using SparseMatrix_T = Sparse::MatrixCSR<Real,Int,LInt>;
-
 	private:
 
 		const Int thread_count = 1;
@@ -254,7 +240,7 @@ namespace Repulsor
 		cptr<Real> F = P_D_far.data();
 		mptr<Real> B = buffer.data();
         
-		ParallelDo(
+		Do<Parallel>(
 			[=]( const Int i )
 			{
 				Real charge = 0;
@@ -279,10 +265,6 @@ namespace Repulsor
     template<typename Real, typename Int, typename LInt>
     struct SimplicialMeshDetails<0,4,Real,Int,LInt>
     {
-	public:
-
-		using SparseMatrix_T = Sparse::MatrixCSR<Real,Int,LInt>;
-
 	private:
 
 		const Int thread_count = 1;
@@ -332,7 +314,7 @@ namespace Repulsor
 		cptr<Real> F = P_D_far.data();
 		mptr<Real> B = buffer.data();
         
-		ParallelDo(
+		Do<Parallel>(
 			[=]( const Int i )
 			{
 				Real charge = 0;
@@ -358,10 +340,6 @@ namespace Repulsor
     template<typename Real, typename Int, typename LInt>
     struct SimplicialMeshDetails<1,2,Real,Int,LInt>
     {
-	public:
-
-		using SparseMatrix_T = Sparse::MatrixCSR<Real,Int,LInt>;
-
 	private:
 
 		const Int thread_count = 1;
@@ -409,7 +387,7 @@ namespace Repulsor
 		cptr<Real> F = P_D_far.data();
 		mptr<Real> B = buffer.data();
         
-		ParallelDo(
+		Do<Parallel>(
 			[=]( const Int i )
 			{
 				Real charge = 0;
@@ -524,10 +502,6 @@ namespace Repulsor
     template<typename Real, typename Int, typename LInt>
     struct SimplicialMeshDetails<1,3,Real,Int,LInt>
     {
-	public:
-
-		using SparseMatrix_T = Sparse::MatrixCSR<Real,Int,LInt>;
-
 	private:
 
 		const Int thread_count = 1;
@@ -575,7 +549,7 @@ namespace Repulsor
 		cptr<Real> F = P_D_far.data();
 		mptr<Real> B = buffer.data();
         
-		ParallelDo(
+		Do<Parallel>(
 			[=]( const Int i )
 			{
 				Real charge = 0;
@@ -764,10 +738,6 @@ namespace Repulsor
     template<typename Real, typename Int, typename LInt>
     struct SimplicialMeshDetails<1,4,Real,Int,LInt>
     {
-	public:
-
-		using SparseMatrix_T = Sparse::MatrixCSR<Real,Int,LInt>;
-
 	private:
 
 		const Int thread_count = 1;
@@ -815,7 +785,7 @@ namespace Repulsor
 		cptr<Real> F = P_D_far.data();
 		mptr<Real> B = buffer.data();
         
-		ParallelDo(
+		Do<Parallel>(
 			[=]( const Int i )
 			{
 				Real charge = 0;
@@ -1100,10 +1070,6 @@ namespace Repulsor
     template<typename Real, typename Int, typename LInt>
     struct SimplicialMeshDetails<2,3,Real,Int,LInt>
     {
-	public:
-
-		using SparseMatrix_T = Sparse::MatrixCSR<Real,Int,LInt>;
-
 	private:
 
 		const Int thread_count = 1;
@@ -1151,7 +1117,7 @@ namespace Repulsor
 		cptr<Real> F = P_D_far.data();
         mptr<Real> B = buffer.data();
 
-		ParallelDo(
+		Do<Parallel>(
 			[=]( const Int i )
 			{
 				Real charge = 0;
@@ -1450,10 +1416,6 @@ namespace Repulsor
     template<typename Real, typename Int, typename LInt>
     struct SimplicialMeshDetails<2,4,Real,Int,LInt>
     {
-	public:
-
-		using SparseMatrix_T = Sparse::MatrixCSR<Real,Int,LInt>;
-
 	private:
 
 		const Int thread_count = 1;
@@ -1501,7 +1463,7 @@ namespace Repulsor
 		cptr<Real> F = P_D_far.data();
         mptr<Real> B = buffer.data();
 
-		ParallelDo(
+		Do<Parallel>(
 			[=]( const Int i )
 			{
 				Real charge = 0;

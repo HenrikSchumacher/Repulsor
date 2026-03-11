@@ -158,7 +158,6 @@ namespace Repulsor
         TOOLS_FORCE_INLINE void Prefetch( const Int j_next ) const
         {
             prefetch_buffer<T_DATA_DIM,0,0>( &T_data[T_DATA_DIM * j_next] );
-            
             if constexpr ( diff_flag || density_flag )
             {
                 prefetch_buffer<T_DATA_DIM,1,0>( &T_D_data[T_DATA_DIM * j_next] );

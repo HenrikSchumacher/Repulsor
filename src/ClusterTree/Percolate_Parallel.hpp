@@ -33,7 +33,8 @@ public:
                 tree_costs[i+1] = C_next[C] - C;
             }
             
-            tree_costs.Accumulate();
+//            tree_costs.Accumulate();
+            tree_costs.Accumulate( thread_count_ );
             
             job_ptr = JobPointers<Int>( TreeCount(), tree_costs.data(), thread_count_ );
             
@@ -233,7 +234,7 @@ protected:
         
         cref<Forest_T> forest = Forest();
         
-        logprint("Breadth-first scan for the top levels of the tree.");
+//        logprint("Breadth-first scan for the top levels of the tree.");
         for( Int level = 0; level < forest.TopLevels(); ++level )
         {
             for( Int C : forest.Row(level) )
@@ -242,8 +243,8 @@ protected:
             }
         }
         
-        logprint("Parallel depth-first scan to for the subtrees.");
-        ParallelDo(
+//        logprint("Parallel depth-first scan to for the subtrees.");
+        Do<Parallel>(
             [this,&forest]( const Int tree )
             {
                 // Exploiting that the subtrees are in depth-first order, so that the inverse ordering is a post-ordering.
@@ -336,8 +337,8 @@ protected:
         
         cref<Forest_T> forest = Forest();
         
-        logprint("Parallel reverse depth-first scan to for subtrees.");
-        ParallelDo(
+//        logprint("Parallel reverse depth-first scan to for subtrees.");
+        Do<Parallel>(
             [this,&forest]( const Int tree )
             {
                 // Exploiting that the subtrees are in depth-first order, so that the inverse ordering is a post-ordering.
@@ -353,7 +354,7 @@ protected:
         );
         
         
-        logprint("Breadth-first scan for the top levels of the tree.");
+//        logprint("Breadth-first scan for the top levels of the tree.");
         for( Int level = forest.TopLevels(); level --> 0 ; )
         {
             for( Int C : forest.Row(level) )

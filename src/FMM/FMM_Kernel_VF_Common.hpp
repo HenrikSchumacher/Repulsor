@@ -119,7 +119,7 @@ public:
     void PrintReport( float time ) const
     {
         logprint( this->ClassName() + ": "
-            + "\n\t time elapsed:  \t" + ToString(time)
+            + "\n\t time elapsed:  \t" + ToStringFPGeneral(time)
             + "\n\t evaluations:   \t" + ToString(this->evaluations)
             + "\n\t deepest level: \t" + ToString(this->max_level_reached)
             + "\n"

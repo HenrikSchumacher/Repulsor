@@ -323,7 +323,7 @@ namespace Repulsor
             const Int near_dim = NearDim();
             const Int  far_dim =  FarDim();
 
-            ParallelDo(
+            Do<Parallel>(
                 [=,this]( const Int i )
                 {
                     const Int j = P_ordering[i];
@@ -356,7 +356,7 @@ namespace Repulsor
             {
                 mptr<Int> inner_ = C_to_P.Inner().data();
                 
-                ParallelDo(
+                Do<Parallel>(
                     [=,this]( const Int i )
                     {
                         const Int leaf  = leaf_clusters[i];
@@ -440,7 +440,7 @@ namespace Repulsor
                     const Int near_dim = NearDim();
                     const Int size = static_cast<Int>(DiffOp.NonzeroCount() / primitive_count);
                     
-                    ParallelDo(
+                    Do<Parallel>(
                         [=]( const Int i )
                         {
                             const Int from = size * ord[i];
@@ -480,7 +480,7 @@ namespace Repulsor
                     const Int near_dim = NearDim();
                     const Int size = static_cast<Int>(AvOp.NonzeroCount() / primitive_count);
                     
-                    ParallelDo(
+                    Do<Parallel>(
                         [=]( const Int i )
                         {
                             const Int from = size * ord[i];
@@ -543,7 +543,7 @@ namespace Repulsor
                     
                     mi_outer[mi_pre.RowCount()] = mi_pre.RowCount() * row_size;
 
-                    ParallelDo(
+                    Do<Parallel>(
                         [=]( const Int i )
                         {
                             const Int row_base = (AMB_DIM+1) * i;
@@ -598,7 +598,7 @@ namespace Repulsor
                     cptr<Real> hi_values = hi_post.Values().data();
                     mptr<Real> mi_values = mi_post.Values().data();
                     
-                    ParallelDo(
+                    Do<Parallel>(
                         [=]( const Int i )
                         {
                             const LInt lo_begin = lo_outer[i  ];
@@ -1130,7 +1130,7 @@ namespace Repulsor
 
                 if( thread == 0 && !addto )
                 {
-                    ParallelDo(
+                    Do<Parallel>(
                         [=]( const Int i )
                         {
                             copy_buffer<VarSize,Sequential>(
@@ -1144,7 +1144,7 @@ namespace Repulsor
                 }
                 else
                 {
-                    ParallelDo(
+                    Do<Parallel>(
                         [=]( const Int i )
                         {
                             add_to_buffer(
@@ -1184,7 +1184,7 @@ namespace Repulsor
             // Finally, permute data for the outside world.
             if( addto )
             {
-                ParallelDo(
+                Do<Parallel>(
                     [=]( const Int i )
                     {
                         add_to_buffer( &from[far_dim * inv_ord[i]], &to[far_dim * i], far_dim );
@@ -1194,7 +1194,7 @@ namespace Repulsor
             }
             else
             {
-                ParallelDo(
+                Do<Parallel>(
                     [=]( const Int i )
                     {
                         copy_buffer<VarSize,Sequential>(

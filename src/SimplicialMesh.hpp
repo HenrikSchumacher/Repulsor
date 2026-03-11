@@ -38,11 +38,13 @@ namespace Repulsor
         using ExtReal = ExtReal_;
         using LInt    = LInt_;
         
-        using TangentVector_T         = typename Base_T::TangentVector_T;
-        using CotangentVector_T       = typename Base_T::CotangentVector_T;
+        using TangentVector_T         = Base_T::TangentVector_T;
+        using CotangentVector_T       = Base_T::CotangentVector_T;
         
-        using SparseMatrix_T          = typename Base_T::SparseMatrix_T;
-        using SparseBinaryMatrix_T    = typename Base_T::SparseBinaryMatrix_T;
+        using SparseMatrix_T          = Base_T::SparseMatrix_T;
+        using SparseBinaryMatrix_T    = Base_T::SparseBinaryMatrix_T;
+        using Permutation_T           = Base_T::Permutation_T;
+        using Solver_T                = Base_T::Solver_T;
         
         using SimplexDataKernel_T     = SimplexDataKernel<DOM_DIM,AMB_DIM,Real,Int>;
         using Primitive_T             = Polytope<DOM_DIM+1,AMB_DIM,GJK_Real,Int,SReal,Real,Int>;

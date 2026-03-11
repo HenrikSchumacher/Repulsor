@@ -19,8 +19,8 @@ protected:
         
         cref<Forest_T> forest = Forest();
         
-        logprint("Parallel reverse depth-first scan to for subtrees.");
-        ParallelDo(
+//        logprint("Parallel reverse depth-first scan to for subtrees.");
+        Do<Parallel>(
             [this,&forest]( const Int tree )
             {
                 // Exploiting that the subtrees are in depth-first order, so that the inverse ordering is a post-ordering.
@@ -37,7 +37,7 @@ protected:
         );
         
         
-        logprint("Breadth-first scan for the top levels of the tree.");
+//        logprint("Breadth-first scan for the top levels of the tree.");
         for( Int level = forest.TopLevels(); level --> 0 ; )
         {
             for( Int C : forest.Row(level) )

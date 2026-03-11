@@ -233,9 +233,7 @@ namespace Repulsor
         TOOLS_FORCE_INLINE void Prefetch( const Int j ) const
         {
             prefetch_buffer<T_DATA_DIM,0,0>( &T_data[T_DATA_DIM * j] );
-            
             prefetch_buffer<T_Tree_T::SIZE,0,0>( &T_ser[T_Tree_T::SIZE * j] );
-            
             if constexpr (diff_flag || density_flag)
             {
                 prefetch_buffer<T_DATA_DIM,1,0>( &T_D_data[T_DATA_DIM * j] );

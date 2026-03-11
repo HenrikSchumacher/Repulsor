@@ -20,8 +20,8 @@ namespace Repulsor
         using ExtReal               = ExtReal_;
         using LInt                  = LInt_;
         
-        using SparseMatrix_T        = Sparse::MatrixCSR      <Real,Int,LInt>;
-        using SparseBinaryMatrix_T  = Sparse::BinaryMatrixCSR<     Int,LInt>;
+        using SparseMatrix_T        = Sparse::MatrixCSR      <Real,Int,LInt,Parallel>;
+        using SparseBinaryMatrix_T  = Sparse::BinaryMatrixCSR<     Int,LInt,Parallel>;
         
         using DataContainer_T       = Tensor2<Real,Int>;
         using BufferContainer_T     = Tensor1<Real,Int>;
@@ -622,13 +622,12 @@ namespace Repulsor
                 cptr<Real> from = thread_C_D_far.data(thread);
                 mptr<Real> to   = C_out.data();
                 
-                ParallelDo(
-                    [=]( const Int i )
+                Do<Parallel>(
+                    [from,to,far_dim]( const Int i )
                     {
                         to[i] += from[far_dim * i];
                     },
-                    cluster_count,
-                    ThreadCount()
+                    cluster_count, ThreadCount()
                 );
             }
             
@@ -643,13 +642,12 @@ namespace Repulsor
                 cptr<Real> from = thread_P_D_near.data(thread);
                 mptr<Real> to   = P_out.data();
                 
-                ParallelDo(
-                    [=]( const Int i )
+                Do<Parallel>(
+                    [from,to,near_dim]( const Int i )
                     {
                         to[i] += from[near_dim * i];
                     },
-                    primitive_count,
-                    thread_count
+                    primitive_count, thread_count
                 );
             }
             
@@ -670,26 +668,24 @@ namespace Repulsor
             
             if( addTo )
             {
-                ParallelDo(
+                Do<Parallel>(
                     [=,this]( const Int i )
                     {
                         const Int j = P_inverse_ordering[i];
                         output[i] += weight * static_cast<ExtReal>(P_out[j]);
                     },
-                    primitive_count,
-                    ThreadCount()
+                    primitive_count, ThreadCount()
                 );
             }
             else
             {
-                ParallelDo(
+                Do<Parallel>(
                     [=,this]( const Int i )
                     {
                         const Int j = P_inverse_ordering[i];
-                        output[i] = weight *    static_cast<ExtReal>(P_out[j]);
+                        output[i] = weight * static_cast<ExtReal>(P_out[j]);
                     },
-                    primitive_count,
-                    ThreadCount()
+                    primitive_count, ThreadCount()
                 );
             }
        
@@ -725,13 +721,12 @@ namespace Repulsor
             );
 
             // Finally, we divide by the dual volumes to obtain the vertex densities.
-            ParallelDo(
+            Do<Parallel>(
                 [=]( const Int i )
                 {
                     output[i] /= dual_volumes[i];
                 },
-                lo_post.RowCount(),
-                ThreadCount()
+                lo_post.RowCount(), ThreadCount()
             );
             
         } // CollectVertexDensities

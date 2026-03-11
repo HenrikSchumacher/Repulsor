@@ -1,6 +1,6 @@
 public:
 
-    virtual cref<Permutation<Int>> MetisOrdering() const override
+    virtual cref<Permutation_T> MetisOrdering() const override
     {
         std::string tag ("MetisOrdering");
         
@@ -8,13 +8,13 @@ public:
         {
             TOOLS_PTIMER(timer,ClassName()+"::"+tag);
 
-            Permutation<Int> perm;
+            Permutation_T perm;
             
 #ifdef TENSORS_HAS_METIS
             
             auto & A = H1Metric();
             
-            perm = Sparse::Metis<Int>()(
+            perm = Sparse::Metis<Int,Parallel>()(
                 A.Outer().data(), A.Inner().data(), A.RowCount(), ThreadCount()
             );
 #else
@@ -26,5 +26,5 @@ public:
             this->SetPersistentCache( tag, std::move(perm) );
         }
         
-        return this->template GetPersistentCache<Permutation<Int>>(tag);
+        return this->template GetPersistentCache<Permutation_T>(tag);
     }

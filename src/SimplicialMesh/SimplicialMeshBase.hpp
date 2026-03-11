@@ -25,8 +25,10 @@ namespace Repulsor
         using SReal   = SReal_;
         using ExtReal = ExtReal_;
         using LInt    = LInt_;
-        using SparseMatrix_T                 = Sparse::MatrixCSR      <Real,Int,LInt>;
-        using SparseBinaryMatrix_T           = Sparse::BinaryMatrixCSR<     Int,LInt>;
+        using SparseMatrix_T                 = Sparse::MatrixCSR      <Real,Int,LInt,Parallel>;
+        using SparseBinaryMatrix_T           = Sparse::BinaryMatrixCSR<     Int,LInt,Parallel>;
+        using Permutation_T                  = Permutation<Int,Parallel>;
+        using Solver_T                       = Sparse::CholeskyDecomposition<Real,Int,LInt,Parallel>;
         
         using ClusterTreeBase_T              =        ClusterTreeBase<Real,Int,LInt,SReal,ExtReal>;
         using BlockClusterTreeBase_T         =   BlockClusterTreeBase<Real,Int,LInt,SReal,ExtReal,true>;
@@ -151,23 +153,23 @@ namespace Repulsor
         
         virtual cref<SparseMatrix_T> MassMatrix() const = 0;
         
-        virtual cref<Permutation<Int>> NestedDissectionOrdering( 
+        virtual cref<Permutation_T> NestedDissectionOrdering(
             const Int local_thread_count = 1
         ) const = 0;
         
-        virtual cref<Permutation<Int>> ApproximateMinimumDegreeOrdering() const = 0;
+        virtual cref<Permutation_T> ApproximateMinimumDegreeOrdering() const = 0;
         
-        virtual cref<Permutation<Int>> MetisOrdering() const = 0;
+        virtual cref<Permutation_T> MetisOrdering() const = 0;
         
         
-        virtual mref<Sparse::CholeskyDecomposition<Real,Int,LInt>> H1Solver() const = 0;
+        virtual mref<Solver_T> H1Solver() const = 0;
         
         virtual Int H1SolverID() const = 0;
 
         virtual void SetH1SolverID( const Int ID ) const = 0;
         
         
-        virtual mref<Sparse::CholeskyDecomposition<Real,Int,LInt>> MassSolver() const = 0;
+        virtual mref<Solver_T> MassSolver() const = 0;
         
         virtual Int MassSolverID() const = 0;
 

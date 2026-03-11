@@ -1,6 +1,6 @@
 public:
 
-    virtual cref<Permutation<Int>> ApproximateMinimumDegreeOrdering() const override
+    virtual cref<Permutation_T> ApproximateMinimumDegreeOrdering() const override
     {
         std::string tag ("ApproximateMinimumDegreeOrdering");
         
@@ -8,13 +8,13 @@ public:
         {
             TOOLS_PTIMER(timer,ClassName()+"::"+tag);
             
-            Permutation<Int> perm;
+            Permutation_T perm;
             
 #ifdef TENSORS_HAS_AMD
             
             auto & A = H1Metric();
             
-            perm = Sparse::ApproximateMinimumDegree<Int>()(
+            perm = Sparse::ApproximateMinimumDegree<Int,Parallel>()(
                 A.Outer().data(), A.Inner().data(), A.RowCount(), ThreadCount()
             );
 #else
@@ -26,5 +26,5 @@ public:
             this->SetPersistentCache( tag, std::move(perm) );
         }
         
-        return this->template GetPersistentCache<Permutation<Int>>(tag);
+        return this->template GetPersistentCache<Permutation_T>(tag);
     }

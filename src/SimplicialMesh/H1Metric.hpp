@@ -1,7 +1,5 @@
 protected:
     
-    using Solver_T = Sparse::CholeskyDecomposition<Real,Int,LInt>;
-
     // Weights for the H^1 metric.
     mutable Real stiffness_weight = 1;
     mutable Real mass_weight      = 1;
@@ -217,7 +215,7 @@ public:
             
             auto & A = H1Metric();
             
-            Permutation<Int> perm;
+            Permutation_T perm;
             
             const Int ID = H1SolverID();
             
@@ -346,7 +344,7 @@ public:
             
             auto & A = MassMatrix();
             
-            Permutation<Int> perm;
+            Permutation_T perm;
             
             const Int ID = MassSolverID();
             

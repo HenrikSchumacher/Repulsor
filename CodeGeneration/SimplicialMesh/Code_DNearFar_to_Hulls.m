@@ -108,7 +108,7 @@ StringJoin["
 		cptr<Real> F = P_D_far.data();
 		mptr<Real> B = buffer.data();
         
-		ParallelDo(
+		Do<Parallel>(
 			[=]( const Int i )
 			{
 				Real charge = 0;
@@ -201,7 +201,7 @@ StringJoin["
 		cptr<Real> F = P_D_far.data();
 		mptr<Real> B = buffer.data();
         
-		ParallelDo(
+		Do<Parallel>(
 			[=]( const Int i )
 			{
 				Real charge = 0;
@@ -306,7 +306,7 @@ StringJoin["
 		cptr<Real> F = P_D_far.data();
         mptr<Real> B = buffer.data();
 
-		ParallelDo(
+		Do<Parallel>(
 			[=]( const Int i )
 			{
 				Real charge = 0;

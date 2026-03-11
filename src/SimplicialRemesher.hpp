@@ -759,12 +759,8 @@ namespace Repulsor
             
             Tensor1<Real,Int> result ( EdgeCount() );
             
-            
-            ParallelDo(
-                [&,this]( const Edge_T e )
-                {
-                    result[e] = SquaredEdgeLength(e);
-                },
+            Do<Parallel>(
+                [&result,this]( const Edge_T e ) { result[e] = SquaredEdgeLength(e); },
                 edge_count, thread_count
             );
 
