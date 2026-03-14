@@ -138,9 +138,9 @@ namespace Repulsor
                 + "," + TypeName<LInt>
                 + "," + TypeName<SReal>
                 + "," + TypeName<ExtReal>
-                +">(" + ToStringFPGeneral(q)
-                + "," + ToStringFPGeneral(p)
-                + "," + ToStringFPGeneral(s)
+                +">(" + ToString(q)
+                + "," + ToString(p)
+                + "," + ToString(s)
                 + ")";
         }
         
