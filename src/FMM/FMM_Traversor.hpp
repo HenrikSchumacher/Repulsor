@@ -77,7 +77,7 @@ namespace Repulsor
             kernel.Allocate( pattern.NonzeroCount() );
             
             Real global_sum = ParallelDoReduce(
-                [&,this]( const Int thread )
+                [&,this]( const Int thread ) -> Real
                 {
                     Kernel_T ker ( kernel, thread );
 
