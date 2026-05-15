@@ -88,7 +88,7 @@ namespace Repulsor
         {
             TOOLS_PTIMER(timer,className()+"::Traverse");
             
-            if( thread_count > 1 )
+            if( thread_count > Int(1) )
             {
                 Traverse_Parallel();
             }

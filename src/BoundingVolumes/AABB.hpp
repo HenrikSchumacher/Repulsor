@@ -168,7 +168,7 @@ namespace Repulsor
             lower.fill( Scalar::Max<SReal> );
             upper.fill( Scalar::Min<SReal> );
             
-            if( thread_count <= 1 )
+            if( thread_count <= Int(1) )
             {
                 for( Int i = begin; i < end; ++i )
                 {
@@ -254,7 +254,7 @@ namespace Repulsor
             lower.Fill( Scalar::Max<SReal> );
             upper.Fill( Scalar::Min<SReal> );
             
-            if( thread_count <= 1 )
+            if( thread_count <= Int(1) )
             {
                 for( Int i = begin; i < end; ++i )
                 {
