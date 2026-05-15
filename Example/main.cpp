@@ -29,7 +29,7 @@
 
 using namespace Tools;
 
-using Int     = int;
+using Int     = std::int64_t;
 using LInt    = std::size_t;
 using Real    = double;
 

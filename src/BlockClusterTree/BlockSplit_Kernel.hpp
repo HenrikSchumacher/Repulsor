@@ -23,10 +23,10 @@ namespace Repulsor
             const Real far_theta2_,
             const Real near_theta2_
         )
-        :   inter_idx           { 1 }
-        ,   verynear_idx        { 1 }
-        ,   near_idx            { 10 * ( S.PrimitiveCount() + T.PrimitiveCount() ) }
-        ,   far_idx             { 10 * ( S.PrimitiveCount() + T.PrimitiveCount() ) }
+        :   inter_idx           { LInt(10) }
+        ,   verynear_idx        { LInt(10) }
+        ,   near_idx            { LInt(10) * ( S.PrimitiveCount() + T.PrimitiveCount() ) }
+        ,   far_idx             { LInt(10) * ( S.PrimitiveCount() + T.PrimitiveCount() ) }
         ,   thread              { thread_                                   }
         ,   S_C_proto           { S.ClusterPrototype().Clone()              } // !!!
         ,   T_C_proto           { T.ClusterPrototype().Clone()              } // !!!

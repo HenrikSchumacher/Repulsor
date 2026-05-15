@@ -277,16 +277,16 @@ int main(void)
     TOOLS_DUMP(tpm.Solver_IterationCount());
     TOOLS_DUMP(tpm.Solver_RelativeResiduals());
     
-    Tiny::Vector<2,Real,Int> abs_metric_errors {
-        tpm.MetricNorm( M, &X[0][0   ], ldX, nrhs ),
-        tpm.MetricNorm( M, &X[0][nrhs], ldX, nrhs )
-    };
-    Tiny::Vector<2,Real,Int> rel_metric_errors {
-        abs_metric_errors[0] / X_true_metric_norms[0],
-        abs_metric_errors[1] / X_true_metric_norms[1]
-    };
-    
-    TOOLS_DUMP(rel_metric_errors);
+//    Tiny::Vector<2,Real,Int> abs_metric_errors {
+//        tpm.MetricNorm( M, &X[0][0   ], ldX, nrhs ),
+//        tpm.MetricNorm( M, &X[0][nrhs], ldX, nrhs )
+//    };
+//    Tiny::Vector<2,Real,Int> rel_metric_errors {
+//        abs_metric_errors[0] / X_true_metric_norms[0],
+//        abs_metric_errors[1] / X_true_metric_norms[1]
+//    };
+//    
+//    TOOLS_DUMP(rel_metric_errors);
 
     print("");
     print("Experiment 2: Done.");

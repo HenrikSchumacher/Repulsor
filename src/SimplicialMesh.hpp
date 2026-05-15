@@ -9,7 +9,7 @@ namespace Repulsor
     
     template<int DOM_DIM, int AMB_DIM, typename Real_, typename Int_, typename ExtReal_, typename ExtInt_>
     class SimplicialRemesher;
-
+    
     template<
         int DOM_DIM, int AMB_DIM,
         typename Real_, typename Int_ = int, typename LInt_ = Size_T,
