@@ -5,8 +5,7 @@
 #define TOOLS_AGGRESSIVE_INLINING
 
 #ifdef __APPLE__
-/// Use these while on a mac. Don't forget to issue the compiler flag `-framework Accelerate`.
-///
+/// Use this when on a mac. Don't forget to issue the compiler flag `-framework Accelerate`.
     #include "../submodules/Tensors/Accelerate.hpp"
 #else
 /// This should work for OpenBLAS.
@@ -33,7 +32,7 @@ int main(int argc, const char * argv[])
 
     const Int thread_count = 8;
     
-    Sparse::MatrixCSR<Real,Int,Size_T> A;
+    Sparse::MatrixCSR<Real,Int,Size_T,Parallel> A;
     
     
     tic("LoadFromMatrixMarket");
@@ -110,7 +109,7 @@ int main(int argc, const char * argv[])
     
     Z.Read(Y.data());
     
-    combine_matrices<Scalar::Flag::Minus,Scalar::Flag::Plus,VarSize,NRHS,Par>
+    combine_matrices<Scalar::Flag::Minus,Scalar::Flag::Plus,VarSize,NRHS,Parallel>
     ( 
      -1., &Y_wide[0][p], ldY,
       1., Z.data(),       NRHS,

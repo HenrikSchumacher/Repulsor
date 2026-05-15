@@ -76,7 +76,7 @@ namespace Repulsor
                 
                 CotangentVector_T diff ( M.VertexCount(), M.AmbDim() );
 
-                M.Assemble_ClusterTree_Derivatives( 
+                M.Assemble_ClusterTree_Derivatives(
                     ExtReal(1), ExtReal(0), diff.data(), M.AmbDim()
                 );
                 

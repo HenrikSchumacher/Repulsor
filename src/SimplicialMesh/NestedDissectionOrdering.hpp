@@ -197,9 +197,7 @@ public:
                 ++level;
             }
             
-            Permutation_T perm (
-                perm_0.data(), VertexCount(), Inverse::False, ThreadCount()
-            );
+            Permutation_T perm ( perm_0.data(), VertexCount(), Inverse::False, ThreadCount() );
             
             this->SetPersistentCache( tag, std::move(perm) );
         }

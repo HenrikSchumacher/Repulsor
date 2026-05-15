@@ -12,13 +12,14 @@
 /// - compute the tangent-point obstacle energy (and its derivative).
 
 
-
-/// Enable the shipped profiler.
+/// Enable the shipped profiler. Typically, you don't want this, as this prints to file.
 #define TOOLS_ENABLE_PROFILER
 
+/// Use the AMD matrix reordering from SuiteSparse; Repulsor comes with a simple nested-dissection reordering, but AMD is typically better.
+#define REPULSOR_USE_AMD
+
 #ifdef __APPLE__
-/// Use these while on a mac. Don't forget to issue the compiler flag `-framework Accelerate`.
-///
+/// Use this when on a mac. Don't forget to issue the compiler flag `-framework Accelerate`.
     #include "../submodules/Tensors/Accelerate.hpp"
 #else
 /// This should work for OpenBLAS.
@@ -29,9 +30,9 @@
 
 using namespace Tools;
 
-using Int     = std::int64_t;
-using LInt    = std::size_t;
-using Real    = double;
+using Int     = std::int32_t; // It is safer to use std::int64_t with big meshes; but std::int32_t will safe RAM.
+using LInt    = std::int64_t; // I recommend to always use a 64-bit integer here.
+using Real    = double;       // Everything else but double won't work.
 
 
 int main(void)
@@ -45,6 +46,8 @@ int main(void)
     /// Set up profiler to write to `~/Tools_Profile.tsv` and `~/Tools_Log.txt`
     Profiler::Clear();
 
+    
+    // Set the number of threads. On my machine, 8 works well. Might be overkill for small meshes.
     int thread_count = 1;
     
     
@@ -73,7 +76,6 @@ int main(void)
     /// Note that with obstacles you might want to use meshes of various dimensions,
     /// so you have to use an according factory.
 
-    
     
     /// Instantiate factory that can create instances of `SimplicialMesh<2,3,Real,Int,LInt>`.
     

@@ -9,8 +9,7 @@
 /// - find a collision-free step size for a displacement field along the manifold.
 
 #ifdef __APPLE__
-/// Use these while on a mac. Don't forget to issue the compiler flag `-framework Accelerate`.
-///
+/// Use this when on a mac. Don't forget to issue the compiler flag `-framework Accelerate`.
     #include "../submodules/Tensors/Accelerate.hpp"
 #else
 /// This should work for OpenBLAS.

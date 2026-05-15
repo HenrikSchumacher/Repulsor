@@ -8,8 +8,7 @@
 //#define REPULSOR_USE_METIS
 
 #ifdef __APPLE__
-/// Use these while on a mac. Don't forget to issue the compiler flag `-framework Accelerate`.
-///
+/// Use this when on a mac. Don't forget to issue the compiler flag `-framework Accelerate`.
     #include "../submodules/Tensors/Accelerate.hpp"
 #else
 /// This should work for OpenBLAS. Don't forget to ussie the compiler flag `-lopenblas`.
@@ -26,7 +25,7 @@ using namespace Tools;
 // You can activate everything you want, but compile times might increase substatially.
 //using Int     = Int64;
 using Int     = Int32;  // Used for the indices of the mesh triangles. 32 bits should suffice.
-using LInt    = Int64;  // We need this 64 for the row pointers of big sparse matrices
+using LInt    = Int64;  // We need this to be 64 bit for the row pointers of big sparse matrices
 using ExtInt  = Int64;
 
 using Real    = Real64; // We need full precision here, definitely.
