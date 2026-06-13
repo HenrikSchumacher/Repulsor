@@ -167,7 +167,6 @@ namespace Repulsor
                 [&,this]( const Int thread )
                 {
                     P_proto[thread] = P_proto_.Clone();
-                    
                     C_proto[thread] = C_proto_.Clone();
                 },
                 ThreadCount()
@@ -181,16 +180,7 @@ namespace Repulsor
         BoundingVolumeHierarchy(const BoundingVolumeHierarchy & rhs) = default;
         
         BoundingVolumeHierarchy( BoundingVolumeHierarchy && rhs) = default;
-        
-        const BoundingVolumeHierarchy & operator=( const BoundingVolumeHierarchy & rhs)
-        {
-            return BoundingVolumeHierarchy ( rhs );
-        };
-        
-        const BoundingVolumeHierarchy & operator=( BoundingVolumeHierarchy && rhs)
-        {
-            return BoundingVolumeHierarchy ( std::move(rhs) );
-        };
+
         
     protected:
         

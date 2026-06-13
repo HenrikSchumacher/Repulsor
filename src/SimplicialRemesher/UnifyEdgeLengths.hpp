@@ -37,17 +37,23 @@ public:
         Int       collapse_count = 1;
         Int iter                 = 0;
         
-        while( (split_count > zero || collapse_count > zero) && (iter < max_iter) )
+        while( (split_count > Int(0) || collapse_count > Int(0)) && (iter < max_iter) )
         {
-            splits.Clear();
-            collapses.Clear();
+            {
+                TOOLS_PTIMER(timer0,"Clear()");
+                splits.Clear();
+                collapses.Clear();
+            }
+
+            // Unblock all vertices.
+            for( Int v = 0; v < vertex_count; ++v )
+            {
+                V_state[v] &= (~VertexModifiedMask);
+            }
             
             for( Int e = 0; e < edge_count; ++e )
             {
-                // Unblock all vertices.
-                std::fill( &V_modified[0], &V_modified[vertex_count], false );
-                
-                if( !E_active[e] )
+                if( !E_activeQ[e] )
                 {
     #ifdef REMESHER_VERBATIM
                     wprint(className()+"::UnifyEdgeLengths: Skipping edge "+ToString(e)+" because it is inactive.");
@@ -65,24 +71,38 @@ public:
                 {
                     collapses.Push(e,L2);
                 }
-
             }
             
             // Order such that shortest edges are collapsed first.
-            sort( collapses.data_1(), collapses.data_0(), collapses.Size() );
-
+            {
+                TOOLS_PTIMER(timer1,"sort");
+                sort( collapses.data_1(), collapses.data_0(), collapses.Size() );
+            }
+            
 //            print(className()+"::UnifyEdgeLengths: iteration "+ToString(iter)+":");
             
             collapse_count = CollapseEdges( collapses.data_0(), collapses.Size() );
+            
+            // DEBUGGING
+            TOOLS_LOGDUMP(collapse_count);
+            
             total_collapse_count += collapse_count;
 //            valprint("  collapse_count",collapse_count);
             
             // Order such that longest edges are split first.
-            reverse_sort( splits.data_1(), splits.data_0(), splits.Size() );
-
+            {
+                TOOLS_PTIMER(timer2,"reverse_sort");
+                reverse_sort( splits.data_1(), splits.data_0(), splits.Size() );
+            }
+            
             split_count = SplitEdges( splits.data_0(), splits.Size() );
+            
+            // DEBUGGING
+            TOOLS_LOGDUMP(split_count);
+
             total_split_count += split_count;
 //            valprint("  split_count   ",split_count);
+
             
             ++iter;
         }
@@ -97,6 +117,6 @@ public:
            wprint(className()+"::UnifyEdgeLengths: "+ToString(splits.Size())+" long  edges could not be split.");
         }
 
-        return (total_collapse_count > zero) || (total_split_count > zero);
+        return (total_collapse_count > Int(0)) || (total_split_count > Int(0));
         
     } // UnifyEdgeLengths

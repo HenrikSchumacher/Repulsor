@@ -14,7 +14,7 @@ public:
         {
             const Int r = SplitEdge(e_list[i]);
             
-            if( r >= zero )
+            if( r >= Int(0) )
             {
                 ++split_counter;
             }
@@ -39,7 +39,7 @@ protected:
     {
         // Returns the index of newly created vertex -- or some error code (negative number).
         
-        if( CheckEdge(e_0) < zero )
+        if( CheckEdge(e_0) < 0 )
         {
     #ifdef REMESHER_VERBATIM
             wprint(ClassName()+"::SplitEdge: edge is not splittable. Skipping.");
@@ -53,7 +53,7 @@ protected:
             
             for( Vertex_T v : E_opp_vertices )
             {
-                if( CheckVertex(v) < zero )
+                if( CheckVertex(v) < 0 )
                 {
     #ifdef REMESHER_VERBATIM
                     wprint(className()+"::SplitEdge: Vertex "+ToString(v)+" opposing edge "+ToString(e_0)+" is blocked. Skipping.");
@@ -77,7 +77,7 @@ protected:
             const Vertex_T v_1 = edges(e_0,1);
             const Vertex_T   w = CreateVertex();
 
-            ComputeVertexPosition(v_0,v_1,w);
+            ComputeSplitVertexPosition(v_0,v_1,w);
             
             const Edge_T e_1 = CreateEdge(w,v_1);
 

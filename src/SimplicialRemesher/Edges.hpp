@@ -15,10 +15,10 @@ protected:
 #ifdef REMESHER_VERBATIM
             print(className()+"::CreateEdge: Reassembling edge array.");
 #endif
-            max_edge_count *= two;
+            max_edge_count *= Int(2);
             
-            edges   .template Resize<true>( max_edge_count, 2 );
-            E_active.template Resize<true>( max_edge_count );
+            edges    .template Resize<true>( max_edge_count, 2 );
+            E_activeQ.template Resize<true>( max_edge_count );
         }
     
         edge_lookup.insert( {p,e} );
@@ -26,7 +26,7 @@ protected:
         edges(e,0) = p.first;
         edges(e,1) = p.second;
         
-        E_active[e] = true;
+        E_activeQ[e] = true;
         
         E_parent_simplices.push_back( SimplexList_T() );
         
@@ -41,7 +41,7 @@ protected:
     {
         Edge_T e = FindEdge(v_0,v_1);
         
-        if( e < zero )
+        if( e < Edge_T(0) )
         {
             e = CreateEdge(v_0,v_1);
             
@@ -57,7 +57,7 @@ protected:
 #ifdef REMESHER_VERBATIM
         print(className()+"::Edge_Delete("+ToString(e)+")");
 #endif
-        E_active[e] = false;
+        E_activeQ[e] = false;
         LookupErase(e);
     }
     

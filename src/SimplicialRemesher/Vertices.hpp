@@ -4,6 +4,22 @@
 
 protected:
 
+
+    bool VertexActiveQ( const Vertex_T v ) const
+    {
+        return (V_state[v] & VertexActiveMask);
+    }
+
+    bool VertexPinnedQ( const Vertex_T v ) const
+    {
+        return (V_state[v] & VertexPinnedMask);
+    }
+
+    bool VertexModifiedQ( const Vertex_T v ) const
+    {
+        return (V_state[v] & VertexModifiedMask);
+    }
+
     Vertex_T CreateVertex()
     {
         Vertex_T w = vertex_count++;
@@ -13,12 +29,17 @@ protected:
 #ifdef REMESHER_VERBATIM
             print(className()+"::CreateVertex: Reassembling vertex array.");
 #endif
-            max_vertex_count *= two;
+            max_vertex_count *= Int(2);
             
-            V_coords  .template Resize<true>( max_vertex_count, AMB_DIM );
-            V_charges .template Resize<true>( max_vertex_count );
-            V_active  .template Resize<true>( max_vertex_count );
-            V_modified.template Resize<true>( max_vertex_count );
+            V_coords .template Resize<true>( max_vertex_count, AMB_DIM );
+            V_charges.template Resize<true>( max_vertex_count );
+            V_state  .template Resize<true>( max_vertex_count );
+            
+            // TODO: Should not be necessary.
+            for( Int v = vertex_count; v < max_vertex_count; ++v )
+            {
+                V_state[v] = VertexState_T{0};
+            }
             
             if( with_data )
             {
@@ -28,9 +49,11 @@ protected:
         
         V_parent_simplices.push_back( SimplexList_T() );
         
-        V_charges [w] = Scalar::One<Real>;
-        V_active  [w] = true;
-        V_modified[w] = true;
+        V_charges[w] = Real(1);
+        V_state  [w] = (VertexActiveMask | VertexModifiedMask);
+        
+//        V_activeQ  [w] = true;
+//        V_modifiedQ[w] = true;
         
         return w;
     }
@@ -40,7 +63,7 @@ protected:
 #ifdef REMESHER_VERBATIM
         print(className()+"::DeactivateVertex("+ToString(v)+")");
 #endif
-        V_active[v] = false;
+        V_state[v] &= (~VertexActiveMask);
     }
     
     void MarkVertexAsModified( const Vertex_T v )
@@ -48,26 +71,65 @@ protected:
 #ifdef REMESHER_VERBATIM
         print(className()+"::MarkVertexAsModified("+ToString(v)+")");
 #endif
-        V_modified[v] = true;
+        V_state[v] &= (~VertexModifiedMask);
+    }
+
+    void PinVertex( const Vertex_T v )
+    {
+//    #ifdef REMESHER_VERBATIM
+        print(className()+"::PinVertex("+ToString(v)+")");
+//    #endif
+        V_state[v] &= (~VertexPinnedMask);
+    }
+
+
+    void ComputeSplitVertexPosition( const Vertex_T v_0, const Vertex_T v_1, const Vertex_T w )
+    {
+        ComputeVertexPosition( v_0, Frac<Real>(1,2), v_1, Frac<Real>(1,2), w );
     }
     
-void ComputeVertexPosition( const Vertex_T v_0, const Vertex_T v_1, const Vertex_T w )
-{
-    for( Int k = 0; k < AMB_DIM; ++k )
+    void ComputeCollapseVertexPosition( const Vertex_T v_0, const Vertex_T v_1, const Vertex_T w )
     {
-        V_coords(w,k) = Scalar::Half<Real> * ( V_coords(v_0,k) + V_coords(v_1,k) );
+        constexpr Real W [2][2] = {
+            { Frac<Real>(1,2), Real(0)         },
+            { Real(1),         Frac<Real>(1,2) }
+        };
+        
+        const bool v_0_pinnedQ = VertexPinnedQ(v_0);
+        const bool v_1_pinnedQ = VertexPinnedQ(v_1);
+        
+        // DEBGUGGING
+        
+        if( v_0_pinnedQ ) { print("vertex v_0 = " + ToString(v_0) + " is pinned."); };
+        if( v_1_pinnedQ ) { print("vertex v_1 = " + ToString(v_1) + " is pinned."); };
+        
+        const Real weight_0 = W[v_0_pinnedQ][v_1_pinnedQ];
+        const Real weight_1 = W[v_1_pinnedQ][v_0_pinnedQ];
+        
+        ComputeVertexPosition( v_0, weight_0, v_1, weight_1, w );
     }
 
-    if( with_data )
+    void ComputeVertexPosition(
+        const Vertex_T v_0, const Real weight_0,
+        const Vertex_T v_1, const Real weight_1,
+        const Vertex_T w
+    )
     {
-        const Int data_dim = V_data.Dim(1);
-
-        for( Int k = 0; k < data_dim; ++k )
+        for( Int k = 0; k < AMB_DIM; ++k )
         {
-            V_data(w,k) = Scalar::Half<Real> * ( V_data(v_0,k) + V_data(v_1,k) );
+            V_coords(w,k) = weight_0 * V_coords(v_0,k) + weight_1 * V_coords(v_1,k);
+        }
+
+        if( with_data )
+        {
+            const Int data_dim = V_data.Dim(1);
+
+            for( Int k = 0; k < data_dim; ++k )
+            {
+                V_data(w,k) = weight_0 *  V_data(v_0,k) + weight_1 * V_data(v_1,k);
+            }
         }
     }
-}
 
 //    void ComputeVertexPosition( const Vertex_T v_0, const Vertex_T v_1, const Vertex_T w )
 //    {

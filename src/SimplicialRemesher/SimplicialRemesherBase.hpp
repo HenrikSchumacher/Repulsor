@@ -23,6 +23,8 @@ namespace Repulsor
         using Vertex_T   = Int;
         using Edge_T     = Int;
         using Simplex_T  = Int;
+        
+        using VertexState_T = UInt8;
 
         // Default constructor
         SimplicialRemesherBase() = default;
@@ -61,6 +63,8 @@ namespace Repulsor
 //        virtual void LoadMesh_External( cref<MeshBase_T> M, cptr<ExtReal> V_data_, const Int data_dim ) = 0;
         
 //        virtual std::unique_ptr<MeshBase_T> CreateMesh() = 0;
+        
+        virtual void PinVertices( cptr<ExtInt> pinned_vertices, ExtInt pinned_vertex_count ) = 0;
 
         virtual cref<Tensor2<Real,Int>> VertexCoordinates() const = 0;
         

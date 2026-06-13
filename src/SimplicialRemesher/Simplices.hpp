@@ -7,8 +7,6 @@ protected:
     //DONE.
     void ComputeSimplexConnectivity( const Simplex_T s )
     {
-//            S_active[s] = true;
-        
         for( Int i = 0; i < S_vertex_count; ++i )
         {
             Vertex_T v = simplices[s][i];
@@ -38,10 +36,10 @@ protected:
             max_simplex_count *= 2;
             
             simplices.template Resize<true>(max_simplex_count,DOM_DIM+1);
-            S_active .template Resize<true>(max_simplex_count);
+            S_activeQ.template Resize<true>(max_simplex_count);
         }
         
-        S_active[s] = true;
+        S_activeQ[s] = true;
         
         copy_buffer<S_vertex_count>( vertex_list, simplices.data(s) );
 
@@ -84,13 +82,13 @@ protected:
     
     void DeleteSimplex( const Simplex_T s )
     {
-        S_active[s] = false;
+        S_activeQ[s] = false;
         
         for( Int i = 0; i < S_vertex_count; ++i )
         {
             const Vertex_T v = simplices(s,i);
             
-            if( v >= zero )
+            if( v >= Vertex_T(0) )
             {
                 V_parent_simplices[v].Drop(s);
             }
