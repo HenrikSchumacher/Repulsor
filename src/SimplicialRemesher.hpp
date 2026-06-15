@@ -375,9 +375,6 @@ namespace Repulsor
             
             vertex_count = 0;
             
-//            // DEBUGGING
-//            TOOLS_LOGDUMP(V_state);
-            
             for( Int v = 0; v < old_vertex_count; ++v )
             {
                 if( VertexActiveQ(v) && (V_parent_simplices[v].Size() > Int(0)) )
@@ -393,20 +390,13 @@ namespace Repulsor
                     
 //                    copy_buffer<(AMB_DIM+1)*(AMB_DIM+1)>( V_quadrics.data(v), V_quadrics.data(v_count) );
                     
-                    //                    VertexActiveQ(v)        = false;
-                    //                    VertexModified(v)      = false;
+                    const Real v_charge         = V_charges[v];
+                    V_charges[v]                = Real(0);
+                    V_charges[vertex_count]     = v_charge;
                     
-                    const Real v_charge     = V_charges[v];
-                    V_charges[v]            = Real(0);
-                    bool v_state            = V_state[v];
-                    V_state[v]              = VertexState_T(0);
-
-                    
-                    V_charges[vertex_count] = v_charge;
-                    V_state  [vertex_count] = v_state & (~VertexModifiedMask);
-                    
-//                    V_activeQ  [vertex_count] = true;
-//                    V_modifiedQ[vertex_count] = false;
+                    const VertexState_T v_state = V_state[v];
+                    V_state[v]                  = VertexState_T(0);
+                    V_state[vertex_count]       = v_state & (~VertexModifiedMask);
                     
                     V_lookup[v] = vertex_count;
                     
@@ -471,6 +461,7 @@ namespace Repulsor
             }
             
             compressedQ = true;
+            
         } // Compress
         
 //        virtual std::unique_ptr<MeshBase_T> CreateMesh() override

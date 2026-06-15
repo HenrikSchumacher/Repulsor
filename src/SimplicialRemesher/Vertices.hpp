@@ -63,7 +63,7 @@ protected:
 #ifdef REMESHER_VERBATIM
         print(className()+"::DeactivateVertex("+ToString(v)+")");
 #endif
-        V_state[v] &= (~VertexActiveMask);
+        V_state[v] = Vertex_T(0);
     }
     
     void MarkVertexAsModified( const Vertex_T v )
@@ -71,15 +71,15 @@ protected:
 #ifdef REMESHER_VERBATIM
         print(className()+"::MarkVertexAsModified("+ToString(v)+")");
 #endif
-        V_state[v] &= (~VertexModifiedMask);
+        V_state[v] |= VertexModifiedMask;
     }
 
     void PinVertex( const Vertex_T v )
     {
-//    #ifdef REMESHER_VERBATIM
+    #ifdef REMESHER_VERBATIM
         print(className()+"::PinVertex("+ToString(v)+")");
-//    #endif
-        V_state[v] &= (~VertexPinnedMask);
+    #endif
+        V_state[v] |= VertexPinnedMask;
     }
 
 
@@ -99,9 +99,10 @@ protected:
         const bool v_1_pinnedQ = VertexPinnedQ(v_1);
         
         // DEBGUGGING
-        
-        if( v_0_pinnedQ ) { print("vertex v_0 = " + ToString(v_0) + " is pinned."); };
-        if( v_1_pinnedQ ) { print("vertex v_1 = " + ToString(v_1) + " is pinned."); };
+        if( v_0_pinnedQ && v_1_pinnedQ )
+        {
+            eprint(ClassName()+"::ComputeCollapseVertexPosition: edge with two pinned vertices.");
+        }
         
         const Real weight_0 = W[v_0_pinnedQ][v_1_pinnedQ];
         const Real weight_1 = W[v_1_pinnedQ][v_0_pinnedQ];

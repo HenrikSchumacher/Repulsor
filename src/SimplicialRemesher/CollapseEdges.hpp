@@ -127,8 +127,9 @@ protected:
         // Edge e is collapsible. Start with deleting it.
         DeleteEdge(e);
         MarkVertexAsModified(v_0);
+        if( VertexPinnedQ(v_1) ) { PinVertex(v_0); }
         DeactivateVertex(v_1);
-
+        
         ComputeCollapseVertexPosition(v_0,v_1,v_0);
 
         // Going through the simplices to delete.

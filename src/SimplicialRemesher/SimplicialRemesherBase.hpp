@@ -106,7 +106,7 @@ namespace Repulsor
         
         virtual Int DelaunayFlip( const Int max_iter = 100 ) = 0;
         
-        virtual void TangentialSmoothing( const Int max_iter = 1 ) = 0;
+        virtual void TangentialSmoothing( const Int max_iter = 1, const Real step_size = Frac<Real>(1,2) ) = 0;
         
         virtual void SelfCheck() = 0;
         

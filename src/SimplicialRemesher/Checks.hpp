@@ -100,10 +100,11 @@ int CheckEdge( const Edge_T e ) const
     
     if( VertexPinnedQ(v_0) && VertexPinnedQ(v_1) )
     {
-#ifdef REMESHER_VERBATIM
-        wprint(className()+"::CheckEdge: Both vertices "+ToString(v_0) + " and "+ToString(v_1)+" are pinned.");
-#endif
-        return -1;
+//#ifdef REMESHER_VERBATIM
+//        wprint(className()+"::CheckEdge: Both vertices "+ToString(v_0) + " and "+ToString(v_1)+" are pinned.");
+//#endif
+        eprint(className()+"::CheckEdge: Both vertices "+ToString(v_0) + " and "+ToString(v_1)+" are pinned.");
+        return -33;
     }
     
     return 0;
