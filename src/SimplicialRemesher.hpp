@@ -31,40 +31,50 @@ namespace Repulsor
         
         static_assert( DOM_DIM  > Int_(0), "Remeshing for domain dimension 0 does not make sense." );
         
-        using Base_T     = SimplicialRemesherBase<Real_,Int_,ExtReal_,ExtInt_>;
+        using Base_T        = SimplicialRemesherBase<Real_,Int_,ExtReal_,ExtInt_>;
         
-        using Real       = typename Base_T::Real;
-        using Int        = typename Base_T::Int;
-        using ExtReal    = typename Base_T::ExtReal;
-        using ExtInt     = typename Base_T::ExtInt;
+        using Real          = Base_T::Real;
+        using Int           = Base_T::Int;
+        using ExtReal       = Base_T::ExtReal;
+        using ExtInt        = Base_T::ExtInt;
         
-        using Vertex_T   = typename Base_T::Vertex_T;
-        using Edge_T     = typename Base_T::Edge_T;
-        using Simplex_T  = typename Base_T::Simplex_T;
+        using Vertex_T      = Base_T::Vertex_T;
+        using Edge_T        = Base_T::Edge_T;
+        using Simplex_T     = Base_T::Simplex_T;
+        
+        using VertexState_T = Base_T::VertexState_T;
         
 //        using MeshBase_T = typename Base_T::MeshBase_T;
         
-        using Pair_T             = std::pair<Vertex_T,Vertex_T>;
+        using Pair_T                 = std::pair<Vertex_T,Vertex_T>;
         
-        using EdgeContainer_T    = Tensor2<Vertex_T,Int>;
-        using SimplexContainer_T = Tensor2<Vertex_T,Int>;
+        using EdgeContainer_T        = Tensor2<Vertex_T,Int>;
+        using SimplexContainer_T     = Tensor2<Vertex_T,Int>;
         
-        using VertexList_T       = SortedList<Vertex_T,Int>;
-        using SimplexList_T      = SortedList<Simplex_T,Int>;
+        using VertexList_T           = SortedList<Vertex_T,Int>;
+        using SimplexList_T          = SortedList<Simplex_T,Int>;
         
-        using Vector_T           = Tiny::Vector<AMB_DIM,        Real,Int>;
-        using Matrix_T           = Tiny::Matrix<AMB_DIM,AMB_DIM,Real,Int>;
+        using Vector_T               = Tiny::Vector<AMB_DIM,        Real,Int>;
+        using Matrix_T               = Tiny::Matrix<AMB_DIM,AMB_DIM,Real,Int>;
 
-        using Quadric_T          = Tiny::Matrix<AMB_DIM+1,AMB_DIM+1,Real,Int>;
+        using Quadric_T              = Tiny::Matrix<AMB_DIM+1,AMB_DIM+1,Real,Int>;
         
-        using BoolContainer_T    = Tensor1<bool,Int>;
+        using BoolContainer_T        = Tensor1<bool,Int>;
+        using VertexStateContainer_T = Tensor1<VertexState_T,Int>;
         
+        static constexpr int VertexActiveBit   = 0;
+        static constexpr int VertexModifiedBit = 1;
+        static constexpr int VertexPinnedBit   = 2;
+        
+        static constexpr VertexState_T VertexActiveMask   = VertexState_T(1 << VertexActiveBit  );
+        static constexpr VertexState_T VertexModifiedMask = VertexState_T(1 << VertexModifiedBit);
+        static constexpr VertexState_T VertexPinnedMask   = VertexState_T(1 << VertexPinnedBit  );
         
     protected:
         
-        static constexpr Int zero = 0;
-        static constexpr Int one  = 1;
-        static constexpr Int two  = 2;
+//        static constexpr Int zero = 0;
+//        static constexpr Int one  = 1;
+//        static constexpr Int two  = 2;
         
         static constexpr Int S_vertex_count = DOM_DIM+1;
         static constexpr Int S_edge_count   = ((DOM_DIM+1)*DOM_DIM)/2;
@@ -83,17 +93,20 @@ namespace Repulsor
         Tensor1<Real,Int> V_charges; // vertex charges
         Tensor1<Int, Int> V_lookup;
         std::vector<SimplexList_T> V_parent_simplices;
-        BoolContainer_T V_active;
-        BoolContainer_T V_modified;
+//        BoolContainer_T V_activeQ;
+//        BoolContainer_T V_modifiedQ;
+//        BoolContainer_T V_pinnedQ;
+        
+        VertexStateContainer_T V_state;
 
         EdgeContainer_T edges;
-        BoolContainer_T E_active;
+        BoolContainer_T E_activeQ;
         std::vector<SimplexList_T> E_parent_simplices;
     
         SimplexContainer_T simplices;
         Tensor3<Real,Int>  S_quadrics; // simplex error quadrics
         
-        BoolContainer_T S_active;
+        BoolContainer_T S_activeQ;
 
         VertexList_T V_0_neighbors;
         VertexList_T V_1_neighbors;
@@ -229,15 +242,17 @@ namespace Repulsor
     
     public:
         
+        
+        
         void LoadMesh(
             cptr<ExtReal> vertex_coords_ ,
-            const Int     vertex_count_,
+            const Int     vertex_count_,    // TODO: Implicit cast from ExtInt to Int is dangerous!
             const bool    vertex_coords_ColMajorQ,
             cptr<ExtInt>  simplices_,
-            const Int     simplex_count_,
+            const Int     simplex_count_,   // TODO: Implicit cast from ExtInt to Int is dangerous!
             const bool    simplices_ColMajorQ,
             cptr<ExtReal> vertex_data_,
-            const Int     vertex_data_dim_,
+            const Int     vertex_data_dim_, // TODO: Implicit cast from ExtInt to Int is dangerous!
             const bool    vertex_data_ColMajorQ,
             const Int     thread_count_ = 1
         ) override
@@ -249,7 +264,7 @@ namespace Repulsor
             simplex_count = simplex_count_;
             thread_count  = thread_count_;
             
-            with_data = ( vertex_data_ != nullptr ) && ( vertex_data_dim_ > zero );
+            with_data = ( vertex_data_ != nullptr ) && ( vertex_data_dim_ > Int(0) );
             
 //            max_vertex_count  = vertex_count + S_vertex_count * simplex_count;
 //            max_edge_count    = S_edge_count * simplex_count + S_edge_count * simplex_count;
@@ -259,10 +274,9 @@ namespace Repulsor
             max_edge_count    = simplex_count * S_edge_count;
             max_simplex_count = simplex_count;
             
-            V_coords           = Tensor2<Real,Int>  ( max_vertex_count, AMB_DIM );
-            V_charges          = Tensor1<Real,Int>  ( max_vertex_count, Scalar::One<Real> );
-            V_modified         = BoolContainer_T    ( max_vertex_count, false );
-            V_active           = BoolContainer_T    ( max_vertex_count );
+            V_coords           = Tensor2<Real,Int>     ( max_vertex_count, AMB_DIM );
+            V_charges          = Tensor1<Real,Int>     ( max_vertex_count, Scalar::One<Real> );
+            V_state            = VertexStateContainer_T( max_vertex_count );
             
             if( with_data )
             {
@@ -270,16 +284,16 @@ namespace Repulsor
             }
             
             edges              = EdgeContainer_T    ( max_edge_count, 2, -1 );
-            E_active           = BoolContainer_T    ( max_edge_count, false );
+            E_activeQ          = BoolContainer_T    ( max_edge_count, false );
             
             simplices          = SimplexContainer_T ( max_simplex_count, DOM_DIM+1, -1 );
-            S_active           = BoolContainer_T    ( max_simplex_count );
+            S_activeQ          = BoolContainer_T    ( max_simplex_count );
             
-            std::fill( &V_active  [0            ], &V_active  [    vertex_count ], true  );
-            std::fill( &V_active  [vertex_count ], &V_active  [max_vertex_count ], false );
-            std::fill( &E_active  [0],             &E_active  [max_edge_count   ], false );
-            std::fill( &S_active  [0            ], &S_active  [    simplex_count], true  );
-            std::fill( &S_active  [simplex_count], &S_active  [max_simplex_count], false );
+            std::fill( &V_state   [0            ], &V_state   [    vertex_count ], VertexActiveMask );
+            std::fill( &V_state   [vertex_count ], &V_state   [max_vertex_count ], VertexState_T{0} );
+            std::fill( &E_activeQ [0],             &E_activeQ [max_edge_count   ], false );
+            std::fill( &S_activeQ [0            ], &S_activeQ [    simplex_count], true  );
+            std::fill( &S_activeQ [simplex_count], &S_activeQ [max_simplex_count], false );
             
             V_parent_simplices = std::vector<SimplexList_T> ( max_vertex_count );
             E_parent_simplices = std::vector<SimplexList_T> ( max_edge_count );
@@ -327,6 +341,23 @@ namespace Repulsor
 
         } // LoadMesh
         
+    
+        void PinVertices( cptr<ExtInt> pinned_vertices, ExtInt pinned_vertex_count ) override
+        {
+            for( ExtInt i = 0; i < pinned_vertex_count; ++i )
+            {
+                ExtInt v_raw = pinned_vertices[i];
+                
+                if( v_raw < ExtInt(0) ) { continue; }
+                
+                Vertex_T v = int_cast<Vertex_T>(v_raw);
+                
+                if( v >= vertex_count ) { continue; }
+                if( !VertexActiveQ(v) ) { continue; }
+                
+                PinVertex(v);
+            }
+        }
         
     public:
         
@@ -346,7 +377,7 @@ namespace Repulsor
             
             for( Int v = 0; v < old_vertex_count; ++v )
             {
-                if( V_active[v] && (V_parent_simplices[v].Size() > Int(0)) )
+                if( VertexActiveQ(v) && (V_parent_simplices[v].Size() > Int(0)) )
                 {
                     copy_buffer<AMB_DIM>( V_coords.data(v), V_coords.data(vertex_count) );
 
@@ -359,13 +390,13 @@ namespace Repulsor
                     
 //                    copy_buffer<(AMB_DIM+1)*(AMB_DIM+1)>( V_quadrics.data(v), V_quadrics.data(v_count) );
                     
-                    V_charges[v]        = Scalar::Zero<Real>;
-                    V_active[v]         = false;
-                    V_modified[v]       = false;
+                    const Real v_charge         = V_charges[v];
+                    V_charges[v]                = Real(0);
+                    V_charges[vertex_count]     = v_charge;
                     
-                    V_charges[vertex_count]  = Scalar::One<Real>;
-                    V_active[vertex_count]   = true;
-                    V_modified[vertex_count] = false;
+                    const VertexState_T v_state = V_state[v];
+                    V_state[v]                  = VertexState_T(0);
+                    V_state[vertex_count]       = v_state & (~VertexModifiedMask);
                     
                     V_lookup[v] = vertex_count;
                     
@@ -382,7 +413,7 @@ namespace Repulsor
 //            }
             
             
-            std::fill( &E_active[0], &E_active[max_edge_count], false );
+            std::fill( &E_activeQ[0], &E_activeQ[max_edge_count], false );
             
             for( Int e = 0; e < max_edge_count; ++e )
             {
@@ -406,13 +437,13 @@ namespace Repulsor
             
             for( Int s = 0; s < old_simplex_count; ++s )
             {
-                if( S_active[s] )
+                if( S_activeQ[s] )
                 {
                     for( Int i = 0; i < S_vertex_count; ++i )
                     {
                         const Vertex_T v = V_lookup[simplices[s][i]];
                         
-                        if( v < zero )
+                        if( v < Vertex_T(0) )
                         {
                             eprint(className()+"::Compress: invalid vertex "+ToString(v)+" found in simplex "+ToString(s)+".");
                         }
@@ -420,8 +451,8 @@ namespace Repulsor
                         simplices[simplex_count][i] = v;
                     }
                     
-                    S_active[s]              = false;
-                    S_active[simplex_count]  = true;
+                    S_activeQ[s]              = false;
+                    S_activeQ[simplex_count]  = true;
                     
                     ComputeSimplexConnectivity(simplex_count);
                     
@@ -430,6 +461,7 @@ namespace Repulsor
             }
             
             compressedQ = true;
+            
         } // Compress
         
 //        virtual std::unique_ptr<MeshBase_T> CreateMesh() override
@@ -489,7 +521,7 @@ namespace Repulsor
             print("Checking vertices...");
             for( Int v = 0; v < vertex_count; ++v )
             {
-                if( V_active[v] )
+                if( VertexActiveQ(v) )
                 {
                     if( V_parent_simplices[v].Size() > V_max_simplex_valence )
                     {
@@ -498,7 +530,7 @@ namespace Repulsor
                     
                     for( Simplex_T s : V_parent_simplices[v] )
                     {
-                        if( !S_active[s] )
+                        if( !S_activeQ[s] )
                         {
                             if( deleted_parent_simplex_found_in_vertex == Int(0) )
                             {
@@ -542,7 +574,7 @@ namespace Repulsor
             print("Checking edges...");
             for( Edge_T e = 0; e < edge_count; ++e )
             {
-                if( E_active[e] )
+                if( E_activeQ[e] )
                 {
                     if( edges(e,0) == edges(e,1) )
                     {
@@ -553,7 +585,7 @@ namespace Repulsor
                     {
                         Vertex_T v = edges(e,i);
                         
-                        if( !V_active[v] )
+                        if( !VertexActiveQ(v) )
                         {
                             if( deleted_vertices_found_in_edges==0 )
                             {
@@ -565,7 +597,7 @@ namespace Repulsor
                     
                     for( Simplex_T s : E_parent_simplices[e] )
                     {
-                        if( !S_active[s] )
+                        if( !S_activeQ[s] )
                         {
                             if( deleted_parent_simplices_found_in_edges == Int(0) )
                             {
@@ -604,7 +636,7 @@ namespace Repulsor
             print("Checking simplices...");
             for( Simplex_T s = 0; s < simplex_count; ++s )
             {
-                if( S_active[s] )
+                if( S_activeQ[s] )
                 {
                     {
                         bool duplicate_freeQ = true;
@@ -631,7 +663,7 @@ namespace Repulsor
                     {
                         const Vertex_T v = simplices(s,i);
                         
-                        if( !V_active[v] )
+                        if( !VertexActiveQ(v) )
                         {
                             if( deleted_vertices_found_in_simplices == Int(0) )
                             {
@@ -667,7 +699,7 @@ namespace Repulsor
                             }
                             ++invalid_edges_found_in_simplices;
                         }
-                        else if( !E_active[e] )
+                        else if( !E_activeQ[e] )
                         {
                             if( deleted_edges_found_in_simplices==0 )
                             {

@@ -1,6 +1,6 @@
 public:
         
-    void TangentialSmoothing( const Int max_iter = 1 ) override
+    void TangentialSmoothing( const Int max_iter = 1, const Real step_size = Frac<Real>(1,2) ) override
     {
         
         TOOLS_PTIMER(timer,ClassName()+"::TangentialSmoothing");
@@ -11,18 +11,12 @@ public:
         
         // mean( neighbor x[s] ) is the mean of centers of simplices containing v
         
-//            if( !compressedQ )
-//            {
-//                eprint(ClassName()+"::VertexTangentialProjectors: run this routine only after compressing data structure! Aborting.");
-//                return;
-//            }
-        
         Compress();
 
         // Compute simplex volumes, centers and tangential projectors.
-        Tensor1<Real,Int> S_vol                   ( simplex_count                   );
-        Tensor2<Real,Int> S_centers               ( simplex_count, AMB_DIM          );
-        Tensor3<Real,Int> S_tangential_projectors ( simplex_count, AMB_DIM, AMB_DIM );
+        Tensor1<Real,Int> S_vol                            ( simplex_count                   );
+        Tensor2<Real,Int> S_center_times_vol               ( simplex_count, AMB_DIM          );
+        Tensor3<Real,Int> S_tangential_projector_times_vol ( simplex_count, AMB_DIM, AMB_DIM );
         
         for( Int iter = 0; iter < max_iter; ++iter )
         {
@@ -34,23 +28,24 @@ public:
 
                     SimplexDataKernel<DOM_DIM,AMB_DIM,Real,Int> ker( V_coords, simplices, V_charges );
                     
-                    Tiny::Matrix<AMB_DIM,AMB_DIM,Real,Int> Q;
+                    Vector_T x;
+                    Matrix_T Q;
                     
                     for( Simplex_T s = s_begin; s < s_end; ++s )
                     {
                         ker.ReadSimplex(s);
                         
+                        const Real s_vol = ker.Volume();
+                        
+                        S_vol[s] = s_vol;
+                        
+                        x = s_vol * ker.Center();
+                        x.Write( S_center_times_vol.data(s) );
+                        
                         Q.SetIdentity();
-                        
                         Q -= ker.NormalProjector();
-                        
-                        Q *= ker.Volume();
-                        
-                        S_vol[s] = ker.Volume();
-                        
-                        ker.Center().Write( S_centers.data(s) );
-                        
-                        Q.Write( S_tangential_projectors.data(s) );
+                        Q *= s_vol;
+                        Q.Write( S_tangential_projector_times_vol.data(s) );
                     }
                 },
                 thread_count
@@ -63,44 +58,47 @@ public:
                     const Vertex_T v_end   = JobPointer( vertex_count, thread_count, thread +1 );
 
                     Vector_T x;
-                    Vector_T mean;
+                    Vector_T u;
                     Matrix_T Q;
                     Matrix_T R;
 
                     for( Vertex_T v = v_begin; v < v_end; ++v )
                     {
+                        if( VertexPinnedQ(v) ) { continue; }
+                        
                         Real a = 0;
-                        mean.SetZero();
+                        u.SetZero();
                         Q.SetZero();
                         
                         for( Simplex_T s : V_parent_simplices[v] )
                         {
-                            a += S_vol[s];
+                            const Real vol_s = S_vol[s];
                             
-                            x.Read( S_centers.data(s) );
+                            a += vol_s;
                             
-                            mean += x;
+                            x.Read( S_center_times_vol.data(s) );
+                            u += x;
                             
-                            R.Read( S_tangential_projectors.data(s) );
-
+                            R.Read( S_tangential_projector_times_vol.data(s) );
                             Q += R;
                         }
                         
+                        
+                        Q /= a;
+                        // Now Q is is the average of the tangential projectors.
                         // Beware, Q is only a coarse approximation to the tangential projector!
                         // We would have to perform PCA to do it correctly.
-                        Q /= a;
                         
-                        mean /=  static_cast<Real>(V_parent_simplices[v].Size());
-                        // Now mean is the mean of the simplex centers.
-                        
+                        u /=  a;
+                        // Now u is the average of the simplex centers.
                         
                         x.Read( V_coords.data(v) );
-
-                        mean -= x;
-
-                        mean *= static_cast<Real>(1.5);
+                        u -= x;
+                        // Now u is the vector that points from x to the average of the simplex centers.
                         
-                        Dot<AddTo>( Q, mean, x );
+                        u *= step_size;
+                        
+                        Dot<AddTo>( Q, u, x );
 
                         x.Write( V_coords.data(v) );
                     }

@@ -293,7 +293,7 @@ namespace Repulsor
         
         void NrhsError( const std::string & tag, Int nrhs ) const
         {
-            eprint( tag + ": nrhs = " + ToString(nrhs)+ " != " + ToString(AMB_DIM) + " = AMB_DIM. The current implementation only accepts nrhs = AMB_DIM. (After all, this is a metric on the space of infinitesimal displacement in " + ToString(AMB_DIM) + "-dimensional Euclidean space.) Doing nothing. The argument nrhs is there only for compatibility reasons. Please set nrhs = " + ToString(AMB_DIM) + ".");
+            eprint( tag + ": nrhs = " + ToString(nrhs)+ " != " + ToString(AMB_DIM) + " = AMB_DIM. The current implementation only accepts nrhs = AMB_DIM. (After all, this is a metric on the space of infinitesimal displacements in " + ToString(AMB_DIM) + "-dimensional Euclidean space.) Doing nothing. The argument nrhs is there only for compatibility reasons. Please set nrhs = " + ToString(AMB_DIM) + ".");
         }
 
         

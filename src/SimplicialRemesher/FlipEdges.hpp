@@ -17,7 +17,7 @@ virtual Int DelaunayFlip( const Int max_iter = 128 ) override
     Int flip_counter = 1;
     Int iter = 0;
     
-    while( flip_counter > 0 && iter < max_iter )
+    while( (flip_counter > Int(0)) && (iter < max_iter) )
     {
         ++iter;
         
@@ -27,7 +27,7 @@ virtual Int DelaunayFlip( const Int max_iter = 128 ) override
         {
             const Int r = FlipEdge( e, true );
             
-            if( r >= zero )
+            if( r >= Int(0) )
             {
                 ++flip_counter;
             }
@@ -69,7 +69,7 @@ virtual Int FlipEdges( cptr<Edge_T> e_list, const Int n, const bool check_Delaun
     {
         const Int r = FlipEdge( e_list[i], check_Delaunay );
         
-        if( r >= zero )
+        if( r >= Int(0) )
         {
             ++flip_counter;
         }
@@ -111,7 +111,7 @@ Int FlipEdge( const Edge_T e, const bool check_Delaunay = false )
         return -1;
     }
     
-    if( !E_active[e] )
+    if( !E_activeQ[e] )
     {
 #ifdef REMESHER_VERBATIM
         wprint(ClassName()+"::FlipEdge: edge is inactive. Skipping.");
@@ -119,16 +119,13 @@ Int FlipEdge( const Edge_T e, const bool check_Delaunay = false )
         return -1;
     }
     
-    if( E_parent_simplices[e].Size() != two )
+    if( E_parent_simplices[e].Size() != Int(2) )
     {
 #ifdef REMESHER_VERBATIM
         wprint(ClassName()+"::FlipEdge: edge "+ToString(e)+" cannot be fliped since it has simplex valences != 2. Skipping.");
 #endif
         return -1;
     }
-    
-    const Simplex_T s_0 = E_parent_simplices[e][0];
-    const Simplex_T s_1 = E_parent_simplices[e][1];
     
     const Vertex_T v_0 = edges(e,0);
     const Vertex_T v_1 = edges(e,1);
@@ -149,7 +146,7 @@ Int FlipEdge( const Edge_T e, const bool check_Delaunay = false )
         return -11;
     }
     
-    if( !V_active[v_0] )
+    if( !VertexActiveQ(v_0) )
     {
 //#ifdef REMESHER_VERBATIM
         wprint(className()+"::FlipEdge: Vertex "+ToString(v_0)+" of edge "+ToString(e)+" is deleted. Skipping.");
@@ -157,7 +154,7 @@ Int FlipEdge( const Edge_T e, const bool check_Delaunay = false )
         return -2;
     }
     
-    if( !V_active[v_1] )
+    if( !VertexActiveQ(v_1) )
     {
 //#ifdef REMESHER_VERBATIM
         wprint(className()+"::FlipEdge: Vertex "+ToString(v_1)+" of edge "+ToString(e)+" is deleted. Skipping.");
@@ -165,6 +162,17 @@ Int FlipEdge( const Edge_T e, const bool check_Delaunay = false )
         return -2;
     }
     
+    if( VertexPinnedQ(v_0) && VertexPinnedQ(v_1) )
+    {
+#ifdef REMESHER_VERBATIM
+        wprint(ClassName()+"::FlipEdge: edge "+ToString(e)+" cannot be fliped since both endpoints are pinned. Skipping.");
+#endif
+        return -1;
+    }
+    
+    
+    const Simplex_T s_0 = E_parent_simplices[e][0];
+    const Simplex_T s_1 = E_parent_simplices[e][1];
     
     Int p_0 = -1; // position of vertex v_1 in simplex s_0 before flip
     
@@ -342,4 +350,3 @@ Int FlipEdge( const Edge_T e, const bool check_Delaunay = false )
     
     
 } // FlipEdge
-

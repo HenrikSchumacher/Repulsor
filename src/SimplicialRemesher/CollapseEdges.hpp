@@ -14,7 +14,7 @@ public:
         {
             const Int r = CollapseEdge(e_list[i]);
             
-            if( r >= zero )
+            if( r >= Int(0) )
             {
                 ++collapse_counter;
             }
@@ -40,7 +40,7 @@ protected:
     {
         // Returns the vertex to which the edge has been collapsed -- or an error code (negative number).
 
-        if( CheckEdge(e) < zero )
+        if( CheckEdge(e) < 0 )
         {
     #ifdef REMESHER_VERBATIM
             wprint(ClassName()+"::CollapseEdge: edge is not collapsible. Skipping.");
@@ -127,9 +127,10 @@ protected:
         // Edge e is collapsible. Start with deleting it.
         DeleteEdge(e);
         MarkVertexAsModified(v_0);
+        if( VertexPinnedQ(v_1) ) { PinVertex(v_0); }
         DeactivateVertex(v_1);
-
-        ComputeVertexPosition(v_0,v_1,v_0);
+        
+        ComputeCollapseVertexPosition(v_0,v_1,v_0);
 
         // Going through the simplices to delete.
         for( Simplex_T s : E_parent_simplices[e] )
@@ -137,7 +138,7 @@ protected:
             SimplexComplement( s, v_0, v_1, &opp_buffer[0] );
             
     //        DeleteSimplex(s);
-            S_active[s] = false;
+            S_activeQ[s] = false;
             
             V_parent_simplices[v_0].Drop(s);
 
@@ -156,7 +157,7 @@ protected:
                 {
                     const Vertex_T w = opp_buffer[i];
                     
-                    if( CheckVertex(w) < -one )
+                    if( CheckVertex(w) < -1 )
                     {
     #ifdef REMESHER_VERBATIM
                         eprint(className()+"::CollapseEdge: Vertex w = "+ToString(w)+" is not present. Skipping it.");
@@ -172,7 +173,7 @@ protected:
                     Edge_T e_0 = FindEdge(v_0,w);
                     Edge_T e_1 = FindEdge(v_1,w);
 
-                    if( e_0 < zero )
+                    if( e_0 < Edge_T(0) )
                     {
     #ifdef REMESHER_VERBATIM
                         eprint(className()+"::CollapseEdge: e_0 == {"+ToString(v_0)+","+ToString(w)+"} could not be found in lookup table.");
@@ -180,7 +181,7 @@ protected:
                         return -100;
                     }
                     
-                    if( e_1 < zero )
+                    if( e_1 < Edge_T(0) )
                     {
     #ifdef REMESHER_VERBATIM
                         eprint(className()+"::CollapseEdge: e_1 == {"+ToString(v_1)+","+ToString(w)+"} could not be found in lookup table.");
@@ -197,7 +198,7 @@ protected:
                     // Move all the undeleted parent simplices of e_1 to e_0.
                     for( Simplex_T t : E_parent_simplices[e_1] )
                     {
-                        if( S_active[t] )
+                        if( S_activeQ[t] )
                         {
                             // TODO: In fact, it should be possible to do this without checking for duplicates:
                             E_parent_simplices[e_0].Insert(t);
@@ -218,7 +219,7 @@ protected:
                     {
                         Edge_T f = FindEdge(opp_buffer[i],opp_buffer[j]);
 
-                        if( f < zero )
+                        if( f < Edge_T(0) )
                         {
     #ifdef REMESHER_VERBATIM
                             eprint(className()+"::CollapseEdge: edge { "+ToString(opp_buffer[i]) +", " + ToString(opp_buffer[j])+" } could not be found. (A)");
@@ -237,7 +238,7 @@ protected:
         // We cycle over the undeleted parent simplices of v_1.
         for( Simplex_T s : V_parent_simplices[v_1] )
         {
-            if( S_active[s] )
+            if( S_activeQ[s] )
             {
                 // The undeleted parent s of v_1 is from now on also parent of v_0.
                 // TODO: It should not be necessary to check for duplicates here as every undeleted parent simplex of v_1 should be visited only once.
@@ -263,14 +264,14 @@ protected:
                         // Finding the edge {v_1,w}.
                         Edge_T f = FindEdge(v_1,w);
 
-                        if( f < zero )
+                        if( f < Edge_T(0) )
                         {
     //                        eprint(className()+"::CollapseEdge: edge { "+ToString(v_1) +", " + ToString(w)+" } could not be found. (B)");
                             continue;
                         }
                         else
                         {
-                            if( E_active[f] )
+                            if( E_activeQ[f] )
                             {
                                 LookupErase(f);
                                 

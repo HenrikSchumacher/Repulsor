@@ -1,13 +1,13 @@
 
-Int CheckVertex( const Vertex_T v ) const
+int CheckVertex( const Vertex_T v ) const
 {
-    if( v < zero )
+    if( v < Vertex_T(0) )
     {
         eprint(className()+"::CheckVertex: Vertex "+ToString(v)+" is invalid.");
         return -11;
     }
     
-    if( !V_active[v] )
+    if( !VertexActiveQ(v) )
     {
 #ifdef REMESHER_VERBATIM
         wprint(className()+"::CheckVertex: Vertex "+ToString(v)+" is already deleted.");
@@ -15,7 +15,7 @@ Int CheckVertex( const Vertex_T v ) const
         return -2;
     }
     
-    if( V_modified[v] )
+    if( VertexModifiedQ(v) )
     {
 #ifdef REMESHER_VERBATIM
         wprint(className()+"::CheckVertex: Vertex "+ToString(v)+" is already modified.");
@@ -26,9 +26,9 @@ Int CheckVertex( const Vertex_T v ) const
     return 0;
 }
 
-Int CheckEdge( const Edge_T e ) const
+int CheckEdge( const Edge_T e ) const
 {
-    if( e < zero )
+    if( e < Edge_T(0) )
     {
 //#ifdef REMESHER_VERBATIM
         eprint(className()+"::CheckEdge: edge "+ToString(e)+" is invalid.");
@@ -36,7 +36,7 @@ Int CheckEdge( const Edge_T e ) const
         return -11;
     }
     
-    if( !E_active[e] )
+    if( !E_activeQ[e] )
     {
 #ifdef REMESHER_VERBATIM
         wprint(className()+"::CheckEdge: edge "+ToString(e)+" is already deleted.");
@@ -46,48 +46,48 @@ Int CheckEdge( const Edge_T e ) const
     
     const Vertex_T v_0 = edges(e,0);
     
-    if( v_0 < zero )
+    if( v_0 < Vertex_T(0) )
     {
-        eprint(className()+"::CheckVertex: Vertex "+ToString(v_0)+" is invalid.");
+        eprint(className()+"::CheckEdge: Vertex "+ToString(v_0)+" is invalid.");
         return -11;
     }
     
-    if( !V_active[v_0] )
+    if( !VertexActiveQ(v_0) )
     {
 //#ifdef REMESHER_VERBATIM
-        eprint(className()+"::CheckVertex: Vertex "+ToString(v_0)+" is already deleted.");
+        eprint(className()+"::CheckEdge: Vertex "+ToString(v_0)+" is already deleted.");
 //#endif
         return -2;
     }
     
-    if( V_modified[v_0] )
+    if( VertexModifiedQ(v_0) )
     {
 #ifdef REMESHER_VERBATIM
-        wprint(className()+"::CheckVertex: Vertex "+ToString(v_0)+" is already modified.");
+        wprint(className()+"::CheckEdge: Vertex "+ToString(v_0)+" is already modified.");
 #endif
         return -1;
     }
     
     const Vertex_T v_1 = edges(e,1);
     
-    if( v_1 < zero )
+    if( v_1 < Vertex_T(0) )
     {
-        eprint(className()+"::CheckVertex: Vertex "+ToString(v_1)+" is invalid.");
+        eprint(className()+"::CheckEdge: Vertex "+ToString(v_1)+" is invalid.");
         return -11;
     }
     
-    if( !V_active[v_1] )
+    if( !VertexActiveQ(v_1) )
     {
 //#ifdef REMESHER_VERBATIM
-        eprint(className()+"::CheckVertex: Vertex "+ToString(v_1)+" is already deleted.");
+        eprint(className()+"::CheckEdge: Vertex "+ToString(v_1)+" is already deleted.");
 //#endif
         return -2;
     }
     
-    if( V_modified[v_1] )
+    if( VertexModifiedQ(v_1) )
     {
 #ifdef REMESHER_VERBATIM
-        wprint(className()+"::CheckVertex: Vertex "+ToString(v_1)+" is already modified.");
+        wprint(className()+"::CheckEdge: Vertex "+ToString(v_1)+" is already modified.");
 #endif
         return -1;
     }
@@ -98,13 +98,22 @@ Int CheckEdge( const Edge_T e ) const
         return -4;
     }
     
+    if( VertexPinnedQ(v_0) && VertexPinnedQ(v_1) )
+    {
+//#ifdef REMESHER_VERBATIM
+//        wprint(className()+"::CheckEdge: Both vertices "+ToString(v_0) + " and "+ToString(v_1)+" are pinned.");
+//#endif
+        eprint(className()+"::CheckEdge: Both vertices "+ToString(v_0) + " and "+ToString(v_1)+" are pinned.");
+        return -33;
+    }
+    
     return 0;
 }
 
 
-Int CheckSimplex( const Simplex_T s ) const
+int CheckSimplex( const Simplex_T s ) const
 {
-    if( s < zero )
+    if( s < Simplex_T(0) )
     {
 #ifdef REMESHER_VERBATIM
         eprint(className()+"::CheckSimplex: Simplex "+ToString(s)+" is invalid.");
@@ -112,7 +121,7 @@ Int CheckSimplex( const Simplex_T s ) const
         return -11;
     }
     
-    if( !S_active[s] )
+    if( !S_activeQ[s] )
     {
 #ifdef REMESHER_VERBATIM
         eprint(className()+"::CheckSimplex: Simplex "+ToString(s)+" is already deleted.");

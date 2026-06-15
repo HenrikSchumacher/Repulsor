@@ -24,9 +24,6 @@ public:
         PairAggregator<Int,Real,Int> splits    (edge_count);
         PairAggregator<Int,Real,Int> collapses (edge_count);
         
-//        TwoArrayQuickSort<Real,Int,Int> quick_sort;
-        
-        
         TwoArraySort<Real,Int,Int,VarSize,std::less   <Real>> sort;
         TwoArraySort<Real,Int,Int,VarSize,std::greater<Real>> reverse_sort;
         
@@ -37,23 +34,32 @@ public:
         Int       collapse_count = 1;
         Int iter                 = 0;
         
-        while( (split_count > zero || collapse_count > zero) && (iter < max_iter) )
+        while( ((split_count > Int(0)) || (collapse_count > Int(0))) && (iter < max_iter) )
         {
             splits.Clear();
             collapses.Clear();
+
+            // Unblock all vertices.
+            for( Int v = 0; v < vertex_count; ++v )
+            {
+                V_state[v] &= (~VertexModifiedMask);
+            }
             
             for( Int e = 0; e < edge_count; ++e )
             {
-                // Unblock all vertices.
-                std::fill( &V_modified[0], &V_modified[vertex_count], false );
-                
-                if( !E_active[e] )
+                if( !E_activeQ[e] )
                 {
     #ifdef REMESHER_VERBATIM
                     wprint(className()+"::UnifyEdgeLengths: Skipping edge "+ToString(e)+" because it is inactive.");
     #endif
                     continue;
                 }
+                
+                const Vertex_T v_0 = edges(e,0);
+                const Vertex_T v_1 = edges(e,1);
+                
+                // We don't want to mess with edges whose vertices are both pinned.
+                if( VertexPinnedQ(v_0) && VertexPinnedQ(v_1) ) { continue; }
 
                 const Real L2 = SquaredEdgeLength(e);
 
@@ -65,38 +71,35 @@ public:
                 {
                     collapses.Push(e,L2);
                 }
-
             }
             
             // Order such that shortest edges are collapsed first.
             sort( collapses.data_1(), collapses.data_0(), collapses.Size() );
 
-//            print(className()+"::UnifyEdgeLengths: iteration "+ToString(iter)+":");
-            
             collapse_count = CollapseEdges( collapses.data_0(), collapses.Size() );
             total_collapse_count += collapse_count;
-//            valprint("  collapse_count",collapse_count);
             
             // Order such that longest edges are split first.
             reverse_sort( splits.data_1(), splits.data_0(), splits.Size() );
-
             split_count = SplitEdges( splits.data_0(), splits.Size() );
             total_split_count += split_count;
-//            valprint("  split_count   ",split_count);
             
             ++iter;
         }
         
-        if( collapses.Size() > Int(0) )
+        Int non_collapsed_count = collapses.Size() - collapse_count;
+        Int non_split_count     = splits.Size() - split_count;
+        
+        if( non_collapsed_count > Int(0) )
         {
-            wprint(className()+"::UnifyEdgeLengths: "+ToString(collapses.Size())+" short edges could not be collapsed.");
+            wprint(className()+"::UnifyEdgeLengths: "+ToString(non_collapsed_count)+" short edges could not be collapsed.");
         }
                    
-        if( splits.Size() > Int(0) )
+        if( non_split_count > Int(0) )
         {
-           wprint(className()+"::UnifyEdgeLengths: "+ToString(splits.Size())+" long  edges could not be split.");
+           wprint(className()+"::UnifyEdgeLengths: "+ToString(non_split_count)+" long  edges could not be split.");
         }
 
-        return (total_collapse_count > zero) || (total_split_count > zero);
+        return (total_collapse_count > Int(0)) || (total_split_count > Int(0));
         
     } // UnifyEdgeLengths
