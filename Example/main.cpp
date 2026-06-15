@@ -15,6 +15,9 @@
 /// Enable the shipped profiler. Typically, you don't want this, as this prints to file.
 #define TOOLS_ENABLE_PROFILER
 
+/// If boost is available, this allows the use of `std::unordered_flat_map`.
+#define TOOLS_USE_BOOST_UNORDERED
+
 /// Use the AMD matrix reordering from SuiteSparse; Repulsor comes with a simple nested-dissection reordering, but AMD is typically better.
 #define REPULSOR_USE_AMD
 
