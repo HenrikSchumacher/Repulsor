@@ -153,8 +153,8 @@ namespace Repulsor
         //Computes support vector supp of dir.
         virtual Real MinSupportVector( cptr<Real> dir, mptr<Real> supp ) const override
         {
-            const SReal * restrict const x = this->serialized_data+1;
-            const SReal * restrict const A = this->serialized_data+1+AMB_DIM;
+            const SReal * TOOLS_RESTRICT const x = this->serialized_data+1;
+            const SReal * TOOLS_RESTRICT const A = this->serialized_data+1+AMB_DIM;
 
             Real R1;
             Real R2;

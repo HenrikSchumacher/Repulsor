@@ -33,7 +33,7 @@ namespace Repulsor
         mutable SReal SReal_buffer [AMB_DIM * (AMB_DIM+1)];
         mutable  Real  Real_buffer [AMB_DIM * (AMB_DIM+1)];
         
-        SReal * restrict serialized_data = nullptr;
+        SReal * TOOLS_RESTRICT serialized_data = nullptr;
         
     public:
         

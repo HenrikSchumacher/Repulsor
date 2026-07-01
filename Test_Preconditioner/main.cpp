@@ -1,6 +1,7 @@
 #include <filesystem>
 #include <iostream>
 
+//#define TOOLS_NO_RESTRICT
 //#define TOOLS_DEBUG
 
 #define TOOLS_ENABLE_PROFILER
@@ -12,7 +13,7 @@
 /// Use this when on a mac. Don't forget to issue the compiler flag `-framework Accelerate`.
     #include "../submodules/Tensors/Accelerate.hpp"
 #else
-/// This should work for OpenBLAS. Don't forget to ussie the compiler flag `-lopenblas`.
+/// This should work for OpenBLAS. Don't forget to issue the compiler flag `-lopenblas`.
     #include "../submodules/Tensors/OpenBLAS.hpp"
 #endif
 
@@ -43,6 +44,8 @@ int main(void)
     print("");
     
     Profiler::Clear();
+    
+    PrintCompilerIndentification();
 
     int thread_count = 8;
     

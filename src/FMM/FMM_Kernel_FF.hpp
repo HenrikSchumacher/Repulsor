@@ -55,16 +55,16 @@ namespace Repulsor
         mutable Tiny::Vector<AMB_DIM, Real,Int> x;
         mutable Tiny::Vector<PROJ_DIM,Real,Int> P;
 #else
-        mutable Real const * restrict x = nullptr;
-        mutable Real const * restrict P = nullptr;
+        mutable Real const * TOOLS_RESTRICT x = nullptr;
+        mutable Real const * TOOLS_RESTRICT P = nullptr;
 #endif
         
 #ifdef FarField_T_Copy
         mutable Tiny::Vector<AMB_DIM, Real,Int> y;
         mutable Tiny::Vector<PROJ_DIM,Real,Int> Q;
 #else
-        mutable Real const * restrict y = nullptr;
-        mutable Real const * restrict Q = nullptr;
+        mutable Real const * TOOLS_RESTRICT y = nullptr;
+        mutable Real const * TOOLS_RESTRICT Q = nullptr;
 #endif
         
         mutable Tiny::Vector<S_DATA_DIM,Real,Int> DX;

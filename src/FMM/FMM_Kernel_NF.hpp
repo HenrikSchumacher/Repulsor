@@ -60,14 +60,14 @@ namespace Repulsor
 #ifdef NearField_S_Copy
         mutable Tiny::Vector<PROJ_DIM,Real,Int> P;
 #else
-        mutable Real const * restrict P = nullptr;
+        mutable Real const * TOOLS_RESTRICT P = nullptr;
 #endif
         
         mutable Tiny::Vector<AMB_DIM,Real,Int> y;
 #ifdef NearField_T_Copy
         mutable Tiny::Vector<PROJ_DIM,Real,Int> Q;
 #else
-        mutable Real const * restrict Q = nullptr;
+        mutable Real const * TOOLS_RESTRICT Q = nullptr;
 #endif
         
         mutable Tiny::Vector<S_DATA_DIM,Real,Int> DX;

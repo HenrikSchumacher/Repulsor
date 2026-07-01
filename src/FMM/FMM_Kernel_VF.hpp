@@ -62,7 +62,7 @@ namespace Repulsor
         
     protected:
         
-        Real * restrict const metric_data = nullptr;
+        Real * TOOLS_RESTRICT const metric_data = nullptr;
         
         mutable Real sum = Scalar::Zero<Real>;
         
@@ -73,14 +73,14 @@ namespace Repulsor
 #ifdef NearField_S_Copy
         mutable Tiny::Vector<PROJ_DIM,Real,Int> P;
 #else
-        mutable Real const * restrict P = nullptr;
+        mutable Real const * TOOLS_RESTRICT P = nullptr;
 #endif
         
         mutable Tiny::Vector<AMB_DIM,Real,Int> y;
 #ifdef NearField_T_Copy
         mutable Tiny::Vector<PROJ_DIM,Real,Int> Q;
 #else
-        mutable Real const * restrict Q = nullptr;
+        mutable Real const * TOOLS_RESTRICT Q = nullptr;
 #endif
         
         mutable Tiny::Vector<S_DATA_DIM,Real,Int> DX;
@@ -99,13 +99,13 @@ namespace Repulsor
 #ifdef NearField_S_Copy
         mutable Tiny::Vector<S_DATA_DIM,Real,Int> x_buffer;
 #else
-        mutable Real const * restrict x_buffer  = nullptr;
+        mutable Real const * TOOLS_RESTRICT x_buffer  = nullptr;
 #endif
         
 #ifdef NearField_T_Copy
         mutable Tiny::Vector<T_DATA_DIM,Real,Int> y_buffer;
 #else
-        mutable Real const * restrict y_buffer  = nullptr;
+        mutable Real const * TOOLS_RESTRICT y_buffer  = nullptr;
 #endif
         using Base_T::thread;
         

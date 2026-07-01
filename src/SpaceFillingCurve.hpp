@@ -98,9 +98,9 @@ namespace Repulsor
 //        UInt H_buffer [n] = {};   // HilbertIndex
         MortonCode_T M_buffer = {};   // MortonIndex
         
-//        UInt * restrict const Y_scratch = &Y_buffer[0];
-//        UInt * restrict const Z_scratch = &Z_buffer[0];
-//        UInt * restrict const H_scratch = &M_buffer[0];
+//        UInt * TOOLS_RESTRICT const Y_scratch = &Y_buffer[0];
+//        UInt * TOOLS_RESTRICT const Z_scratch = &Z_buffer[0];
+//        UInt * TOOLS_RESTRICT const H_scratch = &M_buffer[0];
         
     private:
         

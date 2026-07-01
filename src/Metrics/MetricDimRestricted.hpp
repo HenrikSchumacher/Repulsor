@@ -126,8 +126,8 @@ namespace Repulsor
                 return;
             }
             
-            const auto & restrict S = M.GetBlockClusterTree().GetS();
-            const auto & restrict T = M.GetBlockClusterTree().GetT();
+            const auto & TOOLS_RESTRICT S = M.GetBlockClusterTree().GetS();
+            const auto & TOOLS_RESTRICT T = M.GetBlockClusterTree().GetT();
 
             T.Pre( X, ldX, nrhs, op_type );
             

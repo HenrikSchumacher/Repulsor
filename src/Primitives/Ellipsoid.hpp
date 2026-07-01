@@ -99,9 +99,9 @@ namespace Repulsor
         //Computes support vector supp of dir.
         virtual Real MaxSupportVector( cptr<Real> dir, mptr<Real> supp ) const override
         {
-            const SReal * restrict const x = this->serialized_data+ 1;
-            const SReal * restrict const A = this->serialized_data+ 1 + AMB_DIM;
-                   Real * restrict const b = this->Real_buffer;
+            const SReal * TOOLS_RESTRICT const x = this->serialized_data+ 1;
+            const SReal * TOOLS_RESTRICT const A = this->serialized_data+ 1 + AMB_DIM;
+                   Real * TOOLS_RESTRICT const b = this->Real_buffer;
 
             Real R1 = Scalar::Zero<Real>;
             
@@ -148,9 +148,9 @@ namespace Repulsor
         //Computes support vector supp of dir.
         virtual Real MinSupportVector( cptr<Real> dir, mptr<Real> supp ) const override
         {
-            const SReal * restrict const x = this->serialized_data+ 1;
-            const SReal * restrict const A = this->serialized_data+ 1 + AMB_DIM;
-                   Real * restrict const b = this->Real_buffer;
+            const SReal * TOOLS_RESTRICT const x = this->serialized_data+ 1;
+            const SReal * TOOLS_RESTRICT const A = this->serialized_data+ 1 + AMB_DIM;
+                   Real * TOOLS_RESTRICT const b = this->Real_buffer;
 
             Real R1 = Scalar::Zero<Real>;
             
