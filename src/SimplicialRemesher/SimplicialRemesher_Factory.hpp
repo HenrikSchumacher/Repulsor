@@ -177,7 +177,7 @@ namespace Repulsor
         
     public:
         
-        static std::string ClassName()
+        static constexpr std::string ClassName()
         {
             return std::string("SimplicialRemesher_Factory")+"<"
             + ToString(MinDomDim)+ ","

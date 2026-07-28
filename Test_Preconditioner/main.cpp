@@ -45,7 +45,7 @@ int main(void)
     
     Profiler::Clear();
     
-    PrintCompilerIndentification();
+    PrintCompilerIdentification();
 
     int thread_count = 8;
     

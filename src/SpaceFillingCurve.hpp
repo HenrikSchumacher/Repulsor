@@ -258,7 +258,7 @@ namespace Repulsor
         
     public:
         
-        static std::string ClassName()
+        static constexpr std::string ClassName()
         {
             return std::string("SpaceFillingCurve")+"<"+ToString(n)+","+ToString(bit_count)+","+TypeName<Int>+">";
         }
