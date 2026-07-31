@@ -26,7 +26,7 @@ protected:
         
         if( vertex_count >= max_vertex_count)
         {
-#ifdef REMESHER_VERBATIM
+#ifdef REMESHER_VERBOSE
             print(className()+"::CreateVertex: Reassembling vertex array.");
 #endif
             max_vertex_count *= Int(2);
@@ -60,7 +60,7 @@ protected:
     
     void DeactivateVertex( const Vertex_T v )
     {
-#ifdef REMESHER_VERBATIM
+#ifdef REMESHER_VERBOSE
         print(className()+"::DeactivateVertex("+ToString(v)+")");
 #endif
         V_state[v] = Vertex_T(0);
@@ -68,7 +68,7 @@ protected:
     
     void MarkVertexAsModified( const Vertex_T v )
     {
-#ifdef REMESHER_VERBATIM
+#ifdef REMESHER_VERBOSE
         print(className()+"::MarkVertexAsModified("+ToString(v)+")");
 #endif
         V_state[v] |= VertexModifiedMask;
@@ -76,7 +76,7 @@ protected:
 
     void PinVertex( const Vertex_T v )
     {
-    #ifdef REMESHER_VERBATIM
+    #ifdef REMESHER_VERBOSE
         print(className()+"::PinVertex("+ToString(v)+")");
     #endif
         V_state[v] |= VertexPinnedMask;

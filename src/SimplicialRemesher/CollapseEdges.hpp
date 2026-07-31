@@ -42,7 +42,7 @@ protected:
 
         if( CheckEdge(e) < 0 )
         {
-    #ifdef REMESHER_VERBATIM
+    #ifdef REMESHER_VERBOSE
             wprint(ClassName()+"::CollapseEdge: edge is not collapsible. Skipping.");
     #endif
             return -11;
@@ -58,7 +58,7 @@ protected:
             //TODO: This bound should be adapted for boundary vertices.
             if( val_0 <= 3 )
             {
-    #ifdef REMESHER_VERBATIM
+    #ifdef REMESHER_VERBOSE
                 wprint(className()+"::CollapseEdge: Vertex "+ToString(v_0)+" has simplex valence 3 or less. Skipping.");
     #endif
                 return -3;
@@ -72,7 +72,7 @@ protected:
             //TODO: This bound should be adapted for boundary vertices.
             if( val_1 <= 3 )
             {
-    #ifdef REMESHER_VERBATIM
+    #ifdef REMESHER_VERBOSE
                 wprint(className()+"::CollapseEdge: Vertex "+ToString(v_1)+" has simplex valence 3 or less. Skipping.");
     #endif
                 return -3;
@@ -83,7 +83,7 @@ protected:
         
         if( expected_valence > V_max_simplex_valence )
         {
-    #ifdef REMESHER_VERBATIM
+    #ifdef REMESHER_VERBOSE
             wprint(className()+"::CollapseEdge: Collapse would result in vertex of edge valence > "+Tools::ToString(V_max_simplex_valence)+". Skipping.");
     #endif
             return -3;
@@ -104,7 +104,7 @@ protected:
 
             if( found < E_opp_vertices.end() )
             {
-    #ifdef REMESHER_VERBATIM
+    #ifdef REMESHER_VERBOSE
                 wprint(className()+"::CollapseEdge: Collapsing "+ToString(e)+" would reduce simplex valence of opposing vertex below 3. Skipping.");
     #endif
                 return -4;
@@ -117,7 +117,7 @@ protected:
             
             if( E_neighbors != E_opp_vertices )
             {
-    #ifdef REMESHER_VERBATIM
+    #ifdef REMESHER_VERBOSE
                 wprint(className()+"::CollapseEdge: Neighborhood of edge would become nonmanifold after collapse. Skipping.");
     #endif
                 return -8;
@@ -126,11 +126,13 @@ protected:
 
         // Edge e is collapsible. Start with deleting it.
         DeleteEdge(e);
+        
+        ComputeCollapseVertexPosition(v_0,v_1,v_0);
+        
         MarkVertexAsModified(v_0);
         if( VertexPinnedQ(v_1) ) { PinVertex(v_0); }
         DeactivateVertex(v_1);
-        
-        ComputeCollapseVertexPosition(v_0,v_1,v_0);
+
 
         // Going through the simplices to delete.
         for( Simplex_T s : E_parent_simplices[e] )
@@ -159,7 +161,7 @@ protected:
                     
                     if( CheckVertex(w) < -1 )
                     {
-    #ifdef REMESHER_VERBATIM
+    #ifdef REMESHER_VERBOSE
                         eprint(className()+"::CollapseEdge: Vertex w = "+ToString(w)+" is not present. Skipping it.");
     #endif
                         continue;
@@ -175,7 +177,7 @@ protected:
 
                     if( e_0 < Edge_T(0) )
                     {
-    #ifdef REMESHER_VERBATIM
+    #ifdef REMESHER_VERBOSE
                         eprint(className()+"::CollapseEdge: e_0 == {"+ToString(v_0)+","+ToString(w)+"} could not be found in lookup table.");
     #endif
                         return -100;
@@ -183,7 +185,7 @@ protected:
                     
                     if( e_1 < Edge_T(0) )
                     {
-    #ifdef REMESHER_VERBATIM
+    #ifdef REMESHER_VERBOSE
                         eprint(className()+"::CollapseEdge: e_1 == {"+ToString(v_1)+","+ToString(w)+"} could not be found in lookup table.");
     #endif
                         return -200;
@@ -221,7 +223,7 @@ protected:
 
                         if( f < Edge_T(0) )
                         {
-    #ifdef REMESHER_VERBATIM
+    #ifdef REMESHER_VERBOSE
                             eprint(className()+"::CollapseEdge: edge { "+ToString(opp_buffer[i]) +", " + ToString(opp_buffer[j])+" } could not be found. (A)");
     #endif
                         }

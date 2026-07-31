@@ -861,9 +861,18 @@ namespace Repulsor
     
     private:
   
-        static std::string className()
+        static constexpr std::string className()
         {
-            return "SimplicialMesh<"+ToString(DOM_DIM)+","+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+","+TypeName<LInt>+","+TypeName<SReal>+","+TypeName<ExtReal>+","+TypeName<LInt>+">";
+            return std::string("SimplicialMesh")
+                + "<" + ToString(DOM_DIM)
+                + "," + ToString(AMB_DIM)
+                + "," + TypeName<Real>
+                + "," + TypeName<Int>
+                + "," + TypeName<LInt>
+                + "," + TypeName<SReal>
+                + "," + TypeName<ExtReal>
+                + "," + TypeName<LInt>
+                + ">";
         }
     };
 } // namespace Repulsor

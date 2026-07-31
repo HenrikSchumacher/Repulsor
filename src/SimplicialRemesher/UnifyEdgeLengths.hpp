@@ -7,7 +7,8 @@ public:
     virtual bool UnifyEdgeLengths(
         const Real lower_bound,
         const Real upper_bound,
-        const Int  max_iter = 100
+        const Int  max_iter = 100,
+        const bool verboseQ = false
     ) override
     {
         TOOLS_PTIMER(timer,className()+"::UnifyEdgeLengths");
@@ -49,7 +50,7 @@ public:
             {
                 if( !E_activeQ[e] )
                 {
-    #ifdef REMESHER_VERBATIM
+    #ifdef REMESHER_VERBOSE
                     wprint(className()+"::UnifyEdgeLengths: Skipping edge "+ToString(e)+" because it is inactive.");
     #endif
                     continue;
@@ -90,12 +91,12 @@ public:
         Int non_collapsed_count = collapses.Size() - collapse_count;
         Int non_split_count     = splits.Size() - split_count;
         
-        if( non_collapsed_count > Int(0) )
+        if( verboseQ && (non_collapsed_count > Int(0)) )
         {
             wprint(className()+"::UnifyEdgeLengths: "+ToString(non_collapsed_count)+" short edges could not be collapsed.");
         }
                    
-        if( non_split_count > Int(0) )
+        if( verboseQ && (non_split_count > Int(0)) )
         {
            wprint(className()+"::UnifyEdgeLengths: "+ToString(non_split_count)+" long  edges could not be split.");
         }

@@ -9,7 +9,7 @@ int CheckVertex( const Vertex_T v ) const
     
     if( !VertexActiveQ(v) )
     {
-#ifdef REMESHER_VERBATIM
+#ifdef REMESHER_VERBOSE
         wprint(className()+"::CheckVertex: Vertex "+ToString(v)+" is already deleted.");
 #endif
         return -2;
@@ -17,7 +17,7 @@ int CheckVertex( const Vertex_T v ) const
     
     if( VertexModifiedQ(v) )
     {
-#ifdef REMESHER_VERBATIM
+#ifdef REMESHER_VERBOSE
         wprint(className()+"::CheckVertex: Vertex "+ToString(v)+" is already modified.");
 #endif
         return -1;
@@ -30,7 +30,7 @@ int CheckEdge( const Edge_T e ) const
 {
     if( e < Edge_T(0) )
     {
-//#ifdef REMESHER_VERBATIM
+//#ifdef REMESHER_VERBOSE
         eprint(className()+"::CheckEdge: edge "+ToString(e)+" is invalid.");
 //#endif
         return -11;
@@ -38,7 +38,7 @@ int CheckEdge( const Edge_T e ) const
     
     if( !E_activeQ[e] )
     {
-#ifdef REMESHER_VERBATIM
+#ifdef REMESHER_VERBOSE
         wprint(className()+"::CheckEdge: edge "+ToString(e)+" is already deleted.");
 #endif
         return -2;
@@ -54,7 +54,7 @@ int CheckEdge( const Edge_T e ) const
     
     if( !VertexActiveQ(v_0) )
     {
-//#ifdef REMESHER_VERBATIM
+//#ifdef REMESHER_VERBOSE
         eprint(className()+"::CheckEdge: Vertex "+ToString(v_0)+" is already deleted.");
 //#endif
         return -2;
@@ -62,7 +62,7 @@ int CheckEdge( const Edge_T e ) const
     
     if( VertexModifiedQ(v_0) )
     {
-#ifdef REMESHER_VERBATIM
+#ifdef REMESHER_VERBOSE
         wprint(className()+"::CheckEdge: Vertex "+ToString(v_0)+" is already modified.");
 #endif
         return -1;
@@ -78,7 +78,7 @@ int CheckEdge( const Edge_T e ) const
     
     if( !VertexActiveQ(v_1) )
     {
-//#ifdef REMESHER_VERBATIM
+//#ifdef REMESHER_VERBOSE
         eprint(className()+"::CheckEdge: Vertex "+ToString(v_1)+" is already deleted.");
 //#endif
         return -2;
@@ -86,7 +86,7 @@ int CheckEdge( const Edge_T e ) const
     
     if( VertexModifiedQ(v_1) )
     {
-#ifdef REMESHER_VERBATIM
+#ifdef REMESHER_VERBOSE
         wprint(className()+"::CheckEdge: Vertex "+ToString(v_1)+" is already modified.");
 #endif
         return -1;
@@ -100,7 +100,7 @@ int CheckEdge( const Edge_T e ) const
     
     if( VertexPinnedQ(v_0) && VertexPinnedQ(v_1) )
     {
-//#ifdef REMESHER_VERBATIM
+//#ifdef REMESHER_VERBOSE
 //        wprint(className()+"::CheckEdge: Both vertices "+ToString(v_0) + " and "+ToString(v_1)+" are pinned.");
 //#endif
         eprint(className()+"::CheckEdge: Both vertices "+ToString(v_0) + " and "+ToString(v_1)+" are pinned.");
@@ -115,7 +115,7 @@ int CheckSimplex( const Simplex_T s ) const
 {
     if( s < Simplex_T(0) )
     {
-#ifdef REMESHER_VERBATIM
+#ifdef REMESHER_VERBOSE
         eprint(className()+"::CheckSimplex: Simplex "+ToString(s)+" is invalid.");
 #endif
         return -11;
@@ -123,7 +123,7 @@ int CheckSimplex( const Simplex_T s ) const
     
     if( !S_activeQ[s] )
     {
-#ifdef REMESHER_VERBATIM
+#ifdef REMESHER_VERBOSE
         eprint(className()+"::CheckSimplex: Simplex "+ToString(s)+" is already deleted.");
 #endif
         return -2;
@@ -141,7 +141,7 @@ int CheckSimplex( const Simplex_T s ) const
     
     if( !okay )
     {
-//#ifdef REMESHER_VERBATIM
+//#ifdef REMESHER_VERBOSE
         eprint(className()+"::CheckSimplex: Simplex "+ToString(s)+" containes duplicate vertices.");
 //#endif
         return -3;

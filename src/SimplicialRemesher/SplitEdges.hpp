@@ -41,7 +41,7 @@ protected:
         
         if( CheckEdge(e_0) < 0 )
         {
-    #ifdef REMESHER_VERBATIM
+    #ifdef REMESHER_VERBOSE
             wprint(ClassName()+"::SplitEdge: edge is not splittable. Skipping.");
     #endif
             return -11;
@@ -55,7 +55,7 @@ protected:
             {
                 if( CheckVertex(v) < 0 )
                 {
-    #ifdef REMESHER_VERBATIM
+    #ifdef REMESHER_VERBOSE
                     wprint(className()+"::SplitEdge: Vertex "+ToString(v)+" opposing edge "+ToString(e_0)+" is blocked. Skipping.");
     #endif
                     return -22;
@@ -65,7 +65,7 @@ protected:
                 {
                     if( V_parent_simplices[v].Size()+1 > V_max_simplex_valence )
                     {
-    #ifdef REMESHER_VERBATIM
+    #ifdef REMESHER_VERBOSE
                         wprint(className()+"::SplitEdge: Simplex valence of vertex "+Tools::ToString(v)+" opposing edge "+Tools::ToString(e_0)+" would grow to "+Tools::ToString(V_max_simplex_valence)+" or higher. Skipping.");
     #endif
                         return -33;

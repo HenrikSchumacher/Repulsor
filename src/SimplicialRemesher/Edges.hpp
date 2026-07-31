@@ -12,7 +12,7 @@ protected:
         
         if( e >= max_edge_count )
         {
-#ifdef REMESHER_VERBATIM
+#ifdef REMESHER_VERBOSE
             print(className()+"::CreateEdge: Reassembling edge array.");
 #endif
             max_edge_count *= Int(2);
@@ -54,7 +54,7 @@ protected:
     
     void DeleteEdge( const Edge_T e )
     {
-#ifdef REMESHER_VERBATIM
+#ifdef REMESHER_VERBOSE
         print(className()+"::Edge_Delete("+ToString(e)+")");
 #endif
         E_activeQ[e] = false;

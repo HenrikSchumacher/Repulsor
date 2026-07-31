@@ -101,7 +101,8 @@ namespace Repulsor
         virtual bool UnifyEdgeLengths(
             const Real collapse_threshold,
             const Real split_threshold,
-            const Int  max_iter = 100
+            const Int  max_iter = 100,
+            const bool verboseQ = false
         ) = 0;
         
         virtual Int DelaunayFlip( const Int max_iter = 100 ) = 0;

@@ -1,7 +1,7 @@
 #pragma once
 
 //#define REMESHER_DEBUG
-//#define REMESHER_VERBATIM
+//#define REMESHER_VERBOSE
 
 #include <functional>
 
@@ -816,9 +816,14 @@ namespace Repulsor
         
     private:
         
-        static std::string className()
+        static constexpr std::string className()
         {
-            return "SimplicialRemesher<"+ToString(DOM_DIM)+","+ToString(AMB_DIM)+","+TypeName<Real>+","+TypeName<Int>+">";
+            return std::string("SimplicialRemesher")
+                + "<" + ToString(DOM_DIM)
+                + "," + ToString(AMB_DIM)
+                + "," + TypeName<Real>
+                + "," + TypeName<Int>
+                + ">";
         }
         
     };

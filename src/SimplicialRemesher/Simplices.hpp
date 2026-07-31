@@ -30,7 +30,7 @@ protected:
         
         if( s >= max_simplex_count )
         {
-#ifdef REMESHER_VERBATIM
+#ifdef REMESHER_VERBOSE
             print(className()+"::CreateSimplex: Reassembling simplex array.");
 #endif
             max_simplex_count *= 2;
